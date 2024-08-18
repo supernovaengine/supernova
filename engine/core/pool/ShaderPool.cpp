@@ -195,9 +195,11 @@ std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2,
 	return prop;
 }
 
-std::string ShaderPool::getDepthMeshProperties(bool skinning, bool morphTarget, bool morphNormal, bool morphTangent, bool terrain, bool instanced){
+std::string ShaderPool::getDepthMeshProperties(bool texture, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent, bool terrain, bool instanced){
 	std::string prop;
 
+	if (texture)
+		prop += "Tex";
 	if (skinning)
 		prop += "Ski";
 	if (morphTarget)

@@ -134,7 +134,8 @@ namespace Supernova{
         BLENDMAP,
         TERRAINDETAIL_RED,
         TERRAINDETAIL_GREEN,
-        TERRAINDETAIL_BLUE
+        TERRAINDETAIL_BLUE,
+        DEPTHTEXTURE
     };
 
     enum class TextureType {

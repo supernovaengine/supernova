@@ -286,6 +286,8 @@ std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type, ShaderSt
         texstr = "u_terrainDetailG";
     }else if (type == TextureShaderType::TERRAINDETAIL_BLUE){
         texstr = "u_terrainDetailB";
+    }else if (type == TextureShaderType::DEPTHTEXTURE){
+        texstr = "u_depthTexture";
     }
 
     if (texstr.empty()){

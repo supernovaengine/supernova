@@ -34,6 +34,12 @@ namespace Supernova{
         void setPrimitiveType(unsigned int submesh, PrimitiveType primitiveType);
         PrimitiveType getPrimitiveType(unsigned int submesh) const;
 
+        void setHasDepthTexture(bool hasDepthTexture);
+        bool isHasDepthTexture() const;
+
+        void setHasDepthTexture(unsigned int submesh, bool hasDepthTexture);
+        bool isHasDepthTexture(unsigned int submesh) const;
+
         AABB getAABB();
         AABB getVerticesAABB();
         AABB getWorldAABB();

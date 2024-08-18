@@ -306,6 +306,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getPrimitiveType", 
             luabridge::overload<>(&Mesh::getPrimitiveType),
             luabridge::overload<unsigned int>(&Mesh::getPrimitiveType))
+        .addProperty("hasDepthTexture", &Mesh::isHasDepthTexture, &Mesh::setHasDepthTexture)
+        .addFunction("setHasDepthTexture", 
+            luabridge::overload<bool>(&Mesh::setHasDepthTexture),
+            luabridge::overload<unsigned int, bool>(&Mesh::setHasDepthTexture))
+        .addFunction("isHasDepthTexture", 
+            luabridge::overload<>(&Mesh::isHasDepthTexture),
+            luabridge::overload<unsigned int>(&Mesh::isHasDepthTexture))
         .addFunction("getAABB", &Mesh::getAABB)
         .addFunction("getVerticesAABB", &Mesh::getVerticesAABB)
         .addFunction("getWorldAABB", &Mesh::getWorldAABB)

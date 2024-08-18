@@ -453,6 +453,15 @@ void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 	}
 }
 
+void RenderSystem::loadDepthTexture(Material& material, ShaderData& shaderData, ObjectRender& render){
+	TextureRender* textureDepthRender = material.baseColorTexture.getRender();
+	std::pair<int, int> slotTex = shaderData.getTextureIndex(TextureShaderType::DEPTHTEXTURE, ShaderStageType::FRAGMENT);
+	if (textureDepthRender)
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureDepthRender);
+	else
+		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+}
+
 void RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData){
 	TextureRender* textureRender = NULL;
 	std::pair<int, int> slotTex(-1, -1);
@@ -676,7 +685,8 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		mesh.submeshes[i].shader = ShaderPool::get(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(
-				mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent, false, (instmesh)?true:false);
+				mesh.submeshes[i].hasDepthTexture, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, 
+				mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent, false, (instmesh)?true:false);
 			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
 			if (!mesh.submeshes[i].depthShader->isCreated())
 				return false;
@@ -793,6 +803,10 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 				mesh.submeshes[i].slotVSDepthMorphTarget = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_MORPHTARGET, ShaderStageType::VERTEX);
 			}
 
+			if (mesh.submeshes[i].hasDepthTexture){
+				loadDepthTexture(mesh.submeshes[i].material, depthShaderData, depthRender);
+			}
+
 			if (terrain){
 				mesh.submeshes[i].slotVSDepthTerrain = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_TERRAIN_VS_PARAMS, ShaderStageType::VERTEX);
 
@@ -810,7 +824,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 						depthRender.addIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
 					}else{
 						for (auto const &attr : buf.second->getAttributes()){
-							if (attr.first == AttributeType::POSITION){
+							if (attr.first == AttributeType::POSITION || attr.first == AttributeType::TEXCOORD1){
 								depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 							}
 							if (mesh.submeshes[i].hasSkinning){
@@ -938,6 +952,11 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			if (mesh.submeshes[i].needUpdateTexture || needUpdateFramebuffer){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
 				loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
+
+				if (mesh.submeshes[i].hasDepthTexture){
+					ShaderData& depthShaderData = mesh.submeshes[i].depthShader.get()->shaderData;
+					loadDepthTexture(mesh.submeshes[i].material, depthShaderData, mesh.submeshes[i].depthRender);
+				}
 
 				mesh.submeshes[i].needUpdateTexture = false;
 			}

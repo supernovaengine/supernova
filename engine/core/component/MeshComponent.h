@@ -66,6 +66,7 @@ namespace Supernova{
         bool hasMorphTarget = false;
         bool hasMorphNormal = false;
         bool hasMorphTangent = false;
+        bool hasDepthTexture = false;
 
         bool needUpdateTexture = false;
     };

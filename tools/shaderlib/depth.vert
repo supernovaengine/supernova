@@ -17,6 +17,11 @@ out vec2 v_projZW;
     in vec4 i_matrix_col4;
 #endif
 
+#if defined(HAS_TEXTURE)
+    in vec2 a_texcoord1;
+    out vec2 v_uv1;
+#endif
+
 #include "includes/skinning.glsl"
 #include "includes/morphtarget.glsl"
 #ifdef HAS_TERRAIN
@@ -45,6 +50,10 @@ void main() {
         vec4 pos = instanceMatrix *  getPosition(boneTransform);
     #else
         vec4 pos = getPosition(boneTransform);
+    #endif
+
+    #if defined(HAS_TEXTURE)
+        v_uv1 = a_texcoord1;
     #endif
 
     gl_Position = lightMVPMatrix * pos;

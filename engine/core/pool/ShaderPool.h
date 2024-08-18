@@ -33,7 +33,7 @@ namespace Supernova{
 						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect, 
                         bool fog, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent,
                         bool terrain, bool instanced);
-        static std::string getDepthMeshProperties(bool skinning, bool morphTarget, bool morphNormal, bool morphTangent, bool terrain, bool instanced);
+        static std::string getDepthMeshProperties(bool texture, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent, bool terrain, bool instanced);
         static std::string getUIProperties(bool texture, bool fontAtlasTexture, bool vertexColorVec3, bool vertexColorVec4);
         static std::string getPointsProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4, bool textureRect);
         static std::string getLinesProperties(bool vertexColorVec3, bool vertexColorVec4);

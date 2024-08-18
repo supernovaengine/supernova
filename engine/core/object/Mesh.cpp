@@ -96,6 +96,29 @@ PrimitiveType Mesh::getPrimitiveType(unsigned int submesh) const{
     return mesh.submeshes[submesh].primitiveType;
 }
 
+void Mesh::setHasDepthTexture(bool hasDepthTexture){
+    setHasDepthTexture(0, hasDepthTexture);
+}
+
+bool Mesh::isHasDepthTexture() const{
+    return isHasDepthTexture(0);
+}
+
+void Mesh::setHasDepthTexture(unsigned int submesh, bool hasDepthTexture){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.submeshes[submesh].hasDepthTexture = hasDepthTexture;
+
+    mesh.needReload = true;
+}
+
+bool Mesh::isHasDepthTexture(unsigned int submesh) const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.submeshes[submesh].hasDepthTexture;
+}
+
+
 AABB Mesh::getAABB(){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
