@@ -2289,6 +2289,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 					projectionMatrix[ca] = getDirLightProjection(viewMatrix, sceneCameraInv);
 
+					light.cameras[ca].lightViewMatrix = viewMatrix;
+					light.cameras[ca].lightProjectionMatrix = projectionMatrix[ca];
 					light.cameras[ca].lightViewProjectionMatrix = projectionMatrix[ca] * viewMatrix;
 					light.cameras[ca].nearFar = Vector2(splitNear[ca], splitFar[ca]);
 					updateCameraFrustumPlanes(light.cameras[ca].lightViewProjectionMatrix, light.cameras[ca].frustumPlanes);
@@ -2305,6 +2307,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 				projectionMatrix[0] = getDirLightProjection(viewMatrix, sceneCameraInv);
 
+				light.cameras[0].lightViewMatrix = viewMatrix;
+				light.cameras[0].lightProjectionMatrix = projectionMatrix[0];
 				light.cameras[0].lightViewProjectionMatrix = projectionMatrix[0] * viewMatrix;
 				light.cameras[0].nearFar = Vector2(-1, 1);
 				updateCameraFrustumPlanes(light.cameras[0].lightViewProjectionMatrix, light.cameras[0].frustumPlanes);
@@ -2321,6 +2325,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 			projectionMatrix = Matrix4::perspectiveMatrix(acos(light.outerConeCos)*2, 1, light.shadowCameraNearFar.x, light.shadowCameraNearFar.y);
 
+			light.cameras[0].lightViewMatrix = viewMatrix;
+			light.cameras[0].lightProjectionMatrix = projectionMatrix;
 			light.cameras[0].lightViewProjectionMatrix = projectionMatrix * viewMatrix;
 			light.cameras[0].nearFar = light.shadowCameraNearFar;
 			updateCameraFrustumPlanes(light.cameras[0].lightViewProjectionMatrix, light.cameras[0].frustumPlanes);
@@ -2346,6 +2352,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			calculedNearFar.y =-(light.shadowCameraNearFar.y * light.shadowCameraNearFar.x) / nfsub;
 
 			for (int f = 0; f < 6; f++){
+				light.cameras[f].lightViewMatrix = viewMatrix[f];
+				light.cameras[f].lightProjectionMatrix = projectionMatrix;
 				light.cameras[f].lightViewProjectionMatrix = projectionMatrix * viewMatrix[f];
 				light.cameras[f].nearFar = calculedNearFar;
 				updateCameraFrustumPlanes(light.cameras[f].lightViewProjectionMatrix, light.cameras[f].frustumPlanes);
@@ -2794,7 +2802,32 @@ void RenderSystem::draw(){
 							if (transform->visible){
 								InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
 								TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
-								drawMeshDepth(mesh, light.cameras[c].nearFar.y, light.cameras[c].frustumPlanes, {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix}, instmesh, terrain);
+
+								vs_depth_t vsDepthParams;
+
+								if (transform->billboard && mesh.enableShadowsBillboard){
+									Matrix4 modelViewMatrix = light.cameras[c].lightViewMatrix * transform->modelMatrix;
+
+									modelViewMatrix.set(0, 0, transform->worldScale.x);
+									modelViewMatrix.set(0, 1, 0.0);
+									modelViewMatrix.set(0, 2, 0.0);
+
+									if (!transform->cylindricalBillboard) {
+										modelViewMatrix.set(1, 0, 0.0);
+										modelViewMatrix.set(1, 1, transform->worldScale.y);
+										modelViewMatrix.set(1, 2, 0.0);
+									}
+
+									modelViewMatrix.set(2, 0, 0.0);
+									modelViewMatrix.set(2, 1, 0.0);
+									modelViewMatrix.set(2, 2, transform->worldScale.z);
+
+									vsDepthParams = {modelViewMatrix, light.cameras[c].lightProjectionMatrix};
+								}else{
+									vsDepthParams = {transform->modelMatrix, light.cameras[c].lightViewProjectionMatrix};
+								}
+
+								drawMeshDepth(mesh, light.cameras[c].nearFar.y, light.cameras[c].frustumPlanes, vsDepthParams, instmesh, terrain);
 							}
 						}
 					}

@@ -34,11 +34,11 @@ namespace Supernova{
         void setPrimitiveType(unsigned int submesh, PrimitiveType primitiveType);
         PrimitiveType getPrimitiveType(unsigned int submesh) const;
 
-        void setHasDepthTexture(bool hasDepthTexture);
-        bool isHasDepthTexture() const;
+        void setCastShadowsWithTexture(bool castShadowsWithTexture);
+        bool isCastShadowsWithTexture() const;
 
-        void setHasDepthTexture(unsigned int submesh, bool hasDepthTexture);
-        bool isHasDepthTexture(unsigned int submesh) const;
+        void setCastShadowsWithTexture(unsigned int submesh, bool castShadowsWithTexture);
+        bool isCastShadowsWithTexture(unsigned int submesh) const;
 
         AABB getAABB();
         AABB getVerticesAABB();
@@ -53,6 +53,9 @@ namespace Supernova{
 
         void setReceiveShadows(bool receiveShadows);
         bool isReceiveShadows() const;
+
+        void setEnableShadowsBillboard(bool enableShadowsBillboard);
+        bool isEnableShadowsBillboard() const;
 
         void createInstancedMesh();
         void removeInstancedMesh();

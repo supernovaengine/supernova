@@ -96,23 +96,23 @@ PrimitiveType Mesh::getPrimitiveType(unsigned int submesh) const{
     return mesh.submeshes[submesh].primitiveType;
 }
 
-void Mesh::setHasDepthTexture(bool hasDepthTexture){
-    setHasDepthTexture(0, hasDepthTexture);
+void Mesh::setCastShadowsWithTexture(bool castShadowsWithTexture){
+    setCastShadowsWithTexture(0, castShadowsWithTexture);
 }
 
-bool Mesh::isHasDepthTexture() const{
-    return isHasDepthTexture(0);
+bool Mesh::isCastShadowsWithTexture() const{
+    return isCastShadowsWithTexture(0);
 }
 
-void Mesh::setHasDepthTexture(unsigned int submesh, bool hasDepthTexture){
+void Mesh::setCastShadowsWithTexture(unsigned int submesh, bool castShadowsWithTexture){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
-    mesh.submeshes[submesh].hasDepthTexture = hasDepthTexture;
+    mesh.submeshes[submesh].hasDepthTexture = castShadowsWithTexture;
 
     mesh.needReload = true;
 }
 
-bool Mesh::isHasDepthTexture(unsigned int submesh) const{
+bool Mesh::isCastShadowsWithTexture(unsigned int submesh) const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return mesh.submeshes[submesh].hasDepthTexture;
@@ -176,6 +176,19 @@ bool Mesh::isReceiveShadows() const{
 
     return mesh.receiveShadows;
 }
+
+void Mesh::setEnableShadowsBillboard(bool enableShadowsBillboard){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.enableShadowsBillboard = enableShadowsBillboard;
+}
+
+bool Mesh::isEnableShadowsBillboard() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.enableShadowsBillboard;
+}
+
 
 void Mesh::createInstancedMesh(){
     scene->getSystem<MeshSystem>()->createInstancedMesh(entity);

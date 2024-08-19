@@ -21,6 +21,8 @@ namespace Supernova{
 
     struct LightCamera{
         CameraRender render;
+        Matrix4 lightViewMatrix;
+        Matrix4 lightProjectionMatrix;
         Matrix4 lightViewProjectionMatrix;
         Plane frustumPlanes[6];
         // for point light all cameras are same calculated value that is used by distanceToDepthValue in shader

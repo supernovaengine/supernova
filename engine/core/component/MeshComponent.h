@@ -98,6 +98,7 @@ namespace Supernova{
         bool castShadows = true;
         bool receiveShadows = true;
         bool transparent = false;
+        bool enableShadowsBillboard = true;
 
         bool needUpdateBuffer = false;
         bool needReload = false;

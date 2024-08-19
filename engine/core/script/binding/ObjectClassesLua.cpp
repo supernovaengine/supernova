@@ -306,13 +306,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getPrimitiveType", 
             luabridge::overload<>(&Mesh::getPrimitiveType),
             luabridge::overload<unsigned int>(&Mesh::getPrimitiveType))
-        .addProperty("hasDepthTexture", &Mesh::isHasDepthTexture, &Mesh::setHasDepthTexture)
-        .addFunction("setHasDepthTexture", 
-            luabridge::overload<bool>(&Mesh::setHasDepthTexture),
-            luabridge::overload<unsigned int, bool>(&Mesh::setHasDepthTexture))
-        .addFunction("isHasDepthTexture", 
-            luabridge::overload<>(&Mesh::isHasDepthTexture),
-            luabridge::overload<unsigned int>(&Mesh::isHasDepthTexture))
+        .addProperty("castShadowsWithTexture", &Mesh::isCastShadowsWithTexture, &Mesh::setCastShadowsWithTexture)
+        .addFunction("setCastShadowsWithTexture", 
+            luabridge::overload<bool>(&Mesh::setCastShadowsWithTexture),
+            luabridge::overload<unsigned int, bool>(&Mesh::setCastShadowsWithTexture))
+        .addFunction("isCastShadowsWithTexture", 
+            luabridge::overload<>(&Mesh::isCastShadowsWithTexture),
+            luabridge::overload<unsigned int>(&Mesh::isCastShadowsWithTexture))
         .addFunction("getAABB", &Mesh::getAABB)
         .addFunction("getVerticesAABB", &Mesh::getVerticesAABB)
         .addFunction("getWorldAABB", &Mesh::getWorldAABB)
@@ -320,6 +320,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getMaterial", &Mesh::getMaterial)
         .addProperty("castShadows", &Mesh::isCastShadows, &Mesh::setCastShadows)
         .addProperty("receiveShadows", &Mesh::isReceiveShadows, &Mesh::setReceiveShadows)
+        .addProperty("enableShadowsBillboard", &Mesh::isEnableShadowsBillboard, &Mesh::setEnableShadowsBillboard)
         .addFunction("createInstancedMesh", &Mesh::createInstancedMesh)
         .addFunction("removeInstancedMesh", &Mesh::removeInstancedMesh)
         .addFunction("hasInstancedMesh", &Mesh::hasInstancedMesh)
