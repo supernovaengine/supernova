@@ -140,6 +140,7 @@ def get_default_shaders():
     s += "mesh_PucShwPcfNorTanFogMtaMnrMtg;"
     s += "depth;"
     s += "depth_Tex;"
+    s += "depth_TexIst;"
     s += "depth_Ski;"
     s += "depth_Mta;"
     s += "depth_MtaMnr;"

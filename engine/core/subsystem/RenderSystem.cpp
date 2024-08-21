@@ -917,9 +917,12 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 		}
 		unsigned int instanceCount = 1;
 		if (instmesh){
+			instanceCount = instmesh->numVisible;
+
 			if (instmesh->needUpdateBuffer){
 				instmesh->buffer.getRender()->updateBuffer(instmesh->buffer.getSize(), instmesh->buffer.getData());
-				instanceCount = instmesh->numVisible;
+
+				instmesh->needUpdateBuffer = false;
 			}
 		}
 
