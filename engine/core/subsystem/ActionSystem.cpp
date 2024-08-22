@@ -636,6 +636,7 @@ void ActionSystem::particleActionStart(ParticlesComponent& particles, InstancedM
         particles.particles.back().time = 0;
 
         instmesh.instances.push_back({});
+        instmesh.instances.back().visible = false;
 
         instmesh.needUpdateInstances = true;
     }
@@ -667,6 +668,7 @@ void ActionSystem::particleActionStart(ParticlesComponent& particles, PointsComp
         particles.particles.back().time = 0;
 
         points.points.push_back({});
+        points.points.back().visible = false;
 
         points.needUpdate = true;
     }

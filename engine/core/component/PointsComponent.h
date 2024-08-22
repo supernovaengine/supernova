@@ -10,12 +10,12 @@
 namespace Supernova{
 
     struct PointData{
-        Vector3 position = Vector3(0,0,0);
-        Vector4 color = Vector4(1,1,1,1);
+        Vector3 position = Vector3(0.0, 0.0, 0.0);
+        Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0);
         float size = 1;
         float rotation = 0;
-        Rect textureRect = Rect(0,0,1,1);
-        bool visible = false;
+        Rect textureRect = Rect(0.0, 0.0, 1.0, 1.0);
+        bool visible = true;
     };
 
     struct PointRenderData{

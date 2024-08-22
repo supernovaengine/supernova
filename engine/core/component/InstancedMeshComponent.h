@@ -10,12 +10,12 @@
 namespace Supernova{
 
     struct InstanceData{
-        Vector3 position = Vector3(0,0,0);
+        Vector3 position = Vector3(0.0, 0.0, 0.0);
         Quaternion rotation;
-        Vector3 scale = Vector3(1,1,1);
-        Vector4 color = Vector4(1.0, 0.0, 1.0, 1.0);  //linear color;
+        Vector3 scale = Vector3(1.0, 1.0, 1.0);
+        Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0);  //linear color;
         Rect textureRect = Rect(0.0, 0.0, 1.0, 1.0);
-        bool visible = false;
+        bool visible = true;
     };
 
     struct InstanceRenderData{
