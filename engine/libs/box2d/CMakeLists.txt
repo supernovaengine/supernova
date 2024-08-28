@@ -114,7 +114,7 @@ endif()
 if (MSVC)
 	message(STATUS "Box2D on MSVC")
 	# Visual Studio won't load the natvis unless it is in the project
-	target_sources(box2d PRIVATE box2d.natvis)
+	target_sources(box2d PRIVATE ./src/box2d.natvis)
 
 	# Enable asserts in release with debug info
 	target_compile_definitions(box2d PUBLIC "$<$<CONFIG:RELWITHDEBINFO>:B2_ENABLE_ASSERT>")
