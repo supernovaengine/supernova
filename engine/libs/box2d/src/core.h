@@ -42,7 +42,11 @@
 // Define CPU
 #if defined( __x86_64__ ) || defined( _M_X64 )
 #define B2_CPU_X64
+#elif defined( __i386__ ) || defined( _M_IX86 )
+#define B2_CPU_X64
 #elif defined( __aarch64__ ) || defined( _M_ARM64 )
+#define B2_CPU_ARM
+#elif defined( __arm__ ) || defined( _M_ARM )
 #define B2_CPU_ARM
 #elif defined( __EMSCRIPTEN__ )
 #define B2_CPU_WASM
@@ -105,6 +109,8 @@
 	{                                                                                                                            \
 	}                                                                                                                            \
 	while ( 0 )
+#elif defined( B2_PLATFORM_ANDROID )
+#define B2_BREAKPOINT __builtin_trap()
 #elif defined( B2_COMPILER_GCC ) || defined( B2_COMPILER_CLANG )
 #if defined( B2_CPU_X64 )
 #define B2_BREAKPOINT __asm volatile( "int $0x3" )
