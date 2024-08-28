@@ -164,11 +164,10 @@ std::vector<Contact2D> Body2D::getShapeContacts(size_t index){
 
     std::vector<Contact2D> contacts;
 
-    if (index >= 0 && index < body.numShapes){
+    if (index >= 0 && index < body.numShapes && body.shapes[index].type != Shape2DType::CHAIN){
         int shapeContactCapacity = b2Shape_GetContactCapacity(body.shapes[index].shape);
         b2ContactData contactData[shapeContactCapacity];
         int shapeContactCount = b2Shape_GetContactData(body.shapes[index].shape, contactData, shapeContactCapacity);
-
 
         for (int i = 0; i < shapeContactCount; ++i){
             contacts.push_back(Contact2D(scene, contactData[i]));
@@ -196,8 +195,12 @@ void Body2D::setShapeDensity(size_t index, float density){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        b2Shape_SetDensity(body.shapes[index].shape, density);
-        b2Body_ApplyMassFromShapes(body.body);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            b2Shape_SetDensity(body.shapes[index].shape, density);
+            b2Body_ApplyMassFromShapes(body.body);
+        }else{
+            Log::error("Cannot set density of chain shape %i", index);
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -207,7 +210,11 @@ void Body2D::setShapeFriction(size_t index, float friction){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        b2Shape_SetFriction(body.shapes[index].shape, friction);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            b2Shape_SetFriction(body.shapes[index].shape, friction);
+        }else{
+            b2Chain_SetFriction(body.shapes[index].chain, friction);
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -217,7 +224,11 @@ void Body2D::setShapeRestitution(size_t index, float restitution){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        b2Shape_SetRestitution(body.shapes[index].shape, restitution);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            b2Shape_SetRestitution(body.shapes[index].shape, restitution);
+        }else{
+            b2Chain_SetRestitution(body.shapes[index].chain, restitution);
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -244,7 +255,11 @@ void Body2D::setShapeEnableHitEvents(size_t index, bool hitEvents){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        b2Shape_EnableHitEvents(body.shapes[index].shape, hitEvents);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            b2Shape_EnableHitEvents(body.shapes[index].shape, hitEvents);
+        }else{
+            Log::error("Cannot set hit events of chain shape %i", index);
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -254,7 +269,11 @@ void Body2D::setShapeContactEvents(size_t index, bool contactEvents){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        b2Shape_EnableContactEvents(body.shapes[index].shape, contactEvents);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            b2Shape_EnableContactEvents(body.shapes[index].shape, contactEvents);
+        }else{
+            Log::error("Cannot set shape contact events of chain shape %i", index);
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -264,7 +283,11 @@ void Body2D::setShapePreSolveEvents(size_t index, bool preSolveEvent){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        b2Shape_EnablePreSolveEvents(body.shapes[index].shape, preSolveEvent);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            b2Shape_EnablePreSolveEvents(body.shapes[index].shape, preSolveEvent);
+        }else{
+            Log::error("Cannot set presolve events of chain shape %i", index);
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -274,7 +297,11 @@ void Body2D::setShapeSensorEvents(size_t index, bool sensorEvents){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        b2Shape_EnableSensorEvents(body.shapes[index].shape, sensorEvents);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            b2Shape_EnableSensorEvents(body.shapes[index].shape, sensorEvents);
+        }else{
+            Log::error("Cannot set sensor events of chain shape %i", index);
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -298,7 +325,11 @@ float Body2D::getShapeDensity(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        return b2Shape_GetDensity(body.shapes[index].shape);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            return b2Shape_GetDensity(body.shapes[index].shape);
+        }else{
+            return 0;
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -310,7 +341,12 @@ float Body2D::getShapeFriction(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        return b2Shape_GetFriction(body.shapes[index].shape);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            return b2Shape_GetFriction(body.shapes[index].shape);
+        }else{
+            //return b2Chain_GetFriction(body.shapes[index].chain); // missing this in Box2D
+            return 0;
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -322,7 +358,12 @@ float Body2D::getShapeRestitution(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        return b2Shape_GetRestitution(body.shapes[index].shape);
+        if (body.shapes[index].type != Shape2DType::CHAIN){
+            return b2Shape_GetRestitution(body.shapes[index].shape);
+        }else{
+            //return b2Chain_GetRestitution(body.shapes[index].chain); // missing this in Box2D
+            return 0;
+        }
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -349,6 +390,10 @@ bool Body2D::isShapeSensorEvents() const{
 bool Body2D::isShapeEnableHitEvents(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    if (body.shapes[index].type == Shape2DType::CHAIN){
+        return false;
+    }
+
     if (index >= 0 && index < body.numShapes){
         return b2Shape_AreHitEventsEnabled(body.shapes[index].shape);
     }else{
@@ -360,6 +405,10 @@ bool Body2D::isShapeEnableHitEvents(size_t index) const{
 
 bool Body2D::isShapeContactEvents(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
+
+    if (body.shapes[index].type == Shape2DType::CHAIN){
+        return false;
+    }
 
     if (index >= 0 && index < body.numShapes){
         return b2Shape_AreContactEventsEnabled(body.shapes[index].shape);
@@ -373,6 +422,10 @@ bool Body2D::isShapeContactEvents(size_t index) const{
 bool Body2D::isShapePreSolveEvents(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
+    if (body.shapes[index].type == Shape2DType::CHAIN){
+        return false;
+    }
+
     if (index >= 0 && index < body.numShapes){
         return b2Shape_ArePreSolveEventsEnabled(body.shapes[index].shape);
     }else{
@@ -384,6 +437,10 @@ bool Body2D::isShapePreSolveEvents(size_t index) const{
 
 bool Body2D::isShapeSensorEvents(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
+
+    if (body.shapes[index].type == Shape2DType::CHAIN){
+        return false;
+    }
 
     if (index >= 0 && index < body.numShapes){
         return b2Shape_AreSensorEventsEnabled(body.shapes[index].shape);

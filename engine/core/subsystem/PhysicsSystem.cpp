@@ -221,7 +221,7 @@ int PhysicsSystem::createRectShape2D(Entity entity, float width, float height){
     if (body){
         if (body->numShapes < MAX_SHAPES){
 
-            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
 
             b2Polygon polygon = { 0 };
             // same as shape.SetAsBox but using center on left corner
@@ -252,7 +252,7 @@ int PhysicsSystem::createCenteredRectShape2D(Entity entity, float width, float h
     if (body){
         if (body->numShapes < MAX_SHAPES){
 
-            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
 
             float halfW = width / 2.0 / pointsToMeterScale2D;
             float halfH = height / 2.0 / pointsToMeterScale2D;
@@ -274,7 +274,7 @@ int PhysicsSystem::createPolygonShape2D(Entity entity, std::vector<Vector2> vert
     if (body){
         if (body->numShapes < MAX_SHAPES){
 
-            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
 
             std::vector<b2Vec2> b2vertices(vertices.size());
             for (int i = 0; i < vertices.size(); i++){
@@ -299,7 +299,7 @@ int PhysicsSystem::createCircleShape2D(Entity entity, Vector2 center, float radi
     if (body){
         if (body->numShapes < MAX_SHAPES){
 
-            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
 
             b2Circle circle = { 0 };
             circle.center = {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D};
@@ -313,23 +313,26 @@ int PhysicsSystem::createCircleShape2D(Entity entity, Vector2 center, float radi
 
     return -1;
 }
-/*
-int PhysicsSystem::createLoopChainShape2D(Entity entity, std::vector<Vector2> vertices){
+
+int PhysicsSystem::createChainShape2D(Entity entity, std::vector<Vector2> vertices, bool loop){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
 
-            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
+            body->shapes[body->numShapes].type = Shape2DType::CHAIN;
 
-            b2ChainShape chain;
             std::vector<b2Vec2> b2vertices(vertices.size());
             for (int i = 0; i < vertices.size(); i++){
-                b2vertices[i].Set(vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D);
+                b2vertices[i] = {vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D};
             }
-            chain.CreateLoop(&b2vertices[0], (int)vertices.size());
 
-            return loadShape2D(*body, &chain);
+            b2ChainDef chainDef = b2DefaultChainDef();
+            chainDef.points = &b2vertices[0];
+            chainDef.count = (int)vertices.size();
+            chainDef.isLoop = loop;
+
+            return loadShape2D(*body, chainDef);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -338,32 +341,6 @@ int PhysicsSystem::createLoopChainShape2D(Entity entity, std::vector<Vector2> ve
     return -1;
 }
 
-int PhysicsSystem::createChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
-
-            b2ChainShape chain;
-            std::vector<b2Vec2> b2vertices(vertices.size());
-            for (int i = 0; i < vertices.size(); i++){
-                b2vertices[i].Set(vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D);
-            }
-            b2Vec2 pv(prevVertex.x / pointsToMeterScale2D, prevVertex.y / pointsToMeterScale2D);
-            b2Vec2 nv(nextVertex.x / pointsToMeterScale2D, nextVertex.y / pointsToMeterScale2D);
-            chain.CreateChain(&b2vertices[0], (int)vertices.size(), pv, nv);
-
-            return loadShape2D(*body, &chain);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-*/
 void PhysicsSystem::removeAllShapes2D(Entity entity){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
@@ -398,7 +375,7 @@ int PhysicsSystem::createBoxShape3D(Entity entity, Vector3 position, Quaternion 
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::BOX;
+            body->shapes[body->numShapes].type = Shape3DType::BOX;
             JPH::BoxShapeSettings shape_settings(JPH::Vec3(width/2.0, height/2.0, depth/2.0));
 
             return loadShape3D(*body, position, rotation, &shape_settings);
@@ -415,7 +392,7 @@ int PhysicsSystem::createSphereShape3D(Entity entity, Vector3 position, Quaterni
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::SPHERE;
+            body->shapes[body->numShapes].type = Shape3DType::SPHERE;
             JPH::SphereShapeSettings shape_settings(radius);
 
             return loadShape3D(*body, position, rotation, &shape_settings);
@@ -432,7 +409,7 @@ int PhysicsSystem::createCapsuleShape3D(Entity entity, Vector3 position, Quatern
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::CAPSULE;
+            body->shapes[body->numShapes].type = Shape3DType::CAPSULE;
             JPH::CapsuleShapeSettings shape_settings(halfHeight, radius);
 
             return loadShape3D(*body, position, rotation, &shape_settings);
@@ -449,7 +426,7 @@ int PhysicsSystem::createTaperedCapsuleShape3D(Entity entity, Vector3 position, 
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::TAPERED_CAPSULE;
+            body->shapes[body->numShapes].type = Shape3DType::TAPERED_CAPSULE;
             JPH::TaperedCapsuleShapeSettings shape_settings(halfHeight, topRadius, bottomRadius);
 
             return loadShape3D(*body, position, rotation, &shape_settings);
@@ -466,7 +443,7 @@ int PhysicsSystem::createCylinderShape3D(Entity entity, Vector3 position, Quater
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::CYLINDER;
+            body->shapes[body->numShapes].type = Shape3DType::CYLINDER;
             JPH::CylinderShapeSettings shape_settings(halfHeight, radius);
 
             return loadShape3D(*body, position, rotation, &shape_settings);
@@ -483,7 +460,7 @@ int PhysicsSystem::createConvexHullShape3D(Entity entity, Vector3 position, Quat
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::CONVEX_HULL;
+            body->shapes[body->numShapes].type = Shape3DType::CONVEX_HULL;
 
             JPH::Array<JPH::Vec3> jvertices;
             jvertices.resize(vertices.size());
@@ -507,7 +484,7 @@ int PhysicsSystem::createConvexHullShape3D(Entity entity, MeshComponent& mesh, T
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::CONVEX_HULL;
+            body->shapes[body->numShapes].type = Shape3DType::CONVEX_HULL;
 
             std::map<std::string, Buffer*> buffers;
 
@@ -571,7 +548,7 @@ int PhysicsSystem::createMeshShape3D(Entity entity, Vector3 position, Quaternion
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::MESH;
+            body->shapes[body->numShapes].type = Shape3DType::MESH;
 
             JPH::VertexList jvertices;
             jvertices.resize(vertices.size());
@@ -604,7 +581,7 @@ int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh, Transfo
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::MESH;
+            body->shapes[body->numShapes].type = Shape3DType::MESH;
 
             std::map<std::string, Buffer*> buffers;
 
@@ -751,7 +728,7 @@ int PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& ter
 
     if (body){
         if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = CollisionShape3DType::HEIGHTFIELD;
+            body->shapes[body->numShapes].type = Shape3DType::HEIGHTFIELD;
 
             TextureData& textureData = terrain.heightMap.getData();
 
@@ -856,11 +833,11 @@ bool PhysicsSystem::loadBody3D(Entity entity){
 
         for (int i = 0; i < body.numShapes; i++){
             if (body.type != BodyType::STATIC){
-                if (body.shapes[i].type == CollisionShape3DType::HEIGHTFIELD){
+                if (body.shapes[i].type == Shape3DType::HEIGHTFIELD){
                     Log::error("Heightfield body should be static for 3D Body entity: %u", entity);
                     return false;
                 }
-                if (body.shapes[i].type == CollisionShape3DType::MESH && !body.overrideMassProperties){
+                if (body.shapes[i].type == Shape3DType::MESH && !body.overrideMassProperties){
                     Log::error("Mesh body should be static or with mass and inertia overridden for 3D Body entity: %u", entity);
                     return false;
                 }
@@ -978,11 +955,35 @@ int PhysicsSystem::loadShape2D(Body2DComponent& body, b2Circle& circle){
     return -1;
 }
 
+int PhysicsSystem::loadShape2D(Body2DComponent& body, b2ChainDef& chainDef){
+    if (!b2Chain_IsValid(body.shapes[body.numShapes].chain)){
+        chainDef.userData = reinterpret_cast<void*>(body.numShapes);
+
+        if (!b2Body_IsValid(body.body)){
+            Log::error("Cannot create 2D body shape without loaded body");
+            return -1;
+        }
+
+        body.shapes[body.numShapes].chain = b2CreateChain(body.body, &chainDef);
+
+        body.numShapes++;
+
+        return (body.numShapes - 1);
+    }
+
+    return -1;
+}
+
 void PhysicsSystem::destroyShape2D(Body2DComponent& body, size_t index){
     if (b2Shape_IsValid(body.shapes[index].shape)){
         b2DestroyShape(body.shapes[index].shape);
 
         body.shapes[index].shape = b2_nullShapeId;
+    }
+    if (b2Chain_IsValid(body.shapes[index].chain)){
+        b2DestroyChain(body.shapes[index].chain);
+
+        body.shapes[index].chain = b2_nullChainId;
     }
 }
 

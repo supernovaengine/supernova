@@ -12,24 +12,25 @@
 
 namespace Supernova{
 
-    enum class CollisionShape2DType{
+    enum class Shape2DType{
         POLYGON,
         CIRCLE,
-        EDGE,
-        CHAIN
+        CAPSULE,
+        SEGMENT,
+        CHAIN // chain is a different type in Box2D 3.x
     };
 
-    // fixture in Box2D
-    struct CollisionShape2D{
-        b2ShapeId shape;
+    struct Shape2D{
+        b2ShapeId shape = b2_nullShapeId;
+        b2ChainId chain = b2_nullChainId;
 
-        CollisionShape2DType type = CollisionShape2DType::POLYGON;
+        Shape2DType type = Shape2DType::POLYGON;
     };
 
     struct Body2DComponent{
         b2BodyId body;
 
-        CollisionShape2D shapes[MAX_SHAPES];
+        Shape2D shapes[MAX_SHAPES];
         size_t numShapes = 0;
 
         BodyType type = BodyType::DYNAMIC;

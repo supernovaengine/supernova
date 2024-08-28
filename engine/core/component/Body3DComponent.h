@@ -14,7 +14,7 @@ namespace JPH{
 
 namespace Supernova{
 
-    enum class CollisionShape3DType{
+    enum class Shape3DType{
         SPHERE,
         BOX,
         CAPSULE,
@@ -25,19 +25,18 @@ namespace Supernova{
         HEIGHTFIELD
     };
 
-    // shape in jolt
-    struct CollisionShape3D{
+    struct Shape3D{
         JPH::Shape* shape = NULL;
         Vector3 position = Vector3::ZERO;
         Quaternion rotation = Quaternion::IDENTITY;
 
-        CollisionShape3DType type = CollisionShape3DType::SPHERE;
+        Shape3DType type = Shape3DType::SPHERE;
     };
 
     struct Body3DComponent{
         JPH::Body *body = NULL;
 
-        CollisionShape3D shapes[MAX_SHAPES];
+        Shape3D shapes[MAX_SHAPES];
         size_t numShapes = 0;
 
         bool overrideMassProperties = false;

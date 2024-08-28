@@ -102,8 +102,7 @@ namespace Supernova{
 		int createCircleShape2D(Entity entity, Vector2 center, float radius);
 		//int createTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2);
 		//int createOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
-		//int createLoopChainShape2D(Entity entity, std::vector<Vector2> vertices);
-		//int createChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
+		int createChainShape2D(Entity entity, std::vector<Vector2> vertices, bool loop);
 
 		void removeAllShapes2D(Entity entity);
 
@@ -134,6 +133,7 @@ namespace Supernova{
 
 		int loadShape2D(Body2DComponent& body, b2Polygon& polygon);
 		int loadShape2D(Body2DComponent& body, b2Circle& circle);
+		int loadShape2D(Body2DComponent& body, b2ChainDef& chainDef);
 		void destroyShape2D(Body2DComponent& body, size_t index);
 
 		int loadShape3D(Body3DComponent& body, const Vector3& position, const Quaternion& rotation, JPH::ShapeSettings* shapeSettings);

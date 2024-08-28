@@ -74,23 +74,24 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
-        .beginNamespace("CollisionShape2DType")
-        .addVariable("POLYGON", CollisionShape2DType::POLYGON)
-        .addVariable("CIRCLE", CollisionShape2DType::CIRCLE)
-        .addVariable("EDGE", CollisionShape2DType::EDGE)
-        .addVariable("CHAIN", CollisionShape2DType::CHAIN)
+        .beginNamespace("Shape2DType")
+        .addVariable("POLYGON", Shape2DType::POLYGON)
+        .addVariable("CIRCLE", Shape2DType::CIRCLE)
+        .addVariable("CAPSULE", Shape2DType::CAPSULE)
+        .addVariable("SEGMENT", Shape2DType::SEGMENT)
+        .addVariable("CHAIN", Shape2DType::CHAIN)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
-        .beginNamespace("CollisionShape3DType")
-        .addVariable("SPHERE", CollisionShape3DType::SPHERE)
-        .addVariable("BOX", CollisionShape3DType::BOX)
-        .addVariable("CAPSULE", CollisionShape3DType::CAPSULE)
-        .addVariable("TAPERED_CAPSULE", CollisionShape3DType::TAPERED_CAPSULE)
-        .addVariable("CYLINDER", CollisionShape3DType::CYLINDER)
-        .addVariable("CONVEX_HULL", CollisionShape3DType::CONVEX_HULL)
-        .addVariable("MESH", CollisionShape3DType::MESH)
-        .addVariable("HEIGHTFIELD", CollisionShape3DType::HEIGHTFIELD)
+        .beginNamespace("Shape3DType")
+        .addVariable("SPHERE", Shape3DType::SPHERE)
+        .addVariable("BOX", Shape3DType::BOX)
+        .addVariable("CAPSULE", Shape3DType::CAPSULE)
+        .addVariable("TAPERED_CAPSULE", Shape3DType::TAPERED_CAPSULE)
+        .addVariable("CYLINDER", Shape3DType::CYLINDER)
+        .addVariable("CONVEX_HULL", Shape3DType::CONVEX_HULL)
+        .addVariable("MESH", Shape3DType::MESH)
+        .addVariable("HEIGHTFIELD", Shape3DType::HEIGHTFIELD)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
