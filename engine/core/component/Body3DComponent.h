@@ -38,7 +38,7 @@ namespace Supernova{
         JPH::Body *body = NULL;
 
         CollisionShape3D shapes[MAX_SHAPES];
-        int numShapes = 0;
+        size_t numShapes = 0;
 
         bool overrideMassProperties = false;
         Vector3 solidBoxSize;

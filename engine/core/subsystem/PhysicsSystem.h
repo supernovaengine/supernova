@@ -10,15 +10,11 @@
 #include "component/Joint2DComponent.h"
 #include "object/physics/Contact2D.h"
 #include "object/physics/Manifold2D.h"
-#include "object/physics/ContactImpulse2D.h"
 #include "object/physics/Body3D.h"
 #include "object/physics/CollideShapeResult3D.h"
 #include "object/physics/Contact3D.h"
 
-class b2World;
-class b2Body;
-class b2Shape;
-class b2JointDef;
+#include "box2d/box2d.h"
 
 
 namespace JPH{
@@ -38,9 +34,6 @@ class ObjectLayerPairFilterImpl;
 
 namespace Supernova{
 
-	class Box2DContactListener;
-	class Box2DContactFilter;
-
 	class JoltActivationListener;
 	class JoltContactListener;
 	
@@ -50,11 +43,8 @@ namespace Supernova{
 	private:
 		Vector3 gravity;
 
-		b2World* world2D;
+		b2WorldId world2D;
 		float pointsToMeterScale2D;
-
-		Box2DContactListener* contactListener2D;
-		Box2DContactFilter* contactFilter2D;
 
 		JoltActivationListener* activationListener3D;
 		JoltContactListener* contactListener3D;
@@ -72,6 +62,8 @@ namespace Supernova{
 
 		void createGenericJoltBody(Entity entity, Body3DComponent& body, const JPH::Shape* shape);
 
+		void manageBox2DEvents();
+
 	public:
 		PhysicsSystem(Scene* scene);
 		virtual ~PhysicsSystem();
@@ -84,10 +76,12 @@ namespace Supernova{
 		float getPointsToMeterScale2D() const;
 		void setPointsToMeterScale2D(float pointsToMeterScale2D);
 
-		FunctionSubscribe<void(Contact2D)> beginContact2D;
-		FunctionSubscribe<void(Contact2D)> endContact2D;
-		FunctionSubscribe<void(Contact2D, Manifold2D)> preSolve2D;
-		FunctionSubscribe<void(Contact2D, ContactImpulse2D)> postSolve2D;
+		FunctionSubscribe<void(Body2D, unsigned long, Body2D, unsigned long)> beginContact2D;
+		FunctionSubscribe<void(Body2D, unsigned long, Body2D, unsigned long)> endContact2D;
+		FunctionSubscribe<void(Body2D, unsigned long, Body2D, unsigned long)> beginSensorContact2D;
+		FunctionSubscribe<void(Body2D, unsigned long, Body2D, unsigned long)> endSensorContact2D;
+		FunctionSubscribe<void(Body2D, unsigned long, Body2D, unsigned long, Vector2, Vector2, float)> hitContact2D;
+		FunctionSubscribe<bool(Body2D, unsigned long, Body2D, unsigned long, Manifold2D)> preSolve2D;
 
 		FunctionSubscribe<bool(Body2D, unsigned long, Body2D, unsigned long)> shouldCollide2D;
 
@@ -106,10 +100,10 @@ namespace Supernova{
 		int createCenteredRectShape2D(Entity entity, float width, float height, Vector2 center, float angle);
 		int createPolygonShape2D(Entity entity, std::vector<Vector2> vertices);
 		int createCircleShape2D(Entity entity, Vector2 center, float radius);
-		int createTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2);
-		int createOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
-		int createLoopChainShape2D(Entity entity, std::vector<Vector2> vertices);
-		int createChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
+		//int createTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2);
+		//int createOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
+		//int createLoopChainShape2D(Entity entity, std::vector<Vector2> vertices);
+		//int createChainShape2D(Entity entity, std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
 
 		void removeAllShapes2D(Entity entity);
 
@@ -127,10 +121,10 @@ namespace Supernova{
 		int createMeshShape3D(Entity entity, MeshComponent& mesh, Transform& transform);
 		int createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize);
 
-		b2World* getWorld2D() const;
+		b2WorldId getWorld2D() const;
 		JPH::PhysicsSystem* getWorld3D() const;
 
-		b2Body* getBody(Entity entity);
+		b2BodyId getBody(Entity entity);
 
 		bool loadBody2D(Entity entity);
 		void destroyBody2D(Body2DComponent& body);
@@ -138,23 +132,22 @@ namespace Supernova{
 		bool loadBody3D(Entity entity);
 		void destroyBody3D(Body3DComponent& body);
 
-		int loadShape2D(Body2DComponent& body, b2Shape* shape);
+		int loadShape2D(Body2DComponent& body, b2Polygon& polygon);
+		int loadShape2D(Body2DComponent& body, b2Circle& circle);
 		void destroyShape2D(Body2DComponent& body, size_t index);
 
 		int loadShape3D(Body3DComponent& body, const Vector3& position, const Quaternion& rotation, JPH::ShapeSettings* shapeSettings);
 		void destroyShape3D(Body3DComponent& body, size_t index);
 
-		bool loadDistanceJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB);
-		bool loadRevoluteJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor);
-		bool loadPrismaticJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis);
-		bool loadPulleyJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 groundAnchorA, Vector2 groundAnchorB, Vector2 anchorA, Vector2 anchorB, Vector2 axis, float ratio);
-		bool loadGearJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Entity revoluteJoint, Entity prismaticJoint, float ratio);
-		bool loadMouseJoint2D(Joint2DComponent& joint, Entity body, Vector2 target);
-		bool loadWheelJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis);
-		bool loadWeldJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor);
-		bool loadFrictionJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor);
-		bool loadMotorJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB);
-		bool loadRopeJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB);
+		bool loadDistanceJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB, bool rope);
+		bool loadRevoluteJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor);
+		bool loadPrismaticJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis);
+		//bool loadPulleyJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 groundAnchorA, Vector2 groundAnchorB, Vector2 anchorA, Vector2 anchorB, Vector2 axis, float ratio);
+		//bool loadGearJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Entity revoluteJoint, Entity prismaticJoint, float ratio);
+		bool loadMouseJoint2D(Entity entity, Joint2DComponent& joint, Entity body, Vector2 target);
+		bool loadWheelJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis);
+		bool loadWeldJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor);
+		bool loadMotorJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB);
 		void destroyJoint2D(Joint2DComponent& joint);
 
 		bool loadFixedJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB);

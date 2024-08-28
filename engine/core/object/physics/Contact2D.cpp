@@ -4,11 +4,11 @@
 
 #include "Contact2D.h"
 
-#include "box2d.h"
+#include "box2d/box2d.h"
 
 using namespace Supernova;
 
-Contact2D::Contact2D(Scene* scene, b2Contact* contact){
+Contact2D::Contact2D(Scene* scene, b2ContactData contact){
     this->scene = scene;
     this->contact = contact;
 }
@@ -30,88 +30,34 @@ Contact2D& Contact2D::operator=(const Contact2D& rhs){
     return *this;
 }
 
-b2Contact* Contact2D::getBox2DContact() const{
+b2ContactData Contact2D::getBox2DContact() const{
     return contact;
 }
 
 Manifold2D Contact2D::getManifold() const{
-    return Manifold2D(scene, contact->GetManifold());
-}
-
-WorldManifold2D Contact2D::getWorldManifold() const{
-    WorldManifold2D worldManifold(scene);
-    contact->GetWorldManifold(worldManifold.getBox2DWorldManifold());
-    return worldManifold;
-}
-
-bool Contact2D::isTouching() const{
-    return contact->IsTouching();
+    return Manifold2D(scene, &contact.manifold);
 }
 
 Entity Contact2D::getBodyEntityA() const{
-    return contact->GetFixtureA()->GetBody()->GetUserData().pointer;
+    return reinterpret_cast<uintptr_t>(b2Body_GetUserData(b2Shape_GetBody(contact.shapeIdA)));
 }
 
 Body2D Contact2D::getBodyA() const{
-    Body2D body2d(scene, getBodyEntityA());
-
-    return body2d;
+    return Body2D(scene, getBodyEntityA());
 }
 
 size_t Contact2D::getShapeIndexA() const{
-    return contact->GetFixtureA()->GetUserData().pointer;
+    return reinterpret_cast<size_t>(b2Shape_GetUserData(contact.shapeIdA));
 }
 
 Entity Contact2D::getBodyEntityB() const{
-    return contact->GetFixtureB()->GetBody()->GetUserData().pointer;
+    return reinterpret_cast<uintptr_t>(b2Body_GetUserData(b2Shape_GetBody(contact.shapeIdB)));
 }
 
 Body2D Contact2D::getBodyB() const{
-    Body2D body2d(scene, getBodyEntityB());
-
-    return body2d;
+    return Body2D(scene, getBodyEntityB());
 }
 
 size_t Contact2D::getShapeIndexB() const{
-    return contact->GetFixtureB()->GetUserData().pointer;
-}
-
-bool Contact2D::isEnabled() const{
-    return contact->IsEnabled();
-}
-
-void Contact2D::setEnabled(bool enabled){
-    contact->SetEnabled(enabled);
-}
-
-float Contact2D::getFriction() const{
-    return contact->GetFriction();
-}
-
-void Contact2D::setFriction(float friction){
-    contact->SetFriction(friction);
-}
-
-void Contact2D::resetFriction(){
-    contact->ResetFriction();
-}
-
-float Contact2D::getRestitution() const{
-    return contact->GetRestitution();
-}
-
-void Contact2D::setRestitution(float restitution){
-    contact->SetRestitution(restitution);
-}
-
-void Contact2D::resetRestitution(){
-    contact->ResetRestitution();
-}
-
-float Contact2D::getTangentSpeed() const{
-    return contact->GetTangentSpeed();
-}
-
-void Contact2D::setTangentSpeed(float tangentSpeed){
-    contact->SetTangentSpeed(tangentSpeed);
+    return reinterpret_cast<size_t>(b2Shape_GetUserData(contact.shapeIdB));
 }

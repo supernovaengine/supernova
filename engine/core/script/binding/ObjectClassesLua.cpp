@@ -37,9 +37,7 @@
 #include "Body2D.h"
 #include "Joint2D.h"
 #include "Contact2D.h"
-#include "ContactImpulse2D.h"
 #include "Manifold2D.h"
-#include "WorldManifold2D.h"
 #include "Body3D.h"
 #include "Joint3D.h"
 #include "Contact3D.h"
@@ -107,14 +105,12 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addVariable("DISTANCE", Joint2DType::DISTANCE)
         .addVariable("REVOLUTE", Joint2DType::REVOLUTE)
         .addVariable("PRISMATIC", Joint2DType::PRISMATIC)
-        .addVariable("PULLEY", Joint2DType::PULLEY)
-        .addVariable("GEAR", Joint2DType::GEAR)
+        //.addVariable("PULLEY", Joint2DType::PULLEY)
+        //.addVariable("GEAR", Joint2DType::GEAR)
         .addVariable("MOUSE", Joint2DType::MOUSE)
         .addVariable("WHEEL", Joint2DType::WHEEL)
         .addVariable("WELD", Joint2DType::WELD)
-        .addVariable("FRICTION", Joint2DType::FRICTION)
         .addVariable("MOTOR", Joint2DType::MOTOR)
-        .addVariable("ROPE", Joint2DType::ROPE)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
@@ -131,13 +127,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addVariable("GEAR", Joint3DType::GEAR)
         .addVariable("RACKANDPINON", Joint3DType::RACKANDPINON)
         .addVariable("PULLEY", Joint3DType::PULLEY)
-        .endNamespace();
-
-    luabridge::getGlobalNamespace(L)
-        .beginNamespace("Manifold2DType")
-        .addVariable("CIRCLES", Manifold2DType::CIRCLES)
-        .addVariable("FACEA", Manifold2DType::FACEA)
-        .addVariable("FACEB", Manifold2DType::FACEB)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
@@ -808,10 +797,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<float, float, Vector2, float>(&Body2D::createCenteredRectShape))
         .addFunction("createPolygonShape", &Body2D::createPolygonShape)
         .addFunction("createCircleShape", &Body2D::createCircleShape)
-        .addFunction("createTwoSidedEdgeShape", &Body2D::createTwoSidedEdgeShape)
-        .addFunction("createOneSidedEdgeShape", &Body2D::createOneSidedEdgeShape)
-        .addFunction("createLoopChainShape", &Body2D::createLoopChainShape)
-        .addFunction("createChainShape", &Body2D::createChainShape)
+        //.addFunction("createLoopChainShape", &Body2D::createLoopChainShape)
+        //.addFunction("createChainShape", &Body2D::createChainShape)
         .addFunction("removeAllShapes", &Body2D::removeAllShapes)
         .addProperty("shapeDensity", &Body2D::getShapeDensity, &Body2D::setShapeDensity)
         .addFunction("setShapeDensity", 
@@ -834,11 +821,39 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getShapeRestitution", 
             luabridge::overload<>(&Body2D::getShapeRestitution),
             luabridge::overload<size_t>(&Body2D::getShapeRestitution))
+        .addProperty("shapeEnableHitEvents", &Body2D::isShapeEnableHitEvents, &Body2D::setShapeEnableHitEvents)
+        .addFunction("setShapeEnableHitEvents", 
+            luabridge::overload<bool>(&Body2D::setShapeEnableHitEvents),
+            luabridge::overload<size_t, bool>(&Body2D::setShapeEnableHitEvents))
+        .addFunction("isShapeEnableHitEvents", 
+            luabridge::overload<>(&Body2D::isShapeEnableHitEvents),
+            luabridge::overload<size_t>(&Body2D::isShapeEnableHitEvents))
+        .addProperty("shapeContactEvents", &Body2D::isShapeContactEvents, &Body2D::setShapeContactEvents)
+        .addFunction("setShapeContactEvents", 
+            luabridge::overload<bool>(&Body2D::setShapeContactEvents),
+            luabridge::overload<size_t, bool>(&Body2D::setShapeContactEvents))
+        .addFunction("isShapeContactEvents", 
+            luabridge::overload<>(&Body2D::isShapeContactEvents),
+            luabridge::overload<size_t>(&Body2D::isShapeContactEvents))
+        .addProperty("shapePreSolveEvents", &Body2D::isShapePreSolveEvents, &Body2D::setShapePreSolveEvents)
+        .addFunction("setShapePreSolveEvents", 
+            luabridge::overload<bool>(&Body2D::setShapePreSolveEvents),
+            luabridge::overload<size_t, bool>(&Body2D::setShapePreSolveEvents))
+        .addFunction("isShapePreSolveEvents", 
+            luabridge::overload<>(&Body2D::isShapePreSolveEvents),
+            luabridge::overload<size_t>(&Body2D::isShapePreSolveEvents))
+        .addProperty("shapeSensorEvents", &Body2D::isShapeSensorEvents, &Body2D::setShapeSensorEvents)
+        .addFunction("setShapeSensorEvents", 
+            luabridge::overload<bool>(&Body2D::setShapeSensorEvents),
+            luabridge::overload<size_t, bool>(&Body2D::setShapeSensorEvents))
+        .addFunction("isShapeSensorEvents", 
+            luabridge::overload<>(&Body2D::isShapeSensorEvents),
+            luabridge::overload<size_t>(&Body2D::isShapeSensorEvents))
         .addProperty("linearVelocity", &Body2D::getLinearVelocity, &Body2D::setLinearVelocity)
         .addProperty("angularVelocity", &Body2D::getAngularVelocity, &Body2D::setAngularVelocity)
         .addProperty("linearDamping", &Body2D::getLinearDamping, &Body2D::setLinearDamping)
         .addProperty("angularDamping", &Body2D::getAngularDamping, &Body2D::setAngularDamping)
-        .addProperty("allowSleep", &Body2D::isAllowSleep, &Body2D::setAllowSleep)
+        .addProperty("enableSleep", &Body2D::isEnableSleep, &Body2D::setEnableSleep)
         .addProperty("awake", &Body2D::isAwake, &Body2D::setAwake)
         .addProperty("fixedRotation", &Body2D::isFixedRotation, &Body2D::setFixedRotation)
         .addProperty("bullet", &Body2D::isBullet, &Body2D::setBullet)
@@ -870,9 +885,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<>(&Body2D::getGroupIndexFilter),
             luabridge::overload<size_t>(&Body2D::getGroupIndexFilter))
         .addFunction("getMass", &Body2D::getMass)
-        .addFunction("getInertia", &Body2D::getInertia)
-        .addFunction("getLinearVelocityFromWorldPoint", &Body2D::getLinearVelocityFromWorldPoint)
-        .addFunction("resetMassData", &Body2D::resetMassData)
+        .addFunction("getInertiaTensor", &Body2D::getInertiaTensor)
+        .addFunction("applyMassFromShapes", &Body2D::applyMassFromShapes)
         .addFunction("applyForce", &Body2D::applyForce)
         .addFunction("applyForceToCenter", &Body2D::applyForceToCenter)
         .addFunction("applyTorque", &Body2D::applyTorque)
@@ -887,59 +901,38 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setDistanceJoint", &Joint2D::setDistanceJoint)
         .addFunction("setRevoluteJoint", &Joint2D::setRevoluteJoint)
         .addFunction("setPrismaticJoint", &Joint2D::setPrismaticJoint)
-        .addFunction("setPulleyJoint", &Joint2D::setPulleyJoint)
-        .addFunction("setGearJoint", &Joint2D::setGearJoint)
+        //.addFunction("setPulleyJoint", &Joint2D::setPulleyJoint)
+        //.addFunction("setGearJoint", &Joint2D::setGearJoint)
         .addFunction("setMouseJoint", &Joint2D::setMouseJoint)
         .addFunction("setWheelJoint", &Joint2D::setWheelJoint)
         .addFunction("setWeldJoint", &Joint2D::setWeldJoint)
-        .addFunction("setFrictionJoint", &Joint2D::setFrictionJoint)
         .addFunction("setMotorJoint", &Joint2D::setMotorJoint)
-        .addFunction("setRopeJoint", &Joint2D::setRopeJoint)
         .addFunction("getType", &Joint2D::getType)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Manifold2D>("Manifold2D")
-        .addFunction("getManifoldPointLocalPoint", &Manifold2D::getManifoldPointLocalPoint)
+        .addFunction("getManifoldPointAnchorA", &Manifold2D::getManifoldPointAnchorA)
+        .addFunction("getManifoldPointAnchorB", &Manifold2D::getManifoldPointAnchorB)
+        .addFunction("getManifoldPointPosition", &Manifold2D::getManifoldPointPosition)
         .addFunction("getManifoldPointNormalImpulse", &Manifold2D::getManifoldPointNormalImpulse)
+        .addFunction("getManifoldPointNormalVelocity", &Manifold2D::getManifoldPointNormalVelocity)
         .addFunction("getManifoldPointTangentImpulse", &Manifold2D::getManifoldPointTangentImpulse)
-        .addFunction("getLocalNormal", &Manifold2D::getLocalNormal)
-        .addFunction("getLocalPoint", &Manifold2D::getLocalPoint)
-        .addFunction("getType", &Manifold2D::getType)
+        .addFunction("getManifoldPointSeparation", &Manifold2D::getManifoldPointSeparation)
+        .addFunction("isManifoldPointPersisted", &Manifold2D::isManifoldPointPersisted)
+        .addFunction("getNormal", &Manifold2D::getNormal)
         .addFunction("getPointCount", &Manifold2D::getPointCount)
-        .endClass();
-
-    luabridge::getGlobalNamespace(L)
-        .beginClass<WorldManifold2D>("WorldManifold2D")
-        .addFunction("getNormal", &WorldManifold2D::getNormal)
-        .addFunction("getPoint", &WorldManifold2D::getPoint)
-        .addFunction("getSeparations", &WorldManifold2D::getSeparations)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Contact2D>("Contact2D")
         .addFunction("getManifold", &Contact2D::getManifold)
-        .addFunction("getWorldManifold", &Contact2D::getWorldManifold)
-        .addFunction("isTouching", &Contact2D::isTouching)
         .addFunction("getBodyEntityA", &Contact2D::getBodyEntityA)
         .addFunction("getBodyA", &Contact2D::getBodyA)
         .addFunction("getShapeIndexA", &Contact2D::getShapeIndexA)
         .addFunction("getBodyEntityB", &Contact2D::getBodyEntityB)
         .addFunction("getBodyB", &Contact2D::getBodyB)
         .addFunction("getShapeIndexB", &Contact2D::getShapeIndexB)
-        .addProperty("enabled", &Contact2D::isEnabled, &Contact2D::setEnabled)
-        .addProperty("friction", &Contact2D::getFriction, &Contact2D::setFriction)
-        .addFunction("resetFriction", &Contact2D::resetFriction)
-        .addProperty("restitution", &Contact2D::getRestitution, &Contact2D::setRestitution)
-        .addFunction("resetRestitution", &Contact2D::resetRestitution)
-        .addProperty("tangentSpeed", &Contact2D::getTangentSpeed, &Contact2D::setTangentSpeed)
-        .endClass();
-
-    luabridge::getGlobalNamespace(L)
-        .beginClass<ContactImpulse2D>("ContactImpulse2D")
-        .addFunction("getCount", &ContactImpulse2D::getCount)
-        .addFunction("getNormalImpulses", &ContactImpulse2D::getNormalImpulses)
-        .addFunction("getTangentImpulses", &ContactImpulse2D::getTangentImpulses)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

@@ -74,6 +74,31 @@ namespace Supernova{
             return get_value<Ret>(m_vm);
         }
 
+        template <typename T1, typename T2, typename T3, typename T4, typename T5>
+        Ret operator()(const T1 &p1, const T2 &p2, const T3 &p3, const T4 &p4, const T5 &p5){
+            push_function(m_vm, m_func);
+            push_value(m_vm, p1);
+            push_value(m_vm, p2);
+            push_value(m_vm, p3);
+            push_value(m_vm, p4);
+            push_value(m_vm, p5);
+            call(5, 1);
+            return get_value<Ret>(m_vm);
+        }
+
+        template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+        Ret operator()(const T1 &p1, const T2 &p2, const T3 &p3, const T4 &p4, const T5 &p5, const T6 &p6){
+            push_function(m_vm, m_func);
+            push_value(m_vm, p1);
+            push_value(m_vm, p2);
+            push_value(m_vm, p3);
+            push_value(m_vm, p4);
+            push_value(m_vm, p5);
+            push_value(m_vm, p6);
+            call(6, 1);
+            return get_value<Ret>(m_vm);
+        }
+
         // et cetera, provide as many overloads as you need
     };
 
@@ -126,6 +151,56 @@ namespace Supernova{
             push_value(m_vm, p3);
             push_value(m_vm, p4);
             call(4);
+        }
+
+        template <typename T1, typename T2, typename T3, typename T4, typename T5>
+        void operator()(const T1 &p1, const T2 &p2, const T3 &p3, const T4 &p4, const T5 &p5){
+            push_function(m_vm, m_func);
+            push_value(m_vm, p1);
+            push_value(m_vm, p2);
+            push_value(m_vm, p3);
+            push_value(m_vm, p4);
+            push_value(m_vm, p5);
+            call(5);
+        }
+
+        template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6>
+        void operator()(const T1 &p1, const T2 &p2, const T3 &p3, const T4 &p4, const T5 &p5, const T6 &p6){
+            push_function(m_vm, m_func);
+            push_value(m_vm, p1);
+            push_value(m_vm, p2);
+            push_value(m_vm, p3);
+            push_value(m_vm, p4);
+            push_value(m_vm, p5);
+            push_value(m_vm, p6);
+            call(6);
+        }
+
+        template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7>
+        void operator()(const T1 &p1, const T2 &p2, const T3 &p3, const T4 &p4, const T5 &p5, const T6 &p6, const T7 &p7){
+            push_function(m_vm, m_func);
+            push_value(m_vm, p1);
+            push_value(m_vm, p2);
+            push_value(m_vm, p3);
+            push_value(m_vm, p4);
+            push_value(m_vm, p5);
+            push_value(m_vm, p6);
+            push_value(m_vm, p7);
+            call(7);
+        }
+
+        template <typename T1, typename T2, typename T3, typename T4, typename T5, typename T6, typename T7, typename T8>
+        void operator()(const T1 &p1, const T2 &p2, const T3 &p3, const T4 &p4, const T5 &p5, const T6 &p6, const T7 &p7, const T8 &p8){
+            push_function(m_vm, m_func);
+            push_value(m_vm, p1);
+            push_value(m_vm, p2);
+            push_value(m_vm, p3);
+            push_value(m_vm, p4);
+            push_value(m_vm, p5);
+            push_value(m_vm, p6);
+            push_value(m_vm, p7);
+            push_value(m_vm, p8);
+            call(8);
         }
 
         // et cetera, provide as many overloads as you need

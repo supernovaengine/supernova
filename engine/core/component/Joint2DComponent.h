@@ -7,27 +7,22 @@
 
 #include "Engine.h"
 
-class b2JointDef;
-class b2Joint;
-
 namespace Supernova{
 
     enum class Joint2DType{
         DISTANCE,
         REVOLUTE,
         PRISMATIC,
-        PULLEY,
-        GEAR,
+        //PULLEY,
+        //GEAR,
         MOUSE,
         WHEEL,
         WELD,
-        FRICTION,
-        MOTOR,
-        ROPE // distance in Box2D
+        MOTOR
     };
 
     struct Joint2DComponent{
-        b2Joint* joint = NULL;
+        b2JointId joint;
         Joint2DType type = Joint2DType::DISTANCE;
     };
 

@@ -72,7 +72,6 @@ namespace luabridge
     template<> struct Stack<CollisionShape3DType> : EnumWrapper<CollisionShape3DType>{};
     template<> struct Stack<BodyType> : EnumWrapper<BodyType>{};
     template<> struct Stack<Joint2DType> : EnumWrapper<Joint2DType>{};
-    template<> struct Stack<Manifold2DType> : EnumWrapper<Manifold2DType>{};
 
     template <>
     struct Stack <Touch>

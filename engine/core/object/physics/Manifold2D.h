@@ -6,8 +6,7 @@
 #define MANIFOLD2D_H
 
 #include "Scene.h"
-
-class b2Manifold;
+#include "box2d/box2d.h"
 
 namespace Supernova{
 
@@ -25,15 +24,19 @@ namespace Supernova{
 
             const b2Manifold* getBox2DManifold() const;
     
-            Vector2 getManifoldPointLocalPoint(int32_t index) const;
+            Vector2 getManifoldPointAnchorA(int32_t index) const;
+            Vector2 getManifoldPointAnchorB(int32_t index) const;
+            Vector2 getManifoldPointPosition(int32_t index) const;
             float getManifoldPointNormalImpulse(int32_t index) const;
+            float getManifoldPointNormalVelocity(int32_t index) const;
             float getManifoldPointTangentImpulse(int32_t index) const;
+            float getManifoldPointSeparation(int32_t index) const;
+            bool isManifoldPointPersisted(int32_t index) const;
 
-            Vector2 getLocalNormal() const;
-            Vector2 getLocalPoint() const;
-            Manifold2DType getType() const;
+            Vector2 getNormal() const;
             int32_t getPointCount() const;
     };
+
 }
 
 #endif //MANIFOLD2D_H

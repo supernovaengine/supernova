@@ -181,38 +181,40 @@ RayReturn Ray::intersects(AABB box){
 
 RayReturn Ray::intersects(Body2D body){
     Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
-    if (bodycomp.body){
 
-        float ptmScale = body.getPointsToMeterScale();
+    float ptmScale = body.getPointsToMeterScale();
 
-        Vector3 end = origin + direction;
+    Vector3 end = origin + direction;
+    b2Vec2 bOrigin = {origin.x / ptmScale, origin.y / ptmScale};
+    b2Vec2 bEnd = {end.x / ptmScale, end.y / ptmScale};
 
-        b2RayCastInput input;
-        input.p1 = b2Vec2(origin.x / ptmScale, origin.y / ptmScale);
-        input.p2 = b2Vec2(end.x / ptmScale, end.y / ptmScale);
-        input.maxFraction = 1;
+    b2Vec2 translation = b2Sub(bEnd, bOrigin);
 
-        float closestFraction = FLT_MAX;
-        b2Vec2 intersectionNormal(0,0);
-        size_t shapeIndex = 0;
-        for (b2Fixture* f = bodycomp.body->GetFixtureList(); f; f = f->GetNext()) {
-            b2RayCastOutput output;
-            int32 childCount = f->GetShape()->GetChildCount();
-            for (int32 c = 0; c < childCount; c++) {
-                if ( ! f->RayCast( &output, input, c ) )
-                    continue;
-                if ( output.fraction < closestFraction ) {
-                    closestFraction = output.fraction;
-                    intersectionNormal = output.normal;
-                    shapeIndex = f->GetUserData().pointer;
-                }
-            }
+    int shapesCount = b2Body_GetShapeCount(bodycomp.body);
+    b2ShapeId shapeIds[shapesCount];
+    int returnCount = b2Body_GetShapes(bodycomp.body, shapeIds, shapesCount);
+
+    float closestFraction = FLT_MAX;
+    b2Vec2 intersectionPoint = {0, 0};
+    b2Vec2 intersectionNormal = {0, 0};
+    size_t shapeIndex = 0;
+    for (int i = 0; i < returnCount; ++i){
+        b2ShapeId shapeid = shapeIds[i];
+        b2CastOutput castOutput = b2Shape_RayCast(shapeid, bOrigin, translation);
+
+        if (castOutput.hit){
+            closestFraction = castOutput.fraction;
+            intersectionPoint = castOutput.point;
+            intersectionNormal = castOutput.normal;
+            shapeIndex = reinterpret_cast<size_t>(b2Shape_GetUserData(shapeid));
         }
+    }
 
-        if (closestFraction >= 0 && closestFraction <= 1){
-            return {true, closestFraction, getPoint(closestFraction), Vector3(intersectionNormal.x, intersectionNormal.y, 0), body.getEntity(), shapeIndex};
-        }
+    if (closestFraction >= 0 && closestFraction <= 1){
+        Vector3 point = Vector3(intersectionPoint.x * ptmScale, intersectionPoint.y * ptmScale, 0);
+        Vector3 normal = Vector3(intersectionNormal.x, intersectionNormal.y, 0);
 
+        return {true, closestFraction, point, normal, body.getEntity(), shapeIndex};
     }
 
     return NO_HIT;
@@ -220,34 +222,23 @@ RayReturn Ray::intersects(Body2D body){
 
 RayReturn Ray::intersects(Body2D body, size_t shape){
     Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
-    if (bodycomp.body){
 
-        float ptmScale = body.getPointsToMeterScale();
+    float ptmScale = body.getPointsToMeterScale();
 
-        Vector3 end = origin + direction;
+    Vector3 end = origin + direction;
+    b2Vec2 bOrigin = {origin.x / ptmScale, origin.y / ptmScale};
+    b2Vec2 bEnd = {end.x / ptmScale, end.y / ptmScale};
 
-        b2RayCastInput input;
-        input.p1 = b2Vec2(origin.x / ptmScale, origin.y / ptmScale);
-        input.p2 = b2Vec2(end.x / ptmScale, end.y / ptmScale);
-        input.maxFraction = 1;
+    b2Vec2 translation = b2Sub(bEnd, bOrigin);
 
-        float closestFraction = FLT_MAX;
-        b2Vec2 intersectionNormal(0,0);
-        b2RayCastOutput output;
-        int32 childCount = bodycomp.shapes[shape].fixture->GetShape()->GetChildCount();
-        for (int32 c = 0; c < childCount; c++) {
-            if ( ! bodycomp.shapes[shape].fixture->RayCast( &output, input, c ) )
-                continue;
-            if ( output.fraction < closestFraction ) {
-                closestFraction = output.fraction;
-                intersectionNormal = output.normal;
-            }
-        }
+    b2ShapeId shapeid = bodycomp.shapes[shape].shape;
+    b2CastOutput castOutput = b2Shape_RayCast(shapeid, bOrigin, translation);
 
-        if (closestFraction >= 0 && closestFraction <= 1){
-            return {true, closestFraction, getPoint(closestFraction), Vector3(intersectionNormal.x, intersectionNormal.y, 0), body.getEntity(), shape};
-        }
+    if (castOutput.hit){
+        Vector3 point = Vector3(castOutput.point.x * ptmScale, castOutput.point.y * ptmScale, 0);
+        Vector3 normal = Vector3(castOutput.normal.x, castOutput.normal.y, 0);
 
+        return {true, castOutput.fraction, point, normal, body.getEntity(), shape};
     }
 
     return NO_HIT;
@@ -307,42 +298,51 @@ RayReturn Ray::intersects(Scene* scene, RayFilter raytest, uint16_t categoryBits
 
 RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint16_t categoryBits, uint16_t maskBits){
     if (raytest == RayFilter::BODY_2D){
-        b2World* world = scene->getSystem<PhysicsSystem>()->getWorld2D();
 
-        if (world){
-            std::vector<Box2DWorldRayCastOutput> outputs;
+        b2WorldId world = scene->getSystem<PhysicsSystem>()->getWorld2D();
 
-            Box2DRayCastCallback* rayCastCallback2D = new Box2DRayCastCallback(&outputs, false, onlyStatic, categoryBits, maskBits);
+        float ptmScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
 
-            float ptmScale = scene->getSystem<PhysicsSystem>()->getPointsToMeterScale2D();
+        Vector3 end = origin + direction;
+        b2Vec2 bOrigin = {origin.x / ptmScale, origin.y / ptmScale};
+        b2Vec2 bEnd = {end.x / ptmScale, end.y / ptmScale};
 
-            Vector3 end = origin + direction;
-            b2Vec2 p1 = b2Vec2(origin.x / ptmScale, origin.y / ptmScale);
-            b2Vec2 p2 = b2Vec2(end.x / ptmScale, end.y / ptmScale);
+        b2Vec2 translation = b2Sub(bEnd, bOrigin);
 
-            world->RayCast(rayCastCallback2D, p1, p2);
+        b2QueryFilter filter;
+        filter.categoryBits = categoryBits;
+        filter.maskBits = maskBits;
 
-            delete rayCastCallback2D;
+        std::vector<Box2DWorldRayCastOutput> outputs;
 
-            float closestFraction = FLT_MAX;
-            b2Vec2 intersectionNormal(0,0);
-            Entity entity = NULL_ENTITY;
-            size_t shapeIndex = 0;
-            for (size_t i = 0; i < outputs.size(); i++){
-                    if ( outputs[i].fraction < closestFraction ) {
-                        closestFraction = outputs[i].fraction;
-                        intersectionNormal = outputs[i].normal;
-                        entity = outputs[i].fixture->GetBody()->GetUserData().pointer;
-                        shapeIndex = outputs[i].fixture->GetUserData().pointer;
-                    }
-            }
+        Box2DWorldRayCastContext context = {&outputs, onlyStatic};
 
-            if (closestFraction >= 0 && closestFraction <= 1){
-                return {true, closestFraction, getPoint(closestFraction), Vector3(intersectionNormal.x, intersectionNormal.y, 0), entity, shapeIndex};
-            }
+        b2World_CastRay(world, bOrigin, translation, filter, Box2DAux::CastCallback, &context);
+
+        float closestFraction = FLT_MAX;
+        b2Vec2 intersectionPoint = {0, 0};
+        b2Vec2 intersectionNormal = {0, 0};
+        Entity entity = NULL_ENTITY;
+        size_t shapeIndex = 0;
+        for (size_t i = 0; i < outputs.size(); i++){
+                if ( outputs[i].fraction < closestFraction ) {
+                    closestFraction = outputs[i].fraction;
+                    intersectionPoint = outputs[i].point;
+                    intersectionNormal = outputs[i].normal;
+                    entity = reinterpret_cast<uintptr_t>(b2Body_GetUserData(outputs[i].bodyId));
+                    shapeIndex = reinterpret_cast<size_t>(b2Shape_GetUserData(outputs[i].shapeId));
+                }
+        }
+
+        if (closestFraction >= 0 && closestFraction <= 1){
+            Vector3 point = Vector3(intersectionPoint.x * ptmScale, intersectionPoint.y * ptmScale, 0);
+            Vector3 normal = Vector3(intersectionNormal.x, intersectionNormal.y, 0);
+
+            return {true, closestFraction, point, normal, entity, shapeIndex};
         }
 
     }else if (raytest == RayFilter::BODY_3D){
+
         JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
 
         if (world){
@@ -366,6 +366,7 @@ RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint
                 return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), entity, shapeIndex};
             }
         }
+
     }
 
     return NO_HIT;

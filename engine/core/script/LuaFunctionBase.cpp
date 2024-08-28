@@ -8,7 +8,6 @@
 #include "object/physics/Body2D.h"
 #include "object/physics/Contact2D.h"
 #include "object/physics/Manifold2D.h"
-#include "object/physics/ContactImpulse2D.h"
 #include "object/physics/Body3D.h"
 #include "object/physics/Contact3D.h"
 #include "object/physics/CollideShapeResult3D.h"
@@ -115,6 +114,11 @@ void LuaFunctionBase::push_value(lua_State *vm, wchar_t s){
     lua_pushstring(vm, StringUtils::toUTF8(s).c_str());
 }
 
+void LuaFunctionBase::push_value(lua_State *vm, Vector2 o){
+    if (!luabridge::push<Vector2>(vm, o))
+        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
+}
+
 void LuaFunctionBase::push_value(lua_State *vm, Vector3 o){
     if (!luabridge::push<Vector3>(vm, o))
         throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
@@ -125,18 +129,13 @@ void LuaFunctionBase::push_value(lua_State *vm, Body2D o){
         throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
 }
 
-void LuaFunctionBase::push_value(lua_State *vm, Contact2D o){
-    if (!luabridge::push<Contact2D>(vm, o))
-        throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
-}
-
 void LuaFunctionBase::push_value(lua_State *vm, Manifold2D o){
     if (!luabridge::push<Manifold2D>(vm, o))
         throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
 }
 
-void LuaFunctionBase::push_value(lua_State *vm, ContactImpulse2D o){
-    if (!luabridge::push<ContactImpulse2D>(vm, o))
+void LuaFunctionBase::push_value(lua_State *vm, Contact2D o){
+    if (!luabridge::push<Contact2D>(vm, o))
         throw luabridge::makeErrorCode(luabridge::ErrorCode::LuaStackOverflow);
 }
 

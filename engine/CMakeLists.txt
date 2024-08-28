@@ -13,7 +13,7 @@ include_directories(libs/soloud/include)
 include_directories(libs/tinyobjloader)
 include_directories(libs/tinygltf)
 include_directories(libs/tinyxml2)
-include_directories(libs/box2d/include/box2d)
+include_directories(libs/box2d/include)
 include_directories(libs/joltphysics)
 
 add_subdirectory(libs/sokol)

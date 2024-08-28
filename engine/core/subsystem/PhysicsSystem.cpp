@@ -21,13 +21,13 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
     this->gravity = Vector3(0, -9.81f, 0);
     this->pointsToMeterScale2D = 64.0;
 
-    world2D = new b2World(b2Vec2(this->gravity.x, this->gravity.y));
-  
-    contactListener2D = new Box2DContactListener(scene, this);
-    contactFilter2D = new Box2DContactFilter(scene, this);
+    b2WorldDef worldDef = b2DefaultWorldDef();
+    worldDef.gravity = {this->gravity.x, this->gravity.y};
+    world2D = b2CreateWorld(&worldDef);
 
-    world2D->SetContactListener(contactListener2D);
-    world2D->SetContactFilter(contactFilter2D);
+    b2World_SetPreSolveCallback(world2D, Box2DAux::PreSolve, scene);
+    // TODO: could there be a performance issue by checking this often?
+    b2World_SetCustomFilterCallback(world2D, Box2DAux::CollisionFilter, scene);
 
     // https://github.com/jrouwe/JoltPhysics/issues/244
     JPH::RegisterDefaultAllocator();
@@ -67,10 +67,8 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 }
 
 PhysicsSystem::~PhysicsSystem(){
-    delete world2D;
-
-    delete contactListener2D;
-    delete contactFilter2D;
+    b2DestroyWorld(world2D);
+    world2D = b2_nullWorldId;
 
     delete activationListener3D;
     delete contactListener3D;
@@ -93,7 +91,7 @@ Vector3 PhysicsSystem::getGravity() const{
 void PhysicsSystem::setGravity(Vector3 gravity){
     if (this->gravity != gravity){
         this->gravity = gravity;
-        world2D->SetGravity(b2Vec2(gravity.x, gravity.y));
+        b2World_SetGravity(world2D, {gravity.x, gravity.y});
         world3D->SetGravity(JPH::Vec3(gravity.x, gravity.y, gravity.z));
     }
 }
@@ -117,25 +115,24 @@ void PhysicsSystem::setPointsToMeterScale2D(float pointsToMeterScale2D){
 void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body){
     if (signature.test(scene->getComponentType<Transform>())){
         Transform& transform = scene->getComponent<Transform>(entity);
-        if (body.body){
+        if (b2Body_IsValid(body.body)){
 
-            b2Vec2 bNewPosition(transform.worldPosition.x / pointsToMeterScale2D, transform.worldPosition.y / pointsToMeterScale2D);
+            b2Vec2 bNewPosition = {transform.worldPosition.x / pointsToMeterScale2D, transform.worldPosition.y / pointsToMeterScale2D};
             float bNewAngle = Angle::defaultToRad(transform.worldRotation.getRoll());
 
             if (body.newBody && transform.needUpdate){
-                bNewPosition = b2Vec2(transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D);
+                bNewPosition = {transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D};
                 bNewAngle = Angle::defaultToRad(transform.rotation.getRoll());
                 if (transform.parent != NULL_ENTITY){
                     Log::warn("Body position and rotation cannot be obtained from world: %u (%s)", entity, transform.name.c_str());
                 }
             }
 
-            b2Vec2 bPosition = body.body->GetPosition();
-            float bAngle = body.body->GetAngle();
+            b2Transform bTransform = b2Body_GetTransform(body.body);
 
-            if (bPosition != bNewPosition || bAngle != bNewAngle){
-                body.body->SetTransform(bNewPosition, bNewAngle);
-                body.body->SetAwake(true);
+            if (bTransform.p != bNewPosition || b2Rot_GetAngle(bTransform.q) != bNewAngle){
+                b2Body_SetTransform(body.body, bNewPosition, b2MakeRot(bNewAngle));
+                b2Body_SetAwake(body.body, true);
             }
         }
     }
@@ -226,20 +223,21 @@ int PhysicsSystem::createRectShape2D(Entity entity, float width, float height){
 
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
-            b2PolygonShape shape;
+            b2Polygon polygon = { 0 };
             // same as shape.SetAsBox but using center on left corner
-            shape.m_count = 4;
-            shape.m_vertices[0].Set(0, 0);
-            shape.m_vertices[1].Set( width / pointsToMeterScale2D, 0);
-            shape.m_vertices[2].Set( width / pointsToMeterScale2D,  height / pointsToMeterScale2D);
-            shape.m_vertices[3].Set(0,  height / pointsToMeterScale2D);
-            shape.m_normals[0].Set(0.0f, -1.0f);
-            shape.m_normals[1].Set(1.0f, 0.0f);
-            shape.m_normals[2].Set(0.0f, 1.0f);
-            shape.m_normals[3].Set(-1.0f, 0.0f);
-            shape.m_centroid.SetZero();
+            polygon.count = 4;
+            polygon.vertices[0] = ( b2Vec2 ){ 0, 0 };
+            polygon.vertices[1] = ( b2Vec2 ){ width / pointsToMeterScale2D, 0 };
+            polygon.vertices[2] = ( b2Vec2 ){ width / pointsToMeterScale2D,  height / pointsToMeterScale2D };
+            polygon.vertices[3] = ( b2Vec2 ){ 0,  height / pointsToMeterScale2D };
+            polygon.normals[0] = ( b2Vec2 ){ 0.0f, -1.0f };
+            polygon.normals[1] = ( b2Vec2 ){ 1.0f, 0.0f };
+            polygon.normals[2] = ( b2Vec2 ){ 0.0f, 1.0f };
+            polygon.normals[3] = ( b2Vec2 ){ -1.0f, 0.0f };
+            polygon.radius = 0.0f;
+            polygon.centroid = b2Vec2_zero;
 
-            return loadShape2D(*body, &shape);
+            return loadShape2D(*body, polygon);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -256,12 +254,12 @@ int PhysicsSystem::createCenteredRectShape2D(Entity entity, float width, float h
 
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
-            b2PolygonShape shape;
             float halfW = width / 2.0 / pointsToMeterScale2D;
             float halfH = height / 2.0 / pointsToMeterScale2D;
-            shape.SetAsBox(halfW, halfH, b2Vec2(center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D), Angle::defaultToRad(angle));
 
-            return loadShape2D(*body, &shape);
+            b2Polygon polygon = b2MakeOffsetBox(halfW, halfH, {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D}, Angle::defaultToRad(angle));
+
+            return loadShape2D(*body, polygon);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -278,14 +276,15 @@ int PhysicsSystem::createPolygonShape2D(Entity entity, std::vector<Vector2> vert
 
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
-            b2PolygonShape polygon;
             std::vector<b2Vec2> b2vertices(vertices.size());
             for (int i = 0; i < vertices.size(); i++){
-                b2vertices[i].Set(vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D);
+                b2vertices[i] = {vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D};
             }
-            polygon.Set(&b2vertices[0], (int)vertices.size());
+            b2Hull hull = b2ComputeHull(&b2vertices[0], (int)vertices.size());
 
-            return loadShape2D(*body, &polygon);
+            b2Polygon polygon = b2MakePolygon( &hull, 0.0f );
+
+            return loadShape2D(*body, polygon);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -302,11 +301,11 @@ int PhysicsSystem::createCircleShape2D(Entity entity, Vector2 center, float radi
 
             body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
 
-            b2CircleShape circle;
-            circle.m_p.Set(center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D);
-            circle.m_radius = radius / pointsToMeterScale2D;
+            b2Circle circle = { 0 };
+            circle.center = {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D};
+            circle.radius = radius / pointsToMeterScale2D;
 
-            return loadShape2D(*body, &circle);
+            return loadShape2D(*body, circle);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -314,53 +313,7 @@ int PhysicsSystem::createCircleShape2D(Entity entity, Vector2 center, float radi
 
     return -1;
 }
-
-int PhysicsSystem::createTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
-
-            b2EdgeShape edge;
-            b2Vec2 v1(vertice1.x / pointsToMeterScale2D, vertice1.y / pointsToMeterScale2D);
-            b2Vec2 v2(vertice2.x / pointsToMeterScale2D, vertice2.y / pointsToMeterScale2D);
-            edge.SetTwoSided(v1, v2);
-
-            return loadShape2D(*body, &edge);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = CollisionShape2DType::POLYGON;
-
-            b2EdgeShape edge;
-            b2Vec2 v0(vertice0.x / pointsToMeterScale2D, vertice0.y / pointsToMeterScale2D);
-            b2Vec2 v1(vertice1.x / pointsToMeterScale2D, vertice1.y / pointsToMeterScale2D);
-            b2Vec2 v2(vertice2.x / pointsToMeterScale2D, vertice2.y / pointsToMeterScale2D);
-            b2Vec2 v3(vertice3.x / pointsToMeterScale2D, vertice3.y / pointsToMeterScale2D);
-            edge.SetOneSided(v0, v1, v2, v3);
-
-            return loadShape2D(*body, &edge);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
+/*
 int PhysicsSystem::createLoopChainShape2D(Entity entity, std::vector<Vector2> vertices){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
@@ -410,7 +363,7 @@ int PhysicsSystem::createChainShape2D(Entity entity, std::vector<Vector2> vertic
 
     return -1;
 }
-
+*/
 void PhysicsSystem::removeAllShapes2D(Entity entity){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
@@ -839,7 +792,7 @@ int PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& ter
     return -1;
 }
 
-b2World* PhysicsSystem::getWorld2D() const{
+b2WorldId PhysicsSystem::getWorld2D() const{
      return world2D;
 }
 
@@ -847,25 +800,32 @@ JPH::PhysicsSystem* PhysicsSystem::getWorld3D() const{
     return world3D;
 }
 
-b2Body* PhysicsSystem::getBody(Entity entity){
+b2BodyId PhysicsSystem::getBody(Entity entity){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
         return body->body;
     }
 
-    return NULL;
+    return b2_nullBodyId;
 }
 
 bool PhysicsSystem::loadBody2D(Entity entity){
     Body2DComponent& body = scene->getComponent<Body2DComponent>(entity);
 
-    if (world2D && !body.body){
-        b2BodyDef bodyDef;
-        bodyDef.userData.pointer = entity;
+    if (!b2Body_IsValid(body.body)){
+        b2BodyDef bodyDef = b2DefaultBodyDef();
 
-        body.body = world2D->CreateBody(&bodyDef);
-        body.body->SetType(b2_dynamicBody);
+        if (body.type == BodyType::STATIC){
+            bodyDef.type = b2_staticBody;
+        }else if (body.type == BodyType::KINEMATIC){
+            bodyDef.type = b2_kinematicBody;
+        }else{
+            bodyDef.type = b2_dynamicBody;
+        }
+        bodyDef.userData = reinterpret_cast<void*>(entity);
+
+        body.body = b2CreateBody(world2D, &bodyDef);
         body.newBody = true;
 
         return true;
@@ -877,15 +837,15 @@ bool PhysicsSystem::loadBody2D(Entity entity){
 void PhysicsSystem::destroyBody2D(Body2DComponent& body){
     // When a world leaves scope or is deleted by calling delete on a pointer
     // all the memory reserved for bodies, fixtures, and joints is freed
-    if (world2D && body.body){
+    if (b2Body_IsValid(body.body)){
         for (int i = 0; i < body.numShapes; i++){
             destroyShape2D(body, i);
         }
         body.numShapes = 0;
 
-        world2D->DestroyBody(body.body);
+        b2DestroyBody(body.body);
 
-        body.body = NULL;
+        body.body = b2_nullBodyId;
     }
 }
 
@@ -897,7 +857,7 @@ bool PhysicsSystem::loadBody3D(Entity entity){
         for (int i = 0; i < body.numShapes; i++){
             if (body.type != BodyType::STATIC){
                 if (body.shapes[i].type == CollisionShape3DType::HEIGHTFIELD){
-                    Log::error("Heightfild body should be static for 3D Body entity: %u", entity);
+                    Log::error("Heightfield body should be static for 3D Body entity: %u", entity);
                     return false;
                 }
                 if (body.shapes[i].type == CollisionShape3DType::MESH && !body.overrideMassProperties){
@@ -978,18 +938,37 @@ void PhysicsSystem::destroyBody3D(Body3DComponent& body){
     }
 }
 
-int PhysicsSystem::loadShape2D(Body2DComponent& body, b2Shape* shape){
-    if (world2D && !body.shapes[body.numShapes].fixture){
-        b2FixtureDef fixtureDef;
-        fixtureDef.shape = shape;
-        fixtureDef.userData.pointer = body.numShapes;
+int PhysicsSystem::loadShape2D(Body2DComponent& body, b2Polygon& polygon){
+    if (!b2Shape_IsValid(body.shapes[body.numShapes].shape)){
+        b2ShapeDef shapeDef = b2DefaultShapeDef();
+        shapeDef.userData = reinterpret_cast<void*>(body.numShapes);
 
-        if (!body.body){
+        if (!b2Body_IsValid(body.body)){
             Log::error("Cannot create 2D body shape without loaded body");
             return -1;
         }
 
-        body.shapes[body.numShapes].fixture = body.body->CreateFixture(&fixtureDef);
+        body.shapes[body.numShapes].shape = b2CreatePolygonShape(body.body, &shapeDef, &polygon);
+
+        body.numShapes++;
+
+        return (body.numShapes - 1);
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::loadShape2D(Body2DComponent& body, b2Circle& circle){
+    if (!b2Shape_IsValid(body.shapes[body.numShapes].shape)){
+        b2ShapeDef shapeDef = b2DefaultShapeDef();
+        shapeDef.userData = reinterpret_cast<void*>(body.numShapes);
+
+        if (!b2Body_IsValid(body.body)){
+            Log::error("Cannot create 2D body shape without loaded body");
+            return -1;
+        }
+
+        body.shapes[body.numShapes].shape = b2CreateCircleShape(body.body, &shapeDef, &circle);
 
         body.numShapes++;
 
@@ -1000,10 +979,10 @@ int PhysicsSystem::loadShape2D(Body2DComponent& body, b2Shape* shape){
 }
 
 void PhysicsSystem::destroyShape2D(Body2DComponent& body, size_t index){
-    if (world2D && body.shapes[index].fixture){
-        body.body->DestroyFixture(body.shapes[index].fixture);
+    if (b2Shape_IsValid(body.shapes[index].shape)){
+        b2DestroyShape(body.shapes[index].shape);
 
-        body.shapes[index].fixture = NULL;
+        body.shapes[index].shape = b2_nullShapeId;
     }
 }
 
@@ -1036,7 +1015,7 @@ void PhysicsSystem::destroyShape3D(Body3DComponent& body, size_t index){
     }
 }
 
-bool PhysicsSystem::loadDistanceJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB){
+bool PhysicsSystem::loadDistanceJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB, bool rope){
     Signature signatureA = scene->getSignature(bodyA);
     Signature signatureB = scene->getSignature(bodyB);
 
@@ -1048,13 +1027,21 @@ bool PhysicsSystem::loadDistanceJoint2D(Joint2DComponent& joint, Entity bodyA, E
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
 
-        b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D);
-        b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D);
+        b2Vec2 worldPivotA = {anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D};
+        b2Vec2 worldPivotB = {anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D};
 
-        b2DistanceJointDef jointDef;
-        jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchorA, myAnchorB);
+        b2DistanceJointDef jointDef = b2DefaultDistanceJointDef();
+        jointDef.bodyIdA = myBodyA.body;
+        jointDef.bodyIdB = myBodyB.body;
+        jointDef.localAnchorA = b2Body_GetLocalPoint(myBodyA.body, worldPivotA);
+        jointDef.localAnchorB = b2Body_GetLocalPoint(myBodyB.body, worldPivotB);
+        jointDef.length = b2Distance(worldPivotA, worldPivotB);
+        if (rope){
+            jointDef.minLength = 0;
+        }
+        jointDef.userData = reinterpret_cast<void*>(entity);
 
-        joint.joint = world2D->CreateJoint(&jointDef);
+        joint.joint = b2CreateDistanceJoint(world2D, &jointDef);
         joint.type = Joint2DType::DISTANCE;
 
     }else{
@@ -1065,7 +1052,7 @@ bool PhysicsSystem::loadDistanceJoint2D(Joint2DComponent& joint, Entity bodyA, E
     return true;
 }
 
-bool PhysicsSystem::loadRevoluteJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor){
+bool PhysicsSystem::loadRevoluteJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor){
     Signature signatureA = scene->getSignature(bodyA);
     Signature signatureB = scene->getSignature(bodyB);
 
@@ -1077,12 +1064,16 @@ bool PhysicsSystem::loadRevoluteJoint2D(Joint2DComponent& joint, Entity bodyA, E
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
+        b2Vec2 worldPivot = {anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D};
 
-        b2RevoluteJointDef jointDef;
-        jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchor);
+        b2RevoluteJointDef jointDef = b2DefaultRevoluteJointDef();
+        jointDef.bodyIdA = myBodyA.body;
+        jointDef.bodyIdB = myBodyB.body;
+        jointDef.localAnchorA = b2Body_GetLocalPoint(myBodyA.body, worldPivot);
+        jointDef.localAnchorB = b2Body_GetLocalPoint(myBodyB.body, worldPivot);
+        jointDef.userData = reinterpret_cast<void*>(entity);
 
-        joint.joint = world2D->CreateJoint(&jointDef);
+        joint.joint = b2CreateRevoluteJoint(world2D, &jointDef);
         joint.type = Joint2DType::REVOLUTE;
 
     }else{
@@ -1093,7 +1084,7 @@ bool PhysicsSystem::loadRevoluteJoint2D(Joint2DComponent& joint, Entity bodyA, E
     return true;
 }
 
-bool PhysicsSystem::loadPrismaticJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis){
+bool PhysicsSystem::loadPrismaticJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis){
     Signature signatureA = scene->getSignature(bodyA);
     Signature signatureB = scene->getSignature(bodyB);
 
@@ -1105,13 +1096,18 @@ bool PhysicsSystem::loadPrismaticJoint2D(Joint2DComponent& joint, Entity bodyA, 
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
-        b2Vec2 myAxis(axis.x, axis.y);
+        b2Vec2 worldPivot = {anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D};
+        b2Vec2 worldAxis = {axis.x, axis.y};
 
-        b2PrismaticJointDef jointDef;
-        jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchor, myAxis);
+        b2PrismaticJointDef jointDef = b2DefaultPrismaticJointDef();
+        jointDef.bodyIdA = myBodyA.body;
+        jointDef.bodyIdB = myBodyB.body;
+        jointDef.localAnchorA = b2Body_GetLocalPoint(myBodyA.body, worldPivot);
+        jointDef.localAnchorB = b2Body_GetLocalPoint(myBodyB.body, worldPivot);
+        jointDef.localAxisA = b2Body_GetLocalVector(myBodyA.body, worldAxis);
+        jointDef.userData = reinterpret_cast<void*>(entity);
 
-        joint.joint = world2D->CreateJoint(&jointDef);
+        joint.joint = b2CreatePrismaticJoint(world2D, &jointDef);
         joint.type = Joint2DType::PRISMATIC;
 
     }else{
@@ -1122,81 +1118,7 @@ bool PhysicsSystem::loadPrismaticJoint2D(Joint2DComponent& joint, Entity bodyA, 
     return true;
 }
 
-bool PhysicsSystem::loadPulleyJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 groundAnchorA, Vector2 groundAnchorB, Vector2 anchorA, Vector2 anchorB, Vector2 worldAxis, float ratio){
-    Signature signatureA = scene->getSignature(bodyA);
-    Signature signatureB = scene->getSignature(bodyB);
-
-    if (signatureA.test(scene->getComponentType<Body2DComponent>()) && signatureB.test(scene->getComponentType<Body2DComponent>())){
-
-        Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
-        Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
-
-        updateBody2DPosition(signatureA, bodyA, myBodyA);
-        updateBody2DPosition(signatureB, bodyB, myBodyB);
-
-        b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D);
-        b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D);
-        b2Vec2 myGroundA(groundAnchorA.x / pointsToMeterScale2D, groundAnchorA.y / pointsToMeterScale2D);
-        b2Vec2 myGroundB(groundAnchorB.x / pointsToMeterScale2D, groundAnchorB.y / pointsToMeterScale2D);
-
-        b2PulleyJointDef jointDef;
-        jointDef.Initialize(myBodyA.body, myBodyB.body, myGroundA, myGroundB, myAnchorA, myAnchorB, ratio);
-
-        joint.joint = world2D->CreateJoint(&jointDef);
-        joint.type = Joint2DType::PULLEY;
-
-    }else{
-        Log::error("Cannot create joint, error in bodyA or bodyB");
-        return false;
-    }
-
-    return true;
-}
-
-bool PhysicsSystem::loadGearJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Entity revoluteJoint, Entity prismaticJoint, float ratio){
-    Signature signatureA = scene->getSignature(bodyA);
-    Signature signatureB = scene->getSignature(bodyB);
-
-    if (signatureA.test(scene->getComponentType<Body2DComponent>()) && signatureB.test(scene->getComponentType<Body2DComponent>())){
-
-        Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
-        Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
-
-        Signature signatureJ1 = scene->getSignature(revoluteJoint);
-        Signature signatureJ2 = scene->getSignature(prismaticJoint);
-
-        if (signatureJ1.test(scene->getComponentType<Joint2DComponent>()) && signatureJ2.test(scene->getComponentType<Joint2DComponent>())){
-
-            Joint2DComponent myRevoluteJoint = scene->getComponent<Joint2DComponent>(revoluteJoint);
-            Joint2DComponent myPrismaticJoint = scene->getComponent<Joint2DComponent>(prismaticJoint);
-
-            updateBody2DPosition(signatureA, bodyA, myBodyA);
-            updateBody2DPosition(signatureB, bodyB, myBodyB);
-
-            b2GearJointDef jointDef;
-            jointDef.joint1 = myRevoluteJoint.joint;
-            jointDef.joint2 = myPrismaticJoint.joint;
-            jointDef.bodyA = myBodyA.body;
-            jointDef.bodyB = myBodyB.body;
-            jointDef.ratio = ratio;
-
-            joint.joint = world2D->CreateJoint(&jointDef);
-            joint.type = Joint2DType::GEAR;
-
-        }else{
-            Log::error("Cannot create joint, revoluteJoint or prismaticJoint not created");
-            return false;
-        }
-
-    }else{
-        Log::error("Cannot create joint, error in bodyA or bodyB");
-        return false;
-    }
-
-    return true;
-}
-
-bool PhysicsSystem::loadMouseJoint2D(Joint2DComponent& joint, Entity body, Vector2 target){
+bool PhysicsSystem::loadMouseJoint2D(Entity entity, Joint2DComponent& joint, Entity body, Vector2 target){
     Signature signature = scene->getSignature(body);
 
     if (signature.test(scene->getComponentType<Body2DComponent>())){
@@ -1205,14 +1127,15 @@ bool PhysicsSystem::loadMouseJoint2D(Joint2DComponent& joint, Entity body, Vecto
 
         updateBody2DPosition(signature, body, myBody);
 
-        b2Vec2 myTarget(target.x / pointsToMeterScale2D, target.y / pointsToMeterScale2D);
+        b2Vec2 worldTarget = {target.x / pointsToMeterScale2D, target.y / pointsToMeterScale2D};
 
-        b2MouseJointDef jointDef;
-        jointDef.bodyA = myBody.body;
-        jointDef.bodyB = myBody.body;
-        jointDef.target = myTarget;
+        b2MouseJointDef jointDef = b2DefaultMouseJointDef();
+        jointDef.bodyIdA = myBody.body;
+        jointDef.bodyIdB = myBody.body;
+        jointDef.target = worldTarget;
+        jointDef.userData = reinterpret_cast<void*>(entity);
 
-        joint.joint = world2D->CreateJoint(&jointDef);
+        joint.joint = b2CreateMouseJoint(world2D, &jointDef);
         joint.type = Joint2DType::MOUSE;
 
     }else{
@@ -1223,7 +1146,7 @@ bool PhysicsSystem::loadMouseJoint2D(Joint2DComponent& joint, Entity body, Vecto
     return true;
 }
 
-bool PhysicsSystem::loadWheelJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis){
+bool PhysicsSystem::loadWheelJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor, Vector2 axis){
     Signature signatureA = scene->getSignature(bodyA);
     Signature signatureB = scene->getSignature(bodyB);
 
@@ -1235,13 +1158,18 @@ bool PhysicsSystem::loadWheelJoint2D(Joint2DComponent& joint, Entity bodyA, Enti
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
-        b2Vec2 myAxis(axis.x, axis.y);
+        b2Vec2 worldPivot = {anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D};
+        b2Vec2 worldAxis = {axis.x, axis.y};
 
-        b2WheelJointDef jointDef;
-        jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchor, myAxis);
+        b2WheelJointDef jointDef = b2DefaultWheelJointDef();
+        jointDef.bodyIdA = myBodyA.body;
+        jointDef.bodyIdB = myBodyB.body;
+        jointDef.localAnchorA = b2Body_GetLocalPoint(myBodyA.body, worldPivot);
+        jointDef.localAnchorB = b2Body_GetLocalPoint(myBodyB.body, worldPivot);
+        jointDef.localAxisA = b2Body_GetLocalVector(myBodyA.body, worldAxis);
+        jointDef.userData = reinterpret_cast<void*>(entity);
 
-        joint.joint = world2D->CreateJoint(&jointDef);
+        joint.joint = b2CreateWheelJoint(world2D, &jointDef);
         joint.type = Joint2DType::WHEEL;
 
     }else{
@@ -1252,7 +1180,7 @@ bool PhysicsSystem::loadWheelJoint2D(Joint2DComponent& joint, Entity bodyA, Enti
     return true;
 }
 
-bool PhysicsSystem::loadWeldJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor){
+bool PhysicsSystem::loadWeldJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor){
     Signature signatureA = scene->getSignature(bodyA);
     Signature signatureB = scene->getSignature(bodyB);
 
@@ -1264,12 +1192,16 @@ bool PhysicsSystem::loadWeldJoint2D(Joint2DComponent& joint, Entity bodyA, Entit
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
+        b2Vec2 worldPivot = {anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D};
 
-        b2WeldJointDef jointDef;
-        jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchor);
+        b2WeldJointDef jointDef = b2DefaultWeldJointDef();
+        jointDef.bodyIdA = myBodyA.body;
+        jointDef.bodyIdB = myBodyB.body;
+        jointDef.localAnchorA = b2Body_GetLocalPoint(myBodyA.body, worldPivot);
+        jointDef.localAnchorB = b2Body_GetLocalPoint(myBodyB.body, worldPivot);
+        jointDef.userData = reinterpret_cast<void*>(entity);
 
-        joint.joint = world2D->CreateJoint(&jointDef);
+        joint.joint = b2CreateWeldJoint(world2D, &jointDef);
         joint.type = Joint2DType::WELD;
 
     }else{
@@ -1280,7 +1212,7 @@ bool PhysicsSystem::loadWeldJoint2D(Joint2DComponent& joint, Entity bodyA, Entit
     return true;
 }
 
-bool PhysicsSystem::loadFrictionJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchor){
+bool PhysicsSystem::loadMotorJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB){
     Signature signatureA = scene->getSignature(bodyA);
     Signature signatureB = scene->getSignature(bodyB);
 
@@ -1292,38 +1224,12 @@ bool PhysicsSystem::loadFrictionJoint2D(Joint2DComponent& joint, Entity bodyA, E
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
 
-        b2Vec2 myAnchor(anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D);
+        b2MotorJointDef jointDef = b2DefaultMotorJointDef();
+        jointDef.bodyIdA = myBodyA.body;
+        jointDef.bodyIdB = myBodyB.body;
+        jointDef.userData = reinterpret_cast<void*>(entity);
 
-        b2FrictionJointDef jointDef;
-        jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchor);
-
-        joint.joint = world2D->CreateJoint(&jointDef);
-        joint.type = Joint2DType::FRICTION;
-
-    }else{
-        Log::error("Cannot create joint, error in bodyA or bodyB");
-        return false;
-    }
-
-    return true;
-}
-
-bool PhysicsSystem::loadMotorJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB){
-    Signature signatureA = scene->getSignature(bodyA);
-    Signature signatureB = scene->getSignature(bodyB);
-
-    if (signatureA.test(scene->getComponentType<Body2DComponent>()) && signatureB.test(scene->getComponentType<Body2DComponent>())){
-
-        Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
-        Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
-
-        updateBody2DPosition(signatureA, bodyA, myBodyA);
-        updateBody2DPosition(signatureB, bodyB, myBodyB);
-
-        b2MotorJointDef jointDef;
-        jointDef.Initialize(myBodyA.body, myBodyB.body);
-
-        joint.joint = world2D->CreateJoint(&jointDef);
+        joint.joint = b2CreateMotorJoint(world2D, &jointDef);
         joint.type = Joint2DType::MOTOR;
 
     }else{
@@ -1334,41 +1240,10 @@ bool PhysicsSystem::loadMotorJoint2D(Joint2DComponent& joint, Entity bodyA, Enti
     return true;
 }
 
-bool PhysicsSystem::loadRopeJoint2D(Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB){
-    Signature signatureA = scene->getSignature(bodyA);
-    Signature signatureB = scene->getSignature(bodyB);
-
-    if (signatureA.test(scene->getComponentType<Body2DComponent>()) && signatureB.test(scene->getComponentType<Body2DComponent>())){
-
-        Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
-        Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
-
-        updateBody2DPosition(signatureA, bodyA, myBodyA);
-        updateBody2DPosition(signatureB, bodyB, myBodyB);
-
-        b2Vec2 myAnchorA(anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D);
-        b2Vec2 myAnchorB(anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D);
-
-        b2DistanceJointDef jointDef;
-        jointDef.Initialize(myBodyA.body, myBodyB.body, myAnchorA, myAnchorB);
-        jointDef.minLength = 0;
-
-        joint.joint = world2D->CreateJoint(&jointDef);
-        joint.type = Joint2DType::ROPE;
-
-    }else{
-        Log::error("Cannot create joint, error in bodyA or bodyB");
-        return false;
-    }
-
-    return true;
-}
-
 void PhysicsSystem::destroyJoint2D(Joint2DComponent& joint){
-    if (world2D && joint.joint){
-        world2D->DestroyJoint(joint.joint);
-
-        joint.joint = NULL;
+    if (b2Joint_IsValid(joint.joint)){
+        b2DestroyJoint(joint.joint);
+        joint.joint = b2_nullJointId;
     }
 }
 
@@ -1383,6 +1258,7 @@ bool PhysicsSystem::loadFixedJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
 
         updateBody3DPosition(signatureA, bodyA, myBodyA);
         updateBody3DPosition(signatureB, bodyB, myBodyB);
+
         JPH::FixedConstraintSettings settings;
         settings.mAutoDetectPoint = true;
 
@@ -1837,7 +1713,7 @@ void PhysicsSystem::update(double dt){
 		Entity entity = bodies2d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-        if (body.body){
+        if (b2Body_IsValid(body.body)){
             updateBody2DPosition(signature, entity, body);
 
             body.newBody = false;
@@ -1845,46 +1721,44 @@ void PhysicsSystem::update(double dt){
     }
 
     if (bodies2d->size() > 0){
-        int32 velocityIterations = 6;
-        int32 positionIterations = 2;
-
-        world2D->Step(dt, velocityIterations, positionIterations);
+        int32_t subSteps = 4;
+        b2World_Step(world2D, dt, subSteps);
     }
 
-	for (int i = 0; i < bodies2d->size(); i++){
-		Body2DComponent& body = bodies2d->getComponentFromIndex(i);
-		Entity entity = bodies2d->getEntity(i);
-		Signature signature = scene->getSignature(entity);
+    b2BodyEvents events = b2World_GetBodyEvents(world2D);
+    for (int i = 0; i < events.moveCount; ++i){
+        const b2BodyMoveEvent* event = events.moveEvents + i;
 
-        if (body.body){
-            b2Vec2 position = body.body->GetPosition();
-            float angle = body.body->GetAngle();
-            if (signature.test(scene->getComponentType<Transform>())){
-                Transform& transform = scene->getComponent<Transform>(entity);
+        Entity entity = reinterpret_cast<uintptr_t>(event->userData);
+        Signature signature = scene->getSignature(entity);
 
-                Vector3 nPosition = Vector3(position.x * pointsToMeterScale2D, position.y * pointsToMeterScale2D, transform.worldPosition.z);
-                Quaternion nRotation = Quaternion(Angle::radToDefault(angle), Vector3(0, 0, 1));
+        b2Transform bTransform = event->transform;
+        if (signature.test(scene->getComponentType<Transform>())){
+            Transform& transform = scene->getComponent<Transform>(entity);
 
-                if (transform.parent != NULL_ENTITY){
-                    Transform& transformParent = scene->getComponent<Transform>(transform.parent);
+            Vector3 nPosition = Vector3(bTransform.p.x * pointsToMeterScale2D, bTransform.p.y * pointsToMeterScale2D, transform.worldPosition.z);
+            Quaternion nRotation = Quaternion(Angle::radToDefault(b2Rot_GetAngle(bTransform.q)), Vector3(0, 0, 1));
 
-                    nPosition = transformParent.modelMatrix.inverse() * nPosition;
-                    nRotation = transformParent.worldRotation.inverse() * nRotation;
-                }
+            if (transform.parent != NULL_ENTITY){
+                Transform& transformParent = scene->getComponent<Transform>(transform.parent);
 
-                if (transform.position != nPosition){
-                    transform.position = nPosition;
-                    transform.needUpdate = true;
-                }
+                nPosition = transformParent.modelMatrix.inverse() * nPosition;
+                nRotation = transformParent.worldRotation.inverse() * nRotation;
+            }
 
-                if (transform.rotation != nRotation){
-                    transform.rotation = nRotation;
-                    transform.needUpdate = true;
-                }
+            if (transform.position != nPosition){
+                transform.position = nPosition;
+                transform.needUpdate = true;
+            }
 
+            if (transform.rotation != nRotation){
+                transform.rotation = nRotation;
+                transform.needUpdate = true;
             }
         }
     }
+
+    Box2DAux::manageEvents(scene, world2D);
 
     auto bodies3d = scene->getComponentArray<Body3DComponent>();
 

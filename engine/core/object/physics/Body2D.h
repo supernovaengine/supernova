@@ -9,11 +9,10 @@
 #include "math/Vector2.h"
 #include "component/Body2DComponent.h"
 
-class b2Body;
-class b2Fixture;
 
 namespace Supernova{
 
+    class Contact2D;
     class Object;
 
     class Body2D: public EntityHandle{
@@ -27,8 +26,8 @@ namespace Supernova{
         Body2D(const Body2D& rhs);
         Body2D& operator=(const Body2D& rhs);
 
-        b2Body* getBox2DBody() const;
-        b2Fixture* getBox2DFixture(size_t index) const;
+        b2BodyId getBox2DBody() const;
+        b2ShapeId getBox2DShape(size_t index) const;
 
         Object getAttachedObject();
 
@@ -41,12 +40,15 @@ namespace Supernova{
         int createCenteredRectShape(float width, float height, Vector2 center, float angle);
         int createPolygonShape(std::vector<Vector2> vertices);
         int createCircleShape(Vector2 center, float radius);
-        int createTwoSidedEdgeShape(Vector2 vertice1, Vector2 vertice2);
-        int createOneSidedEdgeShape(Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
-        int createLoopChainShape(std::vector<Vector2> vertices);
-        int createChainShape(std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
+        //int createTwoSidedEdgeShape(Vector2 vertice1, Vector2 vertice2);
+        //int createOneSidedEdgeShape(Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
+        //int createLoopChainShape(std::vector<Vector2> vertices);
+        //int createChainShape(std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
 
         void removeAllShapes();
+
+        std::vector<Contact2D> getBodyContacts();
+        std::vector<Contact2D> getShapeContacts(size_t index);
 
         void setShapeDensity(float density);
         void setShapeFriction(float friction);
@@ -56,6 +58,16 @@ namespace Supernova{
         void setShapeFriction(size_t index, float friction);
         void setShapeRestitution(size_t index, float restitution);
 
+        void setShapeEnableHitEvents(bool hitEvents);
+        void setShapeContactEvents(bool contactEvents);
+        void setShapePreSolveEvents(bool preSolveEvent);
+        void setShapeSensorEvents(bool sensorEvents);
+
+        void setShapeEnableHitEvents(size_t index, bool hitEvents);
+        void setShapeContactEvents(size_t index, bool contactEvents);
+        void setShapePreSolveEvents(size_t index, bool preSolveEvent);
+        void setShapeSensorEvents(size_t index, bool sensorEvents);
+
         float getShapeDensity() const;
         float getShapeFriction() const;
         float getShapeRestitution() const;
@@ -64,12 +76,21 @@ namespace Supernova{
         float getShapeFriction(size_t index) const;
         float getShapeRestitution(size_t index) const;
 
+        bool isShapeEnableHitEvents() const;
+        bool isShapeContactEvents() const;
+        bool isShapePreSolveEvents() const;
+        bool isShapeSensorEvents() const;
+
+        bool isShapeEnableHitEvents(size_t index) const;
+        bool isShapeContactEvents(size_t index) const;
+        bool isShapePreSolveEvents(size_t index) const;
+        bool isShapeSensorEvents(size_t index) const;
 
         void setLinearVelocity(Vector2 linearVelocity);
         void setAngularVelocity(float angularVelocity);
         void setLinearDamping(float linearDamping);
         void setAngularDamping(float angularDamping);
-        void setAllowSleep(bool allowSleep);
+        void setEnableSleep(bool enableSleep);
         void setAwake(bool awake);
         void setFixedRotation(bool fixedRotation);
         void setBullet(bool bullet);
@@ -81,7 +102,7 @@ namespace Supernova{
         float getAngularVelocity() const;
         float getLinearDamping() const;
         float getAngularDamping() const;
-        bool isAllowSleep() const;
+        bool isEnableSleep() const;
         bool isAwake() const;
         bool isFixedRotation() const;
         bool isBullet() const;
@@ -109,10 +130,9 @@ namespace Supernova{
         int16_t getGroupIndexFilter(size_t shapeIndex) const;
 
         float getMass() const;
-        float getInertia() const;
-        Vector2 getLinearVelocityFromWorldPoint(Vector2 worldPoint) const;
+        float getInertiaTensor() const;
 
-        void resetMassData();
+        void applyMassFromShapes();
 
         void applyForce(const Vector2& force, const Vector2& point, bool wake);
         void applyForceToCenter(const Vector2& force, bool wake);

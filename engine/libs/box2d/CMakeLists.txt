@@ -3,69 +3,82 @@
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/include")
 include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/src")
 
+set(BOX2D_SOURCE_FILES
+	./src/aabb.c
+	./src/aabb.h
+	./src/allocate.c
+	./src/allocate.h
+	./src/array.c
+	./src/array.h
+	./src/bitset.c
+	./src/bitset.h
+	./src/block_array.c
+	./src/block_array.h
+	./src/body.c
+	./src/body.h
+	./src/broad_phase.c
+	./src/broad_phase.h
+	./src/constraint_graph.c
+	./src/constraint_graph.h
+	./src/contact.c
+	./src/contact.h
+	./src/contact_solver.c
+	./src/contact_solver.h
+	./src/core.c
+	./src/core.h
+	./src/ctz.h
+	./src/distance.c
+	./src/distance_joint.c
+	./src/dynamic_tree.c
+	./src/geometry.c
+	./src/hull.c
+	./src/id_pool.c
+	./src/id_pool.h
+	./src/island.c
+	./src/island.h
+	./src/joint.c
+	./src/joint.h
+	./src/manifold.c
+	./src/math_functions.c
+	./src/motor_joint.c
+	./src/mouse_joint.c
+	./src/prismatic_joint.c
+	./src/revolute_joint.c
+	./src/shape.c
+	./src/shape.h
+	./src/solver.c
+	./src/solver.h
+	./src/solver_set.c
+	./src/solver_set.h
+	./src/stack_allocator.c
+	./src/stack_allocator.h
+	./src/table.c
+	./src/table.h
+	./src/timer.c
+	./src/types.c
+	./src/weld_joint.c
+	./src/wheel_joint.c
+	./src/world.c
+	./src/world.h
+)
+
+set(BOX2D_API_FILES
+	./include/box2d/base.h
+	./include/box2d/box2d.h
+	./include/box2d/collision.h
+	./include/box2d/id.h
+	./include/box2d/math_functions.h
+	./include/box2d/types.h
+)
+
 add_library(
 
     box2d
 
     STATIC
 
-    src/collision/b2_broad_phase.cpp
-	src/collision/b2_chain_shape.cpp
-	src/collision/b2_circle_shape.cpp
-	src/collision/b2_collide_circle.cpp
-	src/collision/b2_collide_edge.cpp
-	src/collision/b2_collide_polygon.cpp
-	src/collision/b2_collision.cpp
-	src/collision/b2_distance.cpp
-	src/collision/b2_dynamic_tree.cpp
-	src/collision/b2_edge_shape.cpp
-	src/collision/b2_polygon_shape.cpp
-	src/collision/b2_time_of_impact.cpp
-
-	src/common/b2_block_allocator.cpp
-	src/common/b2_draw.cpp
-	src/common/b2_math.cpp
-	src/common/b2_settings.cpp
-	src/common/b2_stack_allocator.cpp
-	src/common/b2_timer.cpp
-
-	src/dynamics/b2_body.cpp
-	src/dynamics/b2_chain_circle_contact.cpp
-	src/dynamics/b2_chain_circle_contact.h
-	src/dynamics/b2_chain_polygon_contact.cpp
-	src/dynamics/b2_chain_polygon_contact.h
-	src/dynamics/b2_circle_contact.cpp
-	src/dynamics/b2_circle_contact.h
-	src/dynamics/b2_contact.cpp
-	src/dynamics/b2_contact_manager.cpp
-	src/dynamics/b2_contact_solver.cpp
-	src/dynamics/b2_contact_solver.h
-	src/dynamics/b2_distance_joint.cpp
-	src/dynamics/b2_edge_circle_contact.cpp
-	src/dynamics/b2_edge_circle_contact.h
-	src/dynamics/b2_edge_polygon_contact.cpp
-	src/dynamics/b2_edge_polygon_contact.h
-	src/dynamics/b2_fixture.cpp
-	src/dynamics/b2_friction_joint.cpp
-	src/dynamics/b2_gear_joint.cpp
-	src/dynamics/b2_island.cpp
-	src/dynamics/b2_island.h
-	src/dynamics/b2_joint.cpp
-	src/dynamics/b2_motor_joint.cpp
-	src/dynamics/b2_mouse_joint.cpp
-	src/dynamics/b2_polygon_circle_contact.cpp
-	src/dynamics/b2_polygon_circle_contact.h
-	src/dynamics/b2_polygon_contact.cpp
-	src/dynamics/b2_polygon_contact.h
-	src/dynamics/b2_prismatic_joint.cpp
-	src/dynamics/b2_pulley_joint.cpp
-	src/dynamics/b2_revolute_joint.cpp
-	src/dynamics/b2_weld_joint.cpp
-	src/dynamics/b2_wheel_joint.cpp
-	src/dynamics/b2_world.cpp
-	src/dynamics/b2_world_callbacks.cpp
-
-	src/rope/b2_rope.cpp
+    ${BOX2D_SOURCE_FILES}
+	${BOX2D_API_FILES}
 )
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")

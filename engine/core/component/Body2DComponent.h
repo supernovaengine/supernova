@@ -6,12 +6,9 @@
 #define BODY2D_COMPONENT_H
 
 #include "Engine.h"
+#include "box2d/box2d.h"
 
 #define MAX_SHAPES 10
-
-class b2Body;
-class b2Shape;
-class b2Fixture;
 
 namespace Supernova{
 
@@ -22,25 +19,20 @@ namespace Supernova{
         CHAIN
     };
 
-    enum class Manifold2DType{
-        CIRCLES,
-        FACEA,
-        FACEB
-    };
-
     // fixture in Box2D
     struct CollisionShape2D{
-        b2Fixture* fixture = NULL;
+        b2ShapeId shape;
 
         CollisionShape2DType type = CollisionShape2DType::POLYGON;
     };
 
     struct Body2DComponent{
-        b2Body* body = NULL;
+        b2BodyId body;
 
         CollisionShape2D shapes[MAX_SHAPES];
-        int numShapes = 0;
+        size_t numShapes = 0;
 
+        BodyType type = BodyType::DYNAMIC;
         bool newBody = true;
     };
 
