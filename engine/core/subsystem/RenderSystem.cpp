@@ -2155,7 +2155,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 }
 
 void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	Vector3 camDir = camDir = (camTransform.worldPosition - camera.worldView).normalize();
+	Vector3 camDir = (camTransform.worldPosition - camera.worldView).normalize();
 
 	auto comparePoints = [&transform, &camDir](const InstanceRenderData& a, const InstanceRenderData& b) -> bool {
 		Vector3 positionA = Vector3(a.instanceMatrix[3][0], a.instanceMatrix[3][1], a.instanceMatrix[3][2]);

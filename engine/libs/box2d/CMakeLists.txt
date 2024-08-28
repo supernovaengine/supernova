@@ -90,3 +90,82 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux"
         "-pthread"
     )
 endif()
+
+
+# Box2D CMakeLists.txt configuration
+
+set(CMAKE_C_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
+set_target_properties(
+	box2d
+
+	PROPERTIES
+
+	C_STANDARD 17
+    C_STANDARD_REQUIRED YES
+    C_EXTENSIONS YES
+)
+
+if (BOX2D_ENABLE_SIMD)
+	target_compile_definitions(box2d PRIVATE BOX2D_ENABLE_SIMD)
+endif()
+
+if (MSVC)
+	message(STATUS "Box2D on MSVC")
+	# Visual Studio won't load the natvis unless it is in the project
+	target_sources(box2d PRIVATE box2d.natvis)
+
+	# Enable asserts in release with debug info
+	target_compile_definitions(box2d PUBLIC "$<$<CONFIG:RELWITHDEBINFO>:B2_ENABLE_ASSERT>")
+
+	# Atomics are still considered experimental in Visual Studio 17.8
+	target_compile_options(box2d PRIVATE /experimental:c11atomics)
+
+	if (BOX2D_AVX2)
+		message(STATUS "Box2D using AVX2")
+		target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
+		target_compile_options(box2d PRIVATE /arch:AVX2)
+	endif()
+
+elseif (MINGW)
+	message(STATUS "Box2D on MinGW")
+	if (BOX2D_AVX2)
+		message(STATUS "Box2D using AVX2")
+		target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
+		target_compile_options(box2d PRIVATE -mavx2)
+	else()
+		# todo should no longer be needed
+		# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
+		message(STATUS "Box2D disabling ABI warning")
+		target_compile_options(box2d PRIVATE -Wno-psabi)
+	endif()
+elseif (APPLE)
+	message(STATUS "Box2D on Apple")
+elseif (EMSCRIPTEN)
+	message(STATUS "Box2D on Emscripten")
+	# todo should no longer be needed
+	# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
+	message(STATUS "Box2D disabling ABI warning")
+	target_compile_options(box2d PRIVATE -Wno-psabi)
+elseif (UNIX)
+	message(STATUS "Box2D using Unix")
+	if ("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
+		# raspberry pi
+		# -mfpu=neon
+		# target_compile_options(box2d PRIVATE)
+	else()
+		# x64
+		if (BOX2D_AVX2)
+			message(STATUS "Box2D using AVX2")
+			# FMA -mfma -mavx -march=native
+			target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
+			target_compile_options(box2d PRIVATE -mavx2)
+		else()
+			# todo should no longer be needed
+			# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
+			message(STATUS "Box2D disabling ABI warning")
+			target_compile_options(box2d PRIVATE -Wno-psabi)
+		endif()
+	endif()
+endif()
