@@ -237,7 +237,7 @@ int PhysicsSystem::createRectShape2D(Entity entity, float width, float height){
             polygon.radius = 0.0f;
             polygon.centroid = b2Vec2_zero;
 
-            return loadShape2D(*body, polygon);
+            return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -259,7 +259,7 @@ int PhysicsSystem::createCenteredRectShape2D(Entity entity, float width, float h
 
             b2Polygon polygon = b2MakeOffsetBox(halfW, halfH, {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D}, Angle::defaultToRad(angle));
 
-            return loadShape2D(*body, polygon);
+            return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -284,7 +284,7 @@ int PhysicsSystem::createPolygonShape2D(Entity entity, std::vector<Vector2> vert
 
             b2Polygon polygon = b2MakePolygon( &hull, 0.0f );
 
-            return loadShape2D(*body, polygon);
+            return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -299,13 +299,56 @@ int PhysicsSystem::createCircleShape2D(Entity entity, Vector2 center, float radi
     if (body){
         if (body->numShapes < MAX_SHAPES){
 
-            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
+            body->shapes[body->numShapes].type = Shape2DType::CIRCLE;
 
             b2Circle circle = { 0 };
             circle.center = {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D};
             circle.radius = radius / pointsToMeterScale2D;
 
-            return loadShape2D(*body, circle);
+            return loadShape2D(*body, &circle, body->shapes[body->numShapes].type);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::createCapsuleShape2D(Entity entity, Vector2 center1, Vector2 center2, float radius){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = Shape2DType::CAPSULE;
+
+            b2Capsule capsule = { 0 };
+            capsule.center1 = {center1.x / pointsToMeterScale2D, center1.y / pointsToMeterScale2D};
+            capsule.center2 = {center2.x / pointsToMeterScale2D, center2.y / pointsToMeterScale2D};
+            capsule.radius = radius / pointsToMeterScale2D;
+
+            return loadShape2D(*body, &capsule, body->shapes[body->numShapes].type);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::createSegmentShape2D(Entity entity, Vector2 point1, Vector2 point2){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = Shape2DType::SEGMENT;
+
+            b2Segment segment = { 0 };
+            segment.point1 = {point1.x / pointsToMeterScale2D, point1.y / pointsToMeterScale2D};
+            segment.point2 = {point2.x / pointsToMeterScale2D, point2.y / pointsToMeterScale2D};
+
+            return loadShape2D(*body, &segment, body->shapes[body->numShapes].type);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -332,7 +375,7 @@ int PhysicsSystem::createChainShape2D(Entity entity, std::vector<Vector2> vertic
             chainDef.count = (int)vertices.size();
             chainDef.isLoop = loop;
 
-            return loadShape2D(*body, chainDef);
+            return loadShape2D(*body, &chainDef, body->shapes[body->numShapes].type);
         }else{
             Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
         }
@@ -915,7 +958,7 @@ void PhysicsSystem::destroyBody3D(Body3DComponent& body){
     }
 }
 
-int PhysicsSystem::loadShape2D(Body2DComponent& body, b2Polygon& polygon){
+int PhysicsSystem::loadShape2D(Body2DComponent& body, void* shape, Shape2DType type){
     if (!b2Shape_IsValid(body.shapes[body.numShapes].shape)){
         b2ShapeDef shapeDef = b2DefaultShapeDef();
         shapeDef.userData = reinterpret_cast<void*>(body.numShapes);
@@ -925,46 +968,20 @@ int PhysicsSystem::loadShape2D(Body2DComponent& body, b2Polygon& polygon){
             return -1;
         }
 
-        body.shapes[body.numShapes].shape = b2CreatePolygonShape(body.body, &shapeDef, &polygon);
+        body.shapes[body.numShapes].shape = b2_nullShapeId;
+        body.shapes[body.numShapes].chain = b2_nullChainId;
 
-        body.numShapes++;
-
-        return (body.numShapes - 1);
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::loadShape2D(Body2DComponent& body, b2Circle& circle){
-    if (!b2Shape_IsValid(body.shapes[body.numShapes].shape)){
-        b2ShapeDef shapeDef = b2DefaultShapeDef();
-        shapeDef.userData = reinterpret_cast<void*>(body.numShapes);
-
-        if (!b2Body_IsValid(body.body)){
-            Log::error("Cannot create 2D body shape without loaded body");
-            return -1;
+        if (type == Shape2DType::POLYGON){
+            body.shapes[body.numShapes].shape = b2CreatePolygonShape(body.body, &shapeDef, (b2Polygon*)shape);
+        }else if (type == Shape2DType::CIRCLE){
+            body.shapes[body.numShapes].shape = b2CreateCircleShape(body.body, &shapeDef, (b2Circle*)shape);
+        }else if (type == Shape2DType::CAPSULE){
+            body.shapes[body.numShapes].shape = b2CreateCapsuleShape(body.body, &shapeDef, (b2Capsule*)shape);
+        }else if (type == Shape2DType::SEGMENT){
+            body.shapes[body.numShapes].shape = b2CreateSegmentShape(body.body, &shapeDef, (b2Segment*)shape);
+        }else if (type == Shape2DType::CHAIN){
+            body.shapes[body.numShapes].chain = b2CreateChain(body.body, (b2ChainDef*)shape);
         }
-
-        body.shapes[body.numShapes].shape = b2CreateCircleShape(body.body, &shapeDef, &circle);
-
-        body.numShapes++;
-
-        return (body.numShapes - 1);
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::loadShape2D(Body2DComponent& body, b2ChainDef& chainDef){
-    if (!b2Chain_IsValid(body.shapes[body.numShapes].chain)){
-        chainDef.userData = reinterpret_cast<void*>(body.numShapes);
-
-        if (!b2Body_IsValid(body.body)){
-            Log::error("Cannot create 2D body shape without loaded body");
-            return -1;
-        }
-
-        body.shapes[body.numShapes].chain = b2CreateChain(body.body, &chainDef);
 
         body.numShapes++;
 

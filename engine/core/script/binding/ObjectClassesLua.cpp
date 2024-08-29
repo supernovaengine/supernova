@@ -798,9 +798,12 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<float, float, Vector2, float>(&Body2D::createCenteredRectShape))
         .addFunction("createPolygonShape", &Body2D::createPolygonShape)
         .addFunction("createCircleShape", &Body2D::createCircleShape)
-        //.addFunction("createLoopChainShape", &Body2D::createLoopChainShape)
-        //.addFunction("createChainShape", &Body2D::createChainShape)
+        .addFunction("createCapsuleShape", &Body2D::createCapsuleShape)
+        .addFunction("createSegmentShape", &Body2D::createSegmentShape)
+        .addFunction("createChainShape", &Body2D::createChainShape)
         .addFunction("removeAllShapes", &Body2D::removeAllShapes)
+        .addFunction("getBodyContacts", &Body2D::getBodyContacts)
+        .addFunction("getShapeContacts", &Body2D::getShapeContacts)
         .addProperty("shapeDensity", &Body2D::getShapeDensity, &Body2D::setShapeDensity)
         .addFunction("setShapeDensity", 
             luabridge::overload<float>(&Body2D::setShapeDensity),

@@ -28,6 +28,7 @@ namespace Supernova{
 
         b2BodyId getBox2DBody() const;
         b2ShapeId getBox2DShape(size_t index) const;
+        b2ChainId getBox2DChain(size_t index) const;
 
         Object getAttachedObject();
 
@@ -40,10 +41,9 @@ namespace Supernova{
         int createCenteredRectShape(float width, float height, Vector2 center, float angle);
         int createPolygonShape(std::vector<Vector2> vertices);
         int createCircleShape(Vector2 center, float radius);
-        //int createTwoSidedEdgeShape(Vector2 vertice1, Vector2 vertice2);
-        //int createOneSidedEdgeShape(Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
-        //int createLoopChainShape(std::vector<Vector2> vertices);
-        //int createChainShape(std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex);
+        int createCapsuleShape(Vector2 center1, Vector2 center2, float radius);
+        int createSegmentShape(Vector2 center, Vector2 point1, Vector2 point2);
+        int createChainShape(std::vector<Vector2> vertices, bool loop);
 
         void removeAllShapes();
 

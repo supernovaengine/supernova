@@ -84,6 +84,18 @@ b2ShapeId Body2D::getBox2DShape(size_t index) const{
     return b2_nullShapeId;
 }
 
+b2ChainId Body2D::getBox2DChain(size_t index) const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    if (index >= 0 && index < MAX_SHAPES){
+        return body.shapes[index].chain;
+    }else{
+        Log::error("Cannot find shape %i of body", index);
+    }
+
+    return b2_nullChainId;
+}
+
 Object Body2D::getAttachedObject(){
     return Object(scene, entity);
 }
@@ -124,17 +136,23 @@ int Body2D::createCircleShape(Vector2 center, float radius){
     return index;
 }
 
-//int Body2D::createLoopChainShape(std::vector<Vector2> vertices){
-//    load();
-//    int index = scene->getSystem<PhysicsSystem>()->createLoopChainShape2D(entity, vertices);
-//    return index;
-//}
-//
-//int Body2D::createChainShape(std::vector<Vector2> vertices, Vector2 prevVertex, Vector2 nextVertex){
-//    load();
-//    int index = scene->getSystem<PhysicsSystem>()->createChainShape2D(entity, vertices, prevVertex, nextVertex);
-//    return index;
-//}
+int Body2D::createCapsuleShape(Vector2 center1, Vector2 center2, float radius){
+    load();
+    int index = scene->getSystem<PhysicsSystem>()->createCapsuleShape2D(entity, center1, center2, radius);
+    return index;
+}
+
+int Body2D::createSegmentShape(Vector2 center, Vector2 point1, Vector2 point2){
+    load();
+    int index = scene->getSystem<PhysicsSystem>()->createSegmentShape2D(entity, point1, point2);
+    return index;
+}
+
+int Body2D::createChainShape(std::vector<Vector2> vertices, bool loop){
+    load();
+    int index = scene->getSystem<PhysicsSystem>()->createChainShape2D(entity, vertices, loop);
+    return index;
+}
 
 void Body2D::removeAllShapes(){
     load();

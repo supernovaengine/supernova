@@ -100,8 +100,8 @@ namespace Supernova{
 		int createCenteredRectShape2D(Entity entity, float width, float height, Vector2 center, float angle);
 		int createPolygonShape2D(Entity entity, std::vector<Vector2> vertices);
 		int createCircleShape2D(Entity entity, Vector2 center, float radius);
-		//int createTwoSidedEdgeShape2D(Entity entity, Vector2 vertice1, Vector2 vertice2);
-		//int createOneSidedEdgeShape2D(Entity entity, Vector2 vertice0, Vector2 vertice1, Vector2 vertice2, Vector2 vertice3);
+		int createCapsuleShape2D(Entity entity, Vector2 center1, Vector2 center2, float radius);
+		int createSegmentShape2D(Entity entity, Vector2 point1, Vector2 point2);
 		int createChainShape2D(Entity entity, std::vector<Vector2> vertices, bool loop);
 
 		void removeAllShapes2D(Entity entity);
@@ -131,9 +131,7 @@ namespace Supernova{
 		bool loadBody3D(Entity entity);
 		void destroyBody3D(Body3DComponent& body);
 
-		int loadShape2D(Body2DComponent& body, b2Polygon& polygon);
-		int loadShape2D(Body2DComponent& body, b2Circle& circle);
-		int loadShape2D(Body2DComponent& body, b2ChainDef& chainDef);
+		int loadShape2D(Body2DComponent& body, void* shape, Shape2DType type);
 		void destroyShape2D(Body2DComponent& body, size_t index);
 
 		int loadShape3D(Body3DComponent& body, const Vector3& position, const Quaternion& rotation, JPH::ShapeSettings* shapeSettings);
