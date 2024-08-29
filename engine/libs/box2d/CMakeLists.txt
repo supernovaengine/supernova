@@ -112,7 +112,7 @@ if (BOX2D_ENABLE_SIMD)
 endif()
 
 if (MSVC)
-	message(STATUS "Box2D on MSVC")
+	#message(STATUS "Box2D on MSVC")
 	# Visual Studio won't load the natvis unless it is in the project
 	target_sources(box2d PRIVATE ./src/box2d.natvis)
 
@@ -129,7 +129,7 @@ if (MSVC)
 	endif()
 
 elseif (MINGW)
-	message(STATUS "Box2D on MinGW")
+	#message(STATUS "Box2D on MinGW")
 	if (BOX2D_AVX2)
 		message(STATUS "Box2D using AVX2")
 		target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
@@ -141,15 +141,15 @@ elseif (MINGW)
 		target_compile_options(box2d PRIVATE -Wno-psabi)
 	endif()
 elseif (APPLE)
-	message(STATUS "Box2D on Apple")
+	#message(STATUS "Box2D on Apple")
 elseif (EMSCRIPTEN)
-	message(STATUS "Box2D on Emscripten")
+	#message(STATUS "Box2D on Emscripten")
 	# todo should no longer be needed
 	# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
 	message(STATUS "Box2D disabling ABI warning")
 	target_compile_options(box2d PRIVATE -Wno-psabi)
 elseif (UNIX)
-	message(STATUS "Box2D using Unix")
+	#message(STATUS "Box2D using Unix")
 	if ("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
 		# raspberry pi
 		# -mfpu=neon

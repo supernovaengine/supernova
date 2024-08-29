@@ -190,9 +190,9 @@ RayReturn Ray::intersects(Body2D body){
 
     b2Vec2 translation = b2Sub(bEnd, bOrigin);
 
-    int shapesCount = b2Body_GetShapeCount(bodycomp.body);
-    b2ShapeId shapeIds[shapesCount];
-    int returnCount = b2Body_GetShapes(bodycomp.body, shapeIds, shapesCount);
+    const int shapesCount = b2Body_GetShapeCount(bodycomp.body);
+    std::vector<b2ShapeId> shapeIds(shapesCount);
+    int returnCount = b2Body_GetShapes(bodycomp.body, &shapeIds.front(), shapesCount);
 
     float closestFraction = FLT_MAX;
     b2Vec2 intersectionPoint = {0, 0};

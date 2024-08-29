@@ -149,8 +149,8 @@ std::vector<Contact2D> Body2D::getBodyContacts(){
     std::vector<Contact2D> contacts;
 
     int bodyContactCapacity = b2Body_GetContactCapacity(body.body);
-    b2ContactData contactData[bodyContactCapacity];
-    int bodyContactCount = b2Body_GetContactData(body.body, contactData, bodyContactCapacity);
+    std::vector<b2ContactData> contactData(bodyContactCapacity);
+    int bodyContactCount = b2Body_GetContactData(body.body, &contactData.front(), bodyContactCapacity);
 
     for (int i = 0; i < bodyContactCount; ++i){
         contacts.push_back(Contact2D(scene, contactData[i]));
@@ -166,8 +166,8 @@ std::vector<Contact2D> Body2D::getShapeContacts(size_t index){
 
     if (index >= 0 && index < body.numShapes && body.shapes[index].type != Shape2DType::CHAIN){
         int shapeContactCapacity = b2Shape_GetContactCapacity(body.shapes[index].shape);
-        b2ContactData contactData[shapeContactCapacity];
-        int shapeContactCount = b2Shape_GetContactData(body.shapes[index].shape, contactData, shapeContactCapacity);
+        std::vector<b2ContactData> contactData(shapeContactCapacity);
+        int shapeContactCount = b2Shape_GetContactData(body.shapes[index].shape, &contactData.front(), shapeContactCapacity);
 
         for (int i = 0; i < shapeContactCount; ++i){
             contacts.push_back(Contact2D(scene, contactData[i]));

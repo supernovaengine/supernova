@@ -9,6 +9,7 @@
 #endif
 
 #if defined(_WIN32)
+#undef SOKOL_LOG
 #define SOKOL_LOG(s) OutputDebugStringA(s)
 #endif
 /* this is only needed for the debug-inspection headers */

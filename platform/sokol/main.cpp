@@ -39,7 +39,7 @@ static void sokol_event(const sapp_event* e) {
         if (e->key_code == SAPP_KEYCODE_ENTER)
             Supernova::Engine::systemCharInput('\r');
         if (e->key_code == SAPP_KEYCODE_ESCAPE)
-            Supernova::Engine::systemCharInput('\e');
+            Supernova::Engine::systemCharInput('\33'); // removed 'e' to avoid warnings
         //Use same keycode of GLFW
         Supernova::Engine::systemKeyDown(e->key_code, e->key_repeat, e->modifiers);
     }else if (e->type == SAPP_EVENTTYPE_KEY_UP)

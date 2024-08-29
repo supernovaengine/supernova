@@ -226,14 +226,14 @@ int PhysicsSystem::createRectShape2D(Entity entity, float width, float height){
             b2Polygon polygon = { 0 };
             // same as shape.SetAsBox but using center on left corner
             polygon.count = 4;
-            polygon.vertices[0] = ( b2Vec2 ){ 0, 0 };
-            polygon.vertices[1] = ( b2Vec2 ){ width / pointsToMeterScale2D, 0 };
-            polygon.vertices[2] = ( b2Vec2 ){ width / pointsToMeterScale2D,  height / pointsToMeterScale2D };
-            polygon.vertices[3] = ( b2Vec2 ){ 0,  height / pointsToMeterScale2D };
-            polygon.normals[0] = ( b2Vec2 ){ 0.0f, -1.0f };
-            polygon.normals[1] = ( b2Vec2 ){ 1.0f, 0.0f };
-            polygon.normals[2] = ( b2Vec2 ){ 0.0f, 1.0f };
-            polygon.normals[3] = ( b2Vec2 ){ -1.0f, 0.0f };
+            polygon.vertices[0] = { 0, 0 };
+            polygon.vertices[1] = { width / pointsToMeterScale2D, 0 };
+            polygon.vertices[2] = { width / pointsToMeterScale2D,  height / pointsToMeterScale2D };
+            polygon.vertices[3] = { 0,  height / pointsToMeterScale2D };
+            polygon.normals[0] = { 0.0f, -1.0f };
+            polygon.normals[1] = { 1.0f, 0.0f };
+            polygon.normals[2] = { 0.0f, 1.0f };
+            polygon.normals[3] = { -1.0f, 0.0f };
             polygon.radius = 0.0f;
             polygon.centroid = b2Vec2_zero;
 
@@ -800,7 +800,7 @@ bool PhysicsSystem::loadBody2D(Entity entity){
         }else{
             bodyDef.type = b2_dynamicBody;
         }
-        bodyDef.userData = reinterpret_cast<void*>(entity);
+        bodyDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         body.body = b2CreateBody(world2D, &bodyDef);
         body.newBody = true;
@@ -1040,7 +1040,7 @@ bool PhysicsSystem::loadDistanceJoint2D(Entity entity, Joint2DComponent& joint, 
         if (rope){
             jointDef.minLength = 0;
         }
-        jointDef.userData = reinterpret_cast<void*>(entity);
+        jointDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         joint.joint = b2CreateDistanceJoint(world2D, &jointDef);
         joint.type = Joint2DType::DISTANCE;
@@ -1072,7 +1072,7 @@ bool PhysicsSystem::loadRevoluteJoint2D(Entity entity, Joint2DComponent& joint, 
         jointDef.bodyIdB = myBodyB.body;
         jointDef.localAnchorA = b2Body_GetLocalPoint(myBodyA.body, worldPivot);
         jointDef.localAnchorB = b2Body_GetLocalPoint(myBodyB.body, worldPivot);
-        jointDef.userData = reinterpret_cast<void*>(entity);
+        jointDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         joint.joint = b2CreateRevoluteJoint(world2D, &jointDef);
         joint.type = Joint2DType::REVOLUTE;
@@ -1106,7 +1106,7 @@ bool PhysicsSystem::loadPrismaticJoint2D(Entity entity, Joint2DComponent& joint,
         jointDef.localAnchorA = b2Body_GetLocalPoint(myBodyA.body, worldPivot);
         jointDef.localAnchorB = b2Body_GetLocalPoint(myBodyB.body, worldPivot);
         jointDef.localAxisA = b2Body_GetLocalVector(myBodyA.body, worldAxis);
-        jointDef.userData = reinterpret_cast<void*>(entity);
+        jointDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         joint.joint = b2CreatePrismaticJoint(world2D, &jointDef);
         joint.type = Joint2DType::PRISMATIC;
@@ -1134,7 +1134,7 @@ bool PhysicsSystem::loadMouseJoint2D(Entity entity, Joint2DComponent& joint, Ent
         jointDef.bodyIdA = myBody.body;
         jointDef.bodyIdB = myBody.body;
         jointDef.target = worldTarget;
-        jointDef.userData = reinterpret_cast<void*>(entity);
+        jointDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         joint.joint = b2CreateMouseJoint(world2D, &jointDef);
         joint.type = Joint2DType::MOUSE;
@@ -1168,7 +1168,7 @@ bool PhysicsSystem::loadWheelJoint2D(Entity entity, Joint2DComponent& joint, Ent
         jointDef.localAnchorA = b2Body_GetLocalPoint(myBodyA.body, worldPivot);
         jointDef.localAnchorB = b2Body_GetLocalPoint(myBodyB.body, worldPivot);
         jointDef.localAxisA = b2Body_GetLocalVector(myBodyA.body, worldAxis);
-        jointDef.userData = reinterpret_cast<void*>(entity);
+        jointDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         joint.joint = b2CreateWheelJoint(world2D, &jointDef);
         joint.type = Joint2DType::WHEEL;
@@ -1200,7 +1200,7 @@ bool PhysicsSystem::loadWeldJoint2D(Entity entity, Joint2DComponent& joint, Enti
         jointDef.bodyIdB = myBodyB.body;
         jointDef.localAnchorA = b2Body_GetLocalPoint(myBodyA.body, worldPivot);
         jointDef.localAnchorB = b2Body_GetLocalPoint(myBodyB.body, worldPivot);
-        jointDef.userData = reinterpret_cast<void*>(entity);
+        jointDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         joint.joint = b2CreateWeldJoint(world2D, &jointDef);
         joint.type = Joint2DType::WELD;
@@ -1228,7 +1228,7 @@ bool PhysicsSystem::loadMotorJoint2D(Entity entity, Joint2DComponent& joint, Ent
         b2MotorJointDef jointDef = b2DefaultMotorJointDef();
         jointDef.bodyIdA = myBodyA.body;
         jointDef.bodyIdB = myBodyB.body;
-        jointDef.userData = reinterpret_cast<void*>(entity);
+        jointDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         joint.joint = b2CreateMotorJoint(world2D, &jointDef);
         joint.type = Joint2DType::MOTOR;
