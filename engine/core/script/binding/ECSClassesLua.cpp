@@ -164,8 +164,9 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("createBody2D", &PhysicsSystem::createBody2D)
         .addFunction("removeBody2D", &PhysicsSystem::removeBody2D)
 
-        .addFunction("createRectShape2D", &PhysicsSystem::createRectShape2D)
-        .addFunction("createCenteredRectShape2D", &PhysicsSystem::createCenteredRectShape2D)
+        .addFunction("createBoxShape2D", &PhysicsSystem::createBoxShape2D)
+        .addFunction("createCenteredBoxShape2D", &PhysicsSystem::createCenteredBoxShape2D)
+        .addFunction("createRoundedBoxShape2D", &PhysicsSystem::createRoundedBoxShape2D)
         .addFunction("createPolygonShape2D", &PhysicsSystem::createPolygonShape2D)
         .addFunction("createCircleShape2D", &PhysicsSystem::createCircleShape2D)
         .addFunction("createCapsuleShape2D", &PhysicsSystem::createCapsuleShape2D)

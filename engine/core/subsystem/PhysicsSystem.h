@@ -96,8 +96,9 @@ namespace Supernova{
 		void createBody2D(Entity entity);
 		void removeBody2D(Entity entity);
 
-		int createRectShape2D(Entity entity, float width, float height);
-		int createCenteredRectShape2D(Entity entity, float width, float height, Vector2 center, float angle);
+		int createBoxShape2D(Entity entity, float width, float height);
+		int createCenteredBoxShape2D(Entity entity, float width, float height, Vector2 center, float angle);
+		int createRoundedBoxShape2D(Entity entity, float width, float height, float radius);
 		int createPolygonShape2D(Entity entity, std::vector<Vector2> vertices);
 		int createCircleShape2D(Entity entity, Vector2 center, float radius);
 		int createCapsuleShape2D(Entity entity, Vector2 center1, Vector2 center2, float radius);

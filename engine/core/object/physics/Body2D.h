@@ -36,9 +36,10 @@ namespace Supernova{
 
         void load();
 
-        int createRectShape(float width, float height);
-        int createCenteredRectShape(float width, float height);
-        int createCenteredRectShape(float width, float height, Vector2 center, float angle);
+        int createBoxShape(float width, float height);
+        int createCenteredBoxShape(float width, float height);
+        int createCenteredBoxShape(float width, float height, Vector2 center, float angle);
+        int createRoundedBoxShape(float width, float height, float radius);
         int createPolygonShape(std::vector<Vector2> vertices);
         int createCircleShape(Vector2 center, float radius);
         int createCapsuleShape(Vector2 center1, Vector2 center2, float radius);
@@ -49,6 +50,9 @@ namespace Supernova{
 
         std::vector<Contact2D> getBodyContacts();
         std::vector<Contact2D> getShapeContacts(size_t index);
+
+        size_t getNumShapes() const;
+        Shape2DType getShapeType(size_t index) const;
 
         void setShapeDensity(float density);
         void setShapeFriction(float friction);

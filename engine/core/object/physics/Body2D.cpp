@@ -61,7 +61,7 @@ Body2D& Body2D::operator=(const Body2D& rhs){
 void Body2D::checkBody(const Body2DComponent& body) const{
     if (!b2Body_IsValid(body.body)){
         Log::error("Body2D is not loaded");
-        throw std::runtime_error("Body2D is not loaded");;
+        throw std::runtime_error("Body2D is not loaded");
     }
 }
 
@@ -108,19 +108,25 @@ void Body2D::load(){
     scene->getSystem<PhysicsSystem>()->loadBody2D(entity);
 }
 
-int Body2D::createRectShape(float width, float height){
+int Body2D::createBoxShape(float width, float height){
     load();
-    int index = scene->getSystem<PhysicsSystem>()->createRectShape2D(entity, width, height);
+    int index = scene->getSystem<PhysicsSystem>()->createBoxShape2D(entity, width, height);
     return index;
 }
 
-int Body2D::createCenteredRectShape(float width, float height){
-    return createCenteredRectShape(width, height, Vector2(0, 0), 0);
+int Body2D::createCenteredBoxShape(float width, float height){
+    return createCenteredBoxShape(width, height, Vector2(0, 0), 0);
 }
 
-int Body2D::createCenteredRectShape(float width, float height, Vector2 center, float angle){
+int Body2D::createCenteredBoxShape(float width, float height, Vector2 center, float angle){
     load();
-    int index = scene->getSystem<PhysicsSystem>()->createCenteredRectShape2D(entity, width, height, center, angle);
+    int index = scene->getSystem<PhysicsSystem>()->createCenteredBoxShape2D(entity, width, height, center, angle);
+    return index;
+}
+
+int Body2D::createRoundedBoxShape(float width, float height, float radius){
+    load();
+    int index = scene->getSystem<PhysicsSystem>()->createRoundedBoxShape2D(entity, width, height, radius);
     return index;
 }
 
@@ -195,6 +201,23 @@ std::vector<Contact2D> Body2D::getShapeContacts(size_t index){
     }
 
     return contacts;
+}
+
+size_t Body2D::getNumShapes() const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    return body.numShapes;
+}
+
+Shape2DType Body2D::getShapeType(size_t index) const{
+    Body2DComponent& body = getComponent<Body2DComponent>();
+
+    if (index >= 0 && index < body.numShapes){
+        return body.shapes[index].type;
+    }else{
+        Log::error("Cannot find shape %i of body", index);
+        throw std::runtime_error("Cannot find shape");
+    }
 }
 
 void Body2D::setShapeDensity(float density){

@@ -64,6 +64,9 @@ namespace Supernova{
         //TODO:
         // MutableCompoundShape
 
+        size_t getNumShapes() const;
+        Shape3DType getShapeType(size_t index) const;
+
         void setShapeDensity(float density);
         void setShapeDensity(size_t index, float density);
         float getShapeDensity() const;

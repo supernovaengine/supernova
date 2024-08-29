@@ -215,7 +215,7 @@ void PhysicsSystem::removeBody2D(Entity entity){
     }
 }
 
-int PhysicsSystem::createRectShape2D(Entity entity, float width, float height){
+int PhysicsSystem::createBoxShape2D(Entity entity, float width, float height){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -246,7 +246,7 @@ int PhysicsSystem::createRectShape2D(Entity entity, float width, float height){
     return -1;
 }
 
-int PhysicsSystem::createCenteredRectShape2D(Entity entity, float width, float height, Vector2 center, float angle){
+int PhysicsSystem::createCenteredBoxShape2D(Entity entity, float width, float height, Vector2 center, float angle){
     Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
 
     if (body){
@@ -258,6 +258,29 @@ int PhysicsSystem::createCenteredRectShape2D(Entity entity, float width, float h
             float halfH = height / 2.0 / pointsToMeterScale2D;
 
             b2Polygon polygon = b2MakeOffsetBox(halfW, halfH, {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D}, Angle::defaultToRad(angle));
+
+            return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
+        }else{
+            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        }
+    }
+
+    return -1;
+}
+
+int PhysicsSystem::createRoundedBoxShape2D(Entity entity, float width, float height, float radius){
+    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
+
+    if (body){
+        if (body->numShapes < MAX_SHAPES){
+
+            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
+
+            float halfW = width / 2.0 / pointsToMeterScale2D;
+            float halfH = height / 2.0 / pointsToMeterScale2D;
+            float sRadius = radius / pointsToMeterScale2D;
+
+            b2Polygon polygon = b2MakeRoundedBox(halfW, halfW, sRadius);
 
             return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
         }else{

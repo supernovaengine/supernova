@@ -792,10 +792,11 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getAttachedObject", &Body2D::getAttachedObject)
         .addProperty("pointsToMeterScale", &Body2D::getPointsToMeterScale)
         .addFunction("load", &Body2D::load)
-        .addFunction("createRectShape", &Body2D::createRectShape)
-        .addFunction("createCenteredRectShape", 
-            luabridge::overload<float, float>(&Body2D::createCenteredRectShape),
-            luabridge::overload<float, float, Vector2, float>(&Body2D::createCenteredRectShape))
+        .addFunction("createBoxShape", &Body2D::createBoxShape)
+        .addFunction("createCenteredBoxShape", 
+            luabridge::overload<float, float>(&Body2D::createCenteredBoxShape),
+            luabridge::overload<float, float, Vector2, float>(&Body2D::createCenteredBoxShape))
+        .addFunction("createRoundedBoxShape", &Body2D::createRoundedBoxShape)
         .addFunction("createPolygonShape", &Body2D::createPolygonShape)
         .addFunction("createCircleShape", &Body2D::createCircleShape)
         .addFunction("createCapsuleShape", &Body2D::createCapsuleShape)
@@ -804,6 +805,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("removeAllShapes", &Body2D::removeAllShapes)
         .addFunction("getBodyContacts", &Body2D::getBodyContacts)
         .addFunction("getShapeContacts", &Body2D::getShapeContacts)
+        .addFunction("getNumShapes", &Body2D::getNumShapes)
+        .addFunction("getShapeType", &Body2D::getShapeType)
         .addProperty("shapeDensity", &Body2D::getShapeDensity, &Body2D::setShapeDensity)
         .addFunction("setShapeDensity", 
             luabridge::overload<float>(&Body2D::setShapeDensity),
@@ -971,6 +974,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("createHeightFieldShape", 
             luabridge::overload<>(&Body3D::createHeightFieldShape),
             luabridge::overload<unsigned int>(&Body3D::createHeightFieldShape))
+        .addFunction("getNumShapes", &Body3D::getNumShapes)
+        .addFunction("getShapeType", &Body3D::getShapeType)
         .addProperty("shapeDensity", &Body3D::getShapeDensity, &Body3D::setShapeDensity)
         .addFunction("setShapeDensity", 
             luabridge::overload<float>(&Body3D::setShapeDensity),

@@ -164,6 +164,23 @@ int Body3D::createHeightFieldShape(unsigned int samplesSize){
     return scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), samplesSize);
 }
 
+size_t Body3D::getNumShapes() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    return body.numShapes;
+}
+
+Shape3DType Body3D::getShapeType(size_t index) const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    if (index >= 0 && index < body.numShapes){
+        return body.shapes[index].type;
+    }else{
+        Log::error("Cannot find shape %i of body", index);
+        throw std::runtime_error("Cannot find shape");
+    }
+}
+
 void Body3D::setShapeDensity(float density){
     setShapeDensity(0, density);
 }
