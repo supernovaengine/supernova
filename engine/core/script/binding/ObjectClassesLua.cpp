@@ -466,6 +466,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<Vector3>(&Points::addPoint),
             luabridge::overload<float, float, float>(&Points::addPoint),
             luabridge::overload<Vector3, Vector4>(&Points::addPoint),
+            luabridge::overload<Vector3, Vector4, float>(&Points::addPoint),
             luabridge::overload<Vector3, Vector4, float, float>(&Points::addPoint),
             luabridge::overload<Vector3, Vector4, float, float, Rect>(&Points::addPoint))
         .addFunction("getPoint", &Points::getPoint)
@@ -474,6 +475,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<size_t, Vector3>(&Points::updatePoint),
             luabridge::overload<size_t, float, float, float>(&Points::updatePoint),
             luabridge::overload<size_t, Vector3, Vector4>(&Points::updatePoint),
+            luabridge::overload<size_t, Vector3, Vector4, float>(&Points::updatePoint),
             luabridge::overload<size_t, Vector3, Vector4, float, float>(&Points::updatePoint),
             luabridge::overload<size_t, Vector3, Vector4, float, float, Rect>(&Points::updatePoint))
         .addFunction("removePoint", &Points::removePoint)

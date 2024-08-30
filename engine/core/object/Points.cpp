@@ -76,6 +76,16 @@ void Points::addPoint(Vector3 position, Vector4 color){
     addPoint(point);
 }
 
+void Points::addPoint(Vector3 position, Vector4 color, float size){
+    PointData point = {};
+
+    point.position = position;
+    point.color = color;
+    point.size = size;
+
+    addPoint(point);
+}
+
 void Points::addPoint(Vector3 position, Vector4 color, float size, float rotation){
     PointData point = {};
 
@@ -133,6 +143,16 @@ void Points::updatePoint(size_t index, Vector3 position, Vector4 color){
 
     point.position = position;
     point.color = color;
+
+    updatePoint(index, point);
+}
+
+void Points::updatePoint(size_t index, Vector3 position, Vector4 color, float size){
+    PointData point = getPoint(index);
+
+    point.position = position;
+    point.color = color;
+    point.size = size;
 
     updatePoint(index, point);
 }

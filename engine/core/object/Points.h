@@ -24,6 +24,7 @@ namespace Supernova{
         void addPoint(Vector3 position);
         void addPoint(float x, float y, float z);
         void addPoint(Vector3 position, Vector4 color);
+        void addPoint(Vector3 position, Vector4 color, float size);
         void addPoint(Vector3 position, Vector4 color, float size, float rotation);
         void addPoint(Vector3 position, Vector4 color, float size, float rotation, Rect textureRect);
 
@@ -33,6 +34,7 @@ namespace Supernova{
         void updatePoint(size_t index, Vector3 position);
         void updatePoint(size_t index, float x, float y, float z);
         void updatePoint(size_t index, Vector3 position, Vector4 color);
+        void updatePoint(size_t index, Vector3 position, Vector4 color, float size);
         void updatePoint(size_t index, Vector3 position, Vector4 color, float size, float rotation);
         void updatePoint(size_t index, Vector3 position, Vector4 color, float size, float rotation, Rect textureRect);
 
