@@ -43,7 +43,7 @@ namespace Supernova{
         Vector3 solidBoxSize;
         float solidBoxDensity;
         
-        BodyType type = BodyType::DYNAMIC;
+        BodyType type = BodyType::STATIC;
         bool newBody = true;
     };
 

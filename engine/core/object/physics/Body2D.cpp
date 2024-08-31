@@ -148,7 +148,7 @@ int Body2D::createCapsuleShape(Vector2 center1, Vector2 center2, float radius){
     return index;
 }
 
-int Body2D::createSegmentShape(Vector2 center, Vector2 point1, Vector2 point2){
+int Body2D::createSegmentShape(Vector2 point1, Vector2 point2){
     load();
     int index = scene->getSystem<PhysicsSystem>()->createSegmentShape2D(entity, point1, point2);
     return index;

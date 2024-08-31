@@ -33,7 +33,7 @@ namespace Supernova{
         Shape2D shapes[MAX_SHAPES];
         size_t numShapes = 0;
 
-        BodyType type = BodyType::DYNAMIC;
+        BodyType type = BodyType::STATIC;
         bool newBody = true;
     };
 

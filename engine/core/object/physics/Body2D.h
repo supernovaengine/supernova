@@ -43,7 +43,7 @@ namespace Supernova{
         int createPolygonShape(std::vector<Vector2> vertices);
         int createCircleShape(Vector2 center, float radius);
         int createCapsuleShape(Vector2 center1, Vector2 center2, float radius);
-        int createSegmentShape(Vector2 center, Vector2 point1, Vector2 point2);
+        int createSegmentShape(Vector2 point1, Vector2 point2);
         int createChainShape(std::vector<Vector2> vertices, bool loop);
 
         void removeAllShapes();
