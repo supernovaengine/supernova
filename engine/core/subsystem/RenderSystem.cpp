@@ -1025,7 +1025,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, const Plane frustumPlanes[6], vs_depth_t vsDepthParams, InstancedMeshComponent* instmesh, TerrainComponent* terrain){
 	if (mesh.loaded && mesh.castShadows){
 
-		if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(cameraFar, frustumPlanes, mesh.worldAABB)) {
+		if (!terrain && mesh.worldAABB != AABB::ZERO && !isInsideCamera(cameraFar, frustumPlanes, mesh.worldAABB)) {
 			return false;
 		}
 
@@ -2248,7 +2248,7 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 				float fov = 0;
 				float ratio = 1;
 
-				float farPlaneOffset = (zFar - zNear) * 0.005;
+				float planeOffset = (zFar - zNear) * 0.05;
 
 				std::vector<float> splitFar;
 				std::vector<float> splitNear;
@@ -2288,7 +2288,7 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 				// Get frustrum box and create light ortho
 				for (int ca = 0; ca < light.numShadowCascades; ca++) {
-					Matrix4 sceneCameraInv = (Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca], splitFar[ca]+farPlaneOffset) * camera.viewMatrix).inverse();
+					Matrix4 sceneCameraInv = (Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca]-planeOffset, splitFar[ca]+planeOffset) * camera.viewMatrix).inverse();
 
 					projectionMatrix[ca] = getDirLightProjection(viewMatrix, sceneCameraInv);
 
