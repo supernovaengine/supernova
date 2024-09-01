@@ -989,6 +989,11 @@ void MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
         }
     }
 
+    Vector3 min = Vector3(-(terrain.terrainSize / 2), 0, -(terrain.terrainSize / 2));
+    Vector3 max = Vector3((terrain.terrainSize / 2), terrain.maxHeight, (terrain.terrainSize / 2));
+
+    mesh.aabb = AABB(min, max);
+
     terrain.heightMapLoaded = true;
 
 }
