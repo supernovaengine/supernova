@@ -41,6 +41,8 @@ elseif(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
     add_definitions("-DLUA_USE_MACOSX")
 elseif(CMAKE_SYSTEM_NAME STREQUAL "Linux")
     add_definitions("-DLUA_USE_LINUX")
+elseif(CMAKE_SYSTEM_NAME STREQUAL "iOS")
+    add_definitions("-DLUA_USE_IOS")
 endif()
 
 add_library(
