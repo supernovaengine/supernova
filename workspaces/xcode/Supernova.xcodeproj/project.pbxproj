@@ -6414,6 +6414,7 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 					"$(SRCROOT)/../../engine/libs/box2d/include",
+					"$(SRCROOT)/../../engine/libs/joltphysics",
 				);
 				INFOPLIST_FILE = ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -6442,6 +6443,7 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 					"$(SRCROOT)/../../engine/libs/box2d/include",
+					"$(SRCROOT)/../../engine/libs/joltphysics",
 				);
 				INFOPLIST_FILE = ios/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
@@ -6476,6 +6478,7 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 					"$(SRCROOT)/../../engine/libs/box2d/include",
+					"$(SRCROOT)/../../engine/libs/joltphysics",
 				);
 				INFOPLIST_FILE = macos/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -6507,6 +6510,7 @@
 					"$(SRCROOT)/../../engine/renders",
 					"$(SRCROOT)/../../engine/libs",
 					"$(SRCROOT)/../../engine/libs/box2d/include",
+					"$(SRCROOT)/../../engine/libs/joltphysics",
 				);
 				INFOPLIST_FILE = macos/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
