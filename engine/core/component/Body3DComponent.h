@@ -7,10 +7,8 @@
 
 #include "Engine.h"
 
-namespace JPH{
-    class Body;
-    class Shape;
-}
+#include "Jolt/Jolt.h"
+#include "Jolt/Physics/Body/Body.h"
 
 namespace Supernova{
 
@@ -34,7 +32,7 @@ namespace Supernova{
     };
 
     struct Body3DComponent{
-        JPH::Body *body = NULL;
+        JPH::BodyID body; 
 
         Shape3D shapes[MAX_SHAPES];
         size_t numShapes = 0;
@@ -42,6 +40,8 @@ namespace Supernova{
         bool overrideMassProperties = false;
         Vector3 solidBoxSize;
         float solidBoxDensity;
+
+        bool lockBody = true;
         
         BodyType type = BodyType::STATIC;
         bool newBody = true;

@@ -16,21 +16,12 @@
 
 #include "box2d/box2d.h"
 
-
-namespace JPH{
-	class Shape;
-	class PhysicsSystem;
-	class TempAllocatorImpl;
-	class JobSystemThreadPool;
-	class ShapeSettings;
-
-	class BroadPhaseLayerInterfaceMask;
-	class ObjectVsBroadPhaseLayerFilterMask;
-	class ObjectLayerPairFilterMask;
-};
-class BPLayerInterfaceImpl;
-class ObjectVsBroadPhaseLayerFilterImpl;
-class ObjectLayerPairFilterImpl;
+#include "Jolt/Jolt.h"
+#include "Jolt/Core/JobSystemThreadPool.h"
+#include "Jolt/Physics/PhysicsSystem.h"
+#include "Jolt/Physics/Collision/BroadPhase/BroadPhaseLayerInterfaceMask.h"
+#include "Jolt/Physics/Collision/BroadPhase/ObjectVsBroadPhaseLayerFilterMask.h"
+#include "Jolt/Physics/Collision/ObjectLayerPairFilterMask.h"
 
 namespace Supernova{
 
@@ -52,6 +43,7 @@ namespace Supernova{
         JPH::TempAllocatorImpl* temp_allocator;
         JPH::JobSystemThreadPool* job_system;
 		JPH::PhysicsSystem* world3D;
+		bool lock3DBodies;
 
 		JPH::BroadPhaseLayerInterfaceMask* broad_phase_layer_interface;
 		JPH::ObjectVsBroadPhaseLayerFilterMask* object_vs_broadphase_layer_filter;
@@ -61,8 +53,6 @@ namespace Supernova{
 		void updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body);
 
 		void createGenericJoltBody(Entity entity, Body3DComponent& body, const JPH::Shape* shape);
-
-		void manageBox2DEvents();
 
 	public:
 		PhysicsSystem(Scene* scene);
@@ -75,6 +65,9 @@ namespace Supernova{
 
 		float getPointsToMeterScale2D() const;
 		void setPointsToMeterScale2D(float pointsToMeterScale2D);
+
+        void setLock3DBodies(bool lock3DBodies);
+        bool isLock3DBodies() const;
 
 		FunctionSubscribe<void(Body2D, unsigned long, Body2D, unsigned long)> beginContact2D;
 		FunctionSubscribe<void(Body2D, unsigned long, Body2D, unsigned long)> endContact2D;

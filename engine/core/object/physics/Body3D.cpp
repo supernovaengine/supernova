@@ -38,42 +38,67 @@ BodyType getJoltToBodyType(JPH::EMotionType type){
 }
 
 Body3D::Body3D(Scene* scene, Entity entity): EntityHandle(scene, entity){
-    lockBodies = true;
 }
 
 Body3D::~Body3D(){
-
 }
 
 Body3D::Body3D(const Body3D& rhs): EntityHandle(rhs){
-    lockBodies = rhs.lockBodies;
 }
 
 Body3D& Body3D::operator=(const Body3D& rhs){
     EntityHandle::operator = (rhs);
 
-    lockBodies = rhs.lockBodies;
-
     return *this;
 }
 
 void Body3D::checkBody(const Body3DComponent& body) const{
-    if (!body.body){
+    if (body.body.IsInvalid()){
         Log::error("Body3D is not loaded");
-        throw std::runtime_error("Body3D is not loaded");;
+        throw std::runtime_error("Body3D is not loaded");
     }
 }
 
-JPH::BodyInterface& Body3D::getBodyInterface() const{
-    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
-    return lockBodies? world->GetBodyInterface() : world->GetBodyInterfaceNoLock();
+const JPH::BodyLockInterface& Body3D::getBodyLockInterface() const{
+    std::shared_ptr<PhysicsSystem> physicsSystem = scene->getSystem<PhysicsSystem>();
+    JPH::PhysicsSystem* world = physicsSystem->getWorld3D();
+    return physicsSystem->isLock3DBodies()? static_cast<const JPH::BodyLockInterface &>(world->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world->GetBodyLockInterfaceNoLock());
 }
 
-JPH::Body* Body3D::getJoltBody() const{
+JPH::BodyInterface& Body3D::getBodyInterface() const{
+    std::shared_ptr<PhysicsSystem> physicsSystem = scene->getSystem<PhysicsSystem>();
+    JPH::PhysicsSystem* world = physicsSystem->getWorld3D();
+    return physicsSystem->isLock3DBodies()? world->GetBodyInterface() : world->GetBodyInterfaceNoLock();
+}
+
+const JPH::Body& Body3D::getJoltBody() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    return body.body;
+
+    JPH::BodyLockRead lock(getBodyLockInterface(), body.body);
+    if (!lock.Succeeded())
+        throw std::runtime_error("Body3D is locked");
+
+    return lock.GetBody();
+}
+
+JPH::Body& Body3D::getJoltBodyWrite() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    checkBody(body);
+
+    JPH::BodyLockWrite lock(getBodyLockInterface(), body.body);
+    if (!lock.Succeeded())
+        throw std::runtime_error("Body3D is locked");
+
+    return lock.GetBody();
+}
+
+JPH::Body* Body3D::getJoltBodyNoLock() const{
+    Body3DComponent& body = getComponent<Body3DComponent>();
+
+    return getBodyLockInterface().TryGetBody(body.body);
 }
 
 Object Body3D::getAttachedObject(){
@@ -82,14 +107,6 @@ Object Body3D::getAttachedObject(){
 
 void Body3D::load(){
     scene->getSystem<PhysicsSystem>()->loadBody3D(entity);
-}
-
-void Body3D::setLockBodies(bool lockBodies){
-    this->lockBodies = lockBodies;
-}
-
-bool Body3D::isLockBodies() const{
-    return this->lockBodies;
 }
 
 int Body3D::createBoxShape(float width, float height, float depth){
@@ -226,14 +243,14 @@ void Body3D::setType(BodyType type){
 
     body.type = type;
 
-    if (body.body){
+    if (!body.body.IsInvalid()){
         JPH::EActivation activation = JPH::EActivation::DontActivate;
 
         if (type != BodyType::STATIC){
             activation = JPH::EActivation::Activate;
         }
 
-        getBodyInterface().SetMotionType(body.body->GetID(), getBodyTypeToJolt(type), activation);
+        getBodyInterface().SetMotionType(body.body, getBodyTypeToJolt(type), activation);
     }
 }
 
@@ -241,21 +258,11 @@ BodyType Body3D::getType() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    return getJoltToBodyType(getBodyInterface().GetMotionType(body.body->GetID()));
-}
-
-uint32_t Body3D::getID() const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    return body.body->GetID().GetIndex();
+    return getJoltToBodyType(getBodyInterface().GetMotionType(body.body));
 }
 
 bool Body3D::canBeKinematicOrDynamic() const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    return body.body->CanBeKinematicOrDynamic();
+    return getJoltBody().CanBeKinematicOrDynamic();
 }
 
 void Body3D::activate(){
@@ -263,7 +270,7 @@ void Body3D::activate(){
 
     checkBody(body);
 
-    getBodyInterface().ActivateBody(body.body->GetID());
+    getBodyInterface().ActivateBody(body.body);
 }
 
 void Body3D::deactivate(){
@@ -271,58 +278,36 @@ void Body3D::deactivate(){
 
     checkBody(body);
 
-    getBodyInterface().DeactivateBody(body.body->GetID());
+    getBodyInterface().DeactivateBody(body.body);
 }
 
 bool Body3D::isSensor() const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    return body.body->IsSensor();
+    return getJoltBody().IsSensor();
 }
 
 void Body3D::setIsSensor(bool sensor){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    body.body->SetIsSensor(sensor);
+    getJoltBodyWrite().SetIsSensor(sensor);
 }
 
 bool Body3D::isCollideKinematicVsNonDynamic() const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    return body.body->GetCollideKinematicVsNonDynamic();
+    return getJoltBody().GetCollideKinematicVsNonDynamic();
 }
 
 void Body3D::setCollideKinematicVsNonDynamic(bool collideKinematicVsNonDynamic){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    body.body->SetCollideKinematicVsNonDynamic(collideKinematicVsNonDynamic);
+    getJoltBodyWrite().SetCollideKinematicVsNonDynamic(collideKinematicVsNonDynamic);
 }
 
 void Body3D::setAllowedDOFsAll(){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::All, body.body->GetShape()->GetMassProperties());
+    JPH::Body& jbody = getJoltBodyWrite();
+    jbody.GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::All, jbody.GetShape()->GetMassProperties());
 }
 
 void Body3D::setAllowedDOFs2DPlane(){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::Plane2D, body.body->GetShape()->GetMassProperties());
+    JPH::Body& jbody = getJoltBodyWrite();
+    jbody.GetMotionProperties()->SetMassProperties(JPH::EAllowedDOFs::Plane2D, jbody.GetShape()->GetMassProperties());
 }
 
 void Body3D::setAllowedDOFs(bool translationX, bool translationY, bool translationZ, bool rotationX, bool rotationY, bool rotationZ){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
     JPH::EAllowedDOFs allowedDOFs;
 
     if (translationX){
@@ -344,31 +329,28 @@ void Body3D::setAllowedDOFs(bool translationX, bool translationY, bool translati
         allowedDOFs |= JPH::EAllowedDOFs::RotationZ;
     }
 
-    body.body->GetMotionProperties()->SetMassProperties(allowedDOFs, body.body->GetShape()->GetMassProperties());
+    JPH::Body& jbody = getJoltBodyWrite();
+    jbody.GetMotionProperties()->SetMassProperties(allowedDOFs, jbody.GetShape()->GetMassProperties());
 }
 
 float Body3D::getMass() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-
-    return getBodyInterface().GetShape(body.body->GetID())->GetMassProperties().mMass;
+    return getBodyInterface().GetShape(body.body)->GetMassProperties().mMass;
 }
 
 void Body3D::setMass(float mass){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    JPH::MassProperties massProperties = body.body->GetShape()->GetMassProperties();
+    JPH::Body& jbody = getJoltBodyWrite();
+    JPH::MassProperties massProperties = jbody.GetShape()->GetMassProperties();
     massProperties.mMass = mass;
-    body.body->GetMotionProperties()->SetMassProperties(body.body->GetMotionProperties()->GetAllowedDOFs(), massProperties);
+    jbody.GetMotionProperties()->SetMassProperties(jbody.GetMotionProperties()->GetAllowedDOFs(), massProperties);
 }
 
 void Body3D::setOverrideMassAndInertia(Vector3 solidBoxSize, float solidBoxDensity){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
-    if (!body.body){
+    if (!body.body.IsInvalid()){
         body.solidBoxSize = solidBoxSize;
         body.solidBoxDensity = solidBoxDensity;
         body.overrideMassProperties = true;
@@ -378,35 +360,25 @@ void Body3D::setOverrideMassAndInertia(Vector3 solidBoxSize, float solidBoxDensi
 }
 
 float Body3D::getGravityFactor() const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    return body.body->GetMotionProperties()->GetGravityFactor();
+    return getJoltBody().GetMotionProperties()->GetGravityFactor();
 }
 
 void Body3D::setGravityFactor(float gravityFactor){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-
-    body.body->GetMotionProperties()->SetGravityFactor(gravityFactor);
+    getJoltBodyWrite().GetMotionProperties()->SetGravityFactor(gravityFactor);
 }
 
 void Body3D::setBitsFilter(uint16_t category, uint16_t mask){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-
-    getBodyInterface().SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(category, mask));
+    getBodyInterface().SetObjectLayer(body.body, JPH::ObjectLayerPairFilterMask::sGetObjectLayer(category, mask));
 }
 
 uint16_t Body3D::getCategoryBitsFilter() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-
-    JPH::ObjectLayer objectLayer = getBodyInterface().GetObjectLayer(body.body->GetID());
+    JPH::ObjectLayer objectLayer = getBodyInterface().GetObjectLayer(body.body);
 
     return JPH::ObjectLayerPairFilterMask::sGetGroup(objectLayer);
 }
@@ -417,18 +389,17 @@ void Body3D::setCategoryBitsFilter(uint16_t category){
     checkBody(body);
     JPH::BodyInterface &body_interface = getBodyInterface();
 
-    JPH::ObjectLayer objectLayer = body_interface.GetObjectLayer(body.body->GetID());
+    JPH::ObjectLayer objectLayer = body_interface.GetObjectLayer(body.body);
     uint32_t mask = JPH::ObjectLayerPairFilterMask::sGetMask(objectLayer);
 
-    body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(category, mask));
+    body_interface.SetObjectLayer(body.body, JPH::ObjectLayerPairFilterMask::sGetObjectLayer(category, mask));
 }
 
 uint16_t Body3D::getMaskBitsFilter() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-
-    JPH::ObjectLayer objectLayer = getBodyInterface().GetObjectLayer(body.body->GetID());
+    JPH::ObjectLayer objectLayer = getBodyInterface().GetObjectLayer(body.body);
 
     return JPH::ObjectLayerPairFilterMask::sGetMask(objectLayer);
 }
@@ -439,48 +410,36 @@ void Body3D::setMaskBitsFilter(uint16_t mask){
     checkBody(body);
     JPH::BodyInterface &body_interface = getBodyInterface();
 
-    JPH::ObjectLayer objectLayer = body_interface.GetObjectLayer(body.body->GetID());
+    JPH::ObjectLayer objectLayer = body_interface.GetObjectLayer(body.body);
     uint32_t group = JPH::ObjectLayerPairFilterMask::sGetGroup(objectLayer);
 
-    body_interface.SetObjectLayer(body.body->GetID(), JPH::ObjectLayerPairFilterMask::sGetObjectLayer(group, mask));
+    body_interface.SetObjectLayer(body.body, JPH::ObjectLayerPairFilterMask::sGetObjectLayer(group, mask));
 }
 
 uint32_t Body3D::getCollisionGroupID() const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    return body.body->GetCollisionGroup().GetGroupID();
+    return getJoltBody().GetCollisionGroup().GetGroupID();
 }
 
 void Body3D::setCollisionGroupID(uint32_t group){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
     JPH::Ref<JPH::GroupFilterTable> group_filter = new JPH::GroupFilterTable(2);
     group_filter->DisableCollision(0, 0);
 
-    body.body->SetCollisionGroup(JPH::CollisionGroup(group_filter, group, 0));
+    getJoltBodyWrite().SetCollisionGroup(JPH::CollisionGroup(group_filter, group, 0));
 }
 
 bool Body3D::isAllowSleeping() const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    return body.body->GetAllowSleeping();
+    return getJoltBody().GetAllowSleeping();
 }
 
 void Body3D::setAllowSleeping(bool allowSleeping){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    body.body->SetAllowSleeping(allowSleeping);
+    getJoltBodyWrite().SetAllowSleeping(allowSleeping);
 }
 
 float Body3D::getFriction() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    return getBodyInterface().GetFriction(body.body->GetID());
+    return getBodyInterface().GetFriction(body.body);
 }
 
 void Body3D::setFriction(float friction){
@@ -491,28 +450,28 @@ void Body3D::setFriction(float friction){
     }
 
     checkBody(body);
-    getBodyInterface().SetFriction(body.body->GetID(), friction);
+    getBodyInterface().SetFriction(body.body, friction);
 }
 
 float Body3D::getRestitution() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    return getBodyInterface().GetRestitution(body.body->GetID());
+    return getBodyInterface().GetRestitution(body.body);
 }
 
 void Body3D::setRestitution(float restitution){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    getBodyInterface().SetRestitution(body.body->GetID(), restitution);
+    getBodyInterface().SetRestitution(body.body, restitution);
 }
 
 Vector3 Body3D::getLinearVelocity() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    JPH::Vec3 vec = getBodyInterface().GetLinearVelocity(body.body->GetID());
+    JPH::Vec3 vec = getBodyInterface().GetLinearVelocity(body.body);
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
@@ -521,21 +480,18 @@ void Body3D::setLinearVelocity(Vector3 linearVelocity){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    getBodyInterface().SetLinearVelocity(body.body->GetID(), JPH::Vec3(linearVelocity.x, linearVelocity.y, linearVelocity.z));
+    getBodyInterface().SetLinearVelocity(body.body, JPH::Vec3(linearVelocity.x, linearVelocity.y, linearVelocity.z));
 }
 
 void Body3D::setLinearVelocityClamped(Vector3 linearVelocity){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    body.body->SetLinearVelocityClamped(JPH::Vec3(linearVelocity.x, linearVelocity.y, linearVelocity.z));
+    getJoltBodyWrite().SetLinearVelocityClamped(JPH::Vec3(linearVelocity.x, linearVelocity.y, linearVelocity.z));
 }
 
 Vector3 Body3D::getAngularVelocity() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    JPH::Vec3 vec = getBodyInterface().GetAngularVelocity(body.body->GetID());
+    JPH::Vec3 vec = getBodyInterface().GetAngularVelocity(body.body);
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
@@ -544,21 +500,15 @@ void Body3D::setAngularVelocity(Vector3 angularVelocity){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    getBodyInterface().SetAngularVelocity(body.body->GetID(), JPH::Vec3(angularVelocity.x, angularVelocity.y, angularVelocity.z));
+    getBodyInterface().SetAngularVelocity(body.body, JPH::Vec3(angularVelocity.x, angularVelocity.y, angularVelocity.z));
 }
 
 void Body3D::setAngularVelocityClamped(Vector3 angularVelocity){
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    body.body->SetAngularVelocityClamped(JPH::Vec3(angularVelocity.x, angularVelocity.y, angularVelocity.z));
+    getJoltBodyWrite().SetAngularVelocityClamped(JPH::Vec3(angularVelocity.x, angularVelocity.y, angularVelocity.z));
 }
 
 Vector3 Body3D::getPointVelocityCOM(Vector3 pointRelativeToCOM) const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    JPH::Vec3 vec = body.body->GetPointVelocityCOM(JPH::Vec3(pointRelativeToCOM.x, pointRelativeToCOM.y, pointRelativeToCOM.z));
+    JPH::Vec3 vec = getJoltBody().GetPointVelocityCOM(JPH::Vec3(pointRelativeToCOM.x, pointRelativeToCOM.y, pointRelativeToCOM.z));
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
@@ -567,25 +517,19 @@ Vector3 Body3D::getPointVelocity(Vector3 point) const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    JPH::Vec3 vec = getBodyInterface().GetPointVelocity(body.body->GetID(), JPH::Vec3(point.x, point.y, point.z));
+    JPH::Vec3 vec = getBodyInterface().GetPointVelocity(body.body, JPH::Vec3(point.x, point.y, point.z));
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
 
 Vector3 Body3D::getAccumulatedForce() const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    JPH::Vec3 vec = body.body->GetAccumulatedForce();
+    JPH::Vec3 vec = getJoltBody().GetAccumulatedForce();
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
 
 Vector3 Body3D::getAccumulatedTorque() const{
-    Body3DComponent& body = getComponent<Body3DComponent>();
-
-    checkBody(body);
-    JPH::Vec3 vec = body.body->GetAccumulatedTorque();
+    JPH::Vec3 vec = getJoltBody().GetAccumulatedTorque();
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }
@@ -594,7 +538,7 @@ Matrix4 Body3D::getInverseInertia() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    JPH::Mat44 mat = getBodyInterface().GetInverseInertia(body.body->GetID());
+    JPH::Mat44 mat = getBodyInterface().GetInverseInertia(body.body);
 
     Matrix4 retMat;
     for (int i = 0; i < 4; i++){
@@ -608,42 +552,42 @@ void Body3D::applyForce(const Vector3& force){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    getBodyInterface().AddForce(body.body->GetID(), JPH::Vec3(force.x, force.y, force.z));
+    getBodyInterface().AddForce(body.body, JPH::Vec3(force.x, force.y, force.z));
 }
 
 void Body3D::applyForce(const Vector3& force, const Vector3& point){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    getBodyInterface().AddForce(body.body->GetID(), JPH::Vec3(force.x, force.y, force.z), JPH::Vec3(point.x, point.y, point.z));
+    getBodyInterface().AddForce(body.body, JPH::Vec3(force.x, force.y, force.z), JPH::Vec3(point.x, point.y, point.z));
 }
 
 void Body3D::applyTorque(const Vector3& torque){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    getBodyInterface().AddTorque(body.body->GetID(), JPH::Vec3(torque.x, torque.y, torque.z));
+    getBodyInterface().AddTorque(body.body, JPH::Vec3(torque.x, torque.y, torque.z));
 }
 
 void Body3D::applyImpulse(const Vector3& impulse){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    getBodyInterface().AddImpulse(body.body->GetID(), JPH::Vec3(impulse.x, impulse.y, impulse.z));
+    getBodyInterface().AddImpulse(body.body, JPH::Vec3(impulse.x, impulse.y, impulse.z));
 }
 
 void Body3D::applyImpulse(const Vector3& impulse, const Vector3& point){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    getBodyInterface().AddImpulse(body.body->GetID(), JPH::Vec3(impulse.x, impulse.y, impulse.z), JPH::Vec3(point.x, point.y, point.z));
+    getBodyInterface().AddImpulse(body.body, JPH::Vec3(impulse.x, impulse.y, impulse.z), JPH::Vec3(point.x, point.y, point.z));
 }
 
 void Body3D::applyAngularImpulse(const Vector3& angularImpulse){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    getBodyInterface().AddAngularImpulse(body.body->GetID(), JPH::Vec3(angularImpulse.x, angularImpulse.y, angularImpulse.z));
+    getBodyInterface().AddAngularImpulse(body.body, JPH::Vec3(angularImpulse.x, angularImpulse.y, angularImpulse.z));
 }
 
 bool Body3D::applyBuoyancyImpulse(const Vector3& surfacePosition, const Vector3& surfaceNormal, const float buoyancy, const float linearDrag, const float angularDrag, const Vector3& fluidVelocity, const Vector3& gravity, const float deltaTime){
@@ -654,15 +598,14 @@ bool Body3D::applyBuoyancyImpulse(const Vector3& surfacePosition, const Vector3&
     JPH::Vec3 fluVel = JPH::Vec3(fluidVelocity.x, fluidVelocity.y, fluidVelocity.z);
     JPH::Vec3 grav = JPH::Vec3(gravity.x, gravity.y, gravity.z);
 
-    checkBody(body);
-    return body.body->ApplyBuoyancyImpulse(surPos, surNor, buoyancy, linearDrag, angularDrag, fluVel, grav, deltaTime);
+    return getJoltBodyWrite().ApplyBuoyancyImpulse(surPos, surNor, buoyancy, linearDrag, angularDrag, fluVel, grav, deltaTime);
 }
 
 Vector3 Body3D::getCenterOfMassPosition(){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     checkBody(body);
-    JPH::Vec3 vec = getBodyInterface().GetCenterOfMassPosition(body.body->GetID());
+    JPH::Vec3 vec = getBodyInterface().GetCenterOfMassPosition(body.body);
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
 }

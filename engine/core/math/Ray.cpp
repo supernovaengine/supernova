@@ -246,17 +246,21 @@ RayReturn Ray::intersects(Body2D body, size_t shape){
 
 RayReturn Ray::intersects(Body3D body){
     Body3DComponent& bodycomp = body.getComponent<Body3DComponent>();
+    std::shared_ptr<PhysicsSystem> physicsSystem = body.getScene()->getSystem<PhysicsSystem>();
+    JPH::PhysicsSystem* world = physicsSystem->getWorld3D();
 
-    if (bodycomp.body){
+    if (!bodycomp.body.IsInvalid()){
         JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
         JPH::SubShapeIDCreator id_creator;
         JPH::RayCastResult hit;
 
-        JPH::Vec3 normal = bodycomp.body->GetShape()->GetSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
+        JPH::ShapeRefC shapeRef = world->GetBodyInterface().GetShape(bodycomp.body);
 
-        size_t shapeIndex = bodycomp.body->GetShape()->GetSubShapeUserData(hit.mSubShapeID2);
+        JPH::Vec3 normal = shapeRef->GetSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));
 
-        if (bodycomp.body->GetShape()->CastRay(ray, id_creator, hit)){
+        size_t shapeIndex = shapeRef->GetSubShapeUserData(hit.mSubShapeID2);
+
+        if (shapeRef->CastRay(ray, id_creator, hit)){
             return {true, hit.mFraction, getPoint(hit.mFraction), Vector3(normal.GetX(), normal.GetY(), normal.GetZ()), body.getEntity(), shapeIndex};
         }
     }
@@ -267,7 +271,7 @@ RayReturn Ray::intersects(Body3D body){
 RayReturn Ray::intersects(Body3D body, size_t shape){
     Body3DComponent& bodycomp = body.getComponent<Body3DComponent>();
 
-    if (bodycomp.body){
+    if (!bodycomp.body.IsInvalid()){
         JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
         JPH::SubShapeIDCreator id_creator;
         JPH::RayCastResult hit;
@@ -377,7 +381,8 @@ RayReturn Ray::intersects(Scene* scene, uint8_t broadPhaseLayer3D){
 }
 
 RayReturn Ray::intersects(Scene* scene, uint8_t broadPhaseLayer3D, uint16_t categoryBits, uint16_t maskBits){
-    JPH::PhysicsSystem* world = scene->getSystem<PhysicsSystem>()->getWorld3D();
+    std::shared_ptr<PhysicsSystem> physicsSystem = scene->getSystem<PhysicsSystem>();
+    JPH::PhysicsSystem* world = physicsSystem->getWorld3D();
 
     if (world && broadPhaseLayer3D < MAX_BROADPHASELAYER_3D){
         JPH::RayCast ray(JPH::Vec3(origin.x, origin.y, origin.z), JPH::Vec3(direction.x, direction.y, direction.z));
@@ -389,7 +394,10 @@ RayReturn Ray::intersects(Scene* scene, uint8_t broadPhaseLayer3D, uint16_t cate
             JPH::Vec3 normal;
             Entity entity = NULL_ENTITY;
             size_t shapeIndex = 0;
-            JPH::BodyLockRead lock(world->GetBodyLockInterface(), hit.mBodyID);
+
+            const JPH::BodyLockInterface& bodyLockInterface = physicsSystem->isLock3DBodies()? static_cast<const JPH::BodyLockInterface &>(world->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world->GetBodyLockInterfaceNoLock());
+
+            JPH::BodyLockRead lock(bodyLockInterface, hit.mBodyID);
             if (lock.Succeeded()){
                 const JPH::Body &hit_body = lock.GetBody();
                 normal = hit_body.GetWorldSpaceSurfaceNormal(hit.mSubShapeID2, ray.GetPointOnRay(hit.mFraction));

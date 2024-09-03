@@ -9,22 +9,19 @@
 #include "math/Vector2.h"
 #include "component/Body3DComponent.h"
 
-namespace JPH{
-    class Body;
-    class BodyInterface;
-}
+#include "Jolt/Jolt.h"
+#include "Jolt/Physics/Body/Body.h"
+#include "Jolt/Physics/Body/BodyInterface.h"
 
 namespace Supernova{
 
     class Object;
 
     class Body3D: public EntityHandle{
-    private:
-        bool lockBodies;
-
     protected:
         void checkBody(const Body3DComponent& body) const;
 
+        const JPH::BodyLockInterface& getBodyLockInterface() const;
         JPH::BodyInterface& getBodyInterface() const;
 
     public:
@@ -34,14 +31,13 @@ namespace Supernova{
         Body3D(const Body3D& rhs);
         Body3D& operator=(const Body3D& rhs);
 
-        JPH::Body* getJoltBody() const;
+        const JPH::Body& getJoltBody() const;
+        JPH::Body& getJoltBodyWrite() const;
+        JPH::Body* getJoltBodyNoLock() const;
 
         Object getAttachedObject();
 
         void load();
-
-        void setLockBodies(bool lockBodies);
-        bool isLockBodies() const;
 
         int createBoxShape(float width, float height, float depth);
         int createBoxShape(Vector3 position, Quaternion rotation, float width, float height, float depth);
@@ -74,8 +70,6 @@ namespace Supernova{
 
         void setType(BodyType type);
         BodyType getType() const;
-
-        uint32_t getID() const;
 
         bool canBeKinematicOrDynamic() const;
 

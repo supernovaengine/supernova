@@ -6,10 +6,7 @@
 #define JOINT3D_COMPONENT_H
 
 #include "Engine.h"
-
-namespace JPH{
-    class TwoBodyConstraint;
-}
+#include "Jolt/Physics/Constraints/TwoBodyConstraint.h"
 
 namespace Supernova{
 

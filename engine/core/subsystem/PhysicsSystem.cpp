@@ -64,6 +64,8 @@ PhysicsSystem::PhysicsSystem(Scene* scene): SubSystem(scene){
 
     contactListener3D = new JoltContactListener(scene, this);
     world3D->SetContactListener(contactListener3D);
+
+    lock3DBodies = true;
 }
 
 PhysicsSystem::~PhysicsSystem(){
@@ -112,6 +114,15 @@ void PhysicsSystem::setPointsToMeterScale2D(float pointsToMeterScale2D){
     this->pointsToMeterScale2D = pointsToMeterScale2D;
 }
 
+
+void PhysicsSystem::setLock3DBodies(bool lock3DBodies){
+    this->lock3DBodies = lock3DBodies;
+}
+
+bool PhysicsSystem::isLock3DBodies() const{
+    return this->lock3DBodies;
+}
+
 void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body){
     if (signature.test(scene->getComponentType<Transform>())){
         Transform& transform = scene->getComponent<Transform>(entity);
@@ -141,7 +152,7 @@ void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Bod
 void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body){
     if (signature.test(scene->getComponentType<Transform>())){
         Transform& transform = scene->getComponent<Transform>(entity);
-        if (body.body){
+        if (!body.body.IsInvalid()){
             JPH::Vec3 jNewPosition(transform.worldPosition.x, transform.worldPosition.y, transform.worldPosition.z);
             JPH::Quat jNewQuat(transform.worldRotation.x, transform.worldRotation.y, transform.worldRotation.z, transform.worldRotation.w);
 
@@ -153,13 +164,13 @@ void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Bod
                 }
             }
 
-            JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
+            JPH::BodyInterface &body_interface = world3D->GetBodyInterfaceNoLock();
             JPH::Vec3 jPosition;
             JPH::Quat jQuat;
-            body_interface.GetPositionAndRotation(body.body->GetID(), jPosition, jQuat);
+            body_interface.GetPositionAndRotation(body.body, jPosition, jQuat);
 
             if (jPosition != jNewPosition || jQuat != jNewQuat){
-                body_interface.SetPositionAndRotation(body.body->GetID(), jNewPosition, jNewQuat, JPH::EActivation::Activate);
+                body_interface.SetPositionAndRotation(body.body, jNewPosition, jNewQuat, JPH::EActivation::Activate);
             }
         }
     }
@@ -188,13 +199,15 @@ void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, 
         settings.mMassPropertiesOverride.SetMassAndInertiaOfSolidBox(JPH::Vec3(body.solidBoxSize.x, body.solidBoxSize.y, body.solidBoxSize.z), body.solidBoxDensity);
     }
 
-    body.body = body_interface.CreateBody(settings);
-    body.body->SetUserData(entity);
+    JPH::Body* jbody = body_interface.CreateBody(settings);
+    jbody->SetUserData(entity);
     //if (type != BodyType::STATIC){
-    //    body.body->SetAllowSleeping(false);
+    //    jbody->SetAllowSleeping(false);
     //}
 
-    body_interface.AddBody(body.body->GetID(), activation);
+    body.body = jbody->GetID();
+
+    body_interface.AddBody(body.body, activation);
 }
 
 void PhysicsSystem::createBody2D(Entity entity){
@@ -895,7 +908,7 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
 bool PhysicsSystem::loadBody3D(Entity entity){
     Body3DComponent& body = scene->getComponent<Body3DComponent>(entity);
 
-    if (world3D && !body.body){
+    if (world3D && body.body.IsInvalid()){
 
         for (int i = 0; i < body.numShapes; i++){
             if (body.type != BodyType::STATIC){
@@ -968,11 +981,9 @@ bool PhysicsSystem::loadBody3D(Entity entity){
 }
 
 void PhysicsSystem::destroyBody3D(Body3DComponent& body){
-    if (world3D && body.body){
+    if (world3D && !body.body.IsInvalid()){
         JPH::BodyInterface &body_interface = world3D->GetBodyInterface();
-        body_interface.RemoveBody(body.body->GetID());
-
-        body.body = NULL;
+        body_interface.RemoveBody(body.body);
 
         for (int i = 0; i < body.numShapes; i++){
             destroyShape3D(body, i);
@@ -1303,7 +1314,11 @@ bool PhysicsSystem::loadFixedJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         JPH::FixedConstraintSettings settings;
         settings.mAutoDetectPoint = true;
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::FIXED;
@@ -1334,7 +1349,11 @@ bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, E
         //settings.mMinDistance = 4.0f;
         //settings.mMaxDistance = 8.0f;
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::DISTANCE;
@@ -1362,7 +1381,11 @@ bool PhysicsSystem::loadPointJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         JPH::PointConstraintSettings settings;
         settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::POINT;
@@ -1392,7 +1415,11 @@ bool PhysicsSystem::loadHingeJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         settings.mHingeAxis1 = settings.mHingeAxis2 = JPH::Vec3(axis.x, axis.y, axis.z);
         settings.mNormalAxis1 = settings.mNormalAxis2 = JPH::Vec3(normal.x, normal.y, normal.z);
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::HINGE;
@@ -1421,7 +1448,11 @@ bool PhysicsSystem::loadConeJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
         settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
         settings.mTwistAxis1 = settings.mTwistAxis2 = JPH::Vec3(twistAxis.x, twistAxis.y, twistAxis.z);
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::CONE;
@@ -1452,7 +1483,11 @@ bool PhysicsSystem::loadPrismaticJoint3D(Joint3DComponent& joint, Entity bodyA, 
 		settings.mLimitsMin = limitsMin;
 		settings.mLimitsMax = limitsMax;
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::PRISMATIC;
@@ -1486,7 +1521,11 @@ bool PhysicsSystem::loadSwingTwistJoint3D(Joint3DComponent& joint, Entity bodyA,
         settings.mTwistMinAngle = Angle::defaultToRad(twistMinAngle);
         settings.mTwistMaxAngle = Angle::defaultToRad(twistMaxAngle);
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::SWINGTWIST;
@@ -1517,7 +1556,11 @@ bool PhysicsSystem::loadSixDOFJoint3D(Joint3DComponent& joint, Entity bodyA, Ent
         settings.mAxisX1 = settings.mAxisX2 = JPH::Vec3(axisX.x, axisX.y, axisX.z);
         settings.mAxisY1 = settings.mAxisY2 = JPH::Vec3(axisY.x, axisY.y, axisY.z);
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::SIXDOF;
@@ -1558,7 +1601,11 @@ bool PhysicsSystem::loadPathJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
         settings.mPath = path;
         settings.mPathPosition = JPH::Vec3(pathPosition.x, pathPosition.y, pathPosition.z);
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::PATH;
@@ -1595,11 +1642,15 @@ bool PhysicsSystem::loadGearJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
                 return false;
             }
 
+            const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+            JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+            JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
             // Disable collision between gears
             JPH::Ref<JPH::GroupFilterTable> group_filter = new JPH::GroupFilterTable(2);
             group_filter->DisableCollision(0, 1);
-            myBodyA.body->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
-            myBodyB.body->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
+            lock.GetBody(0)->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
+            lock.GetBody(1)->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
 
             JPH::HingeConstraintSettings* hingeSetA = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHingeA.joint)->GetConstraintSettings().GetPtr();
             JPH::HingeConstraintSettings* hingeSetB = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHingeB.joint)->GetConstraintSettings().GetPtr();
@@ -1609,7 +1660,7 @@ bool PhysicsSystem::loadGearJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
             settings.mHingeAxis2 = hingeSetB->mHingeAxis1;
             settings.SetRatio(numTeethGearA, numTeethGearB);
 
-            joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+            joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
             ((JPH::GearConstraint *)joint.joint)->SetConstraints(myHingeA.joint, myHingeB.joint);
             world3D->AddConstraint(joint.joint);
@@ -1651,11 +1702,15 @@ bool PhysicsSystem::loadRackAndPinionJoint3D(Joint3DComponent& joint, Entity bod
                 return false;
             }
 
+            const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+            JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+            JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
             // Disable collision between gears
             JPH::Ref<JPH::GroupFilterTable> group_filter = new JPH::GroupFilterTable(2);
             group_filter->DisableCollision(0, 1);
-            myBodyA.body->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
-            myBodyB.body->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
+            lock.GetBody(0)->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
+            lock.GetBody(1)->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
 
             JPH::HingeConstraintSettings* hingeSetA = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHinge.joint)->GetConstraintSettings().GetPtr();
             JPH::SliderConstraintSettings* sliderSetB = (JPH::SliderConstraintSettings*)((JPH::SliderConstraint*)mySlider.joint)->GetConstraintSettings().GetPtr();
@@ -1665,7 +1720,7 @@ bool PhysicsSystem::loadRackAndPinionJoint3D(Joint3DComponent& joint, Entity bod
             settings.mSliderAxis = sliderSetB->mSliderAxis2;
             settings.SetRatio(numTeethRack, rackLength, numTeethGear);
 
-            joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+            joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
             ((JPH::GearConstraint *)joint.joint)->SetConstraints(myHinge.joint, mySlider.joint);
             world3D->AddConstraint(joint.joint);
@@ -1701,7 +1756,11 @@ bool PhysicsSystem::loadPulleyJoint3D(Joint3DComponent& joint, Entity bodyA, Ent
         settings.mFixedPoint1 = JPH::Vec3(fixedPointA.x, fixedPointA.y, fixedPointA.z);
         settings.mFixedPoint2 = JPH::Vec3(fixedPointB.x, fixedPointB.y, fixedPointB.z);
 
-        joint.joint = settings.Create(*myBodyA.body, *myBodyB.body);
+        const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D->GetBodyLockInterfaceNoLock());
+        JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
+        JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
+
+        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
 
         world3D->AddConstraint(joint.joint);
         joint.type = Joint3DType::PULLEY;
@@ -1808,7 +1867,7 @@ void PhysicsSystem::update(double dt){
 		Entity entity = bodies3d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-        if (body.body){
+        if (!body.body.IsInvalid()){
             updateBody3DPosition(signature, entity, body);
 
             body.newBody = false;
@@ -1826,9 +1885,10 @@ void PhysicsSystem::update(double dt){
 		Entity entity = bodies3d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-        if (body.body){
-            JPH::RVec3 position = body.body->GetPosition();
-            JPH::Quat rotation = body.body->GetRotation();
+        if (!body.body.IsInvalid()){
+            JPH::BodyInterface &body_interface = world3D->GetBodyInterfaceNoLock();
+            JPH::RVec3 position = body_interface.GetPosition(body.body);
+            JPH::Quat rotation = body_interface.GetRotation(body.body);
             if (signature.test(scene->getComponentType<Transform>())){
                 Transform& transform = scene->getComponent<Transform>(entity);
 

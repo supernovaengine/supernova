@@ -8,11 +8,8 @@
 #include "Entity.h"
 #include "Body3D.h"
 
-namespace JPH{
-    class Body;
-    class ContactManifold;
-    class ContactSettings;
-}
+#include "Jolt/Physics/Body/Body.h"
+#include "Jolt/Physics/Collision/ContactListener.h"
 
 namespace Supernova{
 

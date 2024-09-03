@@ -8,10 +8,7 @@
 #include "Entity.h"
 #include "Body3D.h"
 
-namespace JPH{
-    class Body;
-    class CollideShapeResult;
-}
+#include "Jolt/Physics/Body/Body.h"
 
 namespace Supernova{
 

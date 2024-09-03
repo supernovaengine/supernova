@@ -431,10 +431,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
 endif()
 
 include_directories (${PLATFORM_ROOT})
-include_directories (${SUPERNOVA_ROOT}/engine/libs)
+
 include_directories (${SUPERNOVA_ROOT}/engine/libs/sokol)
 include_directories (${SUPERNOVA_ROOT}/engine/libs/lua)
 include_directories (${SUPERNOVA_ROOT}/engine/libs/box2d/include)
+include_directories (${SUPERNOVA_ROOT}/engine/libs/joltphysics)
+
 include_directories (${SUPERNOVA_ROOT}/engine/core)
 include_directories (${SUPERNOVA_ROOT}/engine/core/action)
 include_directories (${SUPERNOVA_ROOT}/engine/core/buffer)
