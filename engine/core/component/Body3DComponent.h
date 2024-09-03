@@ -24,7 +24,7 @@ namespace Supernova{
     };
 
     struct Shape3D{
-        JPH::Shape* shape = NULL;
+        JPH::ShapeRefC shape = NULL;
         Vector3 position = Vector3::ZERO;
         Quaternion rotation = Quaternion::IDENTITY;
 

@@ -36,14 +36,15 @@ namespace Supernova{
 
 		b2WorldId world2D;
 		float pointsToMeterScale2D;
+		bool lock3DBodies;
 
 		JoltActivationListener* activationListener3D;
 		JoltContactListener* contactListener3D;
 
         JPH::TempAllocatorImpl* temp_allocator;
         JPH::JobSystemThreadPool* job_system;
-		JPH::PhysicsSystem* world3D;
-		bool lock3DBodies;
+
+		JPH::PhysicsSystem world3D;
 
 		JPH::BroadPhaseLayerInterfaceMask* broad_phase_layer_interface;
 		JPH::ObjectVsBroadPhaseLayerFilterMask* object_vs_broadphase_layer_filter;
@@ -52,7 +53,7 @@ namespace Supernova{
 		void updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body);
 		void updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body);
 
-		void createGenericJoltBody(Entity entity, Body3DComponent& body, const JPH::Shape* shape);
+		void createGenericJoltBody(Entity entity, Body3DComponent& body, const JPH::ShapeRefC shape);
 
 	public:
 		PhysicsSystem(Scene* scene);
@@ -115,7 +116,7 @@ namespace Supernova{
 		int createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize);
 
 		b2WorldId getWorld2D() const;
-		JPH::PhysicsSystem* getWorld3D() const;
+		JPH::PhysicsSystem* getWorld3D();
 
 		b2BodyId getBody(Entity entity);
 

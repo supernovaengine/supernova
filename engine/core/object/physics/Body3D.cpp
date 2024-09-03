@@ -206,9 +206,9 @@ void Body3D::setShapeDensity(size_t index, float density){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        JPH::ConvexShape* shape = dynamic_cast<JPH::ConvexShape*>(body.shapes[index].shape);
-        if (shape){
-            shape->SetDensity(density);
+        if (body.shapes[index].shape->GetType() == JPH::EShapeType::Convex){
+            JPH::ConvexShape* convexShape = (JPH::ConvexShape*)body.shapes[index].shape.GetPtr();
+            convexShape->SetDensity(density);
         }else{
             Log::warn("The shape %i does not have density", index);
         }
@@ -225,9 +225,9 @@ float Body3D::getShapeDensity(size_t index) const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        JPH::ConvexShape* shape = dynamic_cast<JPH::ConvexShape*>(body.shapes[index].shape);
-        if (shape){
-            return shape->GetDensity();
+        if (body.shapes[index].shape->GetType() == JPH::EShapeType::Convex){
+            const JPH::ConvexShape* convexShape = (const JPH::ConvexShape*)body.shapes[index].shape.GetPtr();
+            return convexShape->GetDensity();
         }else{
             Log::warn("The shape %i does not have density", index);
         }
