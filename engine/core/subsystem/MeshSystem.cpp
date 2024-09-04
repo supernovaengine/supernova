@@ -1590,8 +1590,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
 
     mesh.numExternalBuffers = 0;
 
-    loader.SetFsCallbacks({&fileExists, &tinygltf::ExpandFilePath, &readWholeFile, nullptr, nullptr});
-    //loader.SetFsCallbacks({nullptr, nullptr, nullptr, nullptr, nullptr});
+    loader.SetFsCallbacks({&fileExists, &tinygltf::ExpandFilePath, &readWholeFile, &tinygltf::WriteWholeFile, &tinygltf::GetFileSizeInBytes});
 
     std::string ext = FileData::getFilePathExtension(filename);
 
