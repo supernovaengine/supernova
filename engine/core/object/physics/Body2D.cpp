@@ -786,11 +786,11 @@ float Body2D::getMass() const{
     return b2Body_GetMass(body.body);
 }
 
-float Body2D::getInertiaTensor() const{
+float Body2D::getRotationalInertia() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     checkBody(body);
-    return b2Body_GetInertiaTensor(body.body);
+    return b2Body_GetRotationalInertia(body.body);
 }
 
 void Body2D::applyMassFromShapes(){

@@ -65,12 +65,14 @@ void* b2Alloc( uint32_t size )
 		return ptr;
 	}
 
-#if defined(B2_PLATFORM_WINDOWS)
+#ifdef B2_PLATFORM_WINDOWS
 	void* ptr = _aligned_malloc( size32, B2_ALIGNMENT );
 #elif defined(B2_PLATFORM_ANDROID)
     void* ptr = NULL;
-    if (posix_memalign(&ptr, B2_ALIGNMENT, size32) != 0) {
-        ptr = NULL;  // Allocation failed
+    if (posix_memalign(&ptr, B2_ALIGNMENT, size32) != 0)
+	{
+		// allocation failed, exit the application
+		exit(EXIT_FAILURE);
     }
 #else
 	void* ptr = aligned_alloc( B2_ALIGNMENT, size32 );

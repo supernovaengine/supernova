@@ -13,7 +13,7 @@ typedef struct b2Capsule b2Capsule;
 typedef struct b2DistanceCache b2DistanceCache;
 typedef struct b2Polygon b2Polygon;
 typedef struct b2Segment b2Segment;
-typedef struct b2SmoothSegment b2SmoothSegment;
+typedef struct b2ChainSegment b2ChainSegment;
 
 typedef struct b2Hull b2Hull;
 
@@ -153,10 +153,10 @@ typedef struct b2Segment
 	b2Vec2 point2;
 } b2Segment;
 
-/// A smooth line segment with one-sided collision. Only collides on the right side.
+/// A line segment with one-sided collision. Only collides on the right side.
 /// Several of these are generated for a chain shape.
 /// ghost1 -> point1 -> point2 -> ghost2
-typedef struct b2SmoothSegment
+typedef struct b2ChainSegment
 {
 	/// The tail ghost vertex
 	b2Vec2 ghost1;
@@ -169,7 +169,7 @@ typedef struct b2SmoothSegment
 
 	/// The owning chain shape index (internal usage only)
 	int32_t chainId;
-} b2SmoothSegment;
+} b2ChainSegment;
 
 /// Validate ray cast input data (NaN, etc)
 B2_API bool b2IsValidRay( const b2RayCastInput* input );
@@ -192,7 +192,7 @@ B2_API b2Polygon b2MakeBox( float hx, float hy );
 B2_API b2Polygon b2MakeRoundedBox( float hx, float hy, float radius );
 
 /// Make an offset box, bypassing the need for a convex hull.
-B2_API b2Polygon b2MakeOffsetBox( float hx, float hy, b2Vec2 center, float angle );
+B2_API b2Polygon b2MakeOffsetBox( float hx, float hy, b2Vec2 center, b2Rot rotation );
 
 /// Transform a polygon. This is useful for transferring a shape from one body to another.
 B2_API b2Polygon b2TransformPolygon( b2Transform transform, const b2Polygon* polygon );
@@ -554,16 +554,16 @@ B2_API b2Manifold b2CollidePolygons( const b2Polygon* polygonA, b2Transform xfA,
 B2_API b2Manifold b2CollideSegmentAndPolygon( const b2Segment* segmentA, b2Transform xfA, const b2Polygon* polygonB,
 											  b2Transform xfB );
 
-/// Compute the contact manifold between a smooth segment and a circle
-B2_API b2Manifold b2CollideSmoothSegmentAndCircle( const b2SmoothSegment* smoothSegmentA, b2Transform xfA,
+/// Compute the contact manifold between a chain segment and a circle
+B2_API b2Manifold b2CollideChainSegmentAndCircle( const b2ChainSegment* segmentA, b2Transform xfA,
 												   const b2Circle* circleB, b2Transform xfB );
 
-/// Compute the contact manifold between an segment and a capsule
-B2_API b2Manifold b2CollideSmoothSegmentAndCapsule( const b2SmoothSegment* smoothSegmentA, b2Transform xfA,
+/// Compute the contact manifold between a chain segment and a capsule
+B2_API b2Manifold b2CollideChainSegmentAndCapsule( const b2ChainSegment* segmentA, b2Transform xfA,
 													const b2Capsule* capsuleB, b2Transform xfB, b2DistanceCache* cache );
 
-/// Compute the contact manifold between a smooth segment and a rounded polygon
-B2_API b2Manifold b2CollideSmoothSegmentAndPolygon( const b2SmoothSegment* smoothSegmentA, b2Transform xfA,
+/// Compute the contact manifold between a chain segment and a rounded polygon
+B2_API b2Manifold b2CollideChainSegmentAndPolygon( const b2ChainSegment* segmentA, b2Transform xfA,
 													const b2Polygon* polygonB, b2Transform xfB, b2DistanceCache* cache );
 
 /**@}*/
@@ -589,21 +589,20 @@ B2_API b2Manifold b2CollideSmoothSegmentAndPolygon( const b2SmoothSegment* smoot
  */
 
 /// The default category bit for a tree proxy. Used for collision filtering.
-#define b2_defaultCategoryBits ( 0x00000001 )
+#define b2_defaultCategoryBits ( 1 )
 
 /// Convenience mask bits to use when you don't need collision filtering and just want
 ///	all results.
-#define b2_defaultMaskBits ( 0xFFFFFFFF )
+#define b2_defaultMaskBits ( UINT64_MAX )
 
 /// A node in the dynamic tree. This is private data placed here for performance reasons.
-/// 16 + 16 + 8 + pad(8)
 typedef struct b2TreeNode
 {
 	/// The node bounding box
 	b2AABB aabb; // 16
 
 	/// Category bits for collision filtering
-	uint32_t categoryBits; // 4
+	uint64_t categoryBits; // 8
 
 	union
 	{
@@ -631,7 +630,7 @@ typedef struct b2TreeNode
 	bool enlarged; // 1
 
 	/// Padding for clarity
-	char pad[9];
+	char pad[5];
 } b2TreeNode;
 
 /// The dynamic tree structure. This should be considered private data.
@@ -679,7 +678,7 @@ B2_API b2DynamicTree b2DynamicTree_Create( void );
 B2_API void b2DynamicTree_Destroy( b2DynamicTree* tree );
 
 /// Create a proxy. Provide an AABB and a userData value.
-B2_API int32_t b2DynamicTree_CreateProxy( b2DynamicTree* tree, b2AABB aabb, uint32_t categoryBits, int32_t userData );
+B2_API int32_t b2DynamicTree_CreateProxy( b2DynamicTree* tree, b2AABB aabb, uint64_t categoryBits, int32_t userData );
 
 /// Destroy a proxy. This asserts if the id is invalid.
 B2_API void b2DynamicTree_DestroyProxy( b2DynamicTree* tree, int32_t proxyId );
@@ -694,9 +693,8 @@ B2_API void b2DynamicTree_EnlargeProxy( b2DynamicTree* tree, int32_t proxyId, b2
 /// @return true if the query should continue
 typedef bool b2TreeQueryCallbackFcn( int32_t proxyId, int32_t userData, void* context );
 
-/// Query an AABB for overlapping proxies. The callback class
-/// is called for each proxy that overlaps the supplied AABB.
-B2_API void b2DynamicTree_Query( const b2DynamicTree* tree, b2AABB aabb, uint32_t maskBits, b2TreeQueryCallbackFcn* callback,
+/// Query an AABB for overlapping proxies. The callback class is called for each proxy that overlaps the supplied AABB.
+B2_API void b2DynamicTree_Query( const b2DynamicTree* tree, b2AABB aabb, uint64_t maskBits, b2TreeQueryCallbackFcn* callback,
 								 void* context );
 
 /// This function receives clipped raycast input for a proxy. The function
@@ -717,7 +715,7 @@ typedef float b2TreeRayCastCallbackFcn( const b2RayCastInput* input, int32_t pro
 ///	@param maskBits filter bits: `bool accept = (maskBits & node->categoryBits) != 0;`
 /// @param callback a callback class that is called for each proxy that is hit by the ray
 ///	@param context user context that is passed to the callback
-B2_API void b2DynamicTree_RayCast( const b2DynamicTree* tree, const b2RayCastInput* input, uint32_t maskBits,
+B2_API void b2DynamicTree_RayCast( const b2DynamicTree* tree, const b2RayCastInput* input, uint64_t maskBits,
 								   b2TreeRayCastCallbackFcn* callback, void* context );
 
 /// This function receives clipped ray-cast input for a proxy. The function
@@ -737,7 +735,7 @@ typedef float b2TreeShapeCastCallbackFcn( const b2ShapeCastInput* input, int32_t
 ///	@param maskBits filter bits: `bool accept = (maskBits & node->categoryBits) != 0;`
 /// @param callback a callback class that is called for each proxy that is hit by the shape
 ///	@param context user context that is passed to the callback
-B2_API void b2DynamicTree_ShapeCast( const b2DynamicTree* tree, const b2ShapeCastInput* input, uint32_t maskBits,
+B2_API void b2DynamicTree_ShapeCast( const b2DynamicTree* tree, const b2ShapeCastInput* input, uint64_t maskBits,
 									 b2TreeShapeCastCallbackFcn* callback, void* context );
 
 /// Validate this tree. For testing.

@@ -134,7 +134,7 @@ namespace Supernova{
         int16_t getGroupIndexFilter(size_t shapeIndex) const;
 
         float getMass() const;
-        float getInertiaTensor() const;
+        float getRotationalInertia() const;
 
         void applyMassFromShapes();
 

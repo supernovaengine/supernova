@@ -19,47 +19,20 @@
 #include <limits.h>
 #include <stdatomic.h>
 #include <stdbool.h>
+#include <stddef.h>
 
-
-// modified by eduardodoria from miniaudio.h
-
-#if !defined(B2_CPU_ARM)
+#if defined(B2_CPU_ARM)
+static inline void b2Pause (void)
+{
+	__asm__ __volatile__("isb\n");
+}
+#else
 #include <immintrin.h>
-#endif
-
 static inline void b2Pause(void)
 {
-#if defined(__i386) || defined(_M_IX86) || defined(__x86_64__) || defined(_M_X64)
-    /* x86/x64 */
-    #if (defined(_MSC_VER) || defined(__WATCOMC__) || defined(__DMC__)) && !defined(__clang__)
-        #if _MSC_VER >= 1400
-            _mm_pause();
-        #else
-            #if defined(__DMC__)
-                /* Digital Mars does not recognize the PAUSE opcode. Fall back to NOP. */
-                __asm nop;
-            #else
-                __asm pause;
-            #endif
-        #endif
-    #else
-        __asm__ __volatile__ ("pause");
-    #endif
-#elif (defined(__arm__) && defined(__ARM_ARCH) && __ARM_ARCH >= 7) || defined(_M_ARM64) || (defined(_M_ARM) && _M_ARM >= 7) || defined(__ARM_ARCH_6K__) || defined(__ARM_ARCH_6T2__)
-    /* ARM */
-    #if defined(_MSC_VER)
-        /* Apparently there is a __yield() intrinsic that's compatible with ARM, but I cannot find documentation for it nor can I find where it's declared. */
-        __yield();
-    #else
-        __asm__ __volatile__ ("yield"); /* ARMv6K/ARMv6T2 and above. */
-    #endif
-#else
-    /* Unknown or unsupported architecture. No-op. */
-#endif
+	_mm_pause();
 }
-
-// end modification
-
+#endif
 
 typedef struct b2WorkerContext
 {
@@ -904,12 +877,12 @@ static bool b2ContinuousQueryCallback( int proxyId, int shapeId, void* context )
 		}
 	}
 
-	// Prevent pausing on smooth segment junctions
-	if ( shape->type == b2_smoothSegmentShape )
+	// Prevent pausing on chain segment junctions
+	if ( shape->type == b2_chainSegmentShape )
 	{
 		b2Transform transform = bodySim->transform;
-		b2Vec2 p1 = b2TransformPoint( transform, shape->smoothSegment.segment.point1 );
-		b2Vec2 p2 = b2TransformPoint( transform, shape->smoothSegment.segment.point2 );
+		b2Vec2 p1 = b2TransformPoint( transform, shape->chainSegment.segment.point1 );
+		b2Vec2 p2 = b2TransformPoint( transform, shape->chainSegment.segment.point2 );
 		b2Vec2 e = b2Sub( p2, p1 );
 		b2Vec2 c1 = continuousContext->centroid1;
 		b2Vec2 c2 = continuousContext->centroid2;

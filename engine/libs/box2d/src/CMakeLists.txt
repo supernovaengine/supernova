@@ -88,6 +88,8 @@ target_include_directories(box2d
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+set(CMAKE_DEBUG_POSTFIX "d")
+
 # Box2D uses C17
 set_target_properties(box2d PROPERTIES
 	C_STANDARD 17
@@ -95,6 +97,7 @@ set_target_properties(box2d PROPERTIES
     C_EXTENSIONS YES
     VERSION ${PROJECT_VERSION}
     SOVERSION ${PROJECT_VERSION_MAJOR}
+	DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX}
 )
 
 if (BOX2D_PROFILE)
@@ -149,19 +152,12 @@ elseif (MINGW)
 		target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
 		target_compile_options(box2d PRIVATE -mavx2)
 	else()
-		# todo should no longer be needed
-		# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
-		message(STATUS "Box2D disabling ABI warning")
-		target_compile_options(box2d PRIVATE -Wno-psabi)
 	endif()
 elseif (APPLE)
 	message(STATUS "Box2D on Apple")
+	target_compile_options(box2d PRIVATE -ffp-contract=off)
 elseif (EMSCRIPTEN)
 	message(STATUS "Box2D on Emscripten")
-	# todo should no longer be needed
-	# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
-	message(STATUS "Box2D disabling ABI warning")
-	target_compile_options(box2d PRIVATE -Wno-psabi)
 elseif (UNIX)
 	message(STATUS "Box2D using Unix")
 	if ("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
@@ -176,10 +172,6 @@ elseif (UNIX)
 			target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
 			target_compile_options(box2d PRIVATE -mavx2)
 		else()
-			# todo should no longer be needed
-			# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
-			message(STATUS "Box2D disabling ABI warning")
-			target_compile_options(box2d PRIVATE -Wno-psabi)
 		endif()
 	endif()
 endif()
@@ -187,4 +179,31 @@ endif()
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" PREFIX "src" FILES ${BOX2D_SOURCE_FILES})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}/../include" PREFIX "include" FILES ${BOX2D_API_FILES})
 
-install(TARGETS box2d)
+add_library(box2d::box2d ALIAS box2d)
+
+install(
+  TARGETS box2d
+  EXPORT box2dConfig
+  LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+)
+
+install(
+  EXPORT box2dConfig
+  NAMESPACE box2d::
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/box2d"
+)
+
+include(CMakePackageConfigHelpers)
+
+write_basic_package_version_file(
+  "${CMAKE_CURRENT_BINARY_DIR}/box2dConfigVersion.cmake"
+  COMPATIBILITY SameMajorVersion
+)
+
+install(
+  FILES "${CMAKE_CURRENT_BINARY_DIR}/box2dConfigVersion.cmake"
+  DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/box2d"
+)
+

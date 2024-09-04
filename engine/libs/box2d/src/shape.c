@@ -22,11 +22,6 @@ static b2Shape* b2GetShape( b2World* world, b2ShapeId shapeId )
 	return shape;
 }
 
-b2Transform b2GetOwnerTransform( b2World* world, b2Shape* shape )
-{
-	return b2GetBodyTransform( world, shape->bodyId );
-}
-
 static b2ChainShape* b2GetChainShape( b2World* world, b2ChainId chainId )
 {
 	int id = chainId.index1 - 1;
@@ -97,8 +92,8 @@ static b2Shape* b2CreateShapeInternal( b2World* world, b2Body* body, b2Transform
 			shape->segment = *(const b2Segment*)geometry;
 			break;
 
-		case b2_smoothSegmentShape:
-			shape->smoothSegment = *(const b2SmoothSegment*)geometry;
+		case b2_chainSegmentShape:
+			shape->chainSegment = *(const b2ChainSegment*)geometry;
 			break;
 
 		default:
@@ -342,39 +337,39 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 		chainShape->count = n;
 		chainShape->shapeIndices = b2Alloc( n * sizeof( int ) );
 
-		b2SmoothSegment smoothSegment;
+		b2ChainSegment chainSegment;
 
 		int prevIndex = n - 1;
 		for ( int i = 0; i < n - 2; ++i )
 		{
-			smoothSegment.ghost1 = points[prevIndex];
-			smoothSegment.segment.point1 = points[i];
-			smoothSegment.segment.point2 = points[i + 1];
-			smoothSegment.ghost2 = points[i + 2];
-			smoothSegment.chainId = chainId;
+			chainSegment.ghost1 = points[prevIndex];
+			chainSegment.segment.point1 = points[i];
+			chainSegment.segment.point2 = points[i + 1];
+			chainSegment.ghost2 = points[i + 2];
+			chainSegment.chainId = chainId;
 			prevIndex = i;
 
-			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &smoothSegment, b2_smoothSegmentShape );
+			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &chainSegment, b2_chainSegmentShape );
 			chainShape->shapeIndices[i] = shape->id;
 		}
 
 		{
-			smoothSegment.ghost1 = points[n - 3];
-			smoothSegment.segment.point1 = points[n - 2];
-			smoothSegment.segment.point2 = points[n - 1];
-			smoothSegment.ghost2 = points[0];
-			smoothSegment.chainId = chainId;
-			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &smoothSegment, b2_smoothSegmentShape );
+			chainSegment.ghost1 = points[n - 3];
+			chainSegment.segment.point1 = points[n - 2];
+			chainSegment.segment.point2 = points[n - 1];
+			chainSegment.ghost2 = points[0];
+			chainSegment.chainId = chainId;
+			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &chainSegment, b2_chainSegmentShape );
 			chainShape->shapeIndices[n - 2] = shape->id;
 		}
 
 		{
-			smoothSegment.ghost1 = points[n - 2];
-			smoothSegment.segment.point1 = points[n - 1];
-			smoothSegment.segment.point2 = points[0];
-			smoothSegment.ghost2 = points[1];
-			smoothSegment.chainId = chainId;
-			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &smoothSegment, b2_smoothSegmentShape );
+			chainSegment.ghost1 = points[n - 2];
+			chainSegment.segment.point1 = points[n - 1];
+			chainSegment.segment.point2 = points[0];
+			chainSegment.ghost2 = points[1];
+			chainSegment.chainId = chainId;
+			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &chainSegment, b2_chainSegmentShape );
 			chainShape->shapeIndices[n - 1] = shape->id;
 		}
 	}
@@ -383,17 +378,17 @@ b2ChainId b2CreateChain( b2BodyId bodyId, const b2ChainDef* def )
 		chainShape->count = n - 3;
 		chainShape->shapeIndices = b2Alloc( n * sizeof( int ) );
 
-		b2SmoothSegment smoothSegment;
+		b2ChainSegment chainSegment;
 
 		for ( int i = 0; i < n - 3; ++i )
 		{
-			smoothSegment.ghost1 = points[i];
-			smoothSegment.segment.point1 = points[i + 1];
-			smoothSegment.segment.point2 = points[i + 2];
-			smoothSegment.ghost2 = points[i + 3];
-			smoothSegment.chainId = chainId;
+			chainSegment.ghost1 = points[i];
+			chainSegment.segment.point1 = points[i + 1];
+			chainSegment.segment.point2 = points[i + 2];
+			chainSegment.ghost2 = points[i + 3];
+			chainSegment.chainId = chainId;
 
-			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &smoothSegment, b2_smoothSegmentShape );
+			b2Shape* shape = b2CreateShapeInternal( world, body, transform, &shapeDef, &chainSegment, b2_chainSegmentShape );
 			chainShape->shapeIndices[i] = shape->id;
 		}
 	}
@@ -466,8 +461,8 @@ b2AABB b2ComputeShapeAABB( const b2Shape* shape, b2Transform xf )
 			return b2ComputePolygonAABB( &shape->polygon, xf );
 		case b2_segmentShape:
 			return b2ComputeSegmentAABB( &shape->segment, xf );
-		case b2_smoothSegmentShape:
-			return b2ComputeSegmentAABB( &shape->smoothSegment.segment, xf );
+		case b2_chainSegmentShape:
+			return b2ComputeSegmentAABB( &shape->chainSegment.segment, xf );
 		default:
 		{
 			B2_ASSERT( false );
@@ -489,8 +484,8 @@ b2Vec2 b2GetShapeCentroid( const b2Shape* shape )
 			return shape->polygon.centroid;
 		case b2_segmentShape:
 			return b2Lerp( shape->segment.point1, shape->segment.point2, 0.5f );
-		case b2_smoothSegmentShape:
-			return b2Lerp( shape->smoothSegment.segment.point1, shape->smoothSegment.segment.point2, 0.5f );
+		case b2_chainSegmentShape:
+			return b2Lerp( shape->chainSegment.segment.point1, shape->chainSegment.segment.point2, 0.5f );
 		default:
 			return b2Vec2_zero;
 	}
@@ -524,8 +519,8 @@ float b2GetShapePerimeter( const b2Shape* shape )
 		}
 		case b2_segmentShape:
 			return 2.0f * b2Length( b2Sub( shape->segment.point1, shape->segment.point2 ) );
-		case b2_smoothSegmentShape:
-			return 2.0f * b2Length( b2Sub( shape->smoothSegment.segment.point1, shape->smoothSegment.segment.point2 ) );
+		case b2_chainSegmentShape:
+			return 2.0f * b2Length( b2Sub( shape->chainSegment.segment.point1, shape->chainSegment.segment.point2 ) );
 		default:
 			return 0.0f;
 	}
@@ -602,11 +597,11 @@ b2ShapeExtent b2ComputeShapeExtent( const b2Shape* shape, b2Vec2 localCenter )
 		}
 		break;
 
-		case b2_smoothSegmentShape:
+		case b2_chainSegmentShape:
 		{
 			extent.minExtent = 0.0f;
-			b2Vec2 c1 = b2Sub( shape->smoothSegment.segment.point1, localCenter );
-			b2Vec2 c2 = b2Sub( shape->smoothSegment.segment.point2, localCenter );
+			b2Vec2 c1 = b2Sub( shape->chainSegment.segment.point1, localCenter );
+			b2Vec2 c2 = b2Sub( shape->chainSegment.segment.point2, localCenter );
 			extent.maxExtent = sqrtf( b2MaxFloat( b2LengthSquared( c1 ), b2LengthSquared( c2 ) ) );
 		}
 		break;
@@ -639,8 +634,8 @@ b2CastOutput b2RayCastShape( const b2RayCastInput* input, const b2Shape* shape, 
 		case b2_segmentShape:
 			output = b2RayCastSegment( &localInput, &shape->segment, false );
 			break;
-		case b2_smoothSegmentShape:
-			output = b2RayCastSegment( &localInput, &shape->smoothSegment.segment, true );
+		case b2_chainSegmentShape:
+			output = b2RayCastSegment( &localInput, &shape->chainSegment.segment, true );
 			break;
 		default:
 			return output;
@@ -677,8 +672,8 @@ b2CastOutput b2ShapeCastShape( const b2ShapeCastInput* input, const b2Shape* sha
 		case b2_segmentShape:
 			output = b2ShapeCastSegment( &localInput, &shape->segment );
 			break;
-		case b2_smoothSegmentShape:
-			output = b2ShapeCastSegment( &localInput, &shape->smoothSegment.segment );
+		case b2_chainSegmentShape:
+			output = b2ShapeCastSegment( &localInput, &shape->chainSegment.segment );
 			break;
 		default:
 			return output;
@@ -722,8 +717,8 @@ b2DistanceProxy b2MakeShapeDistanceProxy( const b2Shape* shape )
 			return b2MakeProxy( shape->polygon.vertices, shape->polygon.count, shape->polygon.radius );
 		case b2_segmentShape:
 			return b2MakeProxy( &shape->segment.point1, 2, 0.0f );
-		case b2_smoothSegmentShape:
-			return b2MakeProxy( &shape->smoothSegment.segment.point1, 2, 0.0f );
+		case b2_chainSegmentShape:
+			return b2MakeProxy( &shape->chainSegment.segment.point1, 2, 0.0f );
 		default:
 		{
 			B2_ASSERT( false );
@@ -766,7 +761,7 @@ bool b2Shape_TestPoint( b2ShapeId shapeId, b2Vec2 point )
 	b2World* world = b2GetWorld( shapeId.world0 );
 	b2Shape* shape = b2GetShape( world, shapeId );
 
-	b2Transform transform = b2GetOwnerTransform( world, shape );
+	b2Transform transform = b2GetBodyTransform( world, shape->bodyId );
 	b2Vec2 localPoint = b2InvTransformPoint( transform, point );
 
 	switch ( shape->type )
@@ -785,40 +780,41 @@ bool b2Shape_TestPoint( b2ShapeId shapeId, b2Vec2 point )
 	}
 }
 
-b2CastOutput b2Shape_RayCast( b2ShapeId shapeId, b2Vec2 origin, b2Vec2 translation )
+// todo_erin untested
+b2CastOutput b2Shape_RayCast( b2ShapeId shapeId, const b2RayCastInput* input )
 {
 	b2World* world = b2GetWorld( shapeId.world0 );
 	b2Shape* shape = b2GetShape( world, shapeId );
 
-	b2Transform transform = b2GetOwnerTransform( world, shape );
+	b2Transform transform = b2GetBodyTransform( world, shape->bodyId );
 
 	// input in local coordinates
-	b2RayCastInput input;
-	input.maxFraction = 1.0f;
-	input.origin = b2InvTransformPoint( transform, origin );
-	input.translation = b2InvRotateVector( transform.q, translation );
+	b2RayCastInput localInput;
+	localInput.origin = b2InvTransformPoint( transform, input->origin );
+	localInput.translation = b2InvRotateVector( transform.q, input->translation );
+	localInput.maxFraction = input->maxFraction;
 
 	b2CastOutput output = { 0 };
 	switch ( shape->type )
 	{
 		case b2_capsuleShape:
-			output = b2RayCastCapsule( &input, &shape->capsule );
+			output = b2RayCastCapsule( &localInput, &shape->capsule );
 			break;
 
 		case b2_circleShape:
-			output = b2RayCastCircle( &input, &shape->circle );
+			output = b2RayCastCircle( &localInput, &shape->circle );
 			break;
 
 		case b2_segmentShape:
-			output = b2RayCastSegment( &input, &shape->segment, false );
+			output = b2RayCastSegment( &localInput, &shape->segment, false );
 			break;
 
 		case b2_polygonShape:
-			output = b2RayCastPolygon( &input, &shape->polygon );
+			output = b2RayCastPolygon( &localInput, &shape->polygon );
 			break;
 
-		case b2_smoothSegmentShape:
-			output = b2RayCastSegment( &input, &shape->smoothSegment.segment, true );
+		case b2_chainSegmentShape:
+			output = b2RayCastSegment( &localInput, &shape->chainSegment.segment, true );
 			break;
 
 		default:
@@ -832,6 +828,7 @@ b2CastOutput b2Shape_RayCast( b2ShapeId shapeId, b2Vec2 origin, b2Vec2 translati
 		output.normal = b2RotateVector( transform.q, output.normal );
 		output.point = b2TransformPoint( transform, output.point );
 	}
+
 	return output;
 }
 
@@ -1088,12 +1085,12 @@ b2Segment b2Shape_GetSegment( b2ShapeId shapeId )
 	return shape->segment;
 }
 
-b2SmoothSegment b2Shape_GetSmoothSegment( b2ShapeId shapeId )
+b2ChainSegment b2Shape_GetChainSegment( b2ShapeId shapeId )
 {
 	b2World* world = b2GetWorld( shapeId.world0 );
 	b2Shape* shape = b2GetShape( world, shapeId );
-	B2_ASSERT( shape->type == b2_smoothSegmentShape );
-	return shape->smoothSegment;
+	B2_ASSERT( shape->type == b2_chainSegmentShape );
+	return shape->chainSegment;
 }
 
 b2Capsule b2Shape_GetCapsule( b2ShapeId shapeId )
@@ -1188,9 +1185,9 @@ b2ChainId b2Shape_GetParentChain( b2ShapeId shapeId )
 {
 	b2World* world = b2GetWorld( shapeId.world0 );
 	b2Shape* shape = b2GetShape( world, shapeId );
-	if ( shape->type == b2_smoothSegmentShape )
+	if ( shape->type == b2_chainSegmentShape )
 	{
-		int chainId = shape->smoothSegment.chainId;
+		int chainId = shape->chainSegment.chainId;
 		if ( chainId != B2_NULL_INDEX )
 		{
 			b2CheckId( world->chainArray, chainId );

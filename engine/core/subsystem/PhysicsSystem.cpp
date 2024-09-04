@@ -269,7 +269,7 @@ int PhysicsSystem::createCenteredBoxShape2D(Entity entity, float width, float he
             float halfW = width / 2.0 / pointsToMeterScale2D;
             float halfH = height / 2.0 / pointsToMeterScale2D;
 
-            b2Polygon polygon = b2MakeOffsetBox(halfW, halfH, {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D}, Angle::defaultToRad(angle));
+            b2Polygon polygon = b2MakeOffsetBox(halfW, halfH, {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D}, b2MakeRot(Angle::defaultToRad(angle)));
 
             return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
         }else{

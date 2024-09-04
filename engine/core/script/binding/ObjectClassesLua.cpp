@@ -894,7 +894,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<>(&Body2D::getGroupIndexFilter),
             luabridge::overload<size_t>(&Body2D::getGroupIndexFilter))
         .addFunction("getMass", &Body2D::getMass)
-        .addFunction("getInertiaTensor", &Body2D::getInertiaTensor)
+        .addFunction("getRotationalInertia", &Body2D::getRotationalInertia)
         .addFunction("applyMassFromShapes", &Body2D::applyMassFromShapes)
         .addFunction("applyForce", &Body2D::applyForce)
         .addFunction("applyForceToCenter", &Body2D::applyForceToCenter)
