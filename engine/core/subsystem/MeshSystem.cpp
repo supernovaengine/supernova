@@ -421,6 +421,9 @@ bool MeshSystem::readWholeFile(std::vector<unsigned char> *out, std::string *err
     Data filedata;
 
     if (filedata.open(filepath.c_str()) != FileErrors::FILEDATA_OK){
+        if (err) {
+            (*err) += "File open error : " + filepath + "\n";
+        }
         Log::error("Model file not found: %s", filepath.c_str());
         return false;
     }
@@ -456,6 +459,24 @@ bool MeshSystem::readWholeFile(std::vector<unsigned char> *out, std::string *err
     f.read(reinterpret_cast<char *>(&out->at(0)),
            static_cast<std::streamsize>(sz));
     //f.close();
+
+    return true;
+}
+
+bool MeshSystem::getFileSizeInBytes(size_t *filesize_out, std::string *err, const std::string &filepath, void *userdata) {
+  (void)userdata;
+
+    Data filedata;
+
+    if (filedata.open(filepath.c_str()) != FileErrors::FILEDATA_OK){
+        if (err) {
+            (*err) += "File open error : " + filepath + "\n";
+        }
+        Log::error("Model file not found: %s", filepath.c_str());
+        return false;
+    }
+
+    (*filesize_out) = static_cast<size_t>(filedata.length());
 
     return true;
 }
@@ -1590,7 +1611,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
 
     mesh.numExternalBuffers = 0;
 
-    loader.SetFsCallbacks({&fileExists, &tinygltf::ExpandFilePath, &readWholeFile, &tinygltf::WriteWholeFile, &tinygltf::GetFileSizeInBytes});
+    loader.SetFsCallbacks({&fileExists, &tinygltf::ExpandFilePath, &readWholeFile, &tinygltf::WriteWholeFile, &getFileSizeInBytes});
 
     std::string ext = FileData::getFilePathExtension(filename);
 
