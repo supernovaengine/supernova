@@ -963,7 +963,7 @@
     ON STORAGE BUFFERS
     ==================
     Storage buffers can be used to pass large amounts of random access structured
-    data fromt the CPU side to the shaders. They are similar to data textures, but are
+    data from the CPU side to the shaders. They are similar to data textures, but are
     more convenient to use both on the CPU and shader side since they can be accessed
     in shaders as as a 1-dimensional array of struct items.
 
@@ -1496,6 +1496,7 @@
         .wgpu.num_bindgroup_cache_hits
         .wgpu.num_bindgroup_cache_misses
         .wgpu.num_bindgroup_cache_collisions
+        .wgpu_num_bindgroup_cache_invalidates
         .wgpu.num_bindgroup_cache_vs_hash_key_mismatch
 
       The value to pay attention to is `.wgpu.num_bindgroup_cache_collisions`,
@@ -2097,13 +2098,10 @@ typedef enum sg_primitive_type {
     used in the sg_sampler_desc.min_filter, sg_sampler_desc.mag_filter
     and sg_sampler_desc.mipmap_filter members when creating a sampler object.
 
-    For min_filter and mag_filter the default is SG_FILTER_NEAREST.
-
-    For mipmap_filter the default is SG_FILTER_NONE.
+    For the default is SG_FILTER_NEAREST.
 */
 typedef enum sg_filter {
     _SG_FILTER_DEFAULT, // value 0 reserved for default-init
-    SG_FILTER_NONE,     // FIXME: deprecated
     SG_FILTER_NEAREST,
     SG_FILTER_LINEAR,
     _SG_FILTER_NUM,
@@ -2892,7 +2890,7 @@ typedef struct sg_image_desc {
 
     .min_filter:        SG_FILTER_NEAREST
     .mag_filter:        SG_FILTER_NEAREST
-    .mipmap_filter      SG_FILTER_NONE
+    .mipmap_filter      SG_FILTER_NEAREST
     .wrap_u:            SG_WRAP_REPEAT
     .wrap_v:            SG_WRAP_REPEAT
     .wrap_w:            SG_WRAP_REPEAT (only SG_IMAGETYPE_3D)
@@ -3482,6 +3480,7 @@ typedef struct sg_frame_stats_wgpu_bindings {
     uint32_t num_bindgroup_cache_hits;
     uint32_t num_bindgroup_cache_misses;
     uint32_t num_bindgroup_cache_collisions;
+    uint32_t num_bindgroup_cache_invalidates;
     uint32_t num_bindgroup_cache_hash_vs_key_mismatch;
 } sg_frame_stats_wgpu_bindings;
 
@@ -3592,7 +3591,7 @@ typedef struct sg_frame_stats {
     _SG_LOGITEM_XMACRO(WGPU_ATTACHMENTS_CREATE_TEXTURE_VIEW_FAILED, "wgpuTextureCreateView() failed in create attachments") \
     _SG_LOGITEM_XMACRO(IDENTICAL_COMMIT_LISTENER, "attempting to add identical commit listener") \
     _SG_LOGITEM_XMACRO(COMMIT_LISTENER_ARRAY_FULL, "commit listener array full") \
-    _SG_LOGITEM_XMACRO(TRACE_HOOKS_NOT_ENABLED, "sg_install_trace_hooks() called, but SG_TRACE_HOOKS is not defined") \
+    _SG_LOGITEM_XMACRO(TRACE_HOOKS_NOT_ENABLED, "sg_install_trace_hooks() called, but SOKOL_TRACE_HOOKS is not defined") \
     _SG_LOGITEM_XMACRO(DEALLOC_BUFFER_INVALID_STATE, "sg_dealloc_buffer(): buffer must be in ALLOC state") \
     _SG_LOGITEM_XMACRO(DEALLOC_IMAGE_INVALID_STATE, "sg_dealloc_image(): image must be in alloc state") \
     _SG_LOGITEM_XMACRO(DEALLOC_SAMPLER_INVALID_STATE, "sg_dealloc_sampler(): sampler must be in alloc state") \
@@ -3650,8 +3649,6 @@ typedef struct sg_frame_stats {
     _SG_LOGITEM_XMACRO(VALIDATE_IMAGEDESC_DYNAMIC_NO_DATA, "dynamic/stream images cannot be initialized with data") \
     _SG_LOGITEM_XMACRO(VALIDATE_IMAGEDESC_COMPRESSED_IMMUTABLE, "compressed images must be immutable") \
     _SG_LOGITEM_XMACRO(VALIDATE_SAMPLERDESC_CANARY, "sg_sampler_desc not initialized") \
-    _SG_LOGITEM_XMACRO(VALIDATE_SAMPLERDESC_MINFILTER_NONE, "sg_sampler_desc.min_filter cannot be SG_FILTER_NONE") \
-    _SG_LOGITEM_XMACRO(VALIDATE_SAMPLERDESC_MAGFILTER_NONE, "sg_sampler_desc.mag_filter cannot be SG_FILTER_NONE") \
     _SG_LOGITEM_XMACRO(VALIDATE_SAMPLERDESC_ANISTROPIC_REQUIRES_LINEAR_FILTERING, "sg_sampler_desc.max_anisotropy > 1 requires min/mag/mipmap_filter to be SG_FILTER_LINEAR") \
     _SG_LOGITEM_XMACRO(VALIDATE_SHADERDESC_CANARY, "sg_shader_desc not initialized") \
     _SG_LOGITEM_XMACRO(VALIDATE_SHADERDESC_SOURCE, "shader source code required") \
@@ -3887,6 +3884,12 @@ typedef enum sg_log_item {
             before sg_setup() is called
         .environment.d3d11.device_context
             a pointer to the ID3D11DeviceContext object
+        .d3d11_shader_debugging
+            set this to true to compile shaders which are provided as HLSL source
+            code with debug information and without optimization, this allows
+            shader debugging in tools like RenderDoc, to output source code
+            instead of byte code from sokol-shdc, omit the `--binary` cmdline
+            option
 
     WebGPU specific:
         .wgpu_disable_bindgroups_cache
@@ -3999,6 +4002,7 @@ typedef struct sg_desc {
     int uniform_buffer_size;
     int max_commit_listeners;
     bool disable_validation;    // disable validation layer even in debug mode, useful for tests
+    bool d3d11_shader_debugging;    // if true, HLSL shaders are compiled with D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION
     bool mtl_force_managed_storage_mode; // for debugging: use Metal managed storage mode for resources even with UMA
     bool mtl_use_command_buffer_with_retained_references;    // Metal: use a managed MTLCommandBuffer which ref-counts used resources
     bool wgpu_disable_bindgroups_cache;  // set to true to disable the WebGPU backend BindGroup cache
@@ -5783,10 +5787,20 @@ typedef struct {
     uint32_t id;
 } _sg_wgpu_bindgroup_handle_t;
 
-#define _SG_WGPU_BINDGROUPSCACHE_NUM_ITEMS (1 + _SG_WGPU_MAX_BINDGROUP_ENTRIES)
+typedef enum {
+    _SG_WGPU_BINDGROUPSCACHEITEMTYPE_NONE = 0,
+    _SG_WGPU_BINDGROUPSCACHEITEMTYPE_IMAGE = 0x1111111111111111,
+    _SG_WGPU_BINDGROUPSCACHEITEMTYPE_SAMPLER = 0x2222222222222222,
+    _SG_WGPU_BINDGROUPSCACHEITEMTYPE_STORAGEBUFFER = 0x3333333333333333,
+    _SG_WGPU_BINDGROUPSCACHEITEMTYPE_PIPELINE = 0x4444444444444444,
+} _sg_wgpu_bindgroups_cache_item_type_t;
+
+#define _SG_WGPU_BINDGROUPSCACHEKEY_NUM_ITEMS (1 + _SG_WGPU_MAX_BINDGROUP_ENTRIES)
 typedef struct {
     uint64_t hash;
-    uint32_t items[_SG_WGPU_BINDGROUPSCACHE_NUM_ITEMS];
+    // the format of cache key items is (_sg_wgpu_bindgroups_cache_item_type_t << 32) | handle.id,
+    // where the item type is a per-resource-type bit pattern
+    uint64_t items[_SG_WGPU_BINDGROUPSCACHEKEY_NUM_ITEMS];
 } _sg_wgpu_bindgroups_cache_key_t;
 
 typedef struct {
@@ -7142,14 +7156,12 @@ _SOKOL_PRIVATE GLenum _sg_gl_blend_op(sg_blend_op op) {
 _SOKOL_PRIVATE GLenum _sg_gl_min_filter(sg_filter min_f, sg_filter mipmap_f) {
     if (min_f == SG_FILTER_NEAREST) {
         switch (mipmap_f) {
-            case SG_FILTER_NONE:    return GL_NEAREST;
             case SG_FILTER_NEAREST: return GL_NEAREST_MIPMAP_NEAREST;
             case SG_FILTER_LINEAR:  return GL_NEAREST_MIPMAP_LINEAR;
             default: SOKOL_UNREACHABLE; return (GLenum)0;
         }
     } else if (min_f == SG_FILTER_LINEAR) {
         switch (mipmap_f) {
-            case SG_FILTER_NONE:    return GL_LINEAR;
             case SG_FILTER_NEAREST: return GL_LINEAR_MIPMAP_NEAREST;
             case SG_FILTER_LINEAR:  return GL_LINEAR_MIPMAP_LINEAR;
             default: SOKOL_UNREACHABLE; return (GLenum)0;
@@ -8299,40 +8311,57 @@ _SOKOL_PRIVATE sg_resource_state _sg_gl_create_image(_sg_image_t* img, const sg_
             _sg_gl_cache_store_texture_sampler_binding(0);
             _sg_gl_cache_bind_texture_sampler(0, img->gl.target, img->gl.tex[slot], 0);
             glTexParameteri(img->gl.target, GL_TEXTURE_MAX_LEVEL, img->cmn.num_mipmaps - 1);
-            const int num_faces = img->cmn.type == SG_IMAGETYPE_CUBE ? 6 : 1;
-            int data_index = 0;
-            for (int face_index = 0; face_index < num_faces; face_index++) {
-                for (int mip_index = 0; mip_index < img->cmn.num_mipmaps; mip_index++, data_index++) {
-                    GLenum gl_img_target = img->gl.target;
-                    if (SG_IMAGETYPE_CUBE == img->cmn.type) {
-                        gl_img_target = _sg_gl_cubeface_target(face_index);
-                    }
-                    const GLvoid* data_ptr = desc->data.subimage[face_index][mip_index].ptr;
-                    const int mip_width = _sg_miplevel_dim(img->cmn.width, mip_index);
-                    const int mip_height = _sg_miplevel_dim(img->cmn.height, mip_index);
+
+            // NOTE: workaround for https://issues.chromium.org/issues/355605685
+            // FIXME: on GLES3 and GL 4.3 (e.g. not macOS) the texture initialization
+            // should be rewritten to use glTexStorage + glTexSubImage
+            bool tex_storage_allocated = false;
+            #if defined(__EMSCRIPTEN__)
+                if (desc->data.subimage[0][0].ptr == 0) {
+                    tex_storage_allocated = true;
                     if ((SG_IMAGETYPE_2D == img->cmn.type) || (SG_IMAGETYPE_CUBE == img->cmn.type)) {
-                        if (is_compressed) {
-                            const GLsizei data_size = (GLsizei) desc->data.subimage[face_index][mip_index].size;
-                            glCompressedTexImage2D(gl_img_target, mip_index, gl_internal_format,
-                                mip_width, mip_height, 0, data_size, data_ptr);
-                        } else {
-                            const GLenum gl_type = _sg_gl_teximage_type(img->cmn.pixel_format);
-                            glTexImage2D(gl_img_target, mip_index, (GLint)gl_internal_format,
-                                mip_width, mip_height, 0, gl_format, gl_type, data_ptr);
-                        }
+                        glTexStorage2D(img->gl.target, img->cmn.num_mipmaps, gl_internal_format, img->cmn.width, img->cmn.height);
                     } else if ((SG_IMAGETYPE_3D == img->cmn.type) || (SG_IMAGETYPE_ARRAY == img->cmn.type)) {
-                        int mip_depth = img->cmn.num_slices;
-                        if (SG_IMAGETYPE_3D == img->cmn.type) {
-                            mip_depth = _sg_miplevel_dim(mip_depth, mip_index);
+                        glTexStorage3D(img->gl.target, img->cmn.num_mipmaps, gl_internal_format, img->cmn.width, img->cmn.height, img->cmn.num_slices);
+                    }
+                }
+            #endif
+            if (!tex_storage_allocated) {
+                const int num_faces = img->cmn.type == SG_IMAGETYPE_CUBE ? 6 : 1;
+                int data_index = 0;
+                for (int face_index = 0; face_index < num_faces; face_index++) {
+                    for (int mip_index = 0; mip_index < img->cmn.num_mipmaps; mip_index++, data_index++) {
+                        GLenum gl_img_target = img->gl.target;
+                        if (SG_IMAGETYPE_CUBE == img->cmn.type) {
+                            gl_img_target = _sg_gl_cubeface_target(face_index);
                         }
-                        if (is_compressed) {
-                            const GLsizei data_size = (GLsizei) desc->data.subimage[face_index][mip_index].size;
-                            glCompressedTexImage3D(gl_img_target, mip_index, gl_internal_format,
-                                mip_width, mip_height, mip_depth, 0, data_size, data_ptr);
-                        } else {
-                            const GLenum gl_type = _sg_gl_teximage_type(img->cmn.pixel_format);
-                            glTexImage3D(gl_img_target, mip_index, (GLint)gl_internal_format,
-                                mip_width, mip_height, mip_depth, 0, gl_format, gl_type, data_ptr);
+                        const GLvoid* data_ptr = desc->data.subimage[face_index][mip_index].ptr;
+                        const int mip_width = _sg_miplevel_dim(img->cmn.width, mip_index);
+                        const int mip_height = _sg_miplevel_dim(img->cmn.height, mip_index);
+                        if ((SG_IMAGETYPE_2D == img->cmn.type) || (SG_IMAGETYPE_CUBE == img->cmn.type)) {
+                            if (is_compressed) {
+                                const GLsizei data_size = (GLsizei) desc->data.subimage[face_index][mip_index].size;
+                                glCompressedTexImage2D(gl_img_target, mip_index, gl_internal_format,
+                                    mip_width, mip_height, 0, data_size, data_ptr);
+                            } else {
+                                const GLenum gl_type = _sg_gl_teximage_type(img->cmn.pixel_format);
+                                glTexImage2D(gl_img_target, mip_index, (GLint)gl_internal_format,
+                                    mip_width, mip_height, 0, gl_format, gl_type, data_ptr);
+                            }
+                        } else if ((SG_IMAGETYPE_3D == img->cmn.type) || (SG_IMAGETYPE_ARRAY == img->cmn.type)) {
+                            int mip_depth = img->cmn.num_slices;
+                            if (SG_IMAGETYPE_3D == img->cmn.type) {
+                                mip_depth = _sg_miplevel_dim(mip_depth, mip_index);
+                            }
+                            if (is_compressed) {
+                                const GLsizei data_size = (GLsizei) desc->data.subimage[face_index][mip_index].size;
+                                glCompressedTexImage3D(gl_img_target, mip_index, gl_internal_format,
+                                    mip_width, mip_height, mip_depth, 0, data_size, data_ptr);
+                            } else {
+                                const GLenum gl_type = _sg_gl_teximage_type(img->cmn.pixel_format);
+                                glTexImage3D(gl_img_target, mip_index, (GLint)gl_internal_format,
+                                    mip_width, mip_height, mip_depth, 0, gl_format, gl_type, data_ptr);
+                            }
                         }
                     }
                 }
@@ -10683,6 +10712,12 @@ _SOKOL_PRIVATE ID3DBlob* _sg_d3d11_compile_shader(const sg_shader_stage_desc* st
         return NULL;
     }
     SOKOL_ASSERT(stage_desc->d3d11_target);
+    UINT flags1 = D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR;
+    if (_sg.desc.d3d11_shader_debugging) {
+        flags1 |= D3DCOMPILE_DEBUG | D3DCOMPILE_SKIP_OPTIMIZATION;
+    } else {
+        flags1 |= D3DCOMPILE_OPTIMIZATION_LEVEL3;
+    }
     ID3DBlob* output = NULL;
     ID3DBlob* errors_or_warnings = NULL;
     HRESULT hr = _sg.d3d11.D3DCompile_func(
@@ -10693,7 +10728,7 @@ _SOKOL_PRIVATE ID3DBlob* _sg_d3d11_compile_shader(const sg_shader_stage_desc* st
         NULL,                           // pInclude
         stage_desc->entry ? stage_desc->entry : "main",     // pEntryPoint
         stage_desc->d3d11_target,       // pTarget
-        D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR | D3DCOMPILE_OPTIMIZATION_LEVEL3,   // Flags1
+        flags1,     // Flags1
         0,          // Flags2
         &output,    // ppCode
         &errors_or_warnings);   // ppErrorMsgs
@@ -11865,8 +11900,6 @@ _SOKOL_PRIVATE MTLSamplerMinMagFilter _sg_mtl_minmag_filter(sg_filter f) {
 
 _SOKOL_PRIVATE MTLSamplerMipFilter _sg_mtl_mipmap_filter(sg_filter f) {
     switch (f) {
-        case SG_FILTER_NONE:
-            return MTLSamplerMipFilterNotMipmapped;
         case SG_FILTER_NEAREST:
             return MTLSamplerMipFilterNearest;
         case SG_FILTER_LINEAR:
@@ -13422,7 +13455,6 @@ _SOKOL_PRIVATE WGPUFilterMode _sg_wgpu_sampler_minmag_filter(sg_filter f) {
 
 _SOKOL_PRIVATE WGPUMipmapFilterMode _sg_wgpu_sampler_mipmap_filter(sg_filter f) {
     switch (f) {
-        case SG_FILTER_NONE:
         case SG_FILTER_NEAREST:
             return WGPUMipmapFilterMode_Nearest;
         case SG_FILTER_LINEAR:
@@ -14017,6 +14049,26 @@ _SOKOL_PRIVATE uint64_t _sg_wgpu_hash(const void* key, int len, uint64_t seed) {
     return h;
 }
 
+_SOKOL_PRIVATE uint64_t _sg_wgpu_bindgroups_cache_item(_sg_wgpu_bindgroups_cache_item_type_t type, uint32_t id) {
+    return (((uint64_t)type) << 32) | id;
+}
+
+_SOKOL_PRIVATE uint64_t _sg_wgpu_bindgroups_cache_pip_item(uint32_t id) {
+    return _sg_wgpu_bindgroups_cache_item(_SG_WGPU_BINDGROUPSCACHEITEMTYPE_PIPELINE, id);
+}
+
+_SOKOL_PRIVATE uint64_t _sg_wgpu_bindgroups_cache_image_item(uint32_t id) {
+    return _sg_wgpu_bindgroups_cache_item(_SG_WGPU_BINDGROUPSCACHEITEMTYPE_IMAGE, id);
+}
+
+_SOKOL_PRIVATE uint64_t _sg_wgpu_bindgroups_cache_sampler_item(uint32_t id) {
+    return _sg_wgpu_bindgroups_cache_item(_SG_WGPU_BINDGROUPSCACHEITEMTYPE_SAMPLER, id);
+}
+
+_SOKOL_PRIVATE uint64_t _sg_wgpu_bindgroups_cache_sbuf_item(uint32_t id) {
+    return _sg_wgpu_bindgroups_cache_item(_SG_WGPU_BINDGROUPSCACHEITEMTYPE_STORAGEBUFFER, id);
+}
+
 _SOKOL_PRIVATE void _sg_wgpu_init_bindgroups_cache_key(_sg_wgpu_bindgroups_cache_key_t* key, const _sg_bindings_t* bnd) {
     SOKOL_ASSERT(bnd);
     SOKOL_ASSERT(bnd->pip);
@@ -14028,38 +14080,39 @@ _SOKOL_PRIVATE void _sg_wgpu_init_bindgroups_cache_key(_sg_wgpu_bindgroups_cache
     SOKOL_ASSERT(bnd->num_fs_sbufs <= SG_MAX_SHADERSTAGE_STORAGEBUFFERS);
 
     _sg_clear(key->items, sizeof(key->items));
-    key->items[0] = bnd->pip->slot.id;
-    const int vs_imgs_offset = 1;
-    const int vs_smps_offset = vs_imgs_offset + SG_MAX_SHADERSTAGE_IMAGES;
-    const int vs_sbufs_offset = vs_smps_offset + SG_MAX_SHADERSTAGE_SAMPLERS;
-    const int fs_imgs_offset = vs_sbufs_offset + SG_MAX_SHADERSTAGE_STORAGEBUFFERS;
-    const int fs_smps_offset = fs_imgs_offset + SG_MAX_SHADERSTAGE_IMAGES;
-    const int fs_sbufs_offset = fs_smps_offset + SG_MAX_SHADERSTAGE_SAMPLERS;
-    SOKOL_ASSERT((fs_sbufs_offset + SG_MAX_SHADERSTAGE_STORAGEBUFFERS) == _SG_WGPU_BINDGROUPSCACHE_NUM_ITEMS);
+    int item_idx = 0;
+    key->items[item_idx++] = _sg_wgpu_bindgroups_cache_pip_item(bnd->pip->slot.id);
     for (int i = 0; i < bnd->num_vs_imgs; i++) {
         SOKOL_ASSERT(bnd->vs_imgs[i]);
-        key->items[vs_imgs_offset + i] = bnd->vs_imgs[i]->slot.id;
+        SOKOL_ASSERT(item_idx < _SG_WGPU_BINDGROUPSCACHEKEY_NUM_ITEMS);
+        key->items[item_idx++] = _sg_wgpu_bindgroups_cache_image_item(bnd->vs_imgs[i]->slot.id);
     }
     for (int i = 0; i < bnd->num_vs_smps; i++) {
         SOKOL_ASSERT(bnd->vs_smps[i]);
-        key->items[vs_smps_offset + i] = bnd->vs_smps[i]->slot.id;
+        SOKOL_ASSERT(item_idx < _SG_WGPU_BINDGROUPSCACHEKEY_NUM_ITEMS);
+        key->items[item_idx++] = _sg_wgpu_bindgroups_cache_sampler_item(bnd->vs_smps[i]->slot.id);
     }
     for (int i = 0; i < bnd->num_vs_sbufs; i++) {
         SOKOL_ASSERT(bnd->vs_sbufs[i]);
-        key->items[vs_sbufs_offset + i] = bnd->vs_sbufs[i]->slot.id;
+        SOKOL_ASSERT(item_idx < _SG_WGPU_BINDGROUPSCACHEKEY_NUM_ITEMS);
+        key->items[item_idx++] = _sg_wgpu_bindgroups_cache_sbuf_item(bnd->vs_sbufs[i]->slot.id);
     }
     for (int i = 0; i < bnd->num_fs_imgs; i++) {
         SOKOL_ASSERT(bnd->fs_imgs[i]);
-        key->items[fs_imgs_offset + i] = bnd->fs_imgs[i]->slot.id;
+        SOKOL_ASSERT(item_idx < _SG_WGPU_BINDGROUPSCACHEKEY_NUM_ITEMS);
+        key->items[item_idx++] = _sg_wgpu_bindgroups_cache_image_item(bnd->fs_imgs[i]->slot.id);
     }
     for (int i = 0; i < bnd->num_fs_smps; i++) {
         SOKOL_ASSERT(bnd->fs_smps[i]);
-        key->items[fs_smps_offset + i] = bnd->fs_smps[i]->slot.id;
+        SOKOL_ASSERT(item_idx < _SG_WGPU_BINDGROUPSCACHEKEY_NUM_ITEMS);
+        key->items[item_idx++] = _sg_wgpu_bindgroups_cache_sampler_item(bnd->fs_smps[i]->slot.id);
     }
     for (int i = 0; i < bnd->num_fs_sbufs; i++) {
         SOKOL_ASSERT(bnd->fs_sbufs[i]);
-        key->items[fs_sbufs_offset + i] = bnd->fs_sbufs[i]->slot.id;
+        SOKOL_ASSERT(item_idx < _SG_WGPU_BINDGROUPSCACHEKEY_NUM_ITEMS);
+        key->items[item_idx++] = _sg_wgpu_bindgroups_cache_sbuf_item(bnd->fs_sbufs[i]->slot.id);
     }
+    SOKOL_ASSERT(item_idx == (1 + bnd->num_vs_imgs + bnd->num_vs_smps + bnd->num_vs_sbufs + bnd->num_fs_imgs + bnd->num_fs_smps + bnd->num_fs_sbufs));
     key->hash = _sg_wgpu_hash(&key->items, (int)sizeof(key->items), 0x1234567887654321);
 }
 
@@ -14211,6 +14264,33 @@ _SOKOL_PRIVATE uint32_t _sg_wgpu_bindgroups_cache_get(uint64_t hash) {
     return _sg.wgpu.bindgroups_cache.items[index].id;
 }
 
+// called from wgpu resource destroy functions to also invalidate any
+// bindgroups cache slot and bindgroup referencing that resource
+_SOKOL_PRIVATE void _sg_wgpu_bindgroups_cache_invalidate(_sg_wgpu_bindgroups_cache_item_type_t type, uint32_t id) {
+    const uint64_t key_item = _sg_wgpu_bindgroups_cache_item(type, id);
+    SOKOL_ASSERT(_sg.wgpu.bindgroups_cache.items);
+    for (uint32_t cache_item_idx = 0; cache_item_idx < _sg.wgpu.bindgroups_cache.num; cache_item_idx++) {
+        const uint32_t bg_id = _sg.wgpu.bindgroups_cache.items[cache_item_idx].id;
+        if (bg_id != SG_INVALID_ID) {
+            _sg_wgpu_bindgroup_t* bg = _sg_wgpu_lookup_bindgroup(bg_id);
+            SOKOL_ASSERT(bg && (bg->slot.state == SG_RESOURCESTATE_VALID));
+            // check if resource is in bindgroup, if yes discard bindgroup and invalidate cache slot
+            bool invalidate_cache_item = false;
+            for (int key_item_idx = 0; key_item_idx < _SG_WGPU_BINDGROUPSCACHEKEY_NUM_ITEMS; key_item_idx++) {
+                if (bg->key.items[key_item_idx] == key_item) {
+                    invalidate_cache_item = true;
+                    break;
+                }
+            }
+            if (invalidate_cache_item) {
+                _sg_wgpu_discard_bindgroup(bg); bg = 0;
+                _sg_wgpu_bindgroups_cache_set(cache_item_idx, SG_INVALID_ID);
+                _sg_stats_add(wgpu.bindings.num_bindgroup_cache_invalidates, 1);
+            }
+        }
+    }
+}
+
 _SOKOL_PRIVATE void _sg_wgpu_bindings_cache_clear(void) {
     memset(&_sg.wgpu.bindings_cache, 0, sizeof(_sg.wgpu.bindings_cache));
 }
@@ -14271,7 +14351,7 @@ _SOKOL_PRIVATE void _sg_wgpu_bindings_cache_bg_update(const _sg_wgpu_bindgroup_t
     }
 }
 
-_SOKOL_PRIVATE void _sg_wgpu_set_bindings_bindgroup(_sg_wgpu_bindgroup_t* bg) {
+_SOKOL_PRIVATE void _sg_wgpu_set_bindgroup(_sg_wgpu_bindgroup_t* bg) {
     if (_sg_wgpu_bindings_cache_bg_dirty(bg)) {
         _sg_wgpu_bindings_cache_bg_update(bg);
         _sg_stats_add(wgpu.bindings.num_set_bindgroup, 1);
@@ -14317,7 +14397,7 @@ _SOKOL_PRIVATE bool _sg_wgpu_apply_bindgroup(_sg_bindings_t* bnd) {
                 _sg_wgpu_bindgroups_cache_set(key.hash, bg->slot.id);
             }
             if (bg && bg->slot.state == SG_RESOURCESTATE_VALID) {
-                _sg_wgpu_set_bindings_bindgroup(bg);
+                _sg_wgpu_set_bindgroup(bg);
             } else {
                 return false;
             }
@@ -14326,7 +14406,7 @@ _SOKOL_PRIVATE bool _sg_wgpu_apply_bindgroup(_sg_bindings_t* bnd) {
             _sg_wgpu_bindgroup_t* bg = _sg_wgpu_create_bindgroup(bnd);
             if (bg) {
                 if (bg->slot.state == SG_RESOURCESTATE_VALID) {
-                    _sg_wgpu_set_bindings_bindgroup(bg);
+                    _sg_wgpu_set_bindgroup(bg);
                 }
                 _sg_wgpu_discard_bindgroup(bg);
             } else {
@@ -14334,7 +14414,7 @@ _SOKOL_PRIVATE bool _sg_wgpu_apply_bindgroup(_sg_bindings_t* bnd) {
             }
         }
     } else {
-        _sg_wgpu_set_bindings_bindgroup(0);
+        _sg_wgpu_set_bindgroup(0);
     }
     return true;
 }
@@ -14467,8 +14547,10 @@ _SOKOL_PRIVATE sg_resource_state _sg_wgpu_create_buffer(_sg_buffer_t* buf, const
 
 _SOKOL_PRIVATE void _sg_wgpu_discard_buffer(_sg_buffer_t* buf) {
     SOKOL_ASSERT(buf);
+    if (buf->cmn.type == SG_BUFFERTYPE_STORAGEBUFFER) {
+        _sg_wgpu_bindgroups_cache_invalidate(_SG_WGPU_BINDGROUPSCACHEITEMTYPE_STORAGEBUFFER, buf->slot.id);
+    }
     if (buf->wgpu.buf) {
-        wgpuBufferDestroy(buf->wgpu.buf);
         wgpuBufferRelease(buf->wgpu.buf);
     }
 }
@@ -14604,12 +14686,12 @@ _SOKOL_PRIVATE sg_resource_state _sg_wgpu_create_image(_sg_image_t* img, const s
 
 _SOKOL_PRIVATE void _sg_wgpu_discard_image(_sg_image_t* img) {
     SOKOL_ASSERT(img);
+    _sg_wgpu_bindgroups_cache_invalidate(_SG_WGPU_BINDGROUPSCACHEITEMTYPE_IMAGE, img->slot.id);
     if (img->wgpu.view) {
         wgpuTextureViewRelease(img->wgpu.view);
         img->wgpu.view = 0;
     }
     if (img->wgpu.tex) {
-        wgpuTextureDestroy(img->wgpu.tex);
         wgpuTextureRelease(img->wgpu.tex);
         img->wgpu.tex = 0;
     }
@@ -14650,6 +14732,7 @@ _SOKOL_PRIVATE sg_resource_state _sg_wgpu_create_sampler(_sg_sampler_t* smp, con
 
 _SOKOL_PRIVATE void _sg_wgpu_discard_sampler(_sg_sampler_t* smp) {
     SOKOL_ASSERT(smp);
+    _sg_wgpu_bindgroups_cache_invalidate(_SG_WGPU_BINDGROUPSCACHEITEMTYPE_SAMPLER, smp->slot.id);
     if (smp->wgpu.smp) {
         wgpuSamplerRelease(smp->wgpu.smp);
         smp->wgpu.smp = 0;
@@ -14887,6 +14970,7 @@ _SOKOL_PRIVATE sg_resource_state _sg_wgpu_create_pipeline(_sg_pipeline_t* pip, _
 
 _SOKOL_PRIVATE void _sg_wgpu_discard_pipeline(_sg_pipeline_t* pip) {
     SOKOL_ASSERT(pip);
+    _sg_wgpu_bindgroups_cache_invalidate(_SG_WGPU_BINDGROUPSCACHEITEMTYPE_PIPELINE, pip->slot.id);
     if (pip == _sg.wgpu.cur_pipeline) {
         _sg.wgpu.cur_pipeline = 0;
         _sg.wgpu.cur_pipeline_id.id = SG_INVALID_ID;
@@ -16231,8 +16315,6 @@ _SOKOL_PRIVATE bool _sg_validate_sampler_desc(const sg_sampler_desc* desc) {
         _sg_validate_begin();
         _SG_VALIDATE(desc->_start_canary == 0, VALIDATE_SAMPLERDESC_CANARY);
         _SG_VALIDATE(desc->_end_canary == 0, VALIDATE_SAMPLERDESC_CANARY);
-        _SG_VALIDATE(desc->min_filter != SG_FILTER_NONE, VALIDATE_SAMPLERDESC_MINFILTER_NONE);
-        _SG_VALIDATE(desc->mag_filter != SG_FILTER_NONE, VALIDATE_SAMPLERDESC_MAGFILTER_NONE);
         // restriction from WebGPU: when anisotropy > 1, all filters must be linear
         if (desc->max_anisotropy > 1) {
             _SG_VALIDATE((desc->min_filter == SG_FILTER_LINEAR)
@@ -17052,7 +17134,7 @@ _SOKOL_PRIVATE sg_sampler_desc _sg_sampler_desc_defaults(const sg_sampler_desc* 
     sg_sampler_desc def = *desc;
     def.min_filter = _sg_def(def.min_filter, SG_FILTER_NEAREST);
     def.mag_filter = _sg_def(def.mag_filter, SG_FILTER_NEAREST);
-    def.mipmap_filter = _sg_def(def.mipmap_filter, SG_FILTER_NONE);
+    def.mipmap_filter = _sg_def(def.mipmap_filter, SG_FILTER_NEAREST);
     def.wrap_u = _sg_def(def.wrap_u, SG_WRAP_REPEAT);
     def.wrap_v = _sg_def(def.wrap_v, SG_WRAP_REPEAT);
     def.wrap_w = _sg_def(def.wrap_w, SG_WRAP_REPEAT);

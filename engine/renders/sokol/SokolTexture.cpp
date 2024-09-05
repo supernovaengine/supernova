@@ -49,7 +49,7 @@ sg_filter SokolTexture::getFilter(TextureFilter textureFilter){
         return SG_FILTER_NEAREST;
     }
 
-    return SG_FILTER_NONE;
+    return SG_FILTER_NEAREST;
 }
 
 sg_filter SokolTexture::getFilterMipmap(TextureFilter textureFilter){
@@ -63,7 +63,7 @@ sg_filter SokolTexture::getFilterMipmap(TextureFilter textureFilter){
         return SG_FILTER_LINEAR;
     }
 
-    return SG_FILTER_NONE;
+    return SG_FILTER_NEAREST;
 }
 
 sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
