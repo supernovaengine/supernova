@@ -33,23 +33,26 @@ using namespace Supernova;
 #endif
 
 System& System::instance(){
+
+    static System* instance = nullptr;
+
 #ifdef SUPERNOVA_ANDROID
-    static System *instance = new SupernovaAndroid();
+    instance = new SupernovaAndroid();
 #endif
 #ifdef  SUPERNOVA_IOS
-    static System *instance = new SupernovaIOS();
+    instance = new SupernovaIOS();
 #endif
 #ifdef  SUPERNOVA_WEB
-    static System *instance = new SupernovaWeb();
+    instance = new SupernovaWeb();
 #endif
 #ifdef  SUPERNOVA_SOKOL
-    static System *instance = new SupernovaSokol();
+    instance = new SupernovaSokol();
 #endif
 #ifdef  SUPERNOVA_GLFW
-    static System *instance = new SupernovaGLFW();
+    instance = new SupernovaGLFW();
 #endif
 #ifdef  SUPERNOVA_APPLE
-    static System *instance = new SupernovaApple();
+    instance = new SupernovaApple();
 #endif
 
     return *instance;
