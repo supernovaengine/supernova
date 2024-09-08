@@ -91,6 +91,26 @@ sg_primitive_type SokolObject::getPrimitiveType(PrimitiveType primitiveType){
     return _SG_PRIMITIVETYPE_DEFAULT;
 }
 
+sg_cull_mode SokolObject::getCullMode(CullingMode cullingMode){
+    if (cullingMode == CullingMode::BACK){
+        return SG_CULLMODE_BACK;
+    }else if (cullingMode == CullingMode::FRONT){
+        return SG_CULLMODE_FRONT;
+    }
+
+    return _SG_CULLMODE_DEFAULT;
+}
+
+sg_face_winding SokolObject::getFaceWinding(WindingOrder windingOrder){
+    if (windingOrder == WindingOrder::CCW){
+        return SG_FACEWINDING_CCW;
+    }else if (windingOrder == WindingOrder::CW){
+        return SG_FACEWINDING_CW;
+    }
+
+    return _SG_FACEWINDING_DEFAULT;
+}
+
 void SokolObject::beginLoad(PrimitiveType primitiveType){
     bind = {0};
     pip = {0};
@@ -188,12 +208,16 @@ void SokolObject::addTexture(std::pair<int, int> slot, ShaderStageType stage, Te
     }
 }
 
-bool SokolObject::endLoad(uint8_t pipelines){
+bool SokolObject::endLoad(uint8_t pipelines, bool enableFaceCulling, CullingMode cullingMode, WindingOrder windingOrder){
 
     if (pipelines & (int)PipelineType::PIP_DEPTH) {
         sg_pipeline_desc pip_depth_desc = pipeline_desc;
 
-        pip_depth_desc.cull_mode = SG_CULLMODE_FRONT;
+        if (enableFaceCulling){
+            pip_depth_desc.cull_mode = getCullMode(cullingMode);
+            pip_depth_desc.face_winding = getFaceWinding(windingOrder);
+        }
+
         pip_depth_desc.sample_count = 1;
         pip_depth_desc.depth.pixel_format = SG_PIXELFORMAT_DEPTH;
         pip_depth_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
@@ -214,8 +238,10 @@ bool SokolObject::endLoad(uint8_t pipelines){
     if (pipelines & (int)PipelineType::PIP_DEFAULT) {
         sg_pipeline_desc pip_default_desc = pipeline_desc;
 
-        //pip_default_desc.cull_mode = SG_CULLMODE_FRONT;
-        pip_default_desc.face_winding = SG_FACEWINDING_CW;
+        if (enableFaceCulling){
+            pip_default_desc.cull_mode = getCullMode(cullingMode);
+            pip_default_desc.face_winding = getFaceWinding(windingOrder);
+        }
 
         pip_default_desc.depth.write_enabled = true;
         pip_default_desc.depth.compare = SG_COMPAREFUNC_LESS_EQUAL;
@@ -239,7 +265,10 @@ bool SokolObject::endLoad(uint8_t pipelines){
     if (pipelines & (int)PipelineType::PIP_RTT){
         sg_pipeline_desc pip_rtt_desc = pipeline_desc;
 
-        pip_rtt_desc.face_winding = SG_FACEWINDING_CW;
+        if (enableFaceCulling){
+            pip_rtt_desc.cull_mode = getCullMode(cullingMode);
+            pip_rtt_desc.face_winding = getFaceWinding(windingOrder);
+        }
 
         pip_rtt_desc.sample_count = 1;
 

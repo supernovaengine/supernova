@@ -93,6 +93,18 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("CullingMode")
+        .addVariable("BACK", CullingMode::BACK)
+        .addVariable("FRONT", CullingMode::FRONT)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("WindingOrder")
+        .addVariable("CCW", WindingOrder::CCW)
+        .addVariable("CW", WindingOrder::CW)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginNamespace("TextureFilter")
         .addVariable("NEAREST", TextureFilter::NEAREST)
         .addVariable("LINEAR", TextureFilter::LINEAR)

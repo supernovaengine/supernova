@@ -34,11 +34,23 @@ namespace Supernova{
         void setPrimitiveType(unsigned int submesh, PrimitiveType primitiveType);
         PrimitiveType getPrimitiveType(unsigned int submesh) const;
 
+        void setEnableFaceCulling(bool enableFaceCulling);
+        bool isEnableFaceCulling() const;
+
+        void setEnableFaceCulling(unsigned int submesh, bool enableFaceCulling);
+        bool isEnableFaceCulling(unsigned int submesh) const;
+
         void setCastShadowsWithTexture(bool castShadowsWithTexture);
         bool isCastShadowsWithTexture() const;
 
         void setCastShadowsWithTexture(unsigned int submesh, bool castShadowsWithTexture);
         bool isCastShadowsWithTexture(unsigned int submesh) const;
+
+        void setCullingMode(CullingMode cullingMode);
+        CullingMode getCullingMode() const;
+
+        void setWindingOrder(WindingOrder windingOrder);
+        WindingOrder getWindingOrder() const;
 
         AABB getAABB();
         AABB getVerticesAABB();

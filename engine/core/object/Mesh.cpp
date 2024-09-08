@@ -96,6 +96,31 @@ PrimitiveType Mesh::getPrimitiveType(unsigned int submesh) const{
     return mesh.submeshes[submesh].primitiveType;
 }
 
+void Mesh::setEnableFaceCulling(bool enableFaceCulling){
+    setEnableFaceCulling(0, enableFaceCulling);
+}
+
+bool Mesh::isEnableFaceCulling() const{
+    return isEnableFaceCulling(0);
+}
+
+void Mesh::setEnableFaceCulling(unsigned int submesh, bool enableFaceCulling){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    if (mesh.submeshes[submesh].enableFaceCulling != enableFaceCulling){
+        mesh.submeshes[submesh].enableFaceCulling = enableFaceCulling;
+
+        mesh.needReload = true;
+    }
+}
+
+bool Mesh::isEnableFaceCulling(unsigned int submesh) const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.submeshes[submesh].enableFaceCulling;
+}
+
+
 void Mesh::setCastShadowsWithTexture(bool castShadowsWithTexture){
     setCastShadowsWithTexture(0, castShadowsWithTexture);
 }
@@ -116,6 +141,38 @@ bool Mesh::isCastShadowsWithTexture(unsigned int submesh) const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return mesh.submeshes[submesh].hasDepthTexture;
+}
+
+void Mesh::setCullingMode(CullingMode cullingMode){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    if (mesh.cullingMode != cullingMode){
+        mesh.cullingMode = cullingMode;
+
+        mesh.needReload = true;
+    }
+}
+
+CullingMode Mesh::getCullingMode() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.cullingMode;
+}
+
+void Mesh::setWindingOrder(WindingOrder windingOrder){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    if (mesh.windingOrder != windingOrder){
+        mesh.windingOrder = windingOrder;
+
+        mesh.needReload = true;
+    }
+}
+
+WindingOrder Mesh::getWindingOrder() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.windingOrder;
 }
 
 

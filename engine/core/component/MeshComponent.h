@@ -56,6 +56,8 @@ namespace Supernova{
 
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
         unsigned int vertexCount = 0;
+
+        bool enableFaceCulling = true;
         
         bool hasTexCoord1 = false;
         bool hasNormalMap = false;
@@ -99,6 +101,9 @@ namespace Supernova{
         bool receiveShadows = true;
         bool transparent = false;
         bool enableShadowsBillboard = true;
+
+        CullingMode cullingMode = CullingMode::BACK;
+        WindingOrder windingOrder = WindingOrder::CCW;
 
         bool needUpdateBuffer = false;
         bool needReload = false;

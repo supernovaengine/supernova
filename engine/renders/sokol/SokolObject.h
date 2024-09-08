@@ -55,6 +55,8 @@ namespace Supernova{
 
         sg_vertex_format getVertexFormat(unsigned int elements, AttributeDataType dataType, bool normalized);
         sg_primitive_type getPrimitiveType(PrimitiveType primitiveType);
+        sg_cull_mode getCullMode(CullingMode cullingMode);
+        sg_face_winding getFaceWinding(WindingOrder windingOrder);
 
     public:
 
@@ -68,7 +70,7 @@ namespace Supernova{
         void addStorageBuffer(int slot, ShaderStageType stage, BufferRender* buffer);
         void addShader(ShaderRender* shader);
         void addTexture(std::pair<int, int> slot, ShaderStageType stage, TextureRender* texture);
-        bool endLoad(uint8_t pipelines);
+        bool endLoad(uint8_t pipelines, bool enableFaceCulling, CullingMode cullingMode, WindingOrder windingOrder);
 
         bool beginDraw(PipelineType pipType);
         void applyUniformBlock(int slot, ShaderStageType stage, unsigned int count, void* data);

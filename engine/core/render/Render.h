@@ -15,6 +15,16 @@ namespace Supernova{
         LINES
     };
 
+    enum class CullingMode{
+        BACK,
+        FRONT
+    };
+
+    enum class WindingOrder{
+        CCW,
+        CW
+    };
+
     enum class BufferType{
         VERTEX_BUFFER,
         INDEX_BUFFER,

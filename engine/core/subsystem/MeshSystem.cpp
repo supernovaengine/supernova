@@ -29,6 +29,7 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
     mesh.submeshes[0].hasDepthTexture = true;
+    mesh.submeshes[0].enableFaceCulling = false;
     mesh.numSubmeshes = 1;
 
 	mesh.buffer.clear();
@@ -822,12 +823,12 @@ void MeshSystem::createPlaneNodeSubmesh(unsigned int submeshIndex, TerrainCompon
             int d = ( ix + 1 ) + gridX1 * iy;
 
             mesh.indices.addUInt16(attIndice, a + bufferCount);
-            mesh.indices.addUInt16(attIndice, b + bufferCount);
             mesh.indices.addUInt16(attIndice, d + bufferCount);
+            mesh.indices.addUInt16(attIndice, b + bufferCount);
 
             mesh.indices.addUInt16(attIndice, b + bufferCount);
-            mesh.indices.addUInt16(attIndice, c + bufferCount);
             mesh.indices.addUInt16(attIndice, d + bufferCount);
+            mesh.indices.addUInt16(attIndice, c + bufferCount);
 
             bufferIndexCount += 6;
 
@@ -1176,24 +1177,24 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
     }
 
     static const uint16_t indices_array[] = {
-            /* front */
+            // front
             0,  1,  2,
             0,  2,  3,
-            /* back */
-            4,  5,  6,
-            4,  6,  7,
-            /* left */
+            // back
+            4,  6,  5,
+            4,  7,  6,
+            // left
             8,  9, 10,
             8, 10, 11,
-            /* right */
-            12, 13, 14,
-            12, 14, 15,
-            /* top */
+            // right
+            12, 14, 13,
+            12, 15, 14,
+            // top
             16, 17, 18,
             16, 18, 19,
-            /* bottom */
-            20, 21, 22,
-            20, 22, 23,
+            // bottom
+            20, 22, 21,
+            20, 23, 22,
     };
 
     mesh.indices.setValues(
@@ -1276,15 +1277,15 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
             // k1 => k2 => k1+1
             if(i != 0){
                 indices.push_back(k1);
-                indices.push_back(k2);
                 indices.push_back(k1 + 1);
+                indices.push_back(k2);
             }
 
             // k1+1 => k2 => k2+1
             if(i != (stacks-1)){
                 indices.push_back(k1 + 1);
-                indices.push_back(k2);
                 indices.push_back(k2 + 1);
+                indices.push_back(k2);
             }
         }
     }
@@ -1385,12 +1386,12 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
         for(int j = 0; j < slices; ++j, ++k1, ++k2){
             // 2 trianles per sector
             indices.push_back(k1);
-            indices.push_back(k1 + 1);
             indices.push_back(k2);
+            indices.push_back(k1 + 1);
 
             indices.push_back(k2);
-            indices.push_back(k1 + 1);
             indices.push_back(k2 + 1);
+            indices.push_back(k1 + 1);
         }
     }
 
@@ -1398,12 +1399,12 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
     for(int i = 0, k = baseVertexIndex + 1; i < slices; ++i, ++k){
         if(i < (slices - 1)){
             indices.push_back(baseVertexIndex);
-            indices.push_back(k + 1);
             indices.push_back(k);
+            indices.push_back(k + 1);
         }else{    // last triangle
             indices.push_back(baseVertexIndex);
-            indices.push_back(baseVertexIndex + 1);
             indices.push_back(k);
+            indices.push_back(baseVertexIndex + 1);
         }
     }
 
@@ -1411,12 +1412,12 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
     {
         if(i < (slices - 1)){
             indices.push_back(topVertexIndex);
-            indices.push_back(k);
             indices.push_back(k + 1);
+            indices.push_back(k);
         }else{
             indices.push_back(topVertexIndex);
-            indices.push_back(k);
             indices.push_back(topVertexIndex + 1);
+            indices.push_back(k);
         }
     }
 
@@ -1496,12 +1497,12 @@ void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius,
             int second = first + slices + 1;
 
             indices.push_back(first);
-            indices.push_back(second);
             indices.push_back(first + 1);
+            indices.push_back(second);
 
             indices.push_back(second);
-            indices.push_back(second + 1);
             indices.push_back(first + 1);
+            indices.push_back(second + 1);
         }
     }
 
@@ -1570,12 +1571,12 @@ void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsi
         const uint16_t row_b = row_a + rings + 1;
         for (uint16_t ring = 0; ring < rings; ring++) {
             indices.push_back(row_a + ring);
-            indices.push_back(row_a + ring + 1);
             indices.push_back(row_b + ring + 1);
+            indices.push_back(row_a + ring + 1);
 
             indices.push_back(row_a + ring);
-            indices.push_back(row_b + ring + 1);
             indices.push_back(row_b + ring);
+            indices.push_back(row_b + ring + 1);
         }
     }
 
@@ -1660,6 +1661,13 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
     Matrix4 matrix = getGLTFMeshGlobalMatrix(meshNode, model, nodesParent);
     matrix.decompose(transform.position, transform.scale, transform.rotation);
     transform.needUpdate = true;
+
+    mesh.cullingMode = CullingMode::BACK;
+    if (matrix.determinant() < 0.0){
+        mesh.windingOrder = WindingOrder::CW;
+    }else{
+        mesh.windingOrder = WindingOrder::CCW;
+    }
 
     tinygltf::Mesh gltfmesh = model.gltfModel->meshes[meshIndex];
 
@@ -1774,6 +1782,8 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
         }else if (indexType == AttributeDataType::UNSIGNED_INT){
             indexStride = sizeof(uint32_t);
         }
+
+        mesh.submeshes[i].enableFaceCulling = (mat.doubleSided)? false : true;
 
         loadGLTFBuffer(indexAccessor.bufferView, mesh, model, indexStride, loadedBuffers);
 

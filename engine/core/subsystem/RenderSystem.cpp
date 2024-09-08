@@ -781,7 +781,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			mesh.submeshes[i].vertexCount = mesh.vertexCount;
 		}
 
-		if (!render.endLoad(pipelines)){
+		if (!render.endLoad(pipelines, mesh.submeshes[i].enableFaceCulling, mesh.cullingMode, mesh.windingOrder)){
 			return false;
 		}
 
@@ -882,7 +882,10 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 				}
 			}
 
-			if (!depthRender.endLoad(PIP_DEPTH)){
+			CullingMode depthCullingMode = (mesh.cullingMode==CullingMode::BACK)? CullingMode::FRONT : CullingMode::BACK;
+			bool depthFaceCulling = (mesh.submeshes[i].hasDepthTexture)? false : mesh.submeshes[i].enableFaceCulling;
+
+			if (!depthRender.endLoad(PIP_DEPTH, depthFaceCulling, depthCullingMode, mesh.windingOrder)){
 				return false;
 			}
 		}
@@ -955,14 +958,8 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			if (mesh.submeshes[i].needUpdateTexture || needUpdateFramebuffer){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
 				loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
-
-				if (mesh.submeshes[i].hasDepthTexture){
-					ShaderData& depthShaderData = mesh.submeshes[i].depthShader.get()->shaderData;
-					loadDepthTexture(mesh.submeshes[i].material, depthShaderData, mesh.submeshes[i].depthRender);
-				}
-
-				mesh.submeshes[i].needUpdateTexture = false;
 			}
+			mesh.submeshes[i].needUpdateTexture = false; // loadDepthTexture is in drawMeshDepth
 
 			if (scene->isSceneAmbientLightEnabled()){
 				mesh.submeshes[i].material.ambientFactor = scene->getAmbientLightFactor();
@@ -1031,6 +1028,11 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, con
 
 		for (int i = 0; i < mesh.numSubmeshes; i++){
 			ObjectRender& depthRender = mesh.submeshes[i].depthRender;
+
+			if (mesh.submeshes[i].needUpdateTexture && mesh.submeshes[i].hasDepthTexture){
+				ShaderData& depthShaderData = mesh.submeshes[i].depthShader.get()->shaderData;
+				loadDepthTexture(mesh.submeshes[i].material, depthShaderData, mesh.submeshes[i].depthRender);
+			}
 
 			if (!depthRender.beginDraw(PIP_DEPTH)){
 				mesh.needReload = true;
@@ -1220,7 +1222,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, uint8_t pipeline
 	
 	uirender.needUpdateTexture = false;
 
-	if (!render.endLoad(pipelines)){
+	if (!render.endLoad(pipelines, false, CullingMode::BACK, WindingOrder::CCW)){
 		return false;
 	}
 
@@ -1365,7 +1367,7 @@ bool RenderSystem::loadPoints(Entity entity, PointsComponent& points, uint8_t pi
 
 	points.needUpdateTexture = false;
 
-	if (!render.endLoad(pipelines)){
+	if (!render.endLoad(pipelines, false, CullingMode::BACK, WindingOrder::CCW)){
 		return false;
 	}
 
@@ -1421,7 +1423,7 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 		lines.needUpdateBuffer = true;
 	}
 
-	if (!render.endLoad(pipelines)){
+	if (!render.endLoad(pipelines, false, CullingMode::BACK, WindingOrder::CCW)){
 		return false;
 	}
 
@@ -1608,7 +1610,7 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky, uint8_t pipelines){
         }
     }
 
-	if (!render->endLoad(pipelines)){
+	if (!render->endLoad(pipelines, true, CullingMode::BACK, WindingOrder::CCW)){
 		return false;
 	}
 

@@ -296,6 +296,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getPrimitiveType", 
             luabridge::overload<>(&Mesh::getPrimitiveType),
             luabridge::overload<unsigned int>(&Mesh::getPrimitiveType))
+        .addProperty("enableFaceCulling", &Mesh::isEnableFaceCulling, &Mesh::setEnableFaceCulling)
+        .addFunction("setEnableFaceCulling", 
+            luabridge::overload<bool>(&Mesh::setEnableFaceCulling),
+            luabridge::overload<unsigned int, bool>(&Mesh::setEnableFaceCulling))
+        .addFunction("isEnableFaceCulling", 
+            luabridge::overload<>(&Mesh::isEnableFaceCulling),
+            luabridge::overload<unsigned int>(&Mesh::isEnableFaceCulling))
         .addProperty("castShadowsWithTexture", &Mesh::isCastShadowsWithTexture, &Mesh::setCastShadowsWithTexture)
         .addFunction("setCastShadowsWithTexture", 
             luabridge::overload<bool>(&Mesh::setCastShadowsWithTexture),
@@ -303,6 +310,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("isCastShadowsWithTexture", 
             luabridge::overload<>(&Mesh::isCastShadowsWithTexture),
             luabridge::overload<unsigned int>(&Mesh::isCastShadowsWithTexture))
+        .addProperty("cullingMode", &Mesh::getCullingMode, &Mesh::setCullingMode)
+        .addProperty("windingOrder", &Mesh::getWindingOrder, &Mesh::setWindingOrder)
         .addFunction("getAABB", &Mesh::getAABB)
         .addFunction("getVerticesAABB", &Mesh::getVerticesAABB)
         .addFunction("getWorldAABB", &Mesh::getWorldAABB)
