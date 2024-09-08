@@ -31,7 +31,7 @@ sg_image_type SokolTexture::getTextureType(TextureType textureType){
         return SG_IMAGETYPE_CUBE;
     }
 
-    return SG_IMAGETYPE_2D;
+    return _SG_IMAGETYPE_DEFAULT;
 }
 
 sg_filter SokolTexture::getFilter(TextureFilter textureFilter){
@@ -49,7 +49,7 @@ sg_filter SokolTexture::getFilter(TextureFilter textureFilter){
         return SG_FILTER_NEAREST;
     }
 
-    return SG_FILTER_NEAREST;
+    return _SG_FILTER_DEFAULT;
 }
 
 sg_filter SokolTexture::getFilterMipmap(TextureFilter textureFilter){
@@ -63,7 +63,7 @@ sg_filter SokolTexture::getFilterMipmap(TextureFilter textureFilter){
         return SG_FILTER_LINEAR;
     }
 
-    return SG_FILTER_NEAREST;
+    return _SG_FILTER_DEFAULT;
 }
 
 sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
@@ -76,7 +76,7 @@ sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
     }
     // SG_WRAP_CLAMP_TO_BORDER is not used
 
-    return SG_WRAP_REPEAT;
+    return _SG_WRAP_DEFAULT;
 }
 
 void SokolTexture::cleanupMipmapTexture(void* data){

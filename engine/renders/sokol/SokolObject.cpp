@@ -88,7 +88,7 @@ sg_primitive_type SokolObject::getPrimitiveType(PrimitiveType primitiveType){
     else if (primitiveType == PrimitiveType::POINTS)
         return SG_PRIMITIVETYPE_POINTS;
 
-    return SG_PRIMITIVETYPE_TRIANGLES;
+    return _SG_PRIMITIVETYPE_DEFAULT;
 }
 
 void SokolObject::beginLoad(PrimitiveType primitiveType){

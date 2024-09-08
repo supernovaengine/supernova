@@ -90,7 +90,7 @@ sg_image_sample_type SokolShader::textureSamplerToSokolType(TextureSamplerType t
         return SG_IMAGESAMPLETYPE_SINT;
     }
 
-    return SG_IMAGESAMPLETYPE_FLOAT;
+    return _SG_IMAGESAMPLETYPE_DEFAULT;
 }
 
 sg_image_type SokolShader::textureToSokolType(TextureType type){
@@ -104,7 +104,7 @@ sg_image_type SokolShader::textureToSokolType(TextureType type){
         return SG_IMAGETYPE_ARRAY;
     }
 
-    return SG_IMAGETYPE_2D;
+    return _SG_IMAGETYPE_DEFAULT;
 }
 
 sg_sampler_type SokolShader::samplerToSokolType(SamplerType type){
@@ -114,7 +114,7 @@ sg_sampler_type SokolShader::samplerToSokolType(SamplerType type){
         return SG_SAMPLERTYPE_FILTERING;
     }
 
-    return SG_SAMPLERTYPE_NONFILTERING;
+    return _SG_SAMPLERTYPE_DEFAULT;
 }
 
 bool SokolShader::createShader(ShaderData& shaderData){
