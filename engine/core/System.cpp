@@ -16,19 +16,19 @@ using namespace Supernova;
 #ifdef SUPERNOVA_ANDROID
 #include "SupernovaAndroid.h"
 #endif
-#ifdef  SUPERNOVA_IOS
+#ifdef SUPERNOVA_IOS
 #include "SupernovaIOS.h"
 #endif
-#ifdef  SUPERNOVA_WEB
+#ifdef SUPERNOVA_WEB
 #include "SupernovaWeb.h"
 #endif
-#ifdef  SUPERNOVA_SOKOL
+#ifdef SUPERNOVA_SOKOL
 #include "SupernovaSokol.h"
 #endif
-#ifdef  SUPERNOVA_GLFW
+#ifdef SUPERNOVA_GLFW
 #include "SupernovaGLFW.h"
 #endif
-#ifdef  SUPERNOVA_APPLE
+#ifdef SUPERNOVA_APPLE
 #include "SupernovaApple.h"
 #endif
 
