@@ -184,7 +184,8 @@ namespace Supernova{
     enum class TextureWrap{
         REPEAT,
         MIRRORED_REPEAT,
-        CLAMP_TO_EDGE
+        CLAMP_TO_EDGE,
+        CLAMP_TO_BORDER
     };
 
     enum PipelineType {

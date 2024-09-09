@@ -73,8 +73,9 @@ sg_wrap SokolTexture::getWrap(TextureWrap textureWrap){
         return SG_WRAP_MIRRORED_REPEAT;
     }else if (textureWrap == TextureWrap::CLAMP_TO_EDGE){
         return SG_WRAP_CLAMP_TO_EDGE;
+    }else if (textureWrap == TextureWrap::CLAMP_TO_BORDER){
+        return SG_WRAP_CLAMP_TO_BORDER;
     }
-    // SG_WRAP_CLAMP_TO_BORDER is not used
 
     return _SG_WRAP_DEFAULT;
 }
@@ -270,6 +271,10 @@ bool SokolTexture::createFramebufferTexture(
     sampler_desc.mipmap_filter = getFilterMipmap(minFilter);
     sampler_desc.wrap_u = getWrap(wrapU);
     sampler_desc.wrap_v = getWrap(wrapV);
+    if (shadowMap){
+        // Over sampling - https://learnopengl.com/Advanced-Lighting/Shadows/Shadow-Mapping
+        sampler_desc.border_color = SG_BORDERCOLOR_OPAQUE_WHITE;
+    }
 
     //if not set Sokol gets default from sg_desc.context.sample_count
     img_desc.sample_count = 1;

@@ -223,7 +223,7 @@ bool RenderSystem::loadLights(int numLights){
 				if (!light.framebuffer[0].isCreated())
 					light.framebuffer[0].createFramebuffer(
 							TextureType::TEXTURE_CUBE, light.mapResolution, light.mapResolution, 
-							TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::REPEAT, TextureWrap::REPEAT, true);
+							TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::CLAMP_TO_BORDER, TextureWrap::CLAMP_TO_BORDER, true);
 
 				if ((freeShadowCubeMap - MAX_SHADOWSMAP) < MAX_SHADOWSCUBEMAP){
 					light.shadowMapIndex = freeShadowCubeMap++;
@@ -232,7 +232,7 @@ bool RenderSystem::loadLights(int numLights){
 				if (!light.framebuffer[0].isCreated())
 					light.framebuffer[0].createFramebuffer(
 							TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, 
-							TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::REPEAT, TextureWrap::REPEAT, true);
+							TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::CLAMP_TO_BORDER, TextureWrap::CLAMP_TO_BORDER, true);
 
 				if (freeShadowMap < MAX_SHADOWSMAP){
 					light.shadowMapIndex = freeShadowMap++;
@@ -242,7 +242,7 @@ bool RenderSystem::loadLights(int numLights){
 					if (!light.framebuffer[c].isCreated())
 						light.framebuffer[c].createFramebuffer(
 								TextureType::TEXTURE_2D, light.mapResolution, light.mapResolution, 
-								TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::REPEAT, TextureWrap::REPEAT, true);
+								TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::CLAMP_TO_BORDER, TextureWrap::CLAMP_TO_BORDER, true);
 				}
 
 				if ((freeShadowMap + light.numShadowCascades - 1) < MAX_SHADOWSMAP){

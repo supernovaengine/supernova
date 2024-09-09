@@ -119,6 +119,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addVariable("REPEAT", TextureWrap::REPEAT)
         .addVariable("MIRRORED_REPEAT", TextureWrap::MIRRORED_REPEAT)
         .addVariable("CLAMP_TO_EDGE", TextureWrap::CLAMP_TO_EDGE)
+        .addVariable("CLAMP_TO_BORDER", TextureWrap::CLAMP_TO_BORDER)
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
