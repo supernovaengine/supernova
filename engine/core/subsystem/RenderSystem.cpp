@@ -1408,7 +1408,8 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 
 	lines.buffer.setData((unsigned char*)(&lines.lines.at(0)), sizeof(LineData)*lines.lines.size());
 
-	size_t bufferSize = lines.maxLines * lines.buffer.getStride();
+	// two points per line
+	size_t bufferSize = lines.maxLines * (lines.buffer.getStride() * 2);
 
 	if (bufferSize == 0)
 		return false;

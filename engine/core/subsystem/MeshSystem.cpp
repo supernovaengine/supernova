@@ -141,6 +141,7 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 
 void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
+    mesh.submeshes[0].enableFaceCulling = false;
     mesh.numSubmeshes = 1;
 
 	mesh.buffer.clear();
