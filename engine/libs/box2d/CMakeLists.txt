@@ -111,8 +111,15 @@ if (BOX2D_ENABLE_SIMD)
 	target_compile_definitions(box2d PRIVATE BOX2D_ENABLE_SIMD)
 endif()
 
+# Deterministic math
+# https://box2d.org/posts/2024/08/determinism/
+if (MINGW OR APPLE OR UNIX)
+	add_compile_options(-ffp-contract=off)
+endif()
+
 if (MSVC)
 	#message(STATUS "Box2D on MSVC")
+
 	# Visual Studio won't load the natvis unless it is in the project
 	target_sources(box2d PRIVATE ./src/box2d.natvis)
 
@@ -134,20 +141,12 @@ elseif (MINGW)
 		message(STATUS "Box2D using AVX2")
 		target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
 		target_compile_options(box2d PRIVATE -mavx2)
-	else()
-		# todo should no longer be needed
-		# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
-		message(STATUS "Box2D disabling ABI warning")
-		target_compile_options(box2d PRIVATE -Wno-psabi)
 	endif()
 elseif (APPLE)
 	#message(STATUS "Box2D on Apple")
 elseif (EMSCRIPTEN)
 	#message(STATUS "Box2D on Emscripten")
-	# todo should no longer be needed
-	# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
-	message(STATUS "Box2D disabling ABI warning")
-	target_compile_options(box2d PRIVATE -msimd128 -msse2 -Wno-psabi)
+	target_compile_options(box2d PRIVATE -msimd128 -msse2)
 elseif (UNIX)
 	#message(STATUS "Box2D using Unix")
 	if ("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
@@ -161,11 +160,6 @@ elseif (UNIX)
 			# FMA -mfma -mavx -march=native
 			target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
 			target_compile_options(box2d PRIVATE -mavx2)
-		else()
-			# todo should no longer be needed
-			# see SIMDE_DIAGNOSTIC_DISABLE_PSABI_
-			message(STATUS "Box2D disabling ABI warning")
-			target_compile_options(box2d PRIVATE -Wno-psabi)
 		endif()
 	endif()
 endif()
