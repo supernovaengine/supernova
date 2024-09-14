@@ -56,8 +56,8 @@ namespace Supernova{
         float yfov = 0.75;
         float aspect = 1.0;
 
-        float near = -10;
-        float far = 10;
+        float nearPlane = -10.0;
+        float farPlane = 10.0;
 
         Plane frustumPlanes[6];
 

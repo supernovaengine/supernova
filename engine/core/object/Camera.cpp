@@ -30,8 +30,8 @@ void Camera::applyOrthoDefaults(CameraComponent& cameraComponent){
     cameraComponent.right = Engine::getCanvasWidth();
     cameraComponent.bottom = 0;
     cameraComponent.top = Engine::getCanvasHeight();
-    cameraComponent.near = DEFAULT_ORTHO_NEAR;
-    cameraComponent.far = DEFAULT_ORTHO_FAR;
+    cameraComponent.nearPlane = DEFAULT_ORTHO_NEAR;
+    cameraComponent.farPlane = DEFAULT_ORTHO_FAR;
 }
 
 void Camera::applyPerspectiveDefaults(CameraComponent& cameraComponent){
@@ -43,8 +43,8 @@ void Camera::applyPerspectiveDefaults(CameraComponent& cameraComponent){
         cameraComponent.aspect = 1.0;
     }
 
-    cameraComponent.near = DEFAULT_PERSPECTIVE_NEAR;
-    cameraComponent.far = DEFAULT_PERSPECTIVE_FAR;
+    cameraComponent.nearPlane = DEFAULT_PERSPECTIVE_NEAR;
+    cameraComponent.farPlane = DEFAULT_PERSPECTIVE_FAR;
 }
 
 void Camera::activate(){
@@ -60,8 +60,8 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
     camera.right = right;
     camera.bottom = bottom;
     camera.top = top;
-    camera.near = near;
-    camera.far = far;
+    camera.nearPlane = near;
+    camera.farPlane = far;
     
     camera.automatic = false;
 
@@ -75,8 +75,8 @@ void Camera::setPerspective(float yfov, float aspect, float near, float far){
 
     camera.yfov = Angle::defaultToRad(yfov);
     camera.aspect = aspect;
-    camera.near = near;
-    camera.far = far;
+    camera.nearPlane = near;
+    camera.farPlane = far;
     
     camera.automatic = false;
 
@@ -86,8 +86,8 @@ void Camera::setPerspective(float yfov, float aspect, float near, float far){
 void Camera::setNear(float near){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    if (camera.near != near){
-        camera.near = near;
+    if (camera.nearPlane != near){
+        camera.nearPlane = near;
 
         camera.needUpdate = true;
     }
@@ -96,14 +96,14 @@ void Camera::setNear(float near){
 float Camera::getNear() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    return camera.near;
+    return camera.nearPlane;
 }
 
 void Camera::setFar(float far){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    if (camera.far != far){
-        camera.far = far;
+    if (camera.farPlane != far){
+        camera.farPlane = far;
 
         camera.needUpdate = true;
     }
@@ -112,7 +112,7 @@ void Camera::setFar(float far){
 float Camera::getFar() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    return camera.far;
+    return camera.farPlane;
 }
 
 void Camera::setLeft(float left){

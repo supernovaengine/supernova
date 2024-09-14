@@ -982,8 +982,8 @@ void MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
     if (terrain.autoSetRanges) {
         CameraComponent& camera =  scene->getComponent<CameraComponent>(scene->getCamera());
 
-        float lastLevel = camera.far;
-        if (camera.far < (rootNodeSize * 2)){
+        float lastLevel = camera.farPlane;
+        if (camera.farPlane < (rootNodeSize * 2)){
             lastLevel = rootNodeSize * 2;
             Log::warn("Terrain quadtree root is not in camera field of view. Increase terrain root grid.");
         }

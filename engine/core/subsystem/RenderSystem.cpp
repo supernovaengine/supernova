@@ -1783,11 +1783,11 @@ void RenderSystem::updateTransform(Transform& transform){
 void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 	//Update ProjectionMatrix
 	if (camera.type == CameraType::CAMERA_2D){
-		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.top, camera.bottom, camera.near, camera.far);
+		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.top, camera.bottom, camera.nearPlane, camera.farPlane);
 	}else if (camera.type == CameraType::CAMERA_ORTHO) {
-		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.bottom, camera.top, camera.near, camera.far);
+		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.bottom, camera.top, camera.nearPlane, camera.farPlane);
 	}else if (camera.type == CameraType::CAMERA_PERSPECTIVE){
-		camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.yfov, camera.aspect, camera.near, camera.far);
+		camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.yfov, camera.aspect, camera.nearPlane, camera.farPlane);
 	}
 
 	if (transform.parent != NULL_ENTITY){
@@ -2035,12 +2035,12 @@ bool RenderSystem::isInsideCamera(const float cameraFar, const Plane frustumPlan
 }
 
 bool RenderSystem::isInsideCamera(CameraComponent& camera, const AABB& box){
-    return isInsideCamera(camera.far, camera.frustumPlanes, box);
+    return isInsideCamera(camera.farPlane, camera.frustumPlanes, box);
 }
 
 bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point){
     for (int plane = 0; plane < 6; ++plane){
-        if (plane == FRUSTUM_PLANE_FAR && camera.far == 0)
+        if (plane == FRUSTUM_PLANE_FAR && camera.farPlane == 0)
             continue;
 
         if (camera.frustumPlanes[plane].getSide(point) == Plane::Side::NEGATIVE_SIDE){
@@ -2053,7 +2053,7 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point)
 
 bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius){
     for (int plane = 0; plane < 6; ++plane){
-        if (plane == FRUSTUM_PLANE_FAR && camera.far == 0)
+        if (plane == FRUSTUM_PLANE_FAR && camera.farPlane == 0)
             continue;
 
         if (camera.frustumPlanes[plane].getDistance(center) < -radius){
@@ -2174,11 +2174,11 @@ void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshCompo
 
 void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
 	if (light.shadowCameraNearFar.x == 0.0){
-		light.shadowCameraNearFar.x = camera.near;
+		light.shadowCameraNearFar.x = camera.nearPlane;
 	}
 	if (light.shadowCameraNearFar.y == 0.0){
 		if (light.range == 0.0){
-			light.shadowCameraNearFar.y = camera.far;
+			light.shadowCameraNearFar.y = camera.farPlane;
 		}else{
 			light.shadowCameraNearFar.y = light.range;
 		}
@@ -2246,8 +2246,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			//TODO: light directional cascades is only considering main camera
 			if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
 
-				float zFar = camera.far;
-				float zNear = camera.near;
+				float zFar = camera.farPlane;
+				float zNear = camera.nearPlane;
 				float fov = 0;
 				float ratio = 1;
 

@@ -31,28 +31,31 @@ using namespace Supernova;
 #ifdef SUPERNOVA_APPLE
 #include "SupernovaApple.h"
 #endif
+#ifdef SUPERNOVA_EDITOR
+#include "editor/Platform.h"
+#endif
 
 System& System::instance(){
-
-    static System* instance = nullptr;
-
 #ifdef SUPERNOVA_ANDROID
-    instance = new SupernovaAndroid();
+    static System* instance = new SupernovaAndroid();
 #endif
 #ifdef  SUPERNOVA_IOS
-    instance = new SupernovaIOS();
+    static System* instance = new SupernovaIOS();
 #endif
 #ifdef  SUPERNOVA_WEB
-    instance = new SupernovaWeb();
+    static System* instance = new SupernovaWeb();
 #endif
 #ifdef  SUPERNOVA_SOKOL
-    instance = new SupernovaSokol();
+    static System* instance = new SupernovaSokol();
 #endif
 #ifdef  SUPERNOVA_GLFW
-    instance = new SupernovaGLFW();
+    static System* instance = new SupernovaGLFW();
 #endif
 #ifdef  SUPERNOVA_APPLE
-    instance = new SupernovaApple();
+    static System* instance = new SupernovaApple();
+#endif
+#ifdef  SUPERNOVA_EDITOR
+    static System* instance = new Editor::Platform();
 #endif
 
     return *instance;
