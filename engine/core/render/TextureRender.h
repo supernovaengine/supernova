@@ -33,6 +33,8 @@ namespace Supernova{
                 TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV);
 
         void destroyTexture();
+
+        uint32_t getGLHandler();
     };
 }
 

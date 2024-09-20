@@ -43,3 +43,7 @@ bool TextureRender::createFramebufferTexture(
 void TextureRender::destroyTexture(){
     backend.destroyTexture();
 }
+
+uint32_t TextureRender::getGLHandler(){
+    return backend.getGLHandler();
+}

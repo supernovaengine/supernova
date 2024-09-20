@@ -38,3 +38,7 @@ bool FramebufferRender::isCreated(){
 TextureRender& FramebufferRender::getColorTexture(){
     return backend.getColorTexture();
 }
+
+TextureRender& FramebufferRender::getDepthTexture(){
+    return backend.getDepthTexture();
+}

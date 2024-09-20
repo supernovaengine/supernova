@@ -26,6 +26,7 @@ namespace Supernova{
         bool isCreated();
 
         TextureRender& getColorTexture();
+        TextureRender& getDepthTexture();
     };
 }
 

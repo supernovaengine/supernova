@@ -43,6 +43,8 @@ namespace Supernova{
 
         void destroyTexture();
 
+        uint32_t getGLHandler();
+
         sg_image get();
         sg_sampler getSampler();
     };

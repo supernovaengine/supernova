@@ -321,6 +321,16 @@ void SokolTexture::destroyTexture(){
     sampler.id = SG_INVALID_ID;
 }
 
+uint32_t SokolTexture::getGLHandler(){
+    if (image.id != SG_INVALID_ID && sg_isvalid()){
+        sg_gl_image_info info = sg_gl_query_image_info(image);
+
+        return info.tex[info.active_slot];
+    }
+
+    return 0;
+}
+
 sg_image SokolTexture::get(){
     return image;
 }

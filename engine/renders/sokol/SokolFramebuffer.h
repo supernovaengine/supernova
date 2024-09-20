@@ -30,6 +30,7 @@ namespace Supernova{
         bool isCreated();
 
         TextureRender& getColorTexture();
+        TextureRender& getDepthTexture();
 
         sg_attachments get(size_t face);
     };

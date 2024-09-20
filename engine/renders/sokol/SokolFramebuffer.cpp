@@ -84,6 +84,10 @@ TextureRender& SokolFramebuffer::getColorTexture(){
     return colorTexture;
 }
 
+TextureRender& SokolFramebuffer::getDepthTexture(){
+    return depthTexture;
+}
+
 sg_attachments SokolFramebuffer::get(size_t face){
     return attachments[face];
 }
