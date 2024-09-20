@@ -34,7 +34,9 @@ namespace Supernova{
 
         void destroyTexture();
 
-        uint32_t getGLHandler();
+        uint32_t getGLHandler() const;
+        const void* getMetalHandler() const;
+        const void* getD3D11Handler() const;
     };
 }
 

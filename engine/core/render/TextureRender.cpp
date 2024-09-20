@@ -44,6 +44,14 @@ void TextureRender::destroyTexture(){
     backend.destroyTexture();
 }
 
-uint32_t TextureRender::getGLHandler(){
+uint32_t TextureRender::getGLHandler() const{
     return backend.getGLHandler();
+}
+
+const void* TextureRender::getMetalHandler() const{
+    return backend.getMetalHandler();
+}
+
+const void* TextureRender::getD3D11Handler() const{
+    return backend.getD3D11Handler();
 }

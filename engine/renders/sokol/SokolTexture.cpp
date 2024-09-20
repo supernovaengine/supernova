@@ -321,7 +321,7 @@ void SokolTexture::destroyTexture(){
     sampler.id = SG_INVALID_ID;
 }
 
-uint32_t SokolTexture::getGLHandler(){
+uint32_t SokolTexture::getGLHandler() const{
     if (image.id != SG_INVALID_ID && sg_isvalid()){
         sg_gl_image_info info = sg_gl_query_image_info(image);
 
@@ -329,6 +329,26 @@ uint32_t SokolTexture::getGLHandler(){
     }
 
     return 0;
+}
+
+const void* SokolTexture::getMetalHandler() const{
+    if (image.id != SG_INVALID_ID && sg_isvalid()){
+        sg_mtl_image_info info = sg_mtl_query_image_info(image);
+
+        return info.tex[info.active_slot];
+    }
+
+    return NULL;
+}
+
+const void* SokolTexture::getD3D11Handler() const{
+    if (image.id != SG_INVALID_ID && sg_isvalid()){
+        sg_d3d11_image_info info = sg_d3d11_query_image_info(image);
+
+        return info.res;
+    }
+
+    return NULL;
 }
 
 sg_image SokolTexture::get(){
