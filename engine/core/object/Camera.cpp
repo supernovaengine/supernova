@@ -450,6 +450,18 @@ bool Camera::isRenderToTexture() const{
 	return camera.renderToTexture;
 }
 
+void Camera::setUseFramebufferSizes(bool useFramebufferSizes){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+	camera.useFramebufferSizes = useFramebufferSizes;
+}
+
+bool Camera::isUseFramebufferSizes() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+	return camera.useFramebufferSizes;
+}
+
 Framebuffer* Camera::getFramebuffer(){
     CameraComponent& camera = getComponent<CameraComponent>();
 
@@ -459,13 +471,18 @@ Framebuffer* Camera::getFramebuffer(){
 void Camera::setFramebufferSize(int width, int height){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-	camera.framebuffer->setWidth(width);
-	camera.framebuffer->setHeight(height);
+    float oldWidth = camera.framebuffer->getWidth();
+    float oldHeight = camera.framebuffer->getHeight();
 
-	if (camera.renderToTexture){
-		scene->getSystem<RenderSystem>()->updateFramebuffer(camera);
-		scene->getSystem<RenderSystem>()->updateCameraSize(entity);
-	}
+    if ((oldWidth != width) || (oldHeight != height)){
+        camera.framebuffer->setWidth(width);
+        camera.framebuffer->setHeight(height);
+
+        if (camera.renderToTexture){
+            scene->getSystem<RenderSystem>()->updateFramebuffer(camera);
+            scene->getSystem<RenderSystem>()->updateCameraSize(entity);
+        }
+    }
 }
 
 void Camera::setFramebufferFilter(TextureFilter filter){

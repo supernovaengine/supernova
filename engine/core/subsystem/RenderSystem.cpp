@@ -1988,10 +1988,10 @@ void RenderSystem::updateCameraSize(Entity entity){
 		CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
 		
 		Rect rect;
-		if (!camera.renderToTexture) {
-			rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
-		}else{
+		if (camera.renderToTexture && camera.useFramebufferSizes) {
 			rect = Rect(0, 0, camera.framebuffer->getWidth(), camera.framebuffer->getHeight());
+		}else{
+			rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
 		}
 
 		if (camera.automatic){

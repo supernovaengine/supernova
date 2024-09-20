@@ -79,6 +79,9 @@ namespace Supernova{
         void setRenderToTexture(bool renderToTexture);
         bool isRenderToTexture() const;
 
+        void setUseFramebufferSizes(bool useFramebufferSizes);
+        bool isUseFramebufferSizes() const;
+
         Framebuffer* getFramebuffer();
         void setFramebufferSize(int width, int height);
         void setFramebufferFilter(TextureFilter filter);

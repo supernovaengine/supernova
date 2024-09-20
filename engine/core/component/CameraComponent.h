@@ -63,7 +63,8 @@ namespace Supernova{
 
         CameraRender render;
 
-		bool renderToTexture = false;
+        bool renderToTexture = false;
+        bool useFramebufferSizes = true;
         // need to be a pointer to not lost reference when component changes position
         Framebuffer* framebuffer = new Framebuffer();
 
