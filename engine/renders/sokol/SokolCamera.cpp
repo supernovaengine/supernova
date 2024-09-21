@@ -33,16 +33,20 @@ void SokolCamera::setClearColor(Vector4 clearColor){
 }
 
 void SokolCamera::startFrameBuffer(FramebufferRender* framebuffer, size_t face){
-    //sg_pass pass = {0};
-    //pass.action = pass_action;
     pass.attachments = framebuffer->backend.get(face);
     //SokolCmdQueue::add_command_begin_pass(pass);
     sg_begin_pass(pass);
 }
 
+void SokolCamera::startFrameBuffer(int width, int height){
+    pass.swapchain = System::instance().getSokolSwapchain();
+    pass.swapchain.width = width;
+    pass.swapchain.height = height;
+    //SokolCmdQueue::add_command_begin_pass(pass);
+    sg_begin_pass(pass);
+}
+
 void SokolCamera::startFrameBuffer(){
-    //sg_pass pass = {0};
-    //pass.action = pass_action;
     pass.swapchain = System::instance().getSokolSwapchain();
     //SokolCmdQueue::add_command_begin_pass(pass);
     sg_begin_pass(pass);

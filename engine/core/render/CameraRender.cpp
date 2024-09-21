@@ -27,6 +27,10 @@ void CameraRender::startFrameBuffer(FramebufferRender* framebuffer, size_t face)
     backend.startFrameBuffer(framebuffer, face);
 }
 
+void CameraRender::startFrameBuffer(int width, int height){
+    backend.startFrameBuffer(width, height);
+}
+
 void CameraRender::startFrameBuffer(){
     backend.startFrameBuffer();
 }
