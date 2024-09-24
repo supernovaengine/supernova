@@ -75,7 +75,7 @@ namespace Supernova{
         void zoom(float distance);
 
         void slide(float distance);
-        void slideView(float distance);
+        void slideForward(float distance);
         void slideUp(float distance);
 
         void setRenderToTexture(bool renderToTexture);

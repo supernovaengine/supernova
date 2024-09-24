@@ -421,7 +421,7 @@ void Camera::slide(float distance){
     }
 }
 
-void Camera::slideView(float distance){
+void Camera::slideForward(float distance){
     if (distance != 0){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
