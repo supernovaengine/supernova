@@ -366,23 +366,6 @@ void Camera::elevatePosition(float angle){
     }
 }
 
-void Camera::moveForward(float distance){
-    if (distance != 0){
-        CameraComponent& camera = getComponent<CameraComponent>();
-        Transform& transf = getComponent<Transform>();
-
-        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
-
-        viewCenter.normalize();
-
-        camera.view = camera.view + (viewCenter * distance);
-        transf.position = transf.position + (viewCenter * distance);
-
-        transf.needUpdate = true;
-        camera.needUpdate = true;
-    }
-}
-
 void Camera::walkForward(float distance){
     if (distance != 0){
         CameraComponent& camera = getComponent<CameraComponent>();
@@ -401,6 +384,21 @@ void Camera::walkForward(float distance){
 
         transf.needUpdate = true;
         camera.needUpdate = true;
+    }
+}
+
+void Camera::zoom(float distance){
+    if (distance != 0){
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
+
+        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
+
+        viewCenter.normalize();
+
+        transf.position = transf.position + (viewCenter * distance);
+
+        transf.needUpdate = true;
     }
 }
 
@@ -423,7 +421,7 @@ void Camera::slide(float distance){
     }
 }
 
-void Camera::zoom(float distance){
+void Camera::slideView(float distance){
     if (distance != 0){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
@@ -432,9 +430,30 @@ void Camera::zoom(float distance){
 
         viewCenter.normalize();
 
+        camera.view = camera.view + (viewCenter * distance);
         transf.position = transf.position + (viewCenter * distance);
 
         transf.needUpdate = true;
+        camera.needUpdate = true;
+    }
+}
+
+void Camera::slideUp(float distance){
+    if (distance != 0){
+        CameraComponent& camera = getComponent<CameraComponent>();
+        Transform& transf = getComponent<Transform>();
+
+        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
+
+        Vector3 slideVector = camera.up;
+
+        slideVector.normalize();
+
+        camera.view = camera.view + (slideVector * distance);
+        transf.position = transf.position + (slideVector * distance);
+
+        transf.needUpdate = true;
+        camera.needUpdate = true;
     }
 }
 
