@@ -45,6 +45,14 @@ Entity EntityHandle::getEntity() const{
     return entity;
 }
 
+void EntityHandle::setName(std::string name){
+    scene->setEntityName(entity, name);
+}
+
+std::string EntityHandle::getName() const{
+    return scene->getEntityName(entity);
+}
+
 bool EntityHandle::isEntityOwned() const{
     return entityOwned;
 }

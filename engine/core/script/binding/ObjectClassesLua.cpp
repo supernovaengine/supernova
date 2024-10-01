@@ -135,6 +135,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (Scene*)> ()
         .addProperty("scene", &EntityHandle::getScene)
         .addProperty("entity", &EntityHandle::getEntity)
+        .addProperty("name", &EntityHandle::getName, &EntityHandle::setName)
         .addProperty("entityOwned", &EntityHandle::isEntityOwned, &EntityHandle::setEntityOwned)
         .endClass();
 
@@ -178,7 +179,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("moveUp", &Object::moveUp)
         .addFunction("moveDown", &Object::moveDown)
         .addFunction("moveToBottom", &Object::moveToBottom)
-        .addProperty("name", &Object::getName, &Object::setName)
         .addProperty("position", &Object::getPosition, (void(Object::*)(Vector3))&Object::setPosition)
         .addFunction("setPosition", 
             luabridge::overload<const float, const float, const float>(&Object::setPosition),

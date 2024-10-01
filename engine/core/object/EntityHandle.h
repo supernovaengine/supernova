@@ -28,6 +28,9 @@ namespace Supernova{
         Scene* getScene() const;
         Entity getEntity() const;
 
+        void setName(std::string name);
+        std::string getName() const;
+
         bool isEntityOwned() const;
         void setEntityOwned(bool entityOwned);
 

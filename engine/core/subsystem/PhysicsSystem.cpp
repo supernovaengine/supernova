@@ -134,7 +134,7 @@ void PhysicsSystem::updateBody2DPosition(Signature signature, Entity entity, Bod
                 bNewPosition = {transform.position.x / pointsToMeterScale2D, transform.position.y / pointsToMeterScale2D};
                 bNewAngle = Angle::defaultToRad(transform.rotation.getRoll());
                 if (transform.parent != NULL_ENTITY){
-                    Log::warn("Body position and rotation cannot be obtained from world: %u (%s)", entity, transform.name.c_str());
+                    Log::warn("Body position and rotation cannot be obtained from world: %u (%s)", entity, scene->getEntityName(entity).c_str());
                 }
             }
 
@@ -159,7 +159,7 @@ void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Bod
                 jNewPosition = JPH::Vec3(transform.position.x, transform.position.y, transform.position.z);
                 jNewQuat = JPH::Quat(transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w);
                 if (transform.parent != NULL_ENTITY){
-                    Log::warn("Body position and rotation cannot be obtained from world: %u (%s)", entity, transform.name.c_str());
+                    Log::warn("Body position and rotation cannot be obtained from world: %u (%s)", entity, scene->getEntityName(entity).c_str());
                 }
             }
 

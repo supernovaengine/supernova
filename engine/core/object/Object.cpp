@@ -19,16 +19,6 @@ Object::Object(Scene* scene, Entity entity): EntityHandle(scene, entity){
 Object::~Object(){
 }
 
-void Object::setName(std::string name){
-    Transform& transform = getComponent<Transform>();
-    transform.name = name;
-}
-
-std::string Object::getName() const{
-    Transform& transform = getComponent<Transform>();
-    return transform.name;
-}
-
 void Object::setPosition(Vector3 position){
     Transform& transform = getComponent<Transform>();
 

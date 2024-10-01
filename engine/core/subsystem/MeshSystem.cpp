@@ -674,7 +674,7 @@ Entity MeshSystem::generateSketetalStructure(Entity entity, ModelComponent& mode
     BoneComponent& bonecomp = scene->getComponent<BoneComponent>(bone);
 
     bonecomp.index = index;
-    bonetransform.name = node.name;
+    scene->setEntityName(bone, node.name);
 
     Matrix4 matrix = getGLTFNodeMatrix(nodeIndex, model);
     matrix.decompose(bonecomp.bindPosition, bonecomp.bindScale, bonecomp.bindRotation);
@@ -687,7 +687,7 @@ Entity MeshSystem::generateSketetalStructure(Entity entity, ModelComponent& mode
     bonecomp.offsetMatrix = offsetMatrix;
     bonecomp.model = entity;
 
-    model.bonesNameMapping[bonetransform.name] = bone;
+    model.bonesNameMapping[scene->getEntityName(bone)] = bone;
     model.bonesIdMapping[nodeIndex] = bone;
 
     for (size_t i = 0; i < node.children.size(); i++){

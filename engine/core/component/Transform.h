@@ -13,8 +13,6 @@
 namespace Supernova{
 
     struct Transform{
-        std::string name;
-
         Vector3 position;
         Quaternion rotation;
         Vector3 scale = Vector3(1.0, 1.0, 1.0);

@@ -26,9 +26,6 @@ namespace Supernova{
         void moveDown();
         void moveToBottom();
 
-        void setName(std::string name);
-        std::string getName() const;
-
         void setPosition(Vector3 position);
         void setPosition(const float x, const float y, const float z);
         void setPosition(const float x, const float y);

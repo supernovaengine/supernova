@@ -13,47 +13,69 @@
 
 namespace Supernova{
 
+    struct EntityMetadata{
+        std::string name;
+        Signature signature;
+    };
+
     class EntityManager {
     private:
         unsigned lastEntity = 0;
-        std::map<Entity, Signature> signatures;
+        std::map<Entity, EntityMetadata> metadata;
 
     public:
 
         Entity createEntity() {
             lastEntity++;
-            signatures[lastEntity];
+            metadata[lastEntity];
 
             return lastEntity;
         }
 
         void destroy(Entity entity) {
-            signatures.erase(entity);
+            metadata.erase(entity);
         }
 
         std::vector<Entity> getEntityList(){
             std::vector<Entity> list;
-            for (auto const& [key, val] : signatures){
+            for (auto const& [key, val] : metadata){
                 list.push_back(key);
             }
             return list;
         }
 
         void setSignature(Entity entity, Signature signature) {
-        	if (signatures.count(entity)==0){
+            if (metadata.count(entity)==0){
                 Log::error("Entity does not exist to set signature");
             }
 
-        	signatures[entity] = signature;
+            metadata[entity].signature = signature;
         }
 
         Signature getSignature(Entity entity) const{
-        	if (signatures.count(entity)==0){
+            if (metadata.count(entity)==0){
                  Log::error("Entity does not exist to get signature");
                  return Signature();
             }
 
-        	return signatures.at(entity);
+            return metadata.at(entity).signature;
+        }
+
+        void setName(Entity entity, std::string name) {
+            if (metadata.count(entity)==0){
+                Log::error("Entity does not exist to set name");
+            }
+
+            metadata[entity].name = name;
+        }
+
+        std::string getName(Entity entity) const{
+            if (metadata.count(entity)==0){
+                 Log::error("Entity does not exist to get name");
+                 return std::string();
+            }
+
+            return metadata.at(entity).name;
         }
     };
 

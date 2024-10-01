@@ -137,6 +137,18 @@ namespace Supernova{
 		void moveChildUp(Entity entity);
 		void moveChildDown(Entity entity);
 		void moveChildToBottom(Entity entity);
+
+		Signature getSignature(Entity entity) const{
+			return entityManager.getSignature(entity);
+		}
+
+		void setEntityName(Entity entity, std::string name){
+			return entityManager.setName(entity, name);
+		}
+
+		std::string getEntityName(Entity entity) const{
+			return entityManager.getName(entity);
+		}
 	
 	    // Component methods
 
@@ -160,10 +172,6 @@ namespace Supernova{
 		    signature.set(componentManager.getComponentType<T>(), false);
 		    entityManager.setSignature(entity, signature); 
 	    }
-
-		Signature getSignature(Entity entity){
-			return entityManager.getSignature(entity);
-		}
 
 		template<typename T>
 	    T* findComponent(Entity entity) {
