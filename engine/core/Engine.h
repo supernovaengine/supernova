@@ -5,10 +5,6 @@
 #ifndef engine_h
 #define engine_h
 
-#ifndef MAX_SCENE_LAYERS
-#define MAX_SCENE_LAYERS 5
-#endif
-
 #ifndef MAX_LIGHTS
 #define MAX_LIGHTS 6
 #endif
@@ -114,8 +110,7 @@ namespace Supernova {
         
     private:
         //-----Supernova config-----
-        static Scene* scenes[MAX_SCENE_LAYERS];
-        static size_t numScenes;
+        static std::vector<Scene*> scenes;
 
         static Scene* mainScene;
         
@@ -164,7 +159,6 @@ namespace Supernova {
         static bool transformCoordPos(float& x, float& y);
         static void calculateCanvas();
         static void includeScene(size_t index, Scene* scene);
-        static void rearrangeScenes(size_t index);
         
     public:
         //Engine();
@@ -174,8 +168,9 @@ namespace Supernova {
         static void setScene(Scene* scene);
         static Scene* getScene();
         static void addSceneLayer(Scene* scene);
-        static void removeSceneLayer(Scene* scene);
+        static void removeScene(Scene* scene);
         static void removeAllSceneLayers();
+        static void removeAllScenes();
 
         static Scene* getMainScene();
         static Scene* getLastScene();
