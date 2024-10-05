@@ -190,7 +190,7 @@ bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutCompo
         }
     }
 
-    ui.texture.setData(*text.stbtext->getTextureData(), fontId);
+    ui.texture.setData(fontId, *text.stbtext->getTextureData());
     ui.texture.setReleaseDataAfterLoad(true);
 
     ui.needUpdateTexture = true;

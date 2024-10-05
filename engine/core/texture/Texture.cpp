@@ -41,12 +41,12 @@ Texture::Texture(std::string path){
     this->wrapV = TextureWrap::REPEAT;
 }
 
-Texture::Texture(TextureData data, std::string id){
+Texture::Texture(std::string id, TextureData data){
     this->render = NULL;
     this->framebuffer = NULL;
     this->data = std::make_shared<std::array<TextureData,6>>();
     this->data->at(0) = data;
-    this->data = TextureDataPool::get(id, *this->data.get());
+    //this->data = TextureDataPool::get(id, *this->data.get());
     this->id = id;
     this->type = TextureType::TEXTURE_2D;
     this->numFaces = 1;
@@ -159,12 +159,12 @@ void Texture::setPath(std::string path){
     this->needLoad = true;
 }
 
-void Texture::setData(TextureData data, std::string id){
+void Texture::setData(std::string id, TextureData data){
     destroy();
 
     this->data = std::make_shared<std::array<TextureData,6>>();
     this->data->at(0) = data;
-    this->data = TextureDataPool::get(id, *this->data.get());
+    //this->data = TextureDataPool::get(id, *this->data.get());
     this->id = id;
     this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_2D;
@@ -219,6 +219,26 @@ void Texture::setCubePaths(std::string front, std::string back, std::string left
         id = id + "|" + paths[f];
     }
     this->id = id;
+}
+
+void Texture::setCubeDatas(std::string id, TextureData front, TextureData back, TextureData left, TextureData right, TextureData up, TextureData down){
+    destroy();
+
+    this->data = std::make_shared<std::array<TextureData,6>>();
+    this->data->at(5) = front;
+    this->data->at(4) = back;
+    this->data->at(1) = left;
+    this->data->at(0) = right;
+    this->data->at(2) = up;
+    this->data->at(3) = down;
+
+    this->id = id;
+    this->framebuffer = NULL;
+    this->type = TextureType::TEXTURE_CUBE;
+    this->numFaces = 6;
+    this->loadFromPath = false;
+    this->releaseDataAfterLoad = false;
+    this->needLoad = true;
 }
 
 void Texture::setFramebuffer(Framebuffer* framebuffer){

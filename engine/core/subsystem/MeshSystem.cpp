@@ -545,7 +545,7 @@ bool MeshSystem::loadGLTFTexture(int textureIndex, ModelComponent& model, Textur
         TextureData textureData(image.width, image.height, imageSize, colorFormat, image.component, &image.image.at(0));
 
         std::string id = textureName + "|" + image.name;
-        texture.setData(textureData, id);
+        texture.setData(id, textureData);
 
         if (tex.sampler >= 0){
             tinygltf::Sampler &sampler = model.gltfModel->samplers[tex.sampler];

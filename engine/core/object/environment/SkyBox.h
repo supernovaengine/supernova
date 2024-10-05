@@ -15,8 +15,13 @@ namespace Supernova{
 
         bool load();
 
-        void setTextures(std::string textureFront, std::string textureBack,  
-                        std::string textureLeft, std::string textureRight, 
+        void setTextures(std::string id,
+                        TextureData textureFront, TextureData textureBack,
+                        TextureData textureLeft, TextureData textureRight,
+                        TextureData textureUp, TextureData textureDown);
+
+        void setTextures(std::string textureFront, std::string textureBack,
+                        std::string textureLeft, std::string textureRight,
                         std::string textureUp, std::string textureDown);
 
         void setTextureFront(std::string textureFront);

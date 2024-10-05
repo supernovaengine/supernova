@@ -6,6 +6,7 @@
 #define texturedata_h
 
 #include "render/Render.h"
+#include "io/Data.h"
 
 namespace Supernova {
 
@@ -40,7 +41,9 @@ namespace Supernova {
         virtual ~TextureData();
         void copy(const TextureData& v);
         
+        bool loadTexture(Data* filedata);
         bool loadTextureFromFile(const char* filename);
+        bool loadTextureFromMemory(unsigned char* data, unsigned int dataLength);
 
         void releaseImageData();
         

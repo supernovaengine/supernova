@@ -42,13 +42,14 @@ namespace Supernova{
         public:
             Texture();
             Texture(std::string path);
-            Texture(TextureData data, std::string id);
+            Texture(std::string id, TextureData data);
 
             void setPath(std::string path);
-            void setData(TextureData data, std::string id);
+            void setData(std::string id, TextureData data);
             void setId(std::string id);
             void setCubePath(size_t index, std::string path);
             void setCubePaths(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down);
+            void setCubeDatas(std::string id, TextureData front, TextureData back, TextureData left, TextureData right, TextureData up, TextureData down);
             void setFramebuffer(Framebuffer* framebuffer);
 
             Texture(const Texture& rhs);

@@ -17,8 +17,20 @@ bool SkyBox::load(){
     return scene->getSystem<RenderSystem>()->loadSky(entity, sky, PIP_DEFAULT | PIP_RTT);
 }
 
-void SkyBox::setTextures(std::string textureFront, std::string textureBack,  
-                        std::string textureLeft, std::string textureRight, 
+void SkyBox::setTextures(std::string id,
+                        TextureData textureFront, TextureData textureBack,
+                        TextureData textureLeft, TextureData textureRight,
+                        TextureData textureUp, TextureData textureDown){
+
+    SkyComponent& sky = getComponent<SkyComponent>();
+
+    sky.texture.setCubeDatas(id, textureFront, textureBack, textureLeft, textureRight, textureUp, textureDown);
+
+    sky.needUpdateTexture = true;
+}
+
+void SkyBox::setTextures(std::string textureFront, std::string textureBack,
+                        std::string textureLeft, std::string textureRight,
                         std::string textureUp, std::string textureDown){
     
     SkyComponent& sky = getComponent<SkyComponent>();

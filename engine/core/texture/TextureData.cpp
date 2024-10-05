@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "io/Data.h"
 #include "stb_image.h"
 #if RESIZE_WITH_STB
 #include "stb_image_resize2.h"
@@ -92,27 +91,14 @@ bool TextureData::operator != ( const TextureData& v ) const{
     );
 }
 
-bool TextureData::loadTextureFromFile(const char* filename) {
-    
-    Data filedata;
-    
-    int res = filedata.open(filename);
-    
-    if (res==FileErrors::FILE_NOT_FOUND){
-        Log::error("Texture file not found: %s", filename);
-        return false;
-    }
-    if (res==FileErrors::INVALID_PARAMETER){
-        Log::error("Texture file path is invalid: %s", filename);
-        return false;
-    }
-    filedata.seek(0);
+bool TextureData::loadTexture(Data* filedata) {
+    filedata->seek(0);
 
     if (dataOwned && data)
         releaseImageData();
     
     //----- Start std_image read texture
-    stbi_info_from_memory((stbi_uc const *)filedata.getMemPtr(), filedata.length(), &width, &height, &channels);
+    stbi_info_from_memory((stbi_uc const *)filedata->getMemPtr(), filedata->length(), &width, &height, &channels);
 
     //Renders (not GL) only support 8bpp and 32bpp
     int desired_channels = 1;
@@ -123,10 +109,10 @@ bool TextureData::loadTextureFromFile(const char* filename) {
         color_format = ColorFormat::RGBA;
     }
 
-    data = stbi_load_from_memory((stbi_uc const *)filedata.getMemPtr(), filedata.length(), &width, &height, &channels, desired_channels);
+    data = stbi_load_from_memory((stbi_uc const *)filedata->getMemPtr(), filedata->length(), &width, &height, &channels, desired_channels);
 
     if (!data){
-        Log::error("Error loading texture file (%s): %s", filename, stbi_failure_reason());
+        Log::error("Error loading texture: %s", stbi_failure_reason());
         return false;
     }
 
@@ -144,7 +130,43 @@ bool TextureData::loadTextureFromFile(const char* filename) {
     }
     
     return true;
+}
 
+bool TextureData::loadTextureFromFile(const char* filename) {
+    Data filedata;
+
+    int res = filedata.open(filename);
+
+    if (res==FileErrors::FILE_NOT_FOUND){
+        Log::error("Texture file not found: %s", filename);
+        return false;
+    }
+    if (res==FileErrors::INVALID_PARAMETER){
+        Log::error("Texture file path is invalid: %s", filename);
+        return false;
+    }
+
+    bool result = loadTexture(&filedata);
+
+    if (!result){
+        Log::error("Texture file not loaded: %s", filename);
+    }
+
+    return result;
+}
+
+bool TextureData::loadTextureFromMemory(unsigned char* data, unsigned int dataLength){
+    Data filedata;
+
+    int res = filedata.open(data, dataLength, false, false);
+
+    bool result = loadTexture(&filedata);
+
+    if (!result){
+        Log::error("Texture from memory not loaded");
+    }
+
+    return result;
 }
 
 void TextureData::copy ( const TextureData& v ){

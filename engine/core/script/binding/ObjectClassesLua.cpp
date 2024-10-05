@@ -154,7 +154,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .deriveClass<SkyBox, EntityHandle>("SkyBox")
         .addConstructor <void (Scene*)> ()
-        .addFunction("setTextures", &SkyBox::setTextures)
+        .addFunction("setTextures", 
+            luabridge::overload<std::string,std::string,std::string,std::string,std::string,std::string>(&SkyBox::setTextures),
+            luabridge::overload<std::string,TextureData,TextureData,TextureData,TextureData,TextureData,TextureData>(&SkyBox::setTextures))
         .addFunction("setTextureFront", &SkyBox::setTextureFront)
         .addFunction("setTextureBack", &SkyBox::setTextureBack)
         .addFunction("setTextureLeft", &SkyBox::setTextureLeft)
