@@ -57,6 +57,7 @@
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
 #include "util/ThreadUtils.h"
+#include "texture/Framebuffer.h"
 #include <atomic>
 
 void init();
@@ -155,6 +156,8 @@ namespace Supernova {
         thread_local static bool asyncThread;
 
         static Semaphore drawSemaphore;
+
+        static Framebuffer* framebuffer;
         
         static bool transformCoordPos(float& x, float& y);
         static void calculateCanvas();
@@ -236,6 +239,9 @@ namespace Supernova {
         static void endAsyncThread();
         static bool isAsyncThread();
         static bool isViewLoaded();
+
+        static void setFramebuffer(Framebuffer* framebuffer);
+        static Framebuffer* getFramebuffer();
 
         //-----Supernova API functions-----
         static void systemInit(int argc, char* argv[]);

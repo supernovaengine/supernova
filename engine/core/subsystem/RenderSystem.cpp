@@ -123,9 +123,8 @@ void RenderSystem::createFramebuffer(CameraComponent& camera){
 void RenderSystem::updateFramebuffer(CameraComponent& camera){
 	if (camera.framebuffer->isCreated()){
 		camera.framebuffer->destroy();
+		createFramebuffer(camera);
 	}
-
-	createFramebuffer(camera);
 }
 
 void RenderSystem::createEmptyTextures(){
@@ -2571,7 +2570,7 @@ void RenderSystem::update(double dt){
 			pipelines |= PIP_DEFAULT;
 		}
 
-		if (camera.renderToTexture){
+		if (camera.renderToTexture || Engine::getFramebuffer()){
 			pipelines |= PIP_RTT;
 		}
 
@@ -2860,7 +2859,14 @@ void RenderSystem::draw(){
 		}
 		
 		if (!camera.renderToTexture){
-			camera.render.startFrameBuffer();
+			if (Engine::getFramebuffer()){
+				if (!Engine::getFramebuffer()->isCreated()){
+					Engine::getFramebuffer()->create();
+				}
+				camera.render.startFrameBuffer(&Engine::getFramebuffer()->getRender());
+			}else{
+				camera.render.startFrameBuffer();
+			}
 			camera.render.applyViewport(Engine::getViewRect());
 		}else{
 			if (!camera.framebuffer->isCreated()){
@@ -2881,7 +2887,7 @@ void RenderSystem::draw(){
 				updateSkyViewProjection(sky, camera);
 			}
 
-			drawSky(sky, camera.renderToTexture);
+			drawSky(sky, camera.renderToTexture || Engine::getFramebuffer());
 		}
 
 		for (int i = 0; i < transforms->size(); i++){
@@ -2954,7 +2960,7 @@ void RenderSystem::draw(){
 
 					if (!mesh.transparent || !camera.transparentSort){
 						//Draw opaque meshes if transparency is not necessary
-						drawMesh(mesh, transform, camera, cameraTransform, camera.renderToTexture, instmesh, terrain);
+						drawMesh(mesh, transform, camera, cameraTransform, camera.renderToTexture || Engine::getFramebuffer(), instmesh, terrain);
 					}else{
 						transparentMeshes.push({&mesh, instmesh, terrain, &transform, transform.distanceToCamera});
 					}
@@ -2968,7 +2974,7 @@ void RenderSystem::draw(){
 					isText = true;
 				}
 				if (transform.visible)
-					drawUI(ui, transform, camera.renderToTexture);
+					drawUI(ui, transform, camera.renderToTexture || Engine::getFramebuffer());
 
 			}else if (signature.test(scene->getComponentType<PointsComponent>())){
 				PointsComponent& points = scene->getComponent<PointsComponent>(entity);
@@ -2980,13 +2986,13 @@ void RenderSystem::draw(){
 				}
 
 				if (transform.visible)
-					drawPoints(points, transform, cameraTransform, camera.renderToTexture);
+					drawPoints(points, transform, cameraTransform, camera.renderToTexture || Engine::getFramebuffer());
 
 			}else if (signature.test(scene->getComponentType<LinesComponent>())){
 				LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
 
 				if (transform.visible)
-					drawLines(lines, transform, cameraTransform, camera.renderToTexture);
+					drawLines(lines, transform, cameraTransform, camera.renderToTexture || Engine::getFramebuffer());
 
 			}
 
@@ -3005,7 +3011,7 @@ void RenderSystem::draw(){
 			TransparentMeshesData meshData = transparentMeshes.top();
 
 			//Draw transparent meshes
-			drawMesh(*meshData.mesh, *meshData.transform, camera, cameraTransform, camera.renderToTexture, meshData.instmesh, meshData.terrain);
+			drawMesh(*meshData.mesh, *meshData.transform, camera, cameraTransform, camera.renderToTexture || Engine::getFramebuffer(), meshData.instmesh, meshData.terrain);
 
 			transparentMeshes.pop();
 		}

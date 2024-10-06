@@ -62,6 +62,8 @@ bool Engine::showCursor = true;
 thread_local bool Engine::asyncThread = false;
 Semaphore Engine::drawSemaphore;
 
+Framebuffer* Engine::framebuffer = nullptr;
+
 //-----Supernova user events-----
 FunctionSubscribe<void()> Engine::onViewLoaded;
 FunctionSubscribe<void()> Engine::onViewChanged;
@@ -409,6 +411,14 @@ bool Engine::isViewLoaded(){
     return viewLoaded;
 }
 
+void Engine::setFramebuffer(Framebuffer* framebuffer){
+    Engine::framebuffer = framebuffer;
+}
+
+Framebuffer* Engine::getFramebuffer(){
+    return Engine::framebuffer;
+}
+
 void Engine::calculateCanvas(){
     Engine::canvasWidth = preferredCanvasWidth;
     Engine::canvasHeight = preferredCanvasHeight;
@@ -473,6 +483,10 @@ void Engine::systemViewLoaded(){
 
     viewLoaded = true;
     onViewLoaded.call();
+
+    if (framebuffer){
+        framebuffer->create();
+    }
     
     for (int i = 0; i < scenes.size(); i++){
         scenes[i]->load();
@@ -529,6 +543,16 @@ void Engine::systemViewChanged(){
     // S_SCALING_STRETCH do not need nothing
     
     viewRect.setRect(viewX, viewY, viewWidth, viewHeight);
+
+    if (framebuffer){
+        framebuffer->setWidth(screenWidth);
+        framebuffer->setHeight(screenHeight);
+
+        if (framebuffer->isCreated()){
+            framebuffer->destroy();
+            framebuffer->create();
+        }
+    }
 
     for (int i = 0; i < scenes.size(); i++){
         scenes[i]->updateSizeFromCamera();
