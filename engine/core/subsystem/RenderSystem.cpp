@@ -1987,7 +1987,7 @@ void RenderSystem::updateCameraSize(Entity entity){
 		CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
 		
 		Rect rect;
-		if (camera.renderToTexture && camera.useFramebufferSizes) {
+		if (camera.renderToTexture) {
 			rect = Rect(0, 0, camera.framebuffer->getWidth(), camera.framebuffer->getHeight());
 		}else{
 			rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
@@ -2797,7 +2797,7 @@ void RenderSystem::draw(){
 					}
 					light.cameras[c].render.setClearColor(Vector4(1.0, 1.0, 1.0, 1.0));
 
-					light.cameras[c].render.startFrameBuffer(&light.framebuffer[fb], face);
+					light.cameras[c].render.startRenderPass(&light.framebuffer[fb], face);
 					for (int i = 0; i < meshes->size(); i++){
 						MeshComponent& mesh = meshes->getComponentFromIndex(i);
 						Entity entity = meshes->getEntity(i);
@@ -2837,7 +2837,7 @@ void RenderSystem::draw(){
 						}
 					}
 
-					light.cameras[c].render.endFrameBuffer();
+					light.cameras[c].render.endRenderPass();
 				}
 			}
 		}
@@ -2863,16 +2863,16 @@ void RenderSystem::draw(){
 				if (!Engine::getFramebuffer()->isCreated()){
 					Engine::getFramebuffer()->create();
 				}
-				camera.render.startFrameBuffer(&Engine::getFramebuffer()->getRender());
+				camera.render.startRenderPass(&Engine::getFramebuffer()->getRender());
 			}else{
-				camera.render.startFrameBuffer();
+				camera.render.startRenderPass();
 			}
 			camera.render.applyViewport(Engine::getViewRect());
 		}else{
 			if (!camera.framebuffer->isCreated()){
 				createFramebuffer(camera);
 			}
-			camera.render.startFrameBuffer(&camera.framebuffer->getRender());
+			camera.render.startRenderPass(&camera.framebuffer->getRender());
 		}
 
 		//---------Draw opaque meshes and UI----------
@@ -3016,7 +3016,7 @@ void RenderSystem::draw(){
 			transparentMeshes.pop();
 		}
 
-		camera.render.endFrameBuffer();
+		camera.render.endRenderPass();
 
 	}
 

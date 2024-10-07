@@ -469,18 +469,6 @@ bool Camera::isRenderToTexture() const{
 	return camera.renderToTexture;
 }
 
-void Camera::setUseFramebufferSizes(bool useFramebufferSizes){
-    CameraComponent& camera = getComponent<CameraComponent>();
-
-	camera.useFramebufferSizes = useFramebufferSizes;
-}
-
-bool Camera::isUseFramebufferSizes() const{
-    CameraComponent& camera = getComponent<CameraComponent>();
-
-	return camera.useFramebufferSizes;
-}
-
 Framebuffer* Camera::getFramebuffer(){
     CameraComponent& camera = getComponent<CameraComponent>();
 

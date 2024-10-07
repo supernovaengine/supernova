@@ -22,14 +22,14 @@ namespace Supernova{
 
         void setClearColor(Vector4 clearColor);
 
-        void startFrameBuffer(FramebufferRender* framebuffer, size_t face = 0);
-        void startFrameBuffer(int width, int height);
-        void startFrameBuffer();
+        void startRenderPass(FramebufferRender* framebuffer, size_t face = 0);
+        void startRenderPass(int width, int height);
+        void startRenderPass();
 
         void applyViewport(Rect rect);
         void applyScissor(Rect rect);
 
-        void endFrameBuffer();
+        void endRenderPass();
     };
 }
 

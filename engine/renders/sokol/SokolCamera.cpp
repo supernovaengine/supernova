@@ -32,13 +32,13 @@ void SokolCamera::setClearColor(Vector4 clearColor){
     pass.action.colors[0].clear_value = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
 }
 
-void SokolCamera::startFrameBuffer(FramebufferRender* framebuffer, size_t face){
+void SokolCamera::startRenderPass(FramebufferRender* framebuffer, size_t face){
     pass.attachments = framebuffer->backend.get(face);
     //SokolCmdQueue::add_command_begin_pass(pass);
     sg_begin_pass(pass);
 }
 
-void SokolCamera::startFrameBuffer(int width, int height){
+void SokolCamera::startRenderPass(int width, int height){
     pass.swapchain = System::instance().getSokolSwapchain();
     pass.swapchain.width = width;
     pass.swapchain.height = height;
@@ -46,7 +46,7 @@ void SokolCamera::startFrameBuffer(int width, int height){
     sg_begin_pass(pass);
 }
 
-void SokolCamera::startFrameBuffer(){
+void SokolCamera::startRenderPass(){
     pass.swapchain = System::instance().getSokolSwapchain();
     //SokolCmdQueue::add_command_begin_pass(pass);
     sg_begin_pass(pass);
@@ -62,7 +62,7 @@ void SokolCamera::applyScissor(Rect rect){
     sg_apply_scissor_rect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), false);
 }
 
-void SokolCamera::endFrameBuffer(){
+void SokolCamera::endRenderPass(){
     //SokolCmdQueue::add_command_end_pass();
     sg_end_pass();
 }

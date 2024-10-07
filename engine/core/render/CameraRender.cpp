@@ -23,16 +23,16 @@ void CameraRender::setClearColor(Vector4 clearColor){
     backend.setClearColor(clearColor);
 }
 
-void CameraRender::startFrameBuffer(FramebufferRender* framebuffer, size_t face){
-    backend.startFrameBuffer(framebuffer, face);
+void CameraRender::startRenderPass(FramebufferRender* framebuffer, size_t face){
+    backend.startRenderPass(framebuffer, face);
 }
 
-void CameraRender::startFrameBuffer(int width, int height){
-    backend.startFrameBuffer(width, height);
+void CameraRender::startRenderPass(int width, int height){
+    backend.startRenderPass(width, height);
 }
 
-void CameraRender::startFrameBuffer(){
-    backend.startFrameBuffer();
+void CameraRender::startRenderPass(){
+    backend.startRenderPass();
 }
 
 void CameraRender::applyViewport(Rect rect){
@@ -43,6 +43,6 @@ void CameraRender::applyScissor(Rect rect){
     backend.applyScissor(rect);
 }
 
-void CameraRender::endFrameBuffer(){
-    backend.endFrameBuffer();
+void CameraRender::endRenderPass(){
+    backend.endRenderPass();
 }
