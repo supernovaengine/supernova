@@ -97,8 +97,10 @@ Vector3 Object::getWorldScale() const{
 
 void Object::setVisible(bool visible){
     Transform& transform = getComponent<Transform>();
-    transform.visible = visible;
-    transform.needUpdateChildVisibility = true;
+    if (transform.visible != visible){
+        transform.visible = visible;
+        transform.needUpdateChildVisibility = true;
+    }
 }
 
 bool Object::isVisible() const{
