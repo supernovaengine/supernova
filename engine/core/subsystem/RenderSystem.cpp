@@ -2144,7 +2144,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 		}
 	}
 
-	mesh.worldAABB = transform.localMatrix * mesh.aabb;
+	mesh.worldAABB = transform.modelMatrix * mesh.aabb;
 
 	if (instmesh.numVisible > 0){
 		instmesh.buffer.setData((unsigned char*)(&instmesh.renderInstances.at(0)), sizeof(InstanceRenderData)*instmesh.numVisible);
@@ -2708,7 +2708,7 @@ void RenderSystem::update(double dt){
 			if (signature.test(scene->getComponentType<MeshComponent>())){
 				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
-				mesh.worldAABB = transform.localMatrix * mesh.aabb;
+				mesh.worldAABB = transform.modelMatrix * mesh.aabb;
 			}
 
 			if (signature.test(scene->getComponentType<ModelComponent>())){

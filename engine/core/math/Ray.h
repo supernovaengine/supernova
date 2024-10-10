@@ -21,6 +21,10 @@ namespace Supernova {
         Vector3 normal;
         Entity body;
         size_t shapeIndex;
+
+        operator bool() const {
+            return hit;
+        }
     };
 
     class Ray{
