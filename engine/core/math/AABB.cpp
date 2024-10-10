@@ -209,9 +209,9 @@ Vector3 AABB::getCorner(CornerEnum cornerToGet) const {
     }
 }
 
-void AABB::merge( const AABB& rhs ) {
+AABB& AABB::merge( const AABB& rhs ) {
     if ((rhs.mBoxType == BOXTYPE_NULL) || (mBoxType == BOXTYPE_INFINITE)) {
-        return;
+        return *this;
     }else if (rhs.mBoxType == BOXTYPE_INFINITE) {
         mBoxType = BOXTYPE_INFINITE;
     }else if (mBoxType == BOXTYPE_NULL) {
@@ -224,32 +224,36 @@ void AABB::merge( const AABB& rhs ) {
 
         setExtents(min, max);
     }
+
+    return *this;
 }
 
-void AABB::merge( const Vector3& point ) {
+AABB& AABB::merge( const Vector3& point ) {
     switch (mBoxType)
     {
         case BOXTYPE_NULL:
             setExtents(point, point);
-            return;
+            return *this;
 
         case BOXTYPE_FINITE:
             mMaximum.makeCeil(point);
             mMinimum.makeFloor(point);
-            return;
+            return *this;
 
         case BOXTYPE_INFINITE:
-            return;
+            return *this;
     }
 
     //TODO: Put error
     //Never reached
     assert( false );
+
+    return *this;
 }
 
-void AABB::transform( const Matrix4& matrix ) {
+AABB& AABB::transform( const Matrix4& matrix ) {
     if( mBoxType != BOXTYPE_FINITE )
-        return;
+        return *this;
 
     Vector3 oldMin, oldMax, currentCorner;
 
@@ -289,6 +293,8 @@ void AABB::transform( const Matrix4& matrix ) {
     // max min min
     currentCorner.z = oldMin.z;
     merge( matrix * currentCorner );
+
+    return *this;
 }
 
 void AABB::setNull() {

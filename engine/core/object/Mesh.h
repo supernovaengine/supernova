@@ -52,9 +52,9 @@ namespace Supernova{
         void setWindingOrder(WindingOrder windingOrder);
         WindingOrder getWindingOrder() const;
 
-        AABB getAABB();
-        AABB getVerticesAABB();
-        AABB getWorldAABB();
+        AABB getAABB() const;
+        AABB getVerticesAABB() const;
+        AABB getWorldAABB() const;
 
         unsigned int getNumSubmeshes() const;
 

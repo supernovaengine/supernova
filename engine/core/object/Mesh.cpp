@@ -176,19 +176,19 @@ WindingOrder Mesh::getWindingOrder() const{
 }
 
 
-AABB Mesh::getAABB(){
+AABB Mesh::getAABB() const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return mesh.aabb;
 }
 
-AABB Mesh::getVerticesAABB(){
+AABB Mesh::getVerticesAABB() const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return mesh.verticesAABB;
 }
 
-AABB Mesh::getWorldAABB(){
+AABB Mesh::getWorldAABB() const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return mesh.worldAABB;

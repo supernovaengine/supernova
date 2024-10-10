@@ -78,10 +78,10 @@ namespace Supernova{
 
         Vector3 getCorner(CornerEnum cornerToGet) const;
 
-        void merge( const AABB& rhs );
-        void merge( const Vector3& point );
+        AABB& merge( const AABB& rhs );
+        AABB& merge( const Vector3& point );
 
-        void transform( const Matrix4& matrix );
+        AABB& transform( const Matrix4& matrix );
 
         void setNull();
         bool isNull(void) const;
