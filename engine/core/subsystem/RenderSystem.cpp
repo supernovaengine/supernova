@@ -1782,9 +1782,9 @@ void RenderSystem::updateTransform(Transform& transform){
 void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 	//Update ProjectionMatrix
 	if (camera.type == CameraType::CAMERA_2D){
-		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.top, camera.bottom, camera.nearPlane, camera.farPlane);
+		camera.projectionMatrix = Matrix4::orthoMatrix(camera.leftPlane, camera.rightPlane, camera.topPlane, camera.bottomPlane, camera.nearPlane, camera.farPlane);
 	}else if (camera.type == CameraType::CAMERA_ORTHO) {
-		camera.projectionMatrix = Matrix4::orthoMatrix(camera.left, camera.right, camera.bottom, camera.top, camera.nearPlane, camera.farPlane);
+		camera.projectionMatrix = Matrix4::orthoMatrix(camera.leftPlane, camera.rightPlane, camera.bottomPlane, camera.topPlane, camera.nearPlane, camera.farPlane);
 	}else if (camera.type == CameraType::CAMERA_PERSPECTIVE){
 		camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.yfov, camera.aspect, camera.nearPlane, camera.farPlane);
 	}
@@ -2000,11 +2000,11 @@ void RenderSystem::updateCameraSize(Entity entity){
 			float newTop = rect.getHeight();
 			float newAspect = rect.getWidth() / rect.getHeight();
 
-			if ((camera.left != newLeft) || (camera.bottom != newBottom) || (camera.right != newRight) || (camera.top != newTop) || (camera.aspect != newAspect)){
-				camera.left = newLeft;
-				camera.bottom = newBottom;
-				camera.right = newRight;
-				camera.top = newTop;
+			if ((camera.leftPlane != newLeft) || (camera.bottomPlane != newBottom) || (camera.rightPlane != newRight) || (camera.topPlane != newTop) || (camera.aspect != newAspect)){
+				camera.leftPlane = newLeft;
+				camera.bottomPlane = newBottom;
+				camera.rightPlane = newRight;
+				camera.topPlane = newTop;
 				camera.aspect = newAspect;
 
 				camera.needUpdate = true;

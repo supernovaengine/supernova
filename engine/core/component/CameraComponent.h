@@ -48,10 +48,10 @@ namespace Supernova{
         Vector3 worldUp;
         Vector3 worldRight;
 
-        float left = 0;
-        float right = 10;
-        float bottom = 0;
-        float top = 10;
+        float leftPlane = 0;
+        float rightPlane = 10;
+        float bottomPlane = 0;
+        float topPlane = 10;
 
         float yfov = 0.75;
         float aspect = 1.0;

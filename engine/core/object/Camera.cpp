@@ -26,10 +26,10 @@ Camera::Camera(Scene* scene, Entity entity): Object(scene, entity){
 }
 
 void Camera::applyOrthoDefaults(CameraComponent& cameraComponent){
-    cameraComponent.left = 0;
-    cameraComponent.right = Engine::getCanvasWidth();
-    cameraComponent.bottom = 0;
-    cameraComponent.top = Engine::getCanvasHeight();
+    cameraComponent.leftPlane = 0;
+    cameraComponent.rightPlane = Engine::getCanvasWidth();
+    cameraComponent.bottomPlane = 0;
+    cameraComponent.topPlane = Engine::getCanvasHeight();
     cameraComponent.nearPlane = DEFAULT_ORTHO_NEAR;
     cameraComponent.farPlane = DEFAULT_ORTHO_FAR;
 }
@@ -56,10 +56,10 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
 
     camera.type = CameraType::CAMERA_ORTHO;
 
-    camera.left = left;
-    camera.right = right;
-    camera.bottom = bottom;
-    camera.top = top;
+    camera.leftPlane = left;
+    camera.rightPlane = right;
+    camera.bottomPlane = bottom;
+    camera.topPlane = top;
     camera.nearPlane = near;
     camera.farPlane = far;
     
@@ -118,8 +118,8 @@ float Camera::getFar() const{
 void Camera::setLeft(float left){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    if (camera.left != left){
-        camera.left = left;
+    if (camera.leftPlane != left){
+        camera.leftPlane = left;
 
         camera.automatic = false;
 
@@ -130,14 +130,14 @@ void Camera::setLeft(float left){
 float Camera::getLeft() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    return camera.left;
+    return camera.leftPlane;
 }
 
 void Camera::setRight(float right){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    if (camera.right != right){
-        camera.right = right;
+    if (camera.rightPlane != right){
+        camera.rightPlane = right;
 
         camera.automatic = false;
 
@@ -148,14 +148,14 @@ void Camera::setRight(float right){
 float Camera::getRight() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    return camera.right;
+    return camera.rightPlane;
 }
 
 void Camera::setBottom(float bottom){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    if (camera.bottom != bottom){
-        camera.bottom = bottom;
+    if (camera.bottomPlane != bottom){
+        camera.bottomPlane = bottom;
 
         camera.automatic = false;
 
@@ -166,14 +166,14 @@ void Camera::setBottom(float bottom){
 float Camera::getBottom() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    return camera.bottom;
+    return camera.bottomPlane;
 }
 
 void Camera::setTop(float top){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    if (camera.top != top){
-        camera.top = top;
+    if (camera.topPlane != top){
+        camera.topPlane = top;
 
         camera.automatic = false;
 
@@ -184,7 +184,7 @@ void Camera::setTop(float top){
 float Camera::getTop() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    return camera.top;
+    return camera.topPlane;
 }
 
 void Camera::setAspect(float aspect){
@@ -445,7 +445,10 @@ void Camera::slideUp(float distance){
 
         Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
 
-        Vector3 slideVector = camera.up;
+        Vector3 view = viewCenter.normalize();
+        Vector3 right = (view.crossProduct(camera.up)).normalize();
+
+        Vector3 slideVector = right.crossProduct(view);
 
         slideVector.normalize();
 
