@@ -83,7 +83,7 @@ void Camera::setPerspective(float yfov, float aspect, float near, float far){
     camera.needUpdate = true;
 }
 
-void Camera::setNear(float near){
+void Camera::setNearPlane(float near){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     if (camera.nearPlane != near){
@@ -93,13 +93,13 @@ void Camera::setNear(float near){
     }
 }
 
-float Camera::getNear() const{
+float Camera::getNearPlane() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
     return camera.nearPlane;
 }
 
-void Camera::setFar(float far){
+void Camera::setFarPlane(float far){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     if (camera.farPlane != far){
@@ -109,13 +109,13 @@ void Camera::setFar(float far){
     }
 }
 
-float Camera::getFar() const{
+float Camera::getFarPlane() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
     return camera.farPlane;
 }
 
-void Camera::setLeft(float left){
+void Camera::setLeftPlane(float left){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     if (camera.leftPlane != left){
@@ -127,13 +127,13 @@ void Camera::setLeft(float left){
     }
 }
 
-float Camera::getLeft() const{
+float Camera::getLeftPlane() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
     return camera.leftPlane;
 }
 
-void Camera::setRight(float right){
+void Camera::setRightPlane(float right){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     if (camera.rightPlane != right){
@@ -145,13 +145,13 @@ void Camera::setRight(float right){
     }
 }
 
-float Camera::getRight() const{
+float Camera::getRightPlane() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
     return camera.rightPlane;
 }
 
-void Camera::setBottom(float bottom){
+void Camera::setBottomPlane(float bottom){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     if (camera.bottomPlane != bottom){
@@ -163,13 +163,13 @@ void Camera::setBottom(float bottom){
     }
 }
 
-float Camera::getBottom() const{
+float Camera::getBottomPlane() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
     return camera.bottomPlane;
 }
 
-void Camera::setTop(float top){
+void Camera::setTopPlane(float top){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     if (camera.topPlane != top){
@@ -181,7 +181,7 @@ void Camera::setTop(float top){
     }
 }
 
-float Camera::getTop() const{
+float Camera::getTopPlane() const{
     CameraComponent& camera = getComponent<CameraComponent>();
 
     return camera.topPlane;
@@ -243,23 +243,23 @@ CameraType Camera::getType() const{
     return camera.type;
 }
 
-void Camera::setView(Vector3 view){
+void Camera::setTarget(Vector3 target){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    if (camera.view != view){
-        camera.view = view;
+    if (camera.target != target){
+        camera.target = target;
 
         camera.needUpdate = true;
     }
 }
 
-void Camera::setView(const float x, const float y, const float z){
-    setView(Vector3(x,y,z));
+void Camera::setTarget(const float x, const float y, const float z){
+    setTarget(Vector3(x,y,z));
 }
 
-Vector3 Camera::getView() const{
+Vector3 Camera::getTarget() const{
     CameraComponent& camera = getComponent<CameraComponent>();
-    return camera.view;
+    return camera.target;
 }
 
 void Camera::setUp(Vector3 up){
@@ -281,9 +281,24 @@ Vector3 Camera::getUp() const{
     return camera.up;
 }
 
-Vector3 Camera::getWorldView() const{
+Vector3 Camera::getDirection() const{
     CameraComponent& camera = getComponent<CameraComponent>();
-    return camera.worldView;
+    return camera.direction;
+}
+
+Vector3 Camera::getRight() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.right;
+}
+
+Vector3 Camera::getWorldTarget() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.worldTarget;
+}
+
+Vector3 Camera::getWorldDirection() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.worldDirection;
 }
 
 Vector3 Camera::getWorldUp() const{
@@ -301,13 +316,13 @@ void Camera::rotateView(float angle){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
+        Vector3 viewCenter = camera.target - transf.position;
 
         Matrix4 rotation;
         rotation = Matrix4::rotateMatrix(angle, camera.up);
         viewCenter = rotation * viewCenter;
 
-        camera.view = Vector3(viewCenter.x + transf.position.x, viewCenter.y + transf.position.y, viewCenter.z + transf.position.z);
+        camera.target = viewCenter + transf.position;
 
         camera.needUpdate = true;
     }
@@ -318,13 +333,13 @@ void Camera::rotatePosition(float angle){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 positionCenter(transf.position.x - camera.view.x, transf.position.y - camera.view.y, transf.position.z - camera.view.z);
+        Vector3 positionCenter = transf.position - camera.target;
 
         Matrix4 rotation;
         rotation = Matrix4::rotateMatrix(angle, camera.up);
         positionCenter = rotation * positionCenter;
 
-        transf.position = Vector3(positionCenter.x + camera.view.x, positionCenter.y + camera.view.y, positionCenter.z + camera.view.z);
+        transf.position = positionCenter + camera.target;
 
         transf.needUpdate = true;
         camera.needUpdate = true;
@@ -336,13 +351,13 @@ void Camera::elevateView(float angle){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
+        Vector3 viewCenter = camera.target - transf.position;
 
         Matrix4 rotation;
         rotation = Matrix4::rotateMatrix(angle, viewCenter.crossProduct(camera.up));
         viewCenter = rotation * viewCenter;
 
-        camera.view = Vector3(viewCenter.x + transf.position.x, viewCenter.y + transf.position.y, viewCenter.z + transf.position.z);
+        camera.target = viewCenter + transf.position;
 
         camera.needUpdate = true;
     }
@@ -353,13 +368,13 @@ void Camera::elevatePosition(float angle){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 positionCenter(transf.position.x - camera.view.x, transf.position.y - camera.view.y, transf.position.z - camera.view.z);
+        Vector3 positionCenter = transf.position - camera.target;
 
         Matrix4 rotation;
         rotation = Matrix4::rotateMatrix(angle, positionCenter.crossProduct(camera.up));
         positionCenter = rotation * positionCenter;
 
-        transf.position = Vector3(positionCenter.x + camera.view.x, positionCenter.y + camera.view.y, positionCenter.z + camera.view.z);
+        transf.position = positionCenter + camera.target;
 
         transf.needUpdate = true;
         camera.needUpdate = true;
@@ -371,15 +386,10 @@ void Camera::walkForward(float distance){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
-
-        Vector3 aux = viewCenter.dotProduct(camera.up) * camera.up / camera.up.squaredLength();
-
-        Vector3 walkVector = viewCenter - aux;
-
+        Vector3 walkVector = camera.up.crossProduct(camera.right);
         walkVector.normalize();
 
-        camera.view = camera.view + (walkVector * distance);
+        camera.target = camera.target + (walkVector * distance);
         transf.position = transf.position + (walkVector * distance);
 
         transf.needUpdate = true;
@@ -392,11 +402,7 @@ void Camera::zoom(float distance){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
-
-        viewCenter.normalize();
-
-        transf.position = transf.position + (viewCenter * distance);
+        transf.position = transf.position + (camera.direction * distance);
 
         transf.needUpdate = true;
     }
@@ -407,14 +413,8 @@ void Camera::slide(float distance){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
-
-        Vector3 slideVector = viewCenter.crossProduct(camera.up);
-
-        slideVector.normalize();
-
-        camera.view = camera.view + (slideVector * distance);
-        transf.position = transf.position + (slideVector * distance);
+        camera.target = camera.target + (camera.right * distance);
+        transf.position = transf.position + (camera.right * distance);
 
         transf.needUpdate = true;
         camera.needUpdate = true;
@@ -426,12 +426,8 @@ void Camera::slideForward(float distance){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
-
-        viewCenter.normalize();
-
-        camera.view = camera.view + (viewCenter * distance);
-        transf.position = transf.position + (viewCenter * distance);
+        camera.target = camera.target + (camera.direction * distance);
+        transf.position = transf.position + (camera.direction * distance);
 
         transf.needUpdate = true;
         camera.needUpdate = true;
@@ -443,16 +439,10 @@ void Camera::slideUp(float distance){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 viewCenter(camera.view.x - transf.position.x, camera.view.y - transf.position.y, camera.view.z - transf.position.z);
-
-        Vector3 view = viewCenter.normalize();
-        Vector3 right = (view.crossProduct(camera.up)).normalize();
-
-        Vector3 slideVector = right.crossProduct(view);
-
+        Vector3 slideVector = camera.right.crossProduct(camera.direction);
         slideVector.normalize();
 
-        camera.view = camera.view + (slideVector * distance);
+        camera.target = camera.target + (slideVector * distance);
         transf.position = transf.position + (slideVector * distance);
 
         transf.needUpdate = true;

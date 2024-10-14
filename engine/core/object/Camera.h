@@ -26,23 +26,23 @@ namespace Supernova{
         void setOrtho(float left, float right, float bottom, float top, float near, float far);
         void setPerspective(float yfov, float aspect, float near, float far);
 
-        void setNear(float near);
-        float getNear() const;
+        void setNearPlane(float near);
+        float getNearPlane() const;
 
-        void setFar(float far);
-        float getFar() const;
+        void setFarPlane(float far);
+        float getFarPlane() const;
 
-        void setLeft(float left);
-        float getLeft() const;
+        void setLeftPlane(float left);
+        float getLeftPlane() const;
 
-        void setRight(float right);
-        float getRight() const;
+        void setRightPlane(float right);
+        float getRightPlane() const;
 
-        void setBottom(float bottom);
-        float getBottom() const;
+        void setBottomPlane(float bottom);
+        float getBottomPlane() const;
 
-        void setTop(float top);
-        float getTop() const;
+        void setTopPlane(float top);
+        float getTopPlane() const;
 
         void setAspect(float aspect);
         float getAspect() const;
@@ -53,15 +53,20 @@ namespace Supernova{
         void setType(CameraType type);
         CameraType getType() const;
 
-        void setView(Vector3 view);
-        void setView(const float x, const float y, const float z);
-        Vector3 getView() const;
+        void setTarget(Vector3 target);
+        void setTarget(const float x, const float y, const float z);
+        Vector3 getTarget() const;
 
         void setUp(Vector3 up);
         void setUp(const float x, const float y, const float z);
         Vector3 getUp() const;
 
-        Vector3 getWorldView() const;
+        Vector3 getDirection() const;
+        Vector3 getRight() const;
+
+        Vector3 getWorldTarget() const;
+
+        Vector3 getWorldDirection() const;
         Vector3 getWorldUp() const;
         Vector3 getWorldRight() const;
 

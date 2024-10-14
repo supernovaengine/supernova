@@ -41,11 +41,15 @@ namespace Supernova{
         Matrix4 viewMatrix;
         Matrix4 viewProjectionMatrix;
 
-        Vector3 view = Vector3(0, 0, 0);
-        Vector3 up = Vector3(0, 1, 0);
+        Vector3 target = Vector3(0, 0, 0);
+        Vector3 worldTarget;
 
-        Vector3 worldView;
+        Vector3 up = Vector3(0, 1, 0);
+        Vector3 direction;
+        Vector3 right;
+
         Vector3 worldUp;
+        Vector3 worldDirection;
         Vector3 worldRight;
 
         float leftPlane = 0;

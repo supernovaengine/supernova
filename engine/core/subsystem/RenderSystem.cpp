@@ -1789,11 +1789,15 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 		camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.yfov, camera.aspect, camera.nearPlane, camera.farPlane);
 	}
 
+	camera.direction = (camera.target - transform.position).normalize();
+	camera.right = (camera.direction.crossProduct(camera.up)).normalize();
+	//camera.up = right.crossProduct(direction); // no need to align, keep "up" always same
+
 	if (transform.parent != NULL_ENTITY){
-        camera.worldView = transform.modelMatrix * (camera.view - transform.position);
+        camera.worldTarget = transform.modelMatrix * (camera.target - transform.position);
         camera.worldUp = ((transform.modelMatrix * camera.up) - (transform.modelMatrix * Vector3(0,0,0))).normalize();
     }else{
-        camera.worldView = camera.view;
+        camera.worldTarget = camera.target;
         camera.worldUp = camera.up;
     }
 
@@ -1801,9 +1805,10 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 	if (camera.type == CameraType::CAMERA_2D){
         camera.viewMatrix.identity();
     }else{
-        camera.viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, camera.worldView, camera.worldUp);
+        camera.viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, camera.worldTarget, camera.worldUp);
     }
 
+	camera.worldDirection = Vector3(-camera.viewMatrix[0][2], -camera.viewMatrix[1][2], -camera.viewMatrix[2][2]);
 	camera.worldRight = Vector3(camera.viewMatrix[0][0], camera.viewMatrix[1][0], camera.viewMatrix[2][0]);
 
 	//Update ViewProjectionMatrix
@@ -1864,7 +1869,7 @@ void RenderSystem::updatePoints(PointsComponent& points, Transform& transform, C
 }
 
 void RenderSystem::sortPoints(PointsComponent& points, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	Vector3 camDir = (camTransform.worldPosition - camera.worldView).normalize();
+	Vector3 camDir = (camTransform.worldPosition - camera.worldTarget).normalize();
 
 	auto comparePoints = [&transform, &camDir](const PointRenderData& a, const PointRenderData& b) -> bool {
 		return (transform.modelMatrix * a.position).dotProduct(camDir) < (transform.modelMatrix * b.position).dotProduct(camDir);
@@ -2157,7 +2162,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 }
 
 void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshComponent& mesh, Transform& transform, CameraComponent& camera, Transform& camTransform){
-	Vector3 camDir = (camTransform.worldPosition - camera.worldView).normalize();
+	Vector3 camDir = (camTransform.worldPosition - camera.worldTarget).normalize();
 
 	auto comparePoints = [&transform, &camDir](const InstanceRenderData& a, const InstanceRenderData& b) -> bool {
 		Vector3 positionA = Vector3(a.instanceMatrix[3][0], a.instanceMatrix[3][1], a.instanceMatrix[3][2]);

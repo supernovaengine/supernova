@@ -231,7 +231,7 @@ void AudioSystem::update(double dt){
                         Vector3 velocity = audio.lastPosition - worldPosition;
 
                         Vector3 camWorldPos = cameraTransform.worldPosition;
-                        Vector3 camWorldView = camera.worldView - camWorldPos;
+                        Vector3 camWorldView = camera.worldTarget - camWorldPos;
                         Vector3 camWorldUp = camera.worldUp;
                         Vector3 camVelocity = cameraLastPosition - camWorldPos;
 
