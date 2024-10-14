@@ -1789,9 +1789,9 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 		camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.yfov, camera.aspect, camera.nearClip, camera.farClip);
 	}
 
-	camera.direction = (camera.target - transform.position).normalize();
-	camera.right = (camera.direction.crossProduct(camera.up)).normalize();
-	//camera.up = right.crossProduct(direction); // no need to align, keep "up" always same
+	camera.direction = (transform.position - camera.target).normalize();
+	camera.right = (camera.up.crossProduct(camera.direction)).normalize();
+	//camera.up = camera.direction.crossProduct(camera.right); // no need to align, keep "up" always same
 
 	if (transform.parent != NULL_ENTITY){
         camera.worldTarget = transform.modelMatrix * (camera.target - transform.position);
@@ -1808,7 +1808,7 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
         camera.viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, camera.worldTarget, camera.worldUp);
     }
 
-	camera.worldDirection = Vector3(-camera.viewMatrix[0][2], -camera.viewMatrix[1][2], -camera.viewMatrix[2][2]);
+	camera.worldDirection = Vector3(camera.viewMatrix[0][2], camera.viewMatrix[1][2], camera.viewMatrix[2][2]);
 	camera.worldRight = Vector3(camera.viewMatrix[0][0], camera.viewMatrix[1][0], camera.viewMatrix[2][0]);
 
 	//Update ViewProjectionMatrix

@@ -402,7 +402,7 @@ void Camera::zoom(float distance){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        transf.position = transf.position + (camera.direction * distance);
+        transf.position = transf.position - (camera.direction * distance);
 
         transf.needUpdate = true;
     }
@@ -426,8 +426,8 @@ void Camera::slideForward(float distance){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        camera.target = camera.target + (camera.direction * distance);
-        transf.position = transf.position + (camera.direction * distance);
+        camera.target = camera.target - (camera.direction * distance);
+        transf.position = transf.position - (camera.direction * distance);
 
         transf.needUpdate = true;
         camera.needUpdate = true;
@@ -439,7 +439,7 @@ void Camera::slideUp(float distance){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 slideVector = camera.right.crossProduct(camera.direction);
+        Vector3 slideVector = camera.direction.crossProduct(camera.right);
         slideVector.normalize();
 
         camera.target = camera.target + (slideVector * distance);
