@@ -52,16 +52,16 @@ namespace Supernova{
         Vector3 worldDirection;
         Vector3 worldRight;
 
-        float leftPlane = 0;
-        float rightPlane = 10;
-        float bottomPlane = 0;
-        float topPlane = 10;
+        float leftClip = 0;
+        float rightClip = 10;
+        float bottomClip = 0;
+        float topClip = 10;
 
         float yfov = 0.75;
         float aspect = 1.0;
 
-        float nearPlane = -10.0;
-        float farPlane = 10.0;
+        float nearClip = -10.0;
+        float farClip = 10.0;
 
         Plane frustumPlanes[6];
 

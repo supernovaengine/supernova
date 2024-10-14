@@ -1782,11 +1782,11 @@ void RenderSystem::updateTransform(Transform& transform){
 void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 	//Update ProjectionMatrix
 	if (camera.type == CameraType::CAMERA_2D){
-		camera.projectionMatrix = Matrix4::orthoMatrix(camera.leftPlane, camera.rightPlane, camera.topPlane, camera.bottomPlane, camera.nearPlane, camera.farPlane);
+		camera.projectionMatrix = Matrix4::orthoMatrix(camera.leftClip, camera.rightClip, camera.topClip, camera.bottomClip, camera.nearClip, camera.farClip);
 	}else if (camera.type == CameraType::CAMERA_ORTHO) {
-		camera.projectionMatrix = Matrix4::orthoMatrix(camera.leftPlane, camera.rightPlane, camera.bottomPlane, camera.topPlane, camera.nearPlane, camera.farPlane);
+		camera.projectionMatrix = Matrix4::orthoMatrix(camera.leftClip, camera.rightClip, camera.bottomClip, camera.topClip, camera.nearClip, camera.farClip);
 	}else if (camera.type == CameraType::CAMERA_PERSPECTIVE){
-		camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.yfov, camera.aspect, camera.nearPlane, camera.farPlane);
+		camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.yfov, camera.aspect, camera.nearClip, camera.farClip);
 	}
 
 	camera.direction = (camera.target - transform.position).normalize();
@@ -2005,11 +2005,11 @@ void RenderSystem::updateCameraSize(Entity entity){
 			float newTop = rect.getHeight();
 			float newAspect = rect.getWidth() / rect.getHeight();
 
-			if ((camera.leftPlane != newLeft) || (camera.bottomPlane != newBottom) || (camera.rightPlane != newRight) || (camera.topPlane != newTop) || (camera.aspect != newAspect)){
-				camera.leftPlane = newLeft;
-				camera.bottomPlane = newBottom;
-				camera.rightPlane = newRight;
-				camera.topPlane = newTop;
+			if ((camera.leftClip != newLeft) || (camera.bottomClip != newBottom) || (camera.rightClip != newRight) || (camera.topClip != newTop) || (camera.aspect != newAspect)){
+				camera.leftClip = newLeft;
+				camera.bottomClip = newBottom;
+				camera.rightClip = newRight;
+				camera.topClip = newTop;
 				camera.aspect = newAspect;
 
 				camera.needUpdate = true;
@@ -2039,12 +2039,12 @@ bool RenderSystem::isInsideCamera(const float cameraFar, const Plane frustumPlan
 }
 
 bool RenderSystem::isInsideCamera(CameraComponent& camera, const AABB& box){
-    return isInsideCamera(camera.farPlane, camera.frustumPlanes, box);
+    return isInsideCamera(camera.farClip, camera.frustumPlanes, box);
 }
 
 bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point){
     for (int plane = 0; plane < 6; ++plane){
-        if (plane == FRUSTUM_PLANE_FAR && camera.farPlane == 0)
+        if (plane == FRUSTUM_PLANE_FAR && camera.farClip == 0)
             continue;
 
         if (camera.frustumPlanes[plane].getSide(point) == Plane::Side::NEGATIVE_SIDE){
@@ -2057,7 +2057,7 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& point)
 
 bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius){
     for (int plane = 0; plane < 6; ++plane){
-        if (plane == FRUSTUM_PLANE_FAR && camera.farPlane == 0)
+        if (plane == FRUSTUM_PLANE_FAR && camera.farClip == 0)
             continue;
 
         if (camera.frustumPlanes[plane].getDistance(center) < -radius){
@@ -2178,11 +2178,11 @@ void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshCompo
 
 void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
 	if (light.shadowCameraNearFar.x == 0.0){
-		light.shadowCameraNearFar.x = camera.nearPlane;
+		light.shadowCameraNearFar.x = camera.nearClip;
 	}
 	if (light.shadowCameraNearFar.y == 0.0){
 		if (light.range == 0.0){
-			light.shadowCameraNearFar.y = camera.farPlane;
+			light.shadowCameraNearFar.y = camera.farClip;
 		}else{
 			light.shadowCameraNearFar.y = light.range;
 		}
@@ -2250,8 +2250,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			//TODO: light directional cascades is only considering main camera
 			if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
 
-				float zFar = camera.farPlane;
-				float zNear = camera.nearPlane;
+				float zFar = camera.farClip;
+				float zNear = camera.nearClip;
 				float fov = 0;
 				float ratio = 1;
 

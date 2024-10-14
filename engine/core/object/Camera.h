@@ -26,23 +26,23 @@ namespace Supernova{
         void setOrtho(float left, float right, float bottom, float top, float near, float far);
         void setPerspective(float yfov, float aspect, float near, float far);
 
-        void setNearPlane(float near);
-        float getNearPlane() const;
+        void setNearClip(float near);
+        float getNearClip() const;
 
-        void setFarPlane(float far);
-        float getFarPlane() const;
+        void setFarClip(float far);
+        float getFarClip() const;
 
-        void setLeftPlane(float left);
-        float getLeftPlane() const;
+        void setLeftClip(float left);
+        float getLeftClip() const;
 
-        void setRightPlane(float right);
-        float getRightPlane() const;
+        void setRightClip(float right);
+        float getRightClip() const;
 
-        void setBottomPlane(float bottom);
-        float getBottomPlane() const;
+        void setBottomClip(float bottom);
+        float getBottomClip() const;
 
-        void setTopPlane(float top);
-        float getTopPlane() const;
+        void setTopClip(float top);
+        float getTopClip() const;
 
         void setAspect(float aspect);
         float getAspect() const;
