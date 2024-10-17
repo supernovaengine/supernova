@@ -32,6 +32,12 @@ namespace Supernova{
             return lastEntity;
         }
 
+        Entity createEntityInternal(Entity entity) { // for internal editor use only
+            metadata[entity];
+
+            return entity;
+        }
+
         void destroy(Entity entity) {
             metadata.erase(entity);
         }

@@ -240,6 +240,10 @@ Entity Scene::createEntity(){
     return entityManager.createEntity();
 }
 
+Entity Scene::createEntityInternal(Entity entity){
+	return entityManager.createEntityInternal(entity);
+}
+
 void Scene::destroyEntity(Entity entity){
 
 	for (auto const& pair : systems){
@@ -469,4 +473,16 @@ void Scene::moveChildDown(Entity entity){
 
 void Scene::moveChildToBottom(Entity entity){
 	moveChildAux(entity, false, false);
+}
+
+Signature Scene::getSignature(Entity entity) const{
+	return entityManager.getSignature(entity);
+}
+
+void Scene::setEntityName(Entity entity, std::string name){
+	return entityManager.setName(entity, name);
+}
+
+std::string Scene::getEntityName(Entity entity) const{
+	return entityManager.getName(entity);
 }

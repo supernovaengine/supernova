@@ -128,6 +128,7 @@ namespace Supernova{
 		//Entity methods
 
 	    Entity createEntity();
+		Entity createEntityInternal(Entity entity); // for internal editor use only
 	
 		void destroyEntity(Entity entity);
 
@@ -138,17 +139,10 @@ namespace Supernova{
 		void moveChildDown(Entity entity);
 		void moveChildToBottom(Entity entity);
 
-		Signature getSignature(Entity entity) const{
-			return entityManager.getSignature(entity);
-		}
+		Signature getSignature(Entity entity) const;
 
-		void setEntityName(Entity entity, std::string name){
-			return entityManager.setName(entity, name);
-		}
-
-		std::string getEntityName(Entity entity) const{
-			return entityManager.getName(entity);
-		}
+		void setEntityName(Entity entity, std::string name);
+		std::string getEntityName(Entity entity) const;
 	
 	    // Component methods
 
