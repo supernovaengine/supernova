@@ -292,7 +292,7 @@ void Scene::addEntityChild(Entity parent, Entity child){
 	Signature childSignature = entityManager.getSignature(child);
 	
 	Signature signature;
-	signature.set(componentManager.getComponentType<Transform>(), true);
+	signature.set(componentManager.getComponentId<Transform>(), true);
 
 	if ( ((parentSignature & signature) == signature) && ((childSignature & signature) == signature) ){
 		Transform& transformChild = componentManager.getComponent<Transform>(child);
@@ -348,61 +348,61 @@ void Scene::addEntityChild(Entity parent, Entity child){
 
 void Scene::sortComponentsByTransform(Signature entitySignature){
 	// Mesh component
-	if (entitySignature.test(getComponentType<MeshComponent>())){
+	if (entitySignature.test(getComponentId<MeshComponent>())){
 		auto meshes = componentManager.getComponentArray<MeshComponent>();
 		meshes->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// InstancedMesh component
-	if (entitySignature.test(getComponentType<InstancedMeshComponent>())){
+	if (entitySignature.test(getComponentId<InstancedMeshComponent>())){
 		auto instmeshes = componentManager.getComponentArray<InstancedMeshComponent>();
 		instmeshes->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// Model component
-	if (entitySignature.test(getComponentType<ModelComponent>())){
+	if (entitySignature.test(getComponentId<ModelComponent>())){
 		auto models = componentManager.getComponentArray<ModelComponent>();
 		models->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// Bone component
-	if (entitySignature.test(getComponentType<BoneComponent>())){
+	if (entitySignature.test(getComponentId<BoneComponent>())){
 		auto bones = componentManager.getComponentArray<BoneComponent>();
 		bones->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// Polygon component
-	if (entitySignature.test(getComponentType<PolygonComponent>())){
+	if (entitySignature.test(getComponentId<PolygonComponent>())){
 		auto polygons = componentManager.getComponentArray<PolygonComponent>();
 		polygons->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// UI layout component
-	if (entitySignature.test(getComponentType<UILayoutComponent>())){
+	if (entitySignature.test(getComponentId<UILayoutComponent>())){
 		auto layout = componentManager.getComponentArray<UILayoutComponent>();
 		layout->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// UI component
-	if (entitySignature.test(getComponentType<UIComponent>())){
+	if (entitySignature.test(getComponentId<UIComponent>())){
 		auto ui = componentManager.getComponentArray<UIComponent>();
 		ui->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// Points component
-	if (entitySignature.test(getComponentType<PointsComponent>())){
+	if (entitySignature.test(getComponentId<PointsComponent>())){
 		auto points = componentManager.getComponentArray<PointsComponent>();
 		points->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// Lines component
-	if (entitySignature.test(getComponentType<PointsComponent>())){
+	if (entitySignature.test(getComponentId<PointsComponent>())){
 		auto points = componentManager.getComponentArray<PointsComponent>();
 		points->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
 
 	// Audio component
-	if (entitySignature.test(getComponentType<AudioComponent>())){
+	if (entitySignature.test(getComponentId<AudioComponent>())){
 		auto audios = componentManager.getComponentArray<AudioComponent>();
 		audios->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
 	}
@@ -412,7 +412,7 @@ void Scene::moveChildAux(Entity entity, bool increase, bool stopIfFound){
 	Signature entitySignature = entityManager.getSignature(entity);
 	
 	Signature signature;
-	signature.set(componentManager.getComponentType<Transform>(), true);
+	signature.set(componentManager.getComponentId<Transform>(), true);
 
 	if ((entitySignature & signature) == signature){
 		auto transforms = componentManager.getComponentArray<Transform>();

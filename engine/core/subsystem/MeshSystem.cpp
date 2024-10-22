@@ -18,7 +18,7 @@ using namespace Supernova;
 
 
 MeshSystem::MeshSystem(Scene* scene): SubSystem(scene){
-    signature.set(scene->getComponentType<MeshComponent>());
+    signature.set(scene->getComponentId<MeshComponent>());
 }
 
 MeshSystem::~MeshSystem(){
@@ -2412,12 +2412,12 @@ bool MeshSystem::loadOBJ(Entity entity, std::string filename){
 void MeshSystem::createInstancedMesh(Entity entity){
     Signature signature = scene->getSignature(entity);
 
-    if (!signature.test(scene->getComponentType<InstancedMeshComponent>())){
+    if (!signature.test(scene->getComponentId<InstancedMeshComponent>())){
         scene->addComponent<InstancedMeshComponent>(entity, {});
 
         InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(entity);
 
-        if (signature.test(scene->getComponentType<MeshComponent>())){
+        if (signature.test(scene->getComponentId<MeshComponent>())){
             MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
             if (mesh.loaded)
                 mesh.needReload = true;
@@ -2440,11 +2440,11 @@ void MeshSystem::createInstancedMesh(Entity entity){
 void MeshSystem::removeInstancedMesh(Entity entity){
     Signature signature = scene->getSignature(entity);
 
-    if (signature.test(scene->getComponentType<InstancedMeshComponent>())){
+    if (signature.test(scene->getComponentId<InstancedMeshComponent>())){
         //destroyInstancedMesh(scene->getComponent<Body3DComponent>(entity));
         scene->removeComponent<InstancedMeshComponent>(entity);
 
-        if (signature.test(scene->getComponentType<MeshComponent>())){
+        if (signature.test(scene->getComponentId<MeshComponent>())){
             MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
             mesh.aabb = mesh.verticesAABB;
             if (mesh.loaded)
@@ -2456,7 +2456,7 @@ void MeshSystem::removeInstancedMesh(Entity entity){
 bool MeshSystem::hasInstancedMesh(Entity entity) const{
     Signature signature = scene->getSignature(entity);
 
-    return signature.test(scene->getComponentType<InstancedMeshComponent>());
+    return signature.test(scene->getComponentId<InstancedMeshComponent>());
 }
 
 void MeshSystem::destroyModel(ModelComponent& model){
@@ -2550,7 +2550,7 @@ void MeshSystem::update(double dt){
         Entity entity = sprites->getEntity(i);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<MeshComponent>())){
+        if (signature.test(scene->getComponentId<MeshComponent>())){
             MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
             createOrUpdateSprite(sprite, mesh);
@@ -2564,7 +2564,7 @@ void MeshSystem::update(double dt){
         Entity entity = tilemaps->getEntity(i);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<MeshComponent>())){
+        if (signature.test(scene->getComponentId<MeshComponent>())){
             MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
             createOrUpdateTilemap(tilemap, mesh);
@@ -2578,7 +2578,7 @@ void MeshSystem::update(double dt){
         Entity entity = polygons->getEntity(i);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<MeshComponent>())){
+        if (signature.test(scene->getComponentId<MeshComponent>())){
             MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
             createOrUpdateMeshPolygon(polygon, mesh);
@@ -2592,7 +2592,7 @@ void MeshSystem::update(double dt){
         Entity entity = terrains->getEntity(i);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<MeshComponent>())){
+        if (signature.test(scene->getComponentId<MeshComponent>())){
             MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
             createOrUpdateTerrain(terrain, mesh);
@@ -2617,7 +2617,7 @@ void MeshSystem::draw(){
 void MeshSystem::entityDestroyed(Entity entity){
 	Signature signature = scene->getSignature(entity);
 
-	if (signature.test(scene->getComponentType<ModelComponent>())){
+	if (signature.test(scene->getComponentId<ModelComponent>())){
         destroyModel(scene->getComponent<ModelComponent>(entity));
 	}
 }

@@ -19,7 +19,7 @@ using namespace Supernova;
 
 
 UISystem::UISystem(Scene* scene): SubSystem(scene){
-    signature.set(scene->getComponentType<UILayoutComponent>());
+    signature.set(scene->getComponentId<UILayoutComponent>());
 
     eventId.clear();
     lastUIFromPointer = NULL_ENTITY;
@@ -957,27 +957,27 @@ void UISystem::destroy(){
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<TextComponent>())) {
+        if (signature.test(scene->getComponentId<TextComponent>())) {
             TextComponent &text = scene->getComponent<TextComponent>(entity);
 
             destroyText(text);
         }
-        if (signature.test(scene->getComponentType<ButtonComponent>())) {
+        if (signature.test(scene->getComponentId<ButtonComponent>())) {
             ButtonComponent &button = scene->getComponent<ButtonComponent>(entity);
 
             destroyButton(button);
         }
-        if (signature.test(scene->getComponentType<PanelComponent>())){
+        if (signature.test(scene->getComponentId<PanelComponent>())){
             PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
             destroyPanel(panel);
         }
-        if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+        if (signature.test(scene->getComponentId<ScrollbarComponent>())){
             ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
 
             destroyScrollbar(scrollbar);
         }
-        if (signature.test(scene->getComponentType<TextEditComponent>())) {
+        if (signature.test(scene->getComponentId<TextEditComponent>())) {
             TextEditComponent &textedit = scene->getComponent<TextEditComponent>(entity);
 
             destroyTextEdit(textedit);
@@ -989,31 +989,31 @@ void UISystem::draw(){
 }
 
 void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, Entity entity, Signature signature){
-    if (signature.test(scene->getComponentType<UIComponent>())){
+    if (signature.test(scene->getComponentId<UIComponent>())){
         UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
         // Texts
-        if (signature.test(scene->getComponentType<TextComponent>())){
+        if (signature.test(scene->getComponentId<TextComponent>())){
             TextComponent& text = scene->getComponent<TextComponent>(entity);
 
             createOrUpdateText(text, ui, layout);
         }
 
         // UI Polygons
-        if (signature.test(scene->getComponentType<PolygonComponent>())){
+        if (signature.test(scene->getComponentId<PolygonComponent>())){
             PolygonComponent& polygon = scene->getComponent<PolygonComponent>(entity);
 
             createOrUpdatePolygon(polygon, ui, layout);
         }
 
         // Images
-        if (signature.test(scene->getComponentType<ImageComponent>())){
+        if (signature.test(scene->getComponentId<ImageComponent>())){
             ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
             createOrUpdateImage(img, ui, layout);
 
             // Buttons
-            if (signature.test(scene->getComponentType<ButtonComponent>())){
+            if (signature.test(scene->getComponentId<ButtonComponent>())){
                 ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
 
                 if (button.needUpdateButton){
@@ -1024,7 +1024,7 @@ void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, E
             }
 
             // Panels
-            if (signature.test(scene->getComponentType<PanelComponent>())){
+            if (signature.test(scene->getComponentId<PanelComponent>())){
                 PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
                 if (panel.needUpdatePanel){
@@ -1035,7 +1035,7 @@ void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, E
             }
 
             // Scrollbar
-            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+            if (signature.test(scene->getComponentId<ScrollbarComponent>())){
                 ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
 
                 if (scrollbar.needUpdateScrollbar){
@@ -1046,7 +1046,7 @@ void UISystem::createOrUpdateUiComponent(double dt, UILayoutComponent& layout, E
             }
 
             // Textedits
-            if (signature.test(scene->getComponentType<TextEditComponent>())){
+            if (signature.test(scene->getComponentId<TextEditComponent>())){
                 TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
 
                 if (textedit.needUpdateTextEdit){
@@ -1130,7 +1130,7 @@ void UISystem::update(double dt){
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<UIContainerComponent>())){
+        if (signature.test(scene->getComponentId<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
             // reseting all container boxes
             for (int b = 0; b < container.numBoxes; b++){
@@ -1139,7 +1139,7 @@ void UISystem::update(double dt){
             container.numBoxes = 0;
         }
 
-        if (signature.test(scene->getComponentType<Transform>())){
+        if (signature.test(scene->getComponentId<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
             UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
             if (parentlayout){
@@ -1180,7 +1180,7 @@ void UISystem::update(double dt){
 
         createOrUpdateUiComponent(dt, layout, entity, signature);
 
-        if (signature.test(scene->getComponentType<UIContainerComponent>())){
+        if (signature.test(scene->getComponentId<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
             // configuring all container boxes
             if (container.numBoxes > 0){
@@ -1227,7 +1227,7 @@ void UISystem::update(double dt){
             }
         }
 
-        if (signature.test(scene->getComponentType<Transform>())){
+        if (signature.test(scene->getComponentId<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
             UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
             if (parentcontainer && layout.containerBoxIndex >= 0){
@@ -1241,7 +1241,7 @@ void UISystem::update(double dt){
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentType<Transform>())){
+        if (signature.test(scene->getComponentId<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
             if (layout.usingAnchors){
@@ -1325,7 +1325,7 @@ void UISystem::update(double dt){
             }
         }
 
-        if (signature.test(scene->getComponentType<UIContainerComponent>())){
+        if (signature.test(scene->getComponentId<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
             int numObjInLine = 0;
             if (container.type == ContainerType::HORIZONTAL_WRAP){
@@ -1418,19 +1418,19 @@ void UISystem::update(double dt){
         }
 
         if (layout.needUpdateSizes){
-            if (signature.test(scene->getComponentType<ImageComponent>())){
+            if (signature.test(scene->getComponentId<ImageComponent>())){
                 ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
                 img.needUpdatePatches = true;
             }
 
-            if (signature.test(scene->getComponentType<TextComponent>())){
+            if (signature.test(scene->getComponentId<TextComponent>())){
                 TextComponent& text = scene->getComponent<TextComponent>(entity);
 
                 text.needUpdateText = true;
             }
 
-            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+            if (signature.test(scene->getComponentId<ScrollbarComponent>())){
                 ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
 
                 scrollbar.needUpdateScrollbar = true;
@@ -1448,27 +1448,27 @@ void UISystem::update(double dt){
 void UISystem::entityDestroyed(Entity entity){
     Signature signature = scene->getSignature(entity);
 
-    if (signature.test(scene->getComponentType<TextComponent>())){
+    if (signature.test(scene->getComponentId<TextComponent>())){
         TextComponent& text = scene->getComponent<TextComponent>(entity);
 
         destroyText(text);
     }
-    if (signature.test(scene->getComponentType<ButtonComponent>())){
+    if (signature.test(scene->getComponentId<ButtonComponent>())){
         ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
 
         destroyButton(button);
     }
-    if (signature.test(scene->getComponentType<PanelComponent>())){
+    if (signature.test(scene->getComponentId<PanelComponent>())){
         PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
         destroyPanel(panel);
     }
-    if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+    if (signature.test(scene->getComponentId<ScrollbarComponent>())){
         ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
 
         destroyScrollbar(scrollbar);
     }
-    if (signature.test(scene->getComponentType<TextEditComponent>())){
+    if (signature.test(scene->getComponentId<TextEditComponent>())){
         TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
 
         destroyTextEdit(textedit);
@@ -1480,7 +1480,7 @@ bool UISystem::isTextEditFocused(){
     for (int i = 0; i < textedits->size(); i++){
         Entity entity = textedits->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<UIComponent>())){
+        if (signature.test(scene->getComponentId<UIComponent>())){
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
             if (ui.focused){
                 return true;
@@ -1497,7 +1497,7 @@ bool UISystem::eventOnCharInput(wchar_t codepoint){
 
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<TextEditComponent>()) && signature.test(scene->getComponentType<UIComponent>())){
+        if (signature.test(scene->getComponentId<TextEditComponent>()) && signature.test(scene->getComponentId<UIComponent>())){
             TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
@@ -1537,11 +1537,11 @@ bool UISystem::eventOnPointerDown(float x, float y){
 
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<Transform>())){
+        if (signature.test(scene->getComponentId<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
             if (transform.visible){
-                if (signature.test(scene->getComponentType<ImageComponent>())){
+                if (signature.test(scene->getComponentId<ImageComponent>())){
                     Rect uirect(transform.worldPosition.x, transform.worldPosition.y, layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
 
                     if (layout.panel != NULL_ENTITY){
@@ -1553,14 +1553,14 @@ bool UISystem::eventOnPointerDown(float x, float y){
                         lastPanelFromPointer = layout.panel;
                     }
 
-                    if (signature.test(scene->getComponentType<PanelComponent>())){
+                    if (signature.test(scene->getComponentId<PanelComponent>())){
                         if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){
                             lastPanelFromPointer = entity;
                         }
                     }
                 }
 
-                if (signature.test(scene->getComponentType<UIComponent>())){
+                if (signature.test(scene->getComponentId<UIComponent>())){
                     UIComponent& ui = scene->getComponent<UIComponent>(entity);
                     if (ui.focused){
                         ui.focused = false;
@@ -1575,11 +1575,11 @@ bool UISystem::eventOnPointerDown(float x, float y){
         UILayoutComponent& layout = layouts->getComponentFromIndex(layouts->getIndex(lastUIFromPointer));
         Signature signature = scene->getSignature(lastUIFromPointer);
 
-        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
+        if (signature.test(scene->getComponentId<Transform>()) && signature.test(scene->getComponentId<UIComponent>())){
             Transform& transform = scene->getComponent<Transform>(lastUIFromPointer);
             UIComponent& ui = scene->getComponent<UIComponent>(lastUIFromPointer);
             
-            if (signature.test(scene->getComponentType<ButtonComponent>())){
+            if (signature.test(scene->getComponentId<ButtonComponent>())){
                 ButtonComponent& button = scene->getComponent<ButtonComponent>(lastUIFromPointer);
                 if (!button.disabled && !button.pressed){
                     ui.texture = button.texturePressed;
@@ -1590,7 +1590,7 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 }
             }
 
-            if (signature.test(scene->getComponentType<TextEditComponent>())){
+            if (signature.test(scene->getComponentId<TextEditComponent>())){
                 TextEditComponent& textedit = scene->getComponent<TextEditComponent>(lastUIFromPointer);
                 TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
 
@@ -1602,7 +1602,7 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 System::instance().hideVirtualKeyboard();
             }
 
-            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+            if (signature.test(scene->getComponentId<ScrollbarComponent>())){
                 ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(lastUIFromPointer);
                 Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
                 UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
@@ -1617,7 +1617,7 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 }
             }
 
-            if (signature.test(scene->getComponentType<PanelComponent>())){
+            if (signature.test(scene->getComponentId<PanelComponent>())){
                 PanelComponent& panel = scene->getComponent<PanelComponent>(lastUIFromPointer);
                 Transform& headertransform = scene->getComponent<Transform>(panel.headercontainer);
                 UILayoutComponent& headerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
@@ -1687,11 +1687,11 @@ bool UISystem::eventOnPointerUp(float x, float y){
 
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
+        if (signature.test(scene->getComponentId<Transform>()) && signature.test(scene->getComponentId<UIComponent>())){
             Transform& transform = scene->getComponent<Transform>(entity);
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-            if (signature.test(scene->getComponentType<ButtonComponent>())){
+            if (signature.test(scene->getComponentId<ButtonComponent>())){
                 ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
                 if (!button.disabled && button.pressed){
                     ui.texture = button.textureNormal;
@@ -1702,7 +1702,7 @@ bool UISystem::eventOnPointerUp(float x, float y){
                 }
             }
 
-            if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+            if (signature.test(scene->getComponentId<ScrollbarComponent>())){
                 ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
                 Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
                 UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
@@ -1712,7 +1712,7 @@ bool UISystem::eventOnPointerUp(float x, float y){
                 }
             }
 
-            if (signature.test(scene->getComponentType<PanelComponent>())){
+            if (signature.test(scene->getComponentId<PanelComponent>())){
                 PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
                 panel.headerPointerDown = false;
@@ -1745,11 +1745,11 @@ bool UISystem::eventOnPointerMove(float x, float y){
 
         Entity entity = layouts->getEntity(i);
         Signature signature = scene->getSignature(entity);
-        if (signature.test(scene->getComponentType<Transform>())){
+        if (signature.test(scene->getComponentId<Transform>())){
             Transform& transform = scene->getComponent<Transform>(entity);
 
             if (transform.visible){
-                if (signature.test(scene->getComponentType<ImageComponent>())){
+                if (signature.test(scene->getComponentId<ImageComponent>())){
                     Rect uirect(transform.worldPosition.x, transform.worldPosition.y, layout.width * transform.worldScale.x, layout.height * transform.worldScale.y);
 
                     if (layout.panel != NULL_ENTITY){
@@ -1759,10 +1759,10 @@ bool UISystem::eventOnPointerMove(float x, float y){
                     if (uirect.contains(Vector2(x, y)) && !layout.ignoreEvents){
                         cursor = CursorType::ARROW;
 
-                        if (signature.test(scene->getComponentType<TextEditComponent>())){
+                        if (signature.test(scene->getComponentId<TextEditComponent>())){
                             cursor = CursorType::IBEAM;
 
-                        }else if (signature.test(scene->getComponentType<PanelComponent>())){
+                        }else if (signature.test(scene->getComponentId<PanelComponent>())){
                             PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
 
                             UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
@@ -1802,7 +1802,7 @@ bool UISystem::eventOnPointerMove(float x, float y){
 
         Vector2 pointerDiff = Vector2(x, y) - lastPointerPos;
 
-        if (signature.test(scene->getComponentType<Transform>()) && signature.test(scene->getComponentType<UIComponent>())){
+        if (signature.test(scene->getComponentId<Transform>()) && signature.test(scene->getComponentId<UIComponent>())){
             Transform& transform = scene->getComponent<Transform>(lastUIFromPointer);
             UIComponent& ui = scene->getComponent<UIComponent>(lastUIFromPointer);
 
@@ -1810,7 +1810,7 @@ bool UISystem::eventOnPointerMove(float x, float y){
             ui.pointerMoved = true;
         }
 
-        if (signature.test(scene->getComponentType<ScrollbarComponent>())){
+        if (signature.test(scene->getComponentId<ScrollbarComponent>())){
             ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(lastUIFromPointer);
             Transform& transform = scene->getComponent<Transform>(lastUIFromPointer);
             Transform& bartransform = scene->getComponent<Transform>(scrollbar.bar);
@@ -1854,7 +1854,7 @@ bool UISystem::eventOnPointerMove(float x, float y){
             }
         }
 
-        if (signature.test(scene->getComponentType<PanelComponent>())){
+        if (signature.test(scene->getComponentId<PanelComponent>())){
             PanelComponent& panel = scene->getComponent<PanelComponent>(lastUIFromPointer);
             Transform& transform = scene->getComponent<Transform>(lastUIFromPointer);
             ImageComponent& image = scene->getComponent<ImageComponent>(lastUIFromPointer);

@@ -18,7 +18,7 @@ bool AudioSystem::inited = false;
 float AudioSystem::globalVolume = 1.0;
 
 AudioSystem::AudioSystem(Scene* scene): SubSystem(scene){
-    signature.set(scene->getComponentType<AudioComponent>());
+    signature.set(scene->getComponentId<AudioComponent>());
 
     cameraLastPosition = Vector3(0, 0, 0);
 }
@@ -156,7 +156,7 @@ void AudioSystem::update(double dt){
         Signature signature = scene->getSignature(entity);
 
         Vector3 worldPosition = Vector3(0, 0, 0);
-        if (signature.test(scene->getComponentType<Transform>()) && audio.enable3D){
+        if (signature.test(scene->getComponentId<Transform>()) && audio.enable3D){
             Transform& transform = scene->getComponent<Transform>(entity);
 
             worldPosition = transform.worldPosition;
@@ -276,7 +276,7 @@ void AudioSystem::draw(){
 void AudioSystem::entityDestroyed(Entity entity){
     Signature signature = scene->getSignature(entity);
 
-    if (signature.test(scene->getComponentType<AudioComponent>())){
+    if (signature.test(scene->getComponentId<AudioComponent>())){
         AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
 
         destroyAudio(audio);

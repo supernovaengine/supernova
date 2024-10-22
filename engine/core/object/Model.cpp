@@ -82,7 +82,7 @@ Animation Model::findAnimation(std::string name){
 
     for (int i = 0; i < model.animations.size(); i++){
         Signature signature = scene->getSignature(model.animations[i]);
-        if (signature.test(scene->getComponentType<AnimationComponent>())){
+        if (signature.test(scene->getComponentId<AnimationComponent>())){
             AnimationComponent& animcomp = scene->getComponent<AnimationComponent>(model.animations[i]);
 
             if (animcomp.name == name){

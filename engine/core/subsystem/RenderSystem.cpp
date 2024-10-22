@@ -34,7 +34,7 @@ TextureRender RenderSystem::emptyNormal;
 bool RenderSystem::emptyTexturesCreated = false;
 
 RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
-	signature.set(scene->getComponentType<Transform>());
+	signature.set(scene->getComponentId<Transform>());
 
 	this->scene = scene;
 }
@@ -86,30 +86,30 @@ void RenderSystem::destroy(){
 		Entity entity = transforms->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-		if (signature.test(scene->getComponentType<MeshComponent>())){
+		if (signature.test(scene->getComponentId<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 			if (mesh.loaded){
 				destroyMesh(entity, mesh);
 			}
-		}else if (signature.test(scene->getComponentType<UIComponent>())){
+		}else if (signature.test(scene->getComponentId<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
 			if (ui.loaded){
 				destroyUI(entity, ui);
 			}
-		}else if (signature.test(scene->getComponentType<PointsComponent>())){
+		}else if (signature.test(scene->getComponentId<PointsComponent>())){
 			PointsComponent& points = scene->getComponent<PointsComponent>(entity);
 			if (points.loaded){
 				destroyPoints(entity, points);
 			}
-		}else if (signature.test(scene->getComponentType<LinesComponent>())){
+		}else if (signature.test(scene->getComponentId<LinesComponent>())){
 			LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
 			if (lines.loaded){
 				destroyLines(entity, lines);
 			}
-		}else if (signature.test(scene->getComponentType<LightComponent>())){
+		}else if (signature.test(scene->getComponentId<LightComponent>())){
 			LightComponent& light = scene->getComponent<LightComponent>(entity);
 			destroyLight(light);
-		}else if (signature.test(scene->getComponentType<CameraComponent>())){
+		}else if (signature.test(scene->getComponentId<CameraComponent>())){
 			CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
 			destroyCamera(camera, false);
 		}
@@ -1988,7 +1988,7 @@ bool RenderSystem::terrainNodeLODSelect(TerrainComponent& terrain, Transform& tr
 
 void RenderSystem::updateCameraSize(Entity entity){
 	Signature signature = scene->getSignature(entity);
-	if (signature.test(scene->getComponentType<CameraComponent>())){
+	if (signature.test(scene->getComponentId<CameraComponent>())){
 		CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
 		
 		Rect rect;
@@ -2385,27 +2385,27 @@ void RenderSystem::changeLoaded(void* data){
 
 	Signature signature = scene->getSignature(entity);
 
-	if (signature.test(scene->getComponentType<MeshComponent>())){
+	if (signature.test(scene->getComponentId<MeshComponent>())){
 		MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
 		mesh.loaded = true;
 
-	}else if (signature.test(scene->getComponentType<UIComponent>())){
+	}else if (signature.test(scene->getComponentId<UIComponent>())){
 		UIComponent& uirender = scene->getComponent<UIComponent>(entity);
 
 		uirender.loaded = true;
 
-	}else if (signature.test(scene->getComponentType<PointsComponent>())){
+	}else if (signature.test(scene->getComponentId<PointsComponent>())){
 		PointsComponent& points = scene->getComponent<PointsComponent>(entity);
 
 		points.loaded = true;
 
-	}else if (signature.test(scene->getComponentType<LinesComponent>())){
+	}else if (signature.test(scene->getComponentId<LinesComponent>())){
 		LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
 
 		lines.loaded = true;
 
-	}else if (signature.test(scene->getComponentType<SkyComponent>())){
+	}else if (signature.test(scene->getComponentId<SkyComponent>())){
 		SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
 
 		sky.loaded = true;
@@ -2422,31 +2422,31 @@ void RenderSystem::changeDestroy(void* data){
 
 	Signature signature = scene->getSignature(entity);
 
-	if (signature.test(scene->getComponentType<MeshComponent>())){
+	if (signature.test(scene->getComponentId<MeshComponent>())){
 		MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
 		mesh.loaded = false;
 		mesh.loadCalled = false;
 
-	}else if (signature.test(scene->getComponentType<UIComponent>())){
+	}else if (signature.test(scene->getComponentId<UIComponent>())){
 		UIComponent& uirender = scene->getComponent<UIComponent>(entity);
 
 		uirender.loaded = false;
 		uirender.loadCalled = false;
 
-	}else if (signature.test(scene->getComponentType<PointsComponent>())){
+	}else if (signature.test(scene->getComponentId<PointsComponent>())){
 		PointsComponent& points = scene->getComponent<PointsComponent>(entity);
 
 		points.loaded = false;
 		points.loadCalled = false;
 
-	}else if (signature.test(scene->getComponentType<LinesComponent>())){
+	}else if (signature.test(scene->getComponentId<LinesComponent>())){
 		LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
 
 		lines.loaded = false;
 		lines.loadCalled = false;
 
-	}else if (signature.test(scene->getComponentType<SkyComponent>())){
+	}else if (signature.test(scene->getComponentId<SkyComponent>())){
 		SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
 
 		sky.loaded = false;
@@ -2618,7 +2618,7 @@ void RenderSystem::update(double dt){
 		Entity entity = transforms->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
-		if (signature.test(scene->getComponentType<MeshComponent>())){
+		if (signature.test(scene->getComponentId<MeshComponent>())){
 			MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
 			TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
@@ -2648,11 +2648,11 @@ void RenderSystem::update(double dt){
 			if (!mesh.loadCalled){
 				loadMesh(entity, mesh, pipelines, instmesh, terrain);
 			}
-		}else if (signature.test(scene->getComponentType<UIComponent>())){
+		}else if (signature.test(scene->getComponentId<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
 			if (!ui.loaded){
 				bool isText = false;
-				if (signature.test(scene->getComponentType<TextComponent>())){
+				if (signature.test(scene->getComponentId<TextComponent>())){
 					isText = true;
 				}
 				if (ui.loaded && ui.needReload){
@@ -2662,7 +2662,7 @@ void RenderSystem::update(double dt){
 					loadUI(entity, ui, pipelines, isText);
 				}
 			}
-		}else if (signature.test(scene->getComponentType<PointsComponent>())){
+		}else if (signature.test(scene->getComponentId<PointsComponent>())){
 			PointsComponent& points = scene->getComponent<PointsComponent>(entity);
 			if (points.loaded && points.needReload){
 				destroyPoints(entity, points);
@@ -2670,7 +2670,7 @@ void RenderSystem::update(double dt){
 			if (!points.loadCalled){
 				loadPoints(entity, points, pipelines);
 			}
-		}else if (signature.test(scene->getComponentType<LinesComponent>())){
+		}else if (signature.test(scene->getComponentId<LinesComponent>())){
 			LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
 			if (lines.loaded && lines.needReload){
 				destroyLines(entity, lines);
@@ -2686,7 +2686,7 @@ void RenderSystem::update(double dt){
 			if (!hasMultipleCameras){
 				updateMVP(i, transform, mainCamera, mainCameraTransform);
 
-				if (signature.test(scene->getComponentType<TerrainComponent>())){
+				if (signature.test(scene->getComponentId<TerrainComponent>())){
 					TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
 
 					updateTerrain(terrain, transform, mainCamera, mainCameraTransform);
@@ -2694,13 +2694,13 @@ void RenderSystem::update(double dt){
 			}
 
 			// need to be updated ONLY for main camera
-			if (signature.test(scene->getComponentType<LightComponent>())){
+			if (signature.test(scene->getComponentId<LightComponent>())){
 				LightComponent& light = scene->getComponent<LightComponent>(entity);
 				
 				updateLightFromScene(light, transform, mainCamera);
 			}
 			
-			if (signature.test(scene->getComponentType<AudioComponent>())){
+			if (signature.test(scene->getComponentId<AudioComponent>())){
 				AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
 
 				audio.needUpdate = true;
@@ -2710,19 +2710,19 @@ void RenderSystem::update(double dt){
 
 		if (transform.needUpdate){
 
-			if (signature.test(scene->getComponentType<MeshComponent>())){
+			if (signature.test(scene->getComponentId<MeshComponent>())){
 				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
 				mesh.worldAABB = transform.modelMatrix * mesh.aabb;
 			}
 
-			if (signature.test(scene->getComponentType<ModelComponent>())){
+			if (signature.test(scene->getComponentId<ModelComponent>())){
 				ModelComponent& model = scene->getComponent<ModelComponent>(entity);
 
 				model.inverseDerivedTransform = transform.modelMatrix.inverse();
 			}
 
-			if (signature.test(scene->getComponentType<BoneComponent>())){
+			if (signature.test(scene->getComponentId<BoneComponent>())){
 				BoneComponent& bone = scene->getComponent<BoneComponent>(entity);
 
 				if (bone.model != NULL_ENTITY){
@@ -2738,7 +2738,7 @@ void RenderSystem::update(double dt){
 
 		}
 
-        if (signature.test(scene->getComponentType<PointsComponent>())){
+        if (signature.test(scene->getComponentId<PointsComponent>())){
 			PointsComponent& points = scene->getComponent<PointsComponent>(entity);
 
 			bool sortTransparentPoints = points.transparent && mainCamera.type != CameraType::CAMERA_2D;
@@ -2900,7 +2900,7 @@ void RenderSystem::draw(){
 			Entity entity = transforms->getEntity(i);
 			Signature signature = scene->getSignature(entity);
 
-			if (signature.test(scene->getComponentType<CameraComponent>())){
+			if (signature.test(scene->getComponentId<CameraComponent>())){
 				continue;
 			}
 
@@ -2909,14 +2909,14 @@ void RenderSystem::draw(){
 			}
 
 			// apply scissor on UI
-			if (signature.test(scene->getComponentType<UILayoutComponent>())){
+			if (signature.test(scene->getComponentId<UILayoutComponent>())){
 				UILayoutComponent& layout = scene->getComponent<UILayoutComponent>(entity);
 
 				Rect parentScissor;
 
 				if (transform.parent != NULL_ENTITY){
 					Signature parentSignature = scene->getSignature(transform.parent);
-					if (parentSignature.test(scene->getComponentType<UILayoutComponent>())){
+					if (parentSignature.test(scene->getComponentId<UILayoutComponent>())){
 						UILayoutComponent& parentLayout = scene->getComponent<UILayoutComponent>(transform.parent);
 
 						parentScissor = parentLayout.scissor;
@@ -2931,7 +2931,7 @@ void RenderSystem::draw(){
 					}
 				}
 
-				if (signature.test(scene->getComponentType<ImageComponent>())){
+				if (signature.test(scene->getComponentId<ImageComponent>())){
 					ImageComponent& img = scene->getComponent<ImageComponent>(entity);
 
 					layout.scissor = getScissorRect(layout, img, transform, camera);
@@ -2941,7 +2941,7 @@ void RenderSystem::draw(){
 				}
 			}
 
-			if (signature.test(scene->getComponentType<MeshComponent>())){
+			if (signature.test(scene->getComponentId<MeshComponent>())){
 				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
 
 				if (transform.visible){
@@ -2971,17 +2971,17 @@ void RenderSystem::draw(){
 					}
 				}
 
-			}else if (signature.test(scene->getComponentType<UIComponent>())){
+			}else if (signature.test(scene->getComponentId<UIComponent>())){
 				UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
 				bool isText = false;
-				if (signature.test(scene->getComponentType<TextComponent>())){
+				if (signature.test(scene->getComponentId<TextComponent>())){
 					isText = true;
 				}
 				if (transform.visible)
 					drawUI(ui, transform, camera.renderToTexture || Engine::getFramebuffer());
 
-			}else if (signature.test(scene->getComponentType<PointsComponent>())){
+			}else if (signature.test(scene->getComponentId<PointsComponent>())){
 				PointsComponent& points = scene->getComponent<PointsComponent>(entity);
 
 				bool sortTransparentPoints = points.transparent && camera.type != CameraType::CAMERA_2D;
@@ -2993,7 +2993,7 @@ void RenderSystem::draw(){
 				if (transform.visible)
 					drawPoints(points, transform, cameraTransform, camera.renderToTexture || Engine::getFramebuffer());
 
-			}else if (signature.test(scene->getComponentType<LinesComponent>())){
+			}else if (signature.test(scene->getComponentId<LinesComponent>())){
 				LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
 
 				if (transform.visible)
@@ -3049,31 +3049,31 @@ void RenderSystem::draw(){
 void RenderSystem::entityDestroyed(Entity entity){
 	Signature signature = scene->getSignature(entity);
 
-	if (signature.test(scene->getComponentType<LightComponent>())){
+	if (signature.test(scene->getComponentId<LightComponent>())){
 		destroyLight(scene->getComponent<LightComponent>(entity));
 	}
 
-	if (signature.test(scene->getComponentType<CameraComponent>())){
+	if (signature.test(scene->getComponentId<CameraComponent>())){
 		destroyCamera(scene->getComponent<CameraComponent>(entity), true);
 	}
 
-	if (signature.test(scene->getComponentType<MeshComponent>())){
+	if (signature.test(scene->getComponentId<MeshComponent>())){
 		destroyMesh(entity, scene->getComponent<MeshComponent>(entity));
 	}
 
-	if (signature.test(scene->getComponentType<UIComponent>())){
+	if (signature.test(scene->getComponentId<UIComponent>())){
 		destroyUI(entity, scene->getComponent<UIComponent>(entity));
 	}
 
-	if (signature.test(scene->getComponentType<PointsComponent>())){
+	if (signature.test(scene->getComponentId<PointsComponent>())){
 		destroyPoints(entity, scene->getComponent<PointsComponent>(entity));
 	}
 
-	if (signature.test(scene->getComponentType<LinesComponent>())){
+	if (signature.test(scene->getComponentId<LinesComponent>())){
 		destroyLines(entity, scene->getComponent<LinesComponent>(entity));
 	}
 
-	if (signature.test(scene->getComponentType<SkyComponent>())){
+	if (signature.test(scene->getComponentId<SkyComponent>())){
 		destroySky(entity, scene->getComponent<SkyComponent>(entity));
 	}
 }

@@ -13,14 +13,14 @@
 
 namespace Supernova {
 
-	using ComponentType = unsigned char;
+	using ComponentId = unsigned char;
 
 
 	class ComponentManager {
 	private:
-		std::unordered_map<const char*, ComponentType> componentTypeIds{};
+		std::unordered_map<const char*, ComponentId> componentTypeIds{};
 		std::unordered_map<const char*, std::shared_ptr<ComponentArrayBase>> componentArrays{};
-		ComponentType nextComponentTypeId{};
+		ComponentId nextComponentIdId{};
 
 	public:
 		template<typename T>
@@ -29,10 +29,10 @@ namespace Supernova {
 
 			if (componentTypeIds.find(typeName) == componentTypeIds.end()){
 
-				componentTypeIds.insert({typeName, nextComponentTypeId});
+				componentTypeIds.insert({typeName, nextComponentIdId});
 				componentArrays.insert({typeName, std::make_shared<ComponentArray<T>>()});
 
-				++nextComponentTypeId;
+				++nextComponentIdId;
 
 			} else {
 				Log::error("Registering component type more than once");
@@ -41,7 +41,7 @@ namespace Supernova {
 		}
 
 		template<typename T>
-		ComponentType getComponentType() {
+		ComponentId getComponentId() {
 			const char* typeName = typeid(T).name();
 
 			if (componentTypeIds.find(typeName) == componentTypeIds.end())

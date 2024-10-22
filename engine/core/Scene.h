@@ -155,7 +155,7 @@ namespace Supernova{
 	    void addComponent(Entity entity, T component){
 		    componentManager.addComponent<T>(entity, component);
 		    auto signature = entityManager.getSignature(entity);
-		    signature.set(componentManager.getComponentType<T>(), true);
+		    signature.set(componentManager.getComponentId<T>(), true);
 		    entityManager.setSignature(entity, signature);
 	    }
 	
@@ -163,7 +163,7 @@ namespace Supernova{
 	    void removeComponent(Entity entity){
 		    componentManager.removeComponent<T>(entity);
 		    auto signature = entityManager.getSignature(entity);
-		    signature.set(componentManager.getComponentType<T>(), false);
+		    signature.set(componentManager.getComponentId<T>(), false);
 		    entityManager.setSignature(entity, signature); 
 	    }
 
@@ -188,8 +188,8 @@ namespace Supernova{
 	    }
 
 	    template<typename T>
-	    ComponentType getComponentType(){
-		    return componentManager.getComponentType<T>();
+	    ComponentId getComponentId(){
+		    return componentManager.getComponentId<T>();
 	    }
 
 		template<typename T>
