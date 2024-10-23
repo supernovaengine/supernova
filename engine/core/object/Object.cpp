@@ -184,11 +184,11 @@ Matrix4 Object::getModelViewProjectionMatrix() const{
 }
 
 void Object::addChild(Object* child){
-    scene->addEntityChild(this->entity, child->entity);
+    scene->addEntityChild(this->entity, child->entity, false);
 }
 
 void Object::addChild(Entity child){
-    scene->addEntityChild(this->entity, child);
+    scene->addEntityChild(this->entity, child, false);
 }
 
 void Object::moveToTop(){

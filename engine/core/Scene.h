@@ -132,7 +132,7 @@ namespace Supernova{
 	
 		void destroyEntity(Entity entity);
 
-		void addEntityChild(Entity parent, Entity child);
+		void addEntityChild(Entity parent, Entity child, bool changeTransform);
 
 		void moveChildToTop(Entity entity);
 		void moveChildUp(Entity entity);

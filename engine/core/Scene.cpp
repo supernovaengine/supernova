@@ -287,59 +287,77 @@ int32_t Scene::findBranchLastIndex(Entity entity){
 	return currentIndex;
 }
 
-void Scene::addEntityChild(Entity parent, Entity child){
-	Signature parentSignature = entityManager.getSignature(parent);
-	Signature childSignature = entityManager.getSignature(child);
-	
+void Scene::addEntityChild(Entity parent, Entity child, bool changeTransform){
 	Signature signature;
 	signature.set(componentManager.getComponentId<Transform>(), true);
 
-	if ( ((parentSignature & signature) == signature) && ((childSignature & signature) == signature) ){
+	Signature childSignature = entityManager.getSignature(child);
+	if ((childSignature & signature) == signature){
 		Transform& transformChild = componentManager.getComponent<Transform>(child);
-		Transform& transformParent = componentManager.getComponent<Transform>(parent);
 
-		auto transforms = componentManager.getComponentArray<Transform>();
+		transformChild.needUpdate = true;
 
-		if (transformChild.parent != parent) {
-			transformChild.parent = parent;
-
-			//----------DEBUG
-			//Log::debug("Add child - BEFORE");
-			//for (int i = 0; i < transforms->size(); i++){
-			//	auto transform = transforms->getComponentFromIndex(i);
-			//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
-			//}
-			//----------DEBUG
-
-			//size_t parentIndex = transforms->getIndex(parent);
-			size_t childIndex = transforms->getIndex(child);
-
-			//find children of parent and child family
-			size_t newIndex = findBranchLastIndex(parent) + 1;
-			size_t lastChild = findBranchLastIndex(child);
-
-			int length = lastChild - childIndex + 1;
-
-			if (newIndex > childIndex) {
-				newIndex = newIndex - length;
+		if (parent == NULL_ENTITY){
+			transformChild.parent = NULL_ENTITY;
+			if (changeTransform){
+				// set local position same of world position
+				transformChild.modelMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
 			}
+			return;
+		}
 
-			if (childIndex != newIndex) {
-				if (length == 1) {
-					transforms->moveEntityToIndex(child, newIndex);
-				} else {
-					transforms->moveEntityRangeToIndex(child, transforms->getEntity(lastChild), newIndex);
+		Signature parentSignature = entityManager.getSignature(parent);
+		if ((parentSignature & signature) == signature){
+			Transform& transformParent = componentManager.getComponent<Transform>(parent);
+
+			auto transforms = componentManager.getComponentArray<Transform>();
+
+			if (transformChild.parent != parent) {
+				transformChild.parent = parent;
+
+				//----------DEBUG
+				//Log::debug("Add child - BEFORE");
+				//for (int i = 0; i < transforms->size(); i++){
+				//	auto transform = transforms->getComponentFromIndex(i);
+				//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
+				//}
+				//----------DEBUG
+
+				//size_t parentIndex = transforms->getIndex(parent);
+				size_t childIndex = transforms->getIndex(child);
+
+				//find children of parent and child family
+				size_t newIndex = findBranchLastIndex(parent) + 1;
+				size_t lastChild = findBranchLastIndex(child);
+
+				int length = lastChild - childIndex + 1;
+
+				if (newIndex > childIndex) {
+					newIndex = newIndex - length;
 				}
-			}
 
-			//----------DEBUG
-			//Log::debug("Add child - AFTER");
-			//for (int i = 0; i < transforms->size(); i++){
-			//	auto transform = transforms->getComponentFromIndex(i);
-			//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
-			//}
-			//Log::debug("\n");
-			//----------DEBUG
+				if (childIndex != newIndex) {
+					if (length == 1) {
+						transforms->moveEntityToIndex(child, newIndex);
+					} else {
+						transforms->moveEntityRangeToIndex(child, transforms->getEntity(lastChild), newIndex);
+					}
+				}
+
+				if (changeTransform){
+					Matrix4 localMatrix = transformParent.modelMatrix.inverse() * transformChild.modelMatrix;
+					localMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
+				}
+
+				//----------DEBUG
+				//Log::debug("Add child - AFTER");
+				//for (int i = 0; i < transforms->size(); i++){
+				//	auto transform = transforms->getComponentFromIndex(i);
+				//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
+				//}
+				//Log::debug("\n");
+				//----------DEBUG
+			}
 		}
 	}
 

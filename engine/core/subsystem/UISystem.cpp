@@ -266,7 +266,7 @@ void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
         scene->addComponent<UIComponent>(button.label, {});
         scene->addComponent<TextComponent>(button.label, {});
 
-        scene->addEntityChild(entity, button.label);
+        scene->addEntityChild(entity, button.label, false);
 
         UIComponent& labelui = scene->getComponent<UIComponent>(button.label);
         UILayoutComponent& labellayout = scene->getComponent<UILayoutComponent>(button.label);
@@ -287,7 +287,7 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
         scene->addComponent<UIComponent>(panel.headerimage, {});
         scene->addComponent<ImageComponent>(panel.headerimage, {});
 
-        scene->addEntityChild(entity, panel.headerimage);
+        scene->addEntityChild(entity, panel.headerimage, false);
 
         UIComponent& headerui = scene->getComponent<UIComponent>(panel.headerimage);
         UILayoutComponent& headerimagelayout = scene->getComponent<UILayoutComponent>(panel.headerimage);
@@ -309,7 +309,7 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
         scene->addComponent<UILayoutComponent>(panel.headercontainer, {});
         scene->addComponent<UIContainerComponent>(panel.headercontainer, {});
 
-        scene->addEntityChild(panel.headerimage, panel.headercontainer);
+        scene->addEntityChild(panel.headerimage, panel.headercontainer, false);
 
         UIContainerComponent& containerui = scene->getComponent<UIContainerComponent>(panel.headercontainer);
         UILayoutComponent& containerlayout = scene->getComponent<UILayoutComponent>(panel.headercontainer);
@@ -328,7 +328,7 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
         scene->addComponent<UIComponent>(panel.headertext, {});
         scene->addComponent<TextComponent>(panel.headertext, {});
 
-        scene->addEntityChild(panel.headercontainer, panel.headertext);
+        scene->addEntityChild(panel.headercontainer, panel.headertext, false);
 
         UIComponent& titleui = scene->getComponent<UIComponent>(panel.headertext);
         UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.headertext);
@@ -350,7 +350,7 @@ void UISystem::createScrollbarObjects(Entity entity, ScrollbarComponent& scrollb
         scene->addComponent<UIComponent>(scrollbar.bar, {});
         scene->addComponent<ImageComponent>(scrollbar.bar, {});
 
-        scene->addEntityChild(entity, scrollbar.bar);
+        scene->addEntityChild(entity, scrollbar.bar, false);
 
         UILayoutComponent& barlayout = scene->getComponent<UILayoutComponent>(scrollbar.bar);
 
@@ -367,7 +367,7 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
         scene->addComponent<UIComponent>(textedit.text, {});
         scene->addComponent<TextComponent>(textedit.text, {});
 
-        scene->addEntityChild(entity, textedit.text);
+        scene->addEntityChild(entity, textedit.text, false);
 
         UILayoutComponent& textlayout = scene->getComponent<UILayoutComponent>(textedit.text);
         UIComponent& textui = scene->getComponent<UIComponent>(textedit.text);
@@ -383,7 +383,7 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
         scene->addComponent<UIComponent>(textedit.cursor, {});
         scene->addComponent<PolygonComponent>(textedit.cursor, {});
 
-        scene->addEntityChild(entity, textedit.cursor);
+        scene->addEntityChild(entity, textedit.cursor, false);
 
         UILayoutComponent& cursorlayout = scene->getComponent<UILayoutComponent>(textedit.cursor);
 

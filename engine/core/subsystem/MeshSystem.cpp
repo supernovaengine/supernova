@@ -692,7 +692,7 @@ Entity MeshSystem::generateSketetalStructure(Entity entity, ModelComponent& mode
 
     for (size_t i = 0; i < node.children.size(); i++){
         // here bonetransform and bonecomp losts references
-        scene->addEntityChild(bone, generateSketetalStructure(entity, model, node.children[i], skinIndex));
+        scene->addEntityChild(bone, generateSketetalStructure(entity, model, node.children[i], skinIndex), false);
     }
 
     return bone;
@@ -2060,7 +2060,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
                 Log::error("Cannot create skinning bigger than %i", MAX_BONES);
                 return false;
             }
-            scene->addEntityChild(entity, model.skeleton);
+            scene->addEntityChild(entity, model.skeleton, false);
         }
     }
 
