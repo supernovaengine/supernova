@@ -300,7 +300,7 @@ void Scene::addEntityChild(Entity parent, Entity child, bool changeTransform){
 		if (parent == NULL_ENTITY){
 			transformChild.parent = NULL_ENTITY;
 			if (changeTransform){
-				// set local position same of world position
+				// set local position to be the same of world position
 				transformChild.modelMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
 			}
 			return;
@@ -314,6 +314,11 @@ void Scene::addEntityChild(Entity parent, Entity child, bool changeTransform){
 
 			if (transformChild.parent != parent) {
 				transformChild.parent = parent;
+
+				if (changeTransform){
+					Matrix4 localMatrix = transformParent.modelMatrix.inverse() * transformChild.modelMatrix;
+					localMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
+				}
 
 				//----------DEBUG
 				//Log::debug("Add child - BEFORE");
@@ -342,11 +347,6 @@ void Scene::addEntityChild(Entity parent, Entity child, bool changeTransform){
 					} else {
 						transforms->moveEntityRangeToIndex(child, transforms->getEntity(lastChild), newIndex);
 					}
-				}
-
-				if (changeTransform){
-					Matrix4 localMatrix = transformParent.modelMatrix.inverse() * transformChild.modelMatrix;
-					localMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
 				}
 
 				//----------DEBUG
@@ -461,20 +461,27 @@ void Scene::moveChildAux(Entity entity, bool increase, bool stopIfFound){
 			}
 		}
 
-		if (nextIndex != entityIndex){
-			size_t lastChildIndex = findBranchLastIndex(entity);
-			size_t length = lastChildIndex - entityIndex + 1;
-
-			if (length == 1){
-				transforms->moveEntityToIndex(entity, nextIndex);
-			}else{
-				nextIndex = nextIndex - length + 1;
-				transforms->moveEntityRangeToIndex(entity, transforms->getEntity(lastChildIndex), nextIndex);
-			}
-		}
+		moveChildToIndex(entity, nextIndex);
 	}
+}
 
-	sortComponentsByTransform(entitySignature);
+void Scene::moveChildToIndex(Entity entity, size_t index){
+	auto transforms = componentManager.getComponentArray<Transform>();
+	size_t entityIndex = transforms->getIndex(entity);
+
+	if (index != entityIndex){
+		size_t lastChildIndex = findBranchLastIndex(entity);
+		size_t length = lastChildIndex - entityIndex + 1;
+
+		if (length == 1){
+			transforms->moveEntityToIndex(entity, index);
+		}else{
+			index = index - length + 1;
+			transforms->moveEntityRangeToIndex(entity, transforms->getEntity(lastChildIndex), index);
+		}
+
+		sortComponentsByTransform(entityManager.getSignature(entity));
+	}
 }
 
 void Scene::moveChildToTop(Entity entity){
