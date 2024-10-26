@@ -2470,6 +2470,7 @@ void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent
 			Quaternion oldRotation = transform.rotation;
 
 			transform.rotation.fromRotationMatrix(m1);
+			transform.rotation = transform.rotation * transform.billboardBase;
 			if (transform.parent != NULL_ENTITY){
 				auto transformParent = scene->getComponent<Transform>(transform.parent);
 				transform.rotation = transformParent.worldRotation.inverse() * transform.rotation;
