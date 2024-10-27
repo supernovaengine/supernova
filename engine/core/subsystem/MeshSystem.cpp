@@ -1027,10 +1027,10 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clear();
-	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     mesh.indices.clear();
@@ -1083,10 +1083,10 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clear();
-	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     mesh.indices.clear();
@@ -1214,10 +1214,10 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clear();
-	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
@@ -1307,10 +1307,10 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clear();
-	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
@@ -1438,10 +1438,10 @@ void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius,
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clear();
-	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
@@ -1523,10 +1523,10 @@ void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsi
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clear();
-	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
