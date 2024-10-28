@@ -179,6 +179,36 @@ RayReturn Ray::intersects(AABB box){
     return NO_HIT;
 }
 
+RayReturn Ray::intersects(Sphere sphere) {
+    Vector3 rayorig = origin - sphere.center;
+    float radius = sphere.radius;
+
+    // discard inside sphere
+    //if (rayorig.squaredLength() <= radius*radius && discardInside){
+    //    return {true, 0, Vector3::ZERO, Vector3::ZERO, NULL_ENTITY, 0};
+    //}
+
+    float a = direction.dotProduct(direction);
+    float b = 2 * rayorig.dotProduct(direction);
+    float c = rayorig.dotProduct(rayorig) - radius * radius;
+
+    // determinant
+    float d = (b * b) - (4 * a * c);
+    if (d >= 0){
+        float t = ( -b - sqrt(d) ) / (2 * a);
+        if (t < 0){
+            t = ( -b + sqrt(d) ) / (2 * a);
+        }
+
+        Vector3 point = getPoint(t);
+        Vector3 normal = (point - sphere.center).normalize();
+
+        return {true, t, point, normal, NULL_ENTITY, 0};
+    }
+
+    return NO_HIT;
+}
+
 RayReturn Ray::intersects(Body2D body){
     Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
 

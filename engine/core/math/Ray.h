@@ -4,6 +4,7 @@
 #include "math/Vector3.h"
 #include "math/Plane.h"
 #include "math/AABB.h"
+#include "math/Sphere.h"
 #include "object/physics/Body2D.h"
 #include "object/physics/Body3D.h"
 
@@ -55,6 +56,7 @@ namespace Supernova {
 
         RayReturn intersects(Plane plane);
         RayReturn intersects(AABB box);
+        RayReturn intersects(Sphere sphere);
         RayReturn intersects(Body2D body);
         RayReturn intersects(Body2D body, size_t shape);
         RayReturn intersects(Body3D body);

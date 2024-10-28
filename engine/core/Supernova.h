@@ -97,6 +97,7 @@
 #include "math/Quaternion.h"
 #include "math/Ray.h"
 #include "math/Rect.h"
+#include "math/Sphere.h"
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
