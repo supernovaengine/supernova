@@ -1,5 +1,6 @@
 #include "Sphere.h"
 
+#include <cmath>
 #include "Plane.h"
 #include "AABB.h"
 
