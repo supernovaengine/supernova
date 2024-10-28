@@ -2,9 +2,13 @@
 #define sphere_h
 
 #include <cmath>
-#include "Vector3.h" // Ensure you have this header for the Vector3 class
+#include "Vector3.h"
 
 namespace Supernova{
+
+    class Plane;
+    class AABB;
+
     class Sphere {
     public:
         Vector3 center;
@@ -21,11 +25,18 @@ namespace Supernova{
         std::string toString() const;
 
         bool contains(const Vector3& point) const;
+
         bool intersects(const Sphere& other) const;
+        bool intersects(const AABB& aabb) const;
+        bool intersects(const Plane& plane) const;
+        bool intersects(const Vector3& v) const;
+
+        void merge(const Sphere& other);
 
         float surfaceArea() const;
         float volume() const;
     };
+
 }
 
 #endif

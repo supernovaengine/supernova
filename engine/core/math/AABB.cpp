@@ -346,6 +346,28 @@ bool AABB::intersects(const Plane& p) const {
     return (p.getSide(*this) == Plane::Side::BOTH_SIDE);
 }
 
+bool AABB::intersects(const Sphere& sp) const{
+    if (isNull()) return false;
+    if (isInfinite()) return true;
+
+    const Vector3& center = sp.center;
+    float radius = sp.radius;
+    const Vector3& min = getMinimum();
+    const Vector3& max = getMaximum();
+
+    float s, d = 0;
+    for (int i = 0; i < 3; ++i){
+        if (center[i] < min[i]){
+            s = center[i] - min[i];
+            d += s * s;
+        }else if(center[i] > max[i]){
+            s = center[i] - max[i];
+            d += s * s;
+        }
+    }
+    return d <= radius * radius;
+}
+
 bool AABB::intersects(const Vector3& v) const {
     switch (mBoxType)
     {

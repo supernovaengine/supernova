@@ -3,6 +3,7 @@
 
 #include "Vector3.h"
 #include "Matrix4.h"
+#include "Sphere.h"
 
 namespace Supernova{
 
@@ -91,6 +92,7 @@ namespace Supernova{
 
         bool intersects(const AABB& b2) const;
         bool intersects(const Plane& p) const;
+        bool intersects(const Sphere& sp) const;
         bool intersects(const Vector3& v) const;
 
         AABB intersection(const AABB& b2) const;

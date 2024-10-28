@@ -17,6 +17,7 @@
 #include "Quaternion.h"
 #include "Rect.h"
 #include "Ray.h"
+#include "Sphere.h"
 #include "Plane.h"
 #include "AABB.h"
 
@@ -181,6 +182,23 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("contains", &Rect::contains)
         .addFunction("isNormalized", &Rect::isNormalized)
         .addFunction("isZero", &Rect::isZero)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<Sphere>("Sphere")
+        .addConstructor<void(), void(Vector3, float)>()
+        .addProperty("center", &Sphere::center)
+        .addProperty("radius", &Sphere::radius)
+        .addFunction("toString", &Sphere::toString)
+        .addFunction("contains", &Sphere::contains)
+        .addFunction("intersects", 
+            luabridge::overload<const Sphere&>(&Sphere::intersects),
+            luabridge::overload<const AABB&>(&Sphere::intersects),
+            luabridge::overload<const Plane&>(&Sphere::intersects),
+            luabridge::overload<const Vector3&>(&Sphere::intersects))
+        .addFunction("merge", &Sphere::merge)
+        .addFunction("surfaceArea", &Sphere::surfaceArea)
+        .addFunction("volume", &Sphere::volume)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -380,6 +398,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("intersects", 
             luabridge::overload<const AABB&>(&AABB::intersects),
             luabridge::overload<const Plane&>(&AABB::intersects),
+            luabridge::overload<const Sphere&>(&AABB::intersects),
             luabridge::overload<const Vector3&>(&AABB::intersects))
         .addFunction("intersection", &AABB::intersection)
         .addFunction("volume", &AABB::volume)

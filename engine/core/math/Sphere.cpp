@@ -1,5 +1,7 @@
 #include "Sphere.h"
 
+#include "Plane.h"
+#include "AABB.h"
 
 using namespace Supernova;
 
@@ -33,7 +35,7 @@ bool Sphere::operator != (const Sphere& s){
 }
 
 std::string Sphere::toString() const {
-    return std::string("Sphere: center (") + center.toString() + "), radius " + std::to_string(radius);
+    return std::string("Sphere(center: ") + center.toString() + ", radius: " + std::to_string(radius) + ")";
 }
 
 bool Sphere::contains(const Vector3& point) const {
@@ -44,6 +46,39 @@ bool Sphere::intersects(const Sphere& other) const {
     float distanceSquared = (center - other.center).squaredLength();
     float radiusSum = radius + other.radius;
     return distanceSquared <= (radiusSum * radiusSum);
+}
+
+bool Sphere::intersects(const AABB& aabb) const{
+    return aabb.intersects(*this);
+}
+
+bool Sphere::intersects(const Plane& plane) const{
+    return abs(plane.getDistance(center)) <= radius;
+}
+
+bool Sphere::intersects(const Vector3& v) const{
+    return ((v - center).squaredLength() <= (radius*radius));
+}
+
+void Sphere::merge(const Sphere& other){
+    Vector3 diff = other.center - center;
+    float lengthSq = diff.squaredLength();
+    float radiusDiff = other.radius - radius;
+
+    if ((radiusDiff*radiusDiff) >= lengthSq) {
+        if (radiusDiff <= 0.0f){
+            return;
+        }else{
+            center = other.center;
+            radius = other.radius;
+            return;
+        }
+    }
+
+    float length = sqrt(lengthSq);
+    float t = (length + radiusDiff) / (2.0f * length);
+    center = center + diff * t;
+    radius = 0.5f * (length + radius + other.radius);
 }
 
 float Sphere::surfaceArea() const {
