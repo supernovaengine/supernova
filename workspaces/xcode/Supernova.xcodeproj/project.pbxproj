@@ -437,6 +437,9 @@
 		714741FB2B029F7D00C891FF /* TextureDataPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 714741F92B029F7D00C891FF /* TextureDataPool.h */; };
 		714741FC2B029F7D00C891FF /* TextureDataPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714741FA2B029F7D00C891FF /* TextureDataPool.cpp */; };
 		714741FD2B029F7D00C891FF /* TextureDataPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 714741FA2B029F7D00C891FF /* TextureDataPool.cpp */; };
+		715253542CD057C400D294D8 /* Sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = 715253522CD057C400D294D8 /* Sphere.h */; };
+		715253552CD057C400D294D8 /* Sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715253532CD057C400D294D8 /* Sphere.cpp */; };
+		715253562CD057C400D294D8 /* Sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715253532CD057C400D294D8 /* Sphere.cpp */; };
 		7157764E2B050C230049C970 /* FontPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 7157764C2B050C230049C970 /* FontPool.h */; };
 		7157764F2B050C230049C970 /* FontPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157764D2B050C230049C970 /* FontPool.cpp */; };
 		715776502B050C230049C970 /* FontPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157764D2B050C230049C970 /* FontPool.cpp */; };
@@ -1784,6 +1787,8 @@
 		714741F92B029F7D00C891FF /* TextureDataPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureDataPool.h; sourceTree = "<group>"; };
 		714741FA2B029F7D00C891FF /* TextureDataPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureDataPool.cpp; sourceTree = "<group>"; };
 		714BBF7127148B69004A15EE /* PointsComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PointsComponent.h; sourceTree = "<group>"; };
+		715253522CD057C400D294D8 /* Sphere.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Sphere.h; sourceTree = "<group>"; };
+		715253532CD057C400D294D8 /* Sphere.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sphere.cpp; sourceTree = "<group>"; };
 		7157764C2B050C230049C970 /* FontPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontPool.h; sourceTree = "<group>"; };
 		7157764D2B050C230049C970 /* FontPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontPool.cpp; sourceTree = "<group>"; };
 		7158F43D259C2C82006E55D3 /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
@@ -3367,26 +3372,28 @@
 		7162FC4825962A0E0075B97D /* math */ = {
 			isa = PBXGroup;
 			children = (
-				7162FC5A25962A0E0075B97D /* AABB.cpp */,
 				7162FC4E25962A0E0075B97D /* AABB.h */,
-				7162FC5125962A0E0075B97D /* Matrix3.cpp */,
+				7162FC5A25962A0E0075B97D /* AABB.cpp */,
 				7162FC5B25962A0E0075B97D /* Matrix3.h */,
-				7162FC4D25962A0E0075B97D /* Matrix4.cpp */,
+				7162FC5125962A0E0075B97D /* Matrix3.cpp */,
 				7162FC5425962A0E0075B97D /* Matrix4.h */,
-				7162FC5C25962A0E0075B97D /* Plane.cpp */,
+				7162FC4D25962A0E0075B97D /* Matrix4.cpp */,
 				7162FC5225962A0E0075B97D /* Plane.h */,
-				7162FC5825962A0E0075B97D /* Quaternion.cpp */,
+				7162FC5C25962A0E0075B97D /* Plane.cpp */,
 				7162FC4F25962A0E0075B97D /* Quaternion.h */,
-				7162FC5025962A0E0075B97D /* Ray.cpp */,
+				7162FC5825962A0E0075B97D /* Quaternion.cpp */,
 				7162FC5925962A0E0075B97D /* Ray.h */,
-				7162FC5625962A0E0075B97D /* Rect.cpp */,
+				7162FC5025962A0E0075B97D /* Ray.cpp */,
 				7162FC5525962A0E0075B97D /* Rect.h */,
-				7162FC4C25962A0E0075B97D /* Vector2.cpp */,
+				7162FC5625962A0E0075B97D /* Rect.cpp */,
+				715253522CD057C400D294D8 /* Sphere.h */,
+				715253532CD057C400D294D8 /* Sphere.cpp */,
 				7162FC4B25962A0E0075B97D /* Vector2.h */,
-				7162FC4A25962A0E0075B97D /* Vector3.cpp */,
+				7162FC4C25962A0E0075B97D /* Vector2.cpp */,
 				7162FC5D25962A0E0075B97D /* Vector3.h */,
-				7162FC4925962A0E0075B97D /* Vector4.cpp */,
+				7162FC4A25962A0E0075B97D /* Vector3.cpp */,
 				7162FC5725962A0E0075B97D /* Vector4.h */,
+				7162FC4925962A0E0075B97D /* Vector4.cpp */,
 			);
 			path = math;
 			sourceTree = "<group>";
@@ -4201,6 +4208,7 @@
 				71E54516284D5BE000C68FAB /* RotateTracksComponent.h in Headers */,
 				717AD96F290B661A007D7DB5 /* AudioSystem.h in Headers */,
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
+				715253542CD057C400D294D8 /* Sphere.h in Headers */,
 				71E544FE284D5BB700C68FAB /* Animation.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
 				7157764E2B050C230049C970 /* FontPool.h in Headers */,
@@ -5429,6 +5437,7 @@
 				713D82A4259D307F00567F9F /* AABB.cpp in Sources */,
 				713E580E27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AF25BB18DC00965B51 /* StringUtils.cpp in Sources */,
+				715253562CD057C400D294D8 /* Sphere.cpp in Sources */,
 				7105A56728B305B20092EA05 /* MathClassesLua.cpp in Sources */,
 				715776502B050C230049C970 /* FontPool.cpp in Sources */,
 				713D82A5259D307F00567F9F /* Plane.cpp in Sources */,
@@ -5592,6 +5601,7 @@
 				7162FD3125963AE00075B97D /* Ray.cpp in Sources */,
 				713E580D27BA9CE400376680 /* TextEdit.cpp in Sources */,
 				7128D0AE25BB18DC00965B51 /* StringUtils.cpp in Sources */,
+				715253552CD057C400D294D8 /* Sphere.cpp in Sources */,
 				7105A56628B305B20092EA05 /* MathClassesLua.cpp in Sources */,
 				7157764F2B050C230049C970 /* FontPool.cpp in Sources */,
 				7162FD3225963AE00075B97D /* Matrix3.cpp in Sources */,
