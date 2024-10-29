@@ -23,6 +23,7 @@ namespace Supernova {
         Quaternion(const Vector3* akAxis);
         Quaternion(const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
         Quaternion(const float angle, const Vector3& rkAxis);
+        Quaternion(const Matrix4& kRot);
 
         std::string toString() const;
 

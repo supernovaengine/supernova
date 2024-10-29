@@ -290,7 +290,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
             void(const float, const float, const float),
             void(const Vector3*),
             void(const Vector3&, const Vector3&, const Vector3&),
-            void(const float, const Vector3&)>()
+            void(const float, const Vector3&),
+            void(const Matrix4&)>()
         .addStaticProperty("IDENTITY", &Quaternion::IDENTITY)
         .addFunction("__tostring", &Quaternion::toString)
         .addFunction("__eq", &Quaternion::operator==)

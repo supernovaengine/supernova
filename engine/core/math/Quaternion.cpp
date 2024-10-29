@@ -42,6 +42,10 @@ Quaternion::Quaternion(const float angle, const Vector3& rkAxis){
     this->fromAngleAxis(angle, rkAxis);
 }
 
+Quaternion::Quaternion(const Matrix4& kRot){
+    this->fromRotationMatrix(kRot);
+}
+
 std::string Quaternion::toString() const{
     return "Quaternion(" + std::to_string(w) + ", " + std::to_string(x) + ", " + std::to_string(y) + ", " + std::to_string(z) + ")"; 
 }
