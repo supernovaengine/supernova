@@ -1765,7 +1765,9 @@ void RenderSystem::updateTransform(Transform& transform){
 
 		transform.modelMatrix = transformParent.modelMatrix * transform.localMatrix;
 
-		transform.modelMatrix.decompose(transform.worldPosition, transform.worldScale, transform.worldRotation);
+		transform.worldPosition = transformParent.modelMatrix * transform.position;
+		transform.worldScale = transformParent.worldScale * transform.scale;
+		transform.worldRotation = Quaternion((transformParent.modelMatrix.getRotationMatrix() * transform.localMatrix.getRotationMatrix()));
 	}else{
 		transform.modelMatrix = transform.localMatrix;
 

@@ -676,5 +676,5 @@ void Matrix4::decompose(Vector3& position, Vector3& scale, Quaternion& rotation)
             matrix[0][2]/scale.x, matrix[1][2]/scale.y, matrix[2][2]/scale.z, 0.0,
             0.0, 0.0,  0.0, 1.0);
 
-    rotation.fromRotationMatrix(rotationM);
+    rotation.fromRotationMatrix(rotationM).normalize();
 }
