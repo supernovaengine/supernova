@@ -70,6 +70,10 @@ namespace Supernova{
         Vector3 getWorldUp() const;
         Vector3 getWorldRight() const;
 
+        Matrix4 getViewMatrix() const;
+        Matrix4 getProjectionMatrix() const;
+        Matrix4 getViewProjectionMatrix() const;
+
         void rotateView(float angle);
         void rotatePosition(float angle);
 

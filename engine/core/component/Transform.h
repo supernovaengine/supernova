@@ -25,6 +25,8 @@ namespace Supernova{
 
         Matrix4 modelMatrix;
         Matrix4 normalMatrix;
+
+        // internal use only, it depends of camera (same scene can have multiple cameras)
         Matrix4 modelViewProjectionMatrix;
 
         bool staticObject = false;

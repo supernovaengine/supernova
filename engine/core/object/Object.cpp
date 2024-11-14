@@ -197,11 +197,6 @@ Matrix4 Object::getNormalMatrix() const{
     return transform.normalMatrix;
 }
 
-Matrix4 Object::getModelViewProjectionMatrix() const{
-    Transform& transform = getComponent<Transform>();
-    return transform.modelViewProjectionMatrix;
-}
-
 void Object::addChild(Object* child){
     scene->addEntityChild(this->entity, child->entity, false);
 }

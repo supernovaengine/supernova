@@ -65,7 +65,6 @@ namespace Supernova{
 
         Matrix4 getModelMatrix() const;
         Matrix4 getNormalMatrix() const;
-        Matrix4 getModelViewProjectionMatrix() const;
 
         void updateTransform();
 

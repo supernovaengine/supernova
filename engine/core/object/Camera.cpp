@@ -311,6 +311,21 @@ Vector3 Camera::getWorldRight() const{
     return camera.worldRight;
 }
 
+Matrix4 Camera::getViewMatrix() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.viewMatrix;
+}
+
+Matrix4 Camera::getProjectionMatrix() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.projectionMatrix;
+}
+
+Matrix4 Camera::getViewProjectionMatrix() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.viewProjectionMatrix;
+}
+
 void Camera::rotateView(float angle){
     if (angle != 0){
         CameraComponent& camera = getComponent<CameraComponent>();
