@@ -279,6 +279,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("getPositionMatrix", &Matrix4::getPositionMatrix)
         .addFunction("getScaleMatrix", &Matrix4::getScaleMatrix)
         .addFunction("getRotationMatrix", &Matrix4::getRotationMatrix)
+        .addFunction("decomposePosition", &Matrix4::decomposePosition)
+        .addFunction("decomposeScale", &Matrix4::decomposeScale)
+        .addFunction("decomposeRotation", &Matrix4::decomposeRotation)
         .addFunction("decompose", &Matrix4::decompose)
         .endClass();
 

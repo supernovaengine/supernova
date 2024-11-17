@@ -57,7 +57,7 @@ namespace Supernova {
 
         Matrix4 inverse();
         Matrix4 transpose();
-        float determinant();
+        float determinant() const;
 
         static Matrix4 translateMatrix(const float x, const float y, const float z);
         static Matrix4 translateMatrix(const Vector3& position);
@@ -77,11 +77,15 @@ namespace Supernova {
         static Matrix4 perspectiveMatrix(float yfov, float aspect, float near, float far);
 
         // recovering the scale, rotation and translation matrices from the model matrix
-        Matrix4 getPositionMatrix();
-        Matrix4 getScaleMatrix();
-        Matrix4 getRotationMatrix();
+        Matrix4 getPositionMatrix() const;
+        Matrix4 getScaleMatrix() const;
+        Matrix4 getRotationMatrix() const;
 
-        void decompose(Vector3& position, Vector3& scale, Quaternion& rotation);
+        Vector3 decomposePosition() const;
+        Vector3 decomposeScale() const;
+        Quaternion decomposeRotation() const;
+
+        void decompose(Vector3& position, Vector3& scale, Quaternion& rotation) const;
     };
     
 }
