@@ -29,8 +29,6 @@ namespace Supernova{
         // internal use only, it depends of camera (same scene can have multiple cameras)
         Matrix4 modelViewProjectionMatrix;
 
-        bool staticObject = false;
-
         bool visible = true;
 
         Entity parent = NULL_ENTITY;

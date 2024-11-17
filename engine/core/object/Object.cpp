@@ -178,8 +178,21 @@ bool Object::isCylindricalBillboard() const{
 
 void Object::setLocalMatrix(Matrix4 localMatrix){
     Transform& transform = getComponent<Transform>();
-    transform.localMatrix = localMatrix;
-    transform.staticObject = true;
+
+    if (transform.localMatrix != localMatrix){
+        transform.localMatrix = localMatrix;
+
+        Vector3 position;
+        Vector3 scale;
+        Quaternion rotation;
+        localMatrix.decompose(position, scale, rotation);
+
+        transform.position = position;
+        transform.scale = scale;
+        transform.rotation = rotation;
+
+        transform.needUpdate = true;
+    }
 }
 
 Matrix4 Object::getLocalMatrix() const{
