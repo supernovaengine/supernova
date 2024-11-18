@@ -1765,13 +1765,13 @@ void RenderSystem::updateTransform(Transform& transform){
 
 		transform.worldPosition = transformParent.modelMatrix * transform.position;
 		transform.worldScale = transformParent.worldScale * transform.scale;
-		transform.worldRotation = Quaternion((transformParent.modelMatrix.getRotationMatrix() * transform.localMatrix.getRotationMatrix()));
+		transform.worldRotation = transformParent.worldRotation * transform.rotation;
 	}else{
 		transform.modelMatrix = transform.localMatrix;
 
-		transform.worldRotation = transform.rotation;
-		transform.worldScale = transform.scale;
 		transform.worldPosition = transform.position;
+		transform.worldScale = transform.scale;
+		transform.worldRotation = transform.rotation;
 	}
 
 	if (hasLights){
