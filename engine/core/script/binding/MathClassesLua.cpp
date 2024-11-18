@@ -233,6 +233,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addStaticFunction("scaleMatrix", 
             luabridge::overload<const Vector3&>(&Matrix3::scaleMatrix),
             luabridge::overload<const float>(&Matrix3::scaleMatrix))
+        .addFunction("decomposeQDU", &Matrix3::decomposeQDU)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -257,6 +258,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("setColumn", &Matrix4::setColumn)
         .addFunction("identity", &Matrix4::identity)
         .addFunction("translateInPlace", &Matrix4::translateInPlace)
+        .addFunction("linear", &Matrix4::linear)
         .addFunction("inverse", &Matrix4::inverse)
         .addFunction("transpose", &Matrix4::transpose)
         .addFunction("determinant", &Matrix4::determinant)
@@ -276,12 +278,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addStaticFunction("frustumMatrix", &Matrix4::frustumMatrix)
         .addStaticFunction("orthoMatrix", &Matrix4::orthoMatrix)
         .addStaticFunction("perspectiveMatrix", &Matrix4::perspectiveMatrix)
-        .addFunction("getPositionMatrix", &Matrix4::getPositionMatrix)
-        .addFunction("getScaleMatrix", &Matrix4::getScaleMatrix)
-        .addFunction("getRotationMatrix", &Matrix4::getRotationMatrix)
-        .addFunction("decomposePosition", &Matrix4::decomposePosition)
-        .addFunction("decomposeScale", &Matrix4::decomposeScale)
-        .addFunction("decomposeRotation", &Matrix4::decomposeRotation)
+        .addFunction("decomposeStandard", &Matrix4::decomposeStandard)
+        .addFunction("decomposeQDU", &Matrix4::decomposeQDU)
         .addFunction("decompose", &Matrix4::decompose)
         .endClass();
 
@@ -294,6 +292,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             void(const Vector3*),
             void(const Vector3&, const Vector3&, const Vector3&),
             void(const float, const Vector3&),
+            void(const Matrix3&),
             void(const Matrix4&)>()
         .addStaticProperty("IDENTITY", &Quaternion::IDENTITY)
         .addFunction("__tostring", &Quaternion::toString)
@@ -306,7 +305,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("fromAxes", 
             luabridge::overload<const Vector3*>(&Quaternion::fromAxes),
             luabridge::overload<const Vector3&, const Vector3&, const Vector3&>(&Quaternion::fromAxes))
-        .addFunction("fromRotationMatrix", &Quaternion::fromRotationMatrix)
+        .addFunction("fromRotationMatrix", 
+            luabridge::overload<const Matrix3&>(&Quaternion::fromRotationMatrix),
+            luabridge::overload<const Matrix4&>(&Quaternion::fromRotationMatrix))
         .addFunction("getRotationMatrix", &Quaternion::getRotationMatrix)
         .addFunction("fromAngle", &Quaternion::fromAngle)
         .addFunction("fromAngleAxis", &Quaternion::fromAngleAxis)

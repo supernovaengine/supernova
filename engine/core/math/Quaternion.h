@@ -23,6 +23,7 @@ namespace Supernova {
         Quaternion(const Vector3* akAxis);
         Quaternion(const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
         Quaternion(const float angle, const Vector3& rkAxis);
+        Quaternion(const Matrix3& kRot);
         Quaternion(const Matrix4& kRot);
 
         std::string toString() const;
@@ -53,6 +54,7 @@ namespace Supernova {
         void fromEulerAngles(const float xAngle, const float yAngle, const float zAngle);
         void fromAxes (const Vector3* akAxis);
         void fromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
+        Quaternion& fromRotationMatrix (const Matrix3& kRot);
         Quaternion& fromRotationMatrix (const Matrix4& kRot);
         Matrix4 getRotationMatrix();
         void fromAngle (const float angle);

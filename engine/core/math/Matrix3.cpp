@@ -130,11 +130,11 @@ Matrix3::operator const float *() const {
     return (float*)matrix;
 }
 
-void Matrix3::set(const int col,const int row,const float val) {
+void Matrix3::set(const int col, const int row, const float val) {
     matrix[col][row] = val;
 }
 
-float Matrix3::get(const int col,const int row) const {
+float Matrix3::get(const int col, const int row) const {
     return matrix[col][row];
 }
 
@@ -374,4 +374,72 @@ Matrix3 Matrix3::scaleMatrix(const Vector3& sf){
     r.set(2,2,sf[2]);
 
     return r;
+}
+
+
+void Matrix3::decomposeQDU(Matrix3& kQ, Vector3& kD, Vector3& kU) const{
+    // orthogonal matrix Q
+    float fInvLength = matrix[0][0]*matrix[0][0] + matrix[0][1]*matrix[0][1] + matrix[0][2]*matrix[0][2];
+    if (fInvLength != 0) fInvLength = 1.0 / sqrtf(fInvLength);
+
+    kQ[0][0] = matrix[0][0]*fInvLength;
+    kQ[0][1] = matrix[0][1]*fInvLength;
+    kQ[0][2] = matrix[0][2]*fInvLength;
+
+    float fDot = kQ[0][0]*matrix[1][0] + kQ[0][1]*matrix[1][1] + kQ[0][2]*matrix[1][2];
+    kQ[1][0] = matrix[1][0]-fDot*kQ[0][0];
+    kQ[1][1] = matrix[1][1]-fDot*kQ[0][1];
+    kQ[1][2] = matrix[1][2]-fDot*kQ[0][2];
+    fInvLength = kQ[1][0]*kQ[1][0] + kQ[1][1]*kQ[1][1] + kQ[1][2]*kQ[1][2];
+    if (fInvLength != 0) fInvLength = 1.0 / sqrtf(fInvLength);
+
+    kQ[1][0] *= fInvLength;
+    kQ[1][1] *= fInvLength;
+    kQ[1][2] *= fInvLength;
+
+    fDot = kQ[0][0]*matrix[2][0] + kQ[0][1]*matrix[2][1] + kQ[0][2]*matrix[2][2];
+    kQ[2][0] = matrix[2][0]-fDot*kQ[0][0];
+    kQ[2][1] = matrix[2][1]-fDot*kQ[0][1];
+    kQ[2][2] = matrix[2][2]-fDot*kQ[0][2];
+    fDot = kQ[1][0]*matrix[2][0] + kQ[1][1]*matrix[2][1] + kQ[1][2]*matrix[2][2];
+    kQ[2][0] -= fDot*kQ[1][0];
+    kQ[2][1] -= fDot*kQ[1][1];
+    kQ[2][2] -= fDot*kQ[1][2];
+    fInvLength = kQ[2][0]*kQ[2][0] + kQ[2][1]*kQ[2][1] + kQ[2][2]*kQ[2][2];
+    if (fInvLength != 0) fInvLength = 1.0 / sqrtf(fInvLength);
+
+    kQ[2][0] *= fInvLength;
+    kQ[2][1] *= fInvLength;
+    kQ[2][2] *= fInvLength;
+
+    // check that orthogonal matrix has determinant 1 (no reflections)
+    float fDet = kQ[0][0]*kQ[1][1]*kQ[2][2] + kQ[1][0]*kQ[2][1]*kQ[0][2] +
+        kQ[2][0]*kQ[0][1]*kQ[1][2] - kQ[2][0]*kQ[1][1]*kQ[0][2] -
+        kQ[1][0]*kQ[0][1]*kQ[2][2] - kQ[0][0]*kQ[2][1]*kQ[1][2];
+
+    if ( fDet < 0.0 ){
+        for (size_t iCol = 0; iCol < 3; iCol++)
+            for (size_t iRow = 0; iRow < 3; iRow++)
+                kQ[iCol][iRow] = -kQ[iCol][iRow];
+    }
+
+    // right matrix R
+    Matrix3 kR;
+    kR[0][0] = kQ[0][0]*matrix[0][0] + kQ[0][1]*matrix[0][1] + kQ[0][2]*matrix[0][2];
+    kR[1][0] = kQ[0][0]*matrix[1][0] + kQ[0][1]*matrix[1][1] + kQ[0][2]*matrix[1][2];
+    kR[1][1] = kQ[1][0]*matrix[1][0] + kQ[1][1]*matrix[1][1] + kQ[1][2]*matrix[1][2];
+    kR[2][0] = kQ[0][0]*matrix[2][0] + kQ[0][1]*matrix[2][1] + kQ[0][2]*matrix[2][2];
+    kR[2][1] = kQ[1][0]*matrix[2][0] + kQ[1][1]*matrix[2][1] + kQ[1][2]*matrix[2][2];
+    kR[2][2] = kQ[2][0]*matrix[2][0] + kQ[2][1]*matrix[2][1] + kQ[2][2]*matrix[2][2];
+
+    // scaling component
+    kD[0] = kR[0][0];
+    kD[1] = kR[1][1];
+    kD[2] = kR[2][2];
+
+    // shear component
+    float fInvD0 = 1.0f/kD[0];
+    kU[0] = kR[1][0]*fInvD0;
+    kU[1] = kR[2][0]*fInvD0;
+    kU[2] = kR[2][1]/kD[1];
 }

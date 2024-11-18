@@ -37,8 +37,8 @@ namespace Supernova {
 
         Vector3 row(const unsigned int row) const;
         Vector3 column(const unsigned int column) const;
-        void set(const int col,const int row,const float val);
-        float get(const int col,const int row) const;
+        void set(const int col, const int row, const float val);
+        float get(const int col, const int row) const;
 
         void setRow(const unsigned int row, const Vector3& vec);
         void setColumn(const unsigned int column, const Vector3& vec);
@@ -59,6 +59,8 @@ namespace Supernova {
 
         static Matrix3 scaleMatrix(const float sf);
         static Matrix3 scaleMatrix(const Vector3& sf);
+
+        void decomposeQDU(Matrix3& kQ, Vector3& kD, Vector3& kU) const;
 
     };
 

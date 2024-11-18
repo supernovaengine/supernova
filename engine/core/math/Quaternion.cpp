@@ -42,6 +42,10 @@ Quaternion::Quaternion(const float angle, const Vector3& rkAxis){
     this->fromAngleAxis(angle, rkAxis);
 }
 
+Quaternion::Quaternion(const Matrix3& kRot){
+    this->fromRotationMatrix(kRot);
+}
+
 Quaternion::Quaternion(const Matrix4& kRot){
     this->fromRotationMatrix(kRot);
 }
@@ -227,7 +231,7 @@ void Quaternion::fromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vec
 
 }
 
-Quaternion& Quaternion::fromRotationMatrix (const Matrix4& kRot){
+Quaternion& Quaternion::fromRotationMatrix (const Matrix3& kRot){
     float trace = kRot[0][0] + kRot[1][1] + kRot[2][2];
     if (trace > 0) {
         float s = 0.5f / sqrtf(trace + 1.0f);
@@ -258,6 +262,10 @@ Quaternion& Quaternion::fromRotationMatrix (const Matrix4& kRot){
     }
 
     return *this;
+}
+
+Quaternion& Quaternion::fromRotationMatrix (const Matrix4& kRot){
+    return fromRotationMatrix(kRot.linear());
 }
 
 Matrix4 Quaternion::getRotationMatrix(){

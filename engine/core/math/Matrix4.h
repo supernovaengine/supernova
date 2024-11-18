@@ -46,14 +46,16 @@ namespace Supernova {
 
         Vector4 row(const unsigned int row) const;
         Vector4 column(const unsigned int column) const;
-        void set(const int col,const int row,const float val);
-        float get(const int col,const int row) const;
+        void set(const int col, const int row, const float val);
+        float get(const int col, const int row) const;
 
         void setRow(const unsigned int row, const Vector4& vec);
         void setColumn(const unsigned int column, const Vector4& vec);
 
         void identity();
         void translateInPlace(float x, float y, float z);
+
+        Matrix3 linear() const;
 
         Matrix4 inverse();
         Matrix4 transpose();
@@ -76,15 +78,8 @@ namespace Supernova {
         static Matrix4 orthoMatrix(float l, float r, float b, float t, float n, float f);
         static Matrix4 perspectiveMatrix(float yfov, float aspect, float near, float far);
 
-        // recovering the scale, rotation and translation matrices from the model matrix
-        Matrix4 getPositionMatrix() const;
-        Matrix4 getScaleMatrix() const;
-        Matrix4 getRotationMatrix() const;
-
-        Vector3 decomposePosition() const;
-        Vector3 decomposeScale() const;
-        Quaternion decomposeRotation() const;
-
+        void decomposeStandard(Vector3& position, Vector3& scale, Quaternion& rotation) const;
+        void decomposeQDU(Vector3& position, Vector3& scale, Quaternion& rotation) const;
         void decompose(Vector3& position, Vector3& scale, Quaternion& rotation) const;
     };
     

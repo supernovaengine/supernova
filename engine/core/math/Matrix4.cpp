@@ -172,11 +172,11 @@ Matrix4::operator const float *() const{
      return (float*)matrix;
 }
 
-void Matrix4::set(const int col,const int row,const float val){
+void Matrix4::set(const int col, const int row, const float val){
     matrix[col][row] = val;
 }
 
-float Matrix4::get(const int col,const int row) const{
+float Matrix4::get(const int col, const int row) const{
     return matrix[col][row];
 }
 
@@ -221,6 +221,13 @@ void Matrix4::translateInPlace(float x, float y, float z){
         r = row(i);
         set(3, i, get(3, i) + r.dotProduct(t));
     }
+}
+
+Matrix3 Matrix4::linear() const{
+    return Matrix3(
+        matrix[0][0], matrix[1][0], matrix[2][0],
+        matrix[0][1], matrix[1][1], matrix[2][1],
+        matrix[0][2], matrix[1][2], matrix[2][2]);
 }
 
 Matrix4 Matrix4::transpose(){
@@ -624,67 +631,16 @@ Matrix4 Matrix4::perspectiveMatrix(float yfov, float aspect, float near, float f
     return r;
 }
 
-Matrix4 Matrix4::getPositionMatrix() const{
-    return Matrix4(
-            1.0, 0.0, 0.0, matrix[3][0],
-            0.0, 1.0, 0.0, matrix[3][1],
-            0.0, 0.0, 1.0, matrix[3][2],
-            0.0, 0.0, 0.0, 1.0);
-}
-
-Matrix4 Matrix4::getScaleMatrix() const{
-    Vector3 scale;
-
-    scale.x = Vector3(matrix[0][0], matrix[0][1], matrix[0][2]).length();
-    scale.y = Vector3(matrix[1][0], matrix[1][1], matrix[1][2]).length();
-    scale.z = Vector3(matrix[2][0], matrix[2][1], matrix[2][2]).length();
-
-    if (determinant() < 0) scale = -scale;
-
-    return Matrix4(
-            scale.x, 0.0, 0.0, 0.0,
-            0.0, scale.y, 0.0, 0.0,
-            0.0, 0.0, scale.z, 0.0,
-            0.0, 0.0, 0.0, 1.0);
-}
-
-Matrix4 Matrix4::getRotationMatrix() const{
-    Quaternion rotation;
-
-    Matrix4 scale = getScaleMatrix();
-    return Matrix4(
-            matrix[0][0]/scale[0][0], matrix[1][0]/scale[1][1], matrix[2][0]/scale[2][2], 0.0,
-            matrix[0][1]/scale[0][0], matrix[1][1]/scale[1][1], matrix[2][1]/scale[2][2], 0.0,
-            matrix[0][2]/scale[0][0], matrix[1][2]/scale[1][1], matrix[2][2]/scale[2][2], 0.0,
-            0.0, 0.0, 0.0, 1.0);
-}
-
-Vector3 Matrix4::decomposePosition() const{
-    Vector3 position;
-
+void Matrix4::decomposeStandard(Vector3& position, Vector3& scale, Quaternion& rotation) const{
     position.x = matrix[3][0];
 	position.y = matrix[3][1];
 	position.z = matrix[3][2];
-
-    return position;
-}
-
-Vector3 Matrix4::decomposeScale() const{
-    Vector3 scale;
 
     scale.x = Vector3(matrix[0][0], matrix[0][1], matrix[0][2]).length();
 	scale.y = Vector3(matrix[1][0], matrix[1][1], matrix[1][2]).length();
 	scale.z = Vector3(matrix[2][0], matrix[2][1], matrix[2][2]).length();
 
     if (determinant() < 0) scale = -scale;
-
-    return scale;
-}
-
-Quaternion Matrix4::decomposeRotation() const{
-    Quaternion rotation;
-
-    Vector3 scale = decomposeScale();
 
     Matrix4 rotationM = Matrix4(
             matrix[0][0]/scale.x, matrix[1][0]/scale.y, matrix[2][0]/scale.z, 0.0,
@@ -693,26 +649,20 @@ Quaternion Matrix4::decomposeRotation() const{
             0.0, 0.0,  0.0, 1.0);
 
     rotation.fromRotationMatrix(rotationM).normalize();
+}
 
-    return rotation;
+void Matrix4::decomposeQDU(Vector3& position, Vector3& scale, Quaternion& rotation) const{
+    position.x = matrix[3][0];
+	position.y = matrix[3][1];
+	position.z = matrix[3][2];
+
+    Matrix3 matQ;
+    Vector3 vecU;
+    linear().decomposeQDU( matQ, scale, vecU );
+
+    rotation = Quaternion(matQ);
 }
 
 void Matrix4::decompose(Vector3& position, Vector3& scale, Quaternion& rotation) const{
-    position.x = matrix[3][0];
-	position.y = matrix[3][1];
-	position.z = matrix[3][2];
-
-    scale.x = Vector3(matrix[0][0], matrix[0][1], matrix[0][2]).length();
-	scale.y = Vector3(matrix[1][0], matrix[1][1], matrix[1][2]).length();
-	scale.z = Vector3(matrix[2][0], matrix[2][1], matrix[2][2]).length();
-
-    if (determinant() < 0) scale = -scale;
-
-    Matrix4 rotationM = Matrix4(
-            matrix[0][0]/scale.x, matrix[1][0]/scale.y, matrix[2][0]/scale.z, 0.0,
-            matrix[0][1]/scale.x, matrix[1][1]/scale.y, matrix[2][1]/scale.z, 0.0,
-            matrix[0][2]/scale.x, matrix[1][2]/scale.y, matrix[2][2]/scale.z, 0.0,
-            0.0, 0.0,  0.0, 1.0);
-
-    rotation.fromRotationMatrix(rotationM).normalize();
+    decomposeQDU(position, scale, rotation);
 }
