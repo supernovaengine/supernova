@@ -16,6 +16,17 @@ namespace Supernova{
 
         Vector3 pointB = Vector3(0,0,0);
         Vector4 colorB = Vector4(1,1,1,1);
+
+        bool operator==(const LineData& other) const {
+            return pointA == other.pointA &&
+                colorA == other.colorA &&
+                pointB == other.pointB &&
+                colorB == other.colorB;
+        }
+
+        bool operator!=(const LineData& other) const {
+            return !(*this == other);
+        }
     };
 
     struct LinesComponent{

@@ -101,9 +101,11 @@ LineData& Lines::getLine(size_t index){
 void Lines::updateLine(size_t index, LineData line){
     LinesComponent& linescomp = getComponent<LinesComponent>();
 
-    linescomp.lines.at(index) = line;
+    if (linescomp.lines.at(index) != line){
+        linescomp.lines.at(index) = line;
 
-    linescomp.needUpdateBuffer = true;
+        linescomp.needUpdateBuffer = true;
+    }
 }
 
 void Lines::updateLine(size_t index, Vector3 pointA, Vector3 pointB){
