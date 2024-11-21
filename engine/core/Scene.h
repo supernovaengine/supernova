@@ -123,7 +123,7 @@ namespace Supernova{
 		bool isEnableUIEvents() const;
 		void setEnableUIEvents(bool enableUIEvents);
 
-		int32_t findBranchLastIndex(Entity entity);
+		size_t findBranchLastIndex(Entity entity);
 	
 		//Entity methods
 

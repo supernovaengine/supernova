@@ -255,30 +255,29 @@ void Scene::destroyEntity(Entity entity){
 	entityManager.destroy(entity);
 }
 
-int32_t Scene::findBranchLastIndex(Entity entity){
+size_t Scene::findBranchLastIndex(Entity entity){
 	auto transforms = componentManager.getComponentArray<Transform>();
 
+	// will throw error if entity has not Transform
 	size_t index = transforms->getIndex(entity);
-	if (index < 0)
-		return -1;
 
 	size_t currentIndex = index + 1;
 	std::vector<Entity> entityList;
 	entityList.push_back(entity);
 
-	bool found = false;
-	while (!found){
+	bool found = true;
+	while (found){
 		if (currentIndex < transforms.get()->size()){
 			Transform& transform = componentManager.getComponentFromIndex<Transform>(currentIndex);
 			//if not in list
 			if (std::find(entityList.begin(), entityList.end(),transform.parent)==entityList.end()) {
-				found = true;
+				found = false;
 			}else{
 				entityList.push_back(transforms->getEntity(currentIndex));
 				currentIndex++;
 			}
 		} else {
-			found = true;
+			found = false;
 		}
 	}
 
@@ -427,12 +426,9 @@ void Scene::sortComponentsByTransform(Signature entitySignature){
 }
 
 void Scene::moveChildAux(Entity entity, bool increase, bool stopIfFound){
-	Signature entitySignature = entityManager.getSignature(entity);
-	
-	Signature signature;
-	signature.set(componentManager.getComponentId<Transform>(), true);
+	Signature signature = entityManager.getSignature(entity);
 
-	if ((entitySignature & signature) == signature){
+	if (signature.test(getComponentId<Transform>())){
 		auto transforms = componentManager.getComponentArray<Transform>();
 
 		size_t entityIndex = transforms->getIndex(entity);
@@ -466,21 +462,25 @@ void Scene::moveChildAux(Entity entity, bool increase, bool stopIfFound){
 }
 
 void Scene::moveChildToIndex(Entity entity, size_t index){
-	auto transforms = componentManager.getComponentArray<Transform>();
-	size_t entityIndex = transforms->getIndex(entity);
+	Signature signature = entityManager.getSignature(entity);
 
-	if (index != entityIndex){
-		size_t lastChildIndex = findBranchLastIndex(entity);
-		size_t length = lastChildIndex - entityIndex + 1;
+	if (signature.test(getComponentId<Transform>())){
+		auto transforms = componentManager.getComponentArray<Transform>();
+		size_t entityIndex = transforms->getIndex(entity);
 
-		if (length == 1){
-			transforms->moveEntityToIndex(entity, index);
-		}else{
-			index = index - length + 1;
-			transforms->moveEntityRangeToIndex(entity, transforms->getEntity(lastChildIndex), index);
+		if (index != entityIndex){
+			size_t lastChildIndex = findBranchLastIndex(entity);
+			size_t length = lastChildIndex - entityIndex + 1;
+
+			if (length == 1){
+				transforms->moveEntityToIndex(entity, index);
+			}else{
+				index = index - length + 1;
+				transforms->moveEntityRangeToIndex(entity, transforms->getEntity(lastChildIndex), index);
+			}
+
+			sortComponentsByTransform(entityManager.getSignature(entity));
 		}
-
-		sortComponentsByTransform(entityManager.getSignature(entity));
 	}
 }
 
