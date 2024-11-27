@@ -311,6 +311,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("getRotationMatrix", &Quaternion::getRotationMatrix)
         .addFunction("fromAngle", &Quaternion::fromAngle)
         .addFunction("fromAngleAxis", &Quaternion::fromAngleAxis)
+        .addFunction("getEulerAngles", &Quaternion::getEulerAngles)
         .addFunction("xAxis", &Quaternion::xAxis)
         .addFunction("yAxis", &Quaternion::yAxis)
         .addFunction("zAxis", &Quaternion::zAxis)

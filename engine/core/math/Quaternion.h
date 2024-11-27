@@ -60,6 +60,8 @@ namespace Supernova {
         void fromAngle (const float angle);
         void fromAngleAxis (const float angle, const Vector3& rkAxis);
 
+        Vector3 getEulerAngles() const;
+
         Vector3 xAxis(void) const;
         Vector3 yAxis(void) const;
         Vector3 zAxis(void) const;
