@@ -116,7 +116,7 @@ void Object::setVisibleOnly(bool visible){
 void Object::setBillboard(bool billboard, bool fake, bool cylindrical){
     Transform& transform = getComponent<Transform>();
 
-    transform.billboardBase = transform.rotation;
+    transform.billboardRotation = transform.rotation;
 
     transform.billboard = billboard;
     transform.fakeBillboard = fake;
@@ -126,7 +126,7 @@ void Object::setBillboard(bool billboard, bool fake, bool cylindrical){
 void Object::setBillboard(bool billboard){
     Transform& transform = getComponent<Transform>();
 
-    transform.billboardBase = transform.rotation;
+    transform.billboardRotation = transform.rotation;
 
     transform.billboard = billboard;
 }
@@ -137,19 +137,19 @@ bool Object::isBillboard() const{
     return transform.billboard;
 }
 
-void Object::setBillboardBaseRotation(Quaternion rotation){
+void Object::setBillboardRotation(Quaternion rotation){
     Transform& transform = getComponent<Transform>();
 
-    if (transform.billboardBase != rotation){
-        transform.billboardBase = rotation;
+    if (transform.billboardRotation != rotation){
+        transform.billboardRotation = rotation;
         transform.needUpdate = true;
     }
 }
 
-Quaternion Object::getBillboardBaseRotation() const{
+Quaternion Object::getBillboardRotation() const{
     Transform& transform = getComponent<Transform>();
 
-    return transform.billboardBase;
+    return transform.billboardRotation;
 }
 
 void Object::setFakeBillboard(bool fakeBillboard){

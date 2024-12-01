@@ -35,7 +35,7 @@ namespace Supernova{
 
         float distanceToCamera = 0;
 
-        Quaternion billboardBase;
+        Quaternion billboardRotation;
 
         bool billboard = false;
         bool fakeBillboard = false;

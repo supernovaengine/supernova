@@ -196,6 +196,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setVisibleOnly", &Object::setVisibleOnly)
         .addFunction("setBillboard", (void(Object::*)(bool, bool, bool))&Object::setBillboard)
         .addProperty("billboard", &Object::isBillboard, (void(Object::*)(bool))&Object::setBillboard)
+        .addProperty("billboardRotation", &Object::getBillboardRotation, &Object::setBillboardRotation)
         .addProperty("fakeBillboard", &Object::isFakeBillboard, &Object::setFakeBillboard)
         .addProperty("cylindricalBillboard", &Object::isCylindricalBillboard, &Object::setCylindricalBillboard)
         .addProperty("localMatrix", &Object::getLocalMatrix, &Object::setLocalMatrix)
