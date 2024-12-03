@@ -306,13 +306,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getPrimitiveType", 
             luabridge::overload<>(&Mesh::getPrimitiveType),
             luabridge::overload<unsigned int>(&Mesh::getPrimitiveType))
-        .addProperty("enableFaceCulling", &Mesh::isEnableFaceCulling, &Mesh::setEnableFaceCulling)
-        .addFunction("setEnableFaceCulling", 
-            luabridge::overload<bool>(&Mesh::setEnableFaceCulling),
-            luabridge::overload<unsigned int, bool>(&Mesh::setEnableFaceCulling))
-        .addFunction("isEnableFaceCulling", 
-            luabridge::overload<>(&Mesh::isEnableFaceCulling),
-            luabridge::overload<unsigned int>(&Mesh::isEnableFaceCulling))
+        .addProperty("faceCulling", &Mesh::isFaceCulling, &Mesh::setFaceCulling)
+        .addFunction("setFaceCulling", 
+            luabridge::overload<bool>(&Mesh::setFaceCulling),
+            luabridge::overload<unsigned int, bool>(&Mesh::setFaceCulling))
+        .addFunction("isFaceCulling", 
+            luabridge::overload<>(&Mesh::isFaceCulling),
+            luabridge::overload<unsigned int>(&Mesh::isFaceCulling))
         .addProperty("castShadowsWithTexture", &Mesh::isCastShadowsWithTexture, &Mesh::setCastShadowsWithTexture)
         .addFunction("setCastShadowsWithTexture", 
             luabridge::overload<bool>(&Mesh::setCastShadowsWithTexture),
@@ -329,7 +329,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getMaterial", &Mesh::getMaterial)
         .addProperty("castShadows", &Mesh::isCastShadows, &Mesh::setCastShadows)
         .addProperty("receiveShadows", &Mesh::isReceiveShadows, &Mesh::setReceiveShadows)
-        .addProperty("enableShadowsBillboard", &Mesh::isEnableShadowsBillboard, &Mesh::setEnableShadowsBillboard)
+        .addProperty("shadowsBillboard", &Mesh::isShadowsBillboard, &Mesh::setShadowsBillboard)
         .addFunction("createInstancedMesh", &Mesh::createInstancedMesh)
         .addFunction("removeInstancedMesh", &Mesh::removeInstancedMesh)
         .addFunction("hasInstancedMesh", &Mesh::hasInstancedMesh)

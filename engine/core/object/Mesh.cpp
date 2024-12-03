@@ -96,28 +96,28 @@ PrimitiveType Mesh::getPrimitiveType(unsigned int submesh) const{
     return mesh.submeshes[submesh].primitiveType;
 }
 
-void Mesh::setEnableFaceCulling(bool enableFaceCulling){
-    setEnableFaceCulling(0, enableFaceCulling);
+void Mesh::setFaceCulling(bool faceCulling){
+    setFaceCulling(0, faceCulling);
 }
 
-bool Mesh::isEnableFaceCulling() const{
-    return isEnableFaceCulling(0);
+bool Mesh::isFaceCulling() const{
+    return isFaceCulling(0);
 }
 
-void Mesh::setEnableFaceCulling(unsigned int submesh, bool enableFaceCulling){
+void Mesh::setFaceCulling(unsigned int submesh, bool faceCulling){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
-    if (mesh.submeshes[submesh].enableFaceCulling != enableFaceCulling){
-        mesh.submeshes[submesh].enableFaceCulling = enableFaceCulling;
+    if (mesh.submeshes[submesh].faceCulling != faceCulling){
+        mesh.submeshes[submesh].faceCulling = faceCulling;
 
         mesh.needReload = true;
     }
 }
 
-bool Mesh::isEnableFaceCulling(unsigned int submesh) const{
+bool Mesh::isFaceCulling(unsigned int submesh) const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
-    return mesh.submeshes[submesh].enableFaceCulling;
+    return mesh.submeshes[submesh].faceCulling;
 }
 
 
@@ -234,16 +234,16 @@ bool Mesh::isReceiveShadows() const{
     return mesh.receiveShadows;
 }
 
-void Mesh::setEnableShadowsBillboard(bool enableShadowsBillboard){
+void Mesh::setShadowsBillboard(bool shadowsBillboard){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
-    mesh.enableShadowsBillboard = enableShadowsBillboard;
+    mesh.shadowsBillboard = shadowsBillboard;
 }
 
-bool Mesh::isEnableShadowsBillboard() const{
+bool Mesh::isShadowsBillboard() const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
-    return mesh.enableShadowsBillboard;
+    return mesh.shadowsBillboard;
 }
 
 

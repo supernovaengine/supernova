@@ -34,11 +34,11 @@ namespace Supernova{
         void setPrimitiveType(unsigned int submesh, PrimitiveType primitiveType);
         PrimitiveType getPrimitiveType(unsigned int submesh) const;
 
-        void setEnableFaceCulling(bool enableFaceCulling);
-        bool isEnableFaceCulling() const;
+        void setFaceCulling(bool faceCulling);
+        bool isFaceCulling() const;
 
-        void setEnableFaceCulling(unsigned int submesh, bool enableFaceCulling);
-        bool isEnableFaceCulling(unsigned int submesh) const;
+        void setFaceCulling(unsigned int submesh, bool faceCulling);
+        bool isFaceCulling(unsigned int submesh) const;
 
         void setCastShadowsWithTexture(bool castShadowsWithTexture);
         bool isCastShadowsWithTexture() const;
@@ -66,8 +66,8 @@ namespace Supernova{
         void setReceiveShadows(bool receiveShadows);
         bool isReceiveShadows() const;
 
-        void setEnableShadowsBillboard(bool enableShadowsBillboard);
-        bool isEnableShadowsBillboard() const;
+        void setShadowsBillboard(bool shadowsBillboard);
+        bool isShadowsBillboard() const;
 
         void createInstancedMesh();
         void removeInstancedMesh();

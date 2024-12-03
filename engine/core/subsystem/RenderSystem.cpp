@@ -780,7 +780,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			mesh.submeshes[i].vertexCount = mesh.vertexCount;
 		}
 
-		if (!render.endLoad(pipelines, mesh.submeshes[i].enableFaceCulling, mesh.cullingMode, mesh.windingOrder)){
+		if (!render.endLoad(pipelines, mesh.submeshes[i].faceCulling, mesh.cullingMode, mesh.windingOrder)){
 			return false;
 		}
 
@@ -882,7 +882,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			}
 
 			CullingMode depthCullingMode = (mesh.cullingMode==CullingMode::BACK)? CullingMode::FRONT : CullingMode::BACK;
-			bool depthFaceCulling = (mesh.submeshes[i].hasDepthTexture)? false : mesh.submeshes[i].enableFaceCulling;
+			bool depthFaceCulling = (mesh.submeshes[i].hasDepthTexture)? false : mesh.submeshes[i].faceCulling;
 
 			if (!depthRender.endLoad(PIP_DEPTH, depthFaceCulling, depthCullingMode, mesh.windingOrder)){
 				return false;
@@ -2816,7 +2816,7 @@ void RenderSystem::draw(){
 
 								vs_depth_t vsDepthParams;
 
-								if (transform->billboard && mesh.enableShadowsBillboard){
+								if (transform->billboard && mesh.shadowsBillboard){
 									Matrix4 modelViewMatrix = light.cameras[c].lightViewMatrix * transform->modelMatrix;
 
 									modelViewMatrix.set(0, 0, transform->worldScale.x);

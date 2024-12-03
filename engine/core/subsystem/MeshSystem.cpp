@@ -29,7 +29,7 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
     mesh.submeshes[0].hasDepthTexture = true;
-    mesh.submeshes[0].enableFaceCulling = false;
+    mesh.submeshes[0].faceCulling = false;
     mesh.numSubmeshes = 1;
 
 	mesh.buffer.clear();
@@ -141,7 +141,7 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 
 void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
-    mesh.submeshes[0].enableFaceCulling = false;
+    mesh.submeshes[0].faceCulling = false;
     mesh.numSubmeshes = 1;
 
 	mesh.buffer.clear();
@@ -1784,7 +1784,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
             indexStride = sizeof(uint32_t);
         }
 
-        mesh.submeshes[i].enableFaceCulling = (mat.doubleSided)? false : true;
+        mesh.submeshes[i].faceCulling = (mat.doubleSided)? false : true;
 
         loadGLTFBuffer(indexAccessor.bufferView, mesh, model, indexStride, loadedBuffers);
 
