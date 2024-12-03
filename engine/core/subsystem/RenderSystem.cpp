@@ -2247,11 +2247,13 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
 
+			configureLightShadowNearFar(light, camera);
+
 			//TODO: light directional cascades is only considering main camera
 			if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
 
-				float zFar = camera.farClip;
-				float zNear = camera.nearClip;
+				float zNear = light.shadowCameraNearFar.x;
+				float zFar = light.shadowCameraNearFar.y;
 				float fov = 0;
 				float ratio = 1;
 
@@ -2329,8 +2331,6 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			Matrix4 projectionMatrix;
 			Matrix4 viewMatrix;
 
-			configureLightShadowNearFar(light, camera);
-
 			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
 
 			projectionMatrix = Matrix4::perspectiveMatrix(acos(light.outerConeCos)*2, 1, light.shadowCameraNearFar.x, light.shadowCameraNearFar.y);
@@ -2344,8 +2344,6 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 		}else if (light.type == LightType::POINT){
 			Matrix4 projectionMatrix;
 			Matrix4 viewMatrix[6];
-
-			configureLightShadowNearFar(light, camera);
 
 			viewMatrix[0] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3( 1.f, 0.f, 0.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
 			viewMatrix[1] = Matrix4::lookAtMatrix(transform.worldPosition, Vector3(-1.f, 0.f, 0.f) + transform.worldPosition, Vector3(0.f, -1.f, 0.f));
