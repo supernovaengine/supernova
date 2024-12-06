@@ -35,12 +35,15 @@ namespace luabridge
 void LuaBinding::registerMathClasses(lua_State *L){
 #ifndef DISABLE_LUA_BINDINGS
 
-        static const Vector2 ZERO;
-        static const Vector2 UNIT_X;
-        static const Vector2 UNIT_Y;
-        static const Vector2 NEGATIVE_UNIT_X;
-        static const Vector2 NEGATIVE_UNIT_Y;
-        static const Vector2 UNIT_SCALE;
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("RotationOrder")
+        .addVariable("XYZ", RotationOrder::XYZ)
+        .addVariable("XZY", RotationOrder::XZY)
+        .addVariable("YXZ", RotationOrder::YXZ)
+        .addVariable("YZX", RotationOrder::YZX)
+        .addVariable("ZXY", RotationOrder::ZXY)
+        .addVariable("ZYX", RotationOrder::ZYX)
+        .endNamespace();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Vector2>("Vector2")
@@ -289,6 +292,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             void(), 
             void(const float, const float, const float, const float), 
             void(const float, const float, const float),
+            void(const float, const float, const float, RotationOrder),
             void(const Vector3*),
             void(const Vector3&, const Vector3&, const Vector3&),
             void(const float, const Vector3&),

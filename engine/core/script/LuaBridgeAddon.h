@@ -52,6 +52,8 @@ namespace luabridge
     template<> struct Stack<AdMobRating> : EnumWrapper<AdMobRating>{};
     template<> struct Stack<CursorType> : EnumWrapper<CursorType>{};
 
+    template<> struct Stack<RotationOrder> : EnumWrapper<RotationOrder>{};
+
     template<> struct Stack<FogType> : EnumWrapper<FogType>{};
     template<> struct Stack<CameraType> : EnumWrapper<CameraType>{};
     template<> struct Stack<FrustumPlane> : EnumWrapper<FrustumPlane>{};
