@@ -292,7 +292,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             void(), 
             void(const float, const float, const float, const float), 
             void(const float, const float, const float),
-            void(const float, const float, const float, RotationOrder),
+            void(const float, const float, const float, const RotationOrder&),
             void(const Vector3*),
             void(const Vector3&, const Vector3&, const Vector3&),
             void(const float, const Vector3&),

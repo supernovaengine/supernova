@@ -29,7 +29,7 @@ namespace Supernova {
         Quaternion( const float fW, const float fX, const float fY, const float fZ );
         explicit Quaternion( float* const r );
         Quaternion(const float xAngle, const float yAngle, const float zAngle);
-        Quaternion(const float xAngle, const float yAngle, const float zAngle, RotationOrder order);
+        Quaternion(const float xAngle, const float yAngle, const float zAngle, const RotationOrder& order);
         Quaternion(const Vector3* akAxis);
         Quaternion(const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
         Quaternion(const float angle, const Vector3& rkAxis);
@@ -61,16 +61,16 @@ namespace Supernova {
 
         void swap(Quaternion& other);
 
-        void fromEulerAngles(const float xAngle, const float yAngle, const float zAngle, RotationOrder order);
+        void fromEulerAngles(const float xAngle, const float yAngle, const float zAngle, const RotationOrder& order);
         void fromAxes (const Vector3* akAxis);
         void fromAxes (const Vector3& xaxis, const Vector3& yaxis, const Vector3& zaxis);
         Quaternion& fromRotationMatrix (const Matrix3& kRot);
         Quaternion& fromRotationMatrix (const Matrix4& kRot);
-        Matrix4 getRotationMatrix();
+        Matrix4 getRotationMatrix() const;
         void fromAngle (const float angle);
         void fromAngleAxis (const float angle, const Vector3& rkAxis);
 
-        Vector3 getEulerAngles(RotationOrder order) const;
+        Vector3 getEulerAngles(const RotationOrder& order) const;
         Vector3 xAxis(void) const;
         Vector3 yAxis(void) const;
         Vector3 zAxis(void) const;

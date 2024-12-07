@@ -30,7 +30,7 @@ Quaternion::Quaternion(const float xAngle, const float yAngle, const float zAngl
     this->fromEulerAngles(xAngle, yAngle, zAngle, RotationOrder::ZYX);
 }
 
-Quaternion::Quaternion(const float xAngle, const float yAngle, const float zAngle, RotationOrder order){
+Quaternion::Quaternion(const float xAngle, const float yAngle, const float zAngle, const RotationOrder& order){
     this->fromEulerAngles(xAngle, yAngle, zAngle, order);
 }
 
@@ -167,7 +167,7 @@ void Quaternion::swap(Quaternion& other){
     std::swap(z, other.z);
 }
 
-void Quaternion::fromEulerAngles(const float xAngle, const float yAngle, const float zAngle, RotationOrder order){
+void Quaternion::fromEulerAngles(const float xAngle, const float yAngle, const float zAngle, const RotationOrder& order){
     Quaternion qx, qy, qz;
 
     qx.fromAngleAxis(xAngle, Vector3(1,0,0));
@@ -279,7 +279,7 @@ Quaternion& Quaternion::fromRotationMatrix (const Matrix4& kRot){
     return fromRotationMatrix(kRot.linear());
 }
 
-Matrix4 Quaternion::getRotationMatrix(){
+Matrix4 Quaternion::getRotationMatrix() const{
 
     float xx      = x * x;
     float xy      = x * y;
@@ -335,127 +335,132 @@ void Quaternion::fromAngleAxis (const float angle, const Vector3& rkAxis){
     z = fSin*rkAxis.z;
 }
 
-Vector3 Quaternion::getEulerAngles(RotationOrder order) const{
-    Vector3 eulerAngles;
+Vector3 Quaternion::getEulerAngles(const RotationOrder& order) const {
+    Matrix4 rotMatrix = getRotationMatrix();
+
+    float x, y, z;
 
     switch (order) {
         case RotationOrder::XYZ: {
-            // Roll (X-axis rotation)
-            float sinr_cosp = 2 * (w * x + y * z);
-            float cosr_cosp = 1 - 2 * (x * x + y * y);
-            eulerAngles.x = atan2(sinr_cosp, cosr_cosp);
+            y = asin(std::clamp(rotMatrix[2][0], -1.0f, 1.0f));
+            if (y < M_PI_2){
+                if (y > -M_PI_2){
+                    x = atan2(-rotMatrix[2][1], rotMatrix[2][2]);
+                    z = atan2(-rotMatrix[1][0], rotMatrix[0][0]);
+                }else{ // Gimbal lock
+                    float mY = atan2(rotMatrix[0][1], rotMatrix[1][1]);
+                    z = 0.0f; // any angle
+                    x = z - mY;
+                }
 
-            // Pitch (Y-axis rotation)
-            float sinp = 2 * (w * y - z * x);
-            if (fabs(sinp) >= 1)  // Handle gimbal lock
-                eulerAngles.y = copysign(M_PI / 2, sinp);
-            else
-                eulerAngles.y = asin(sinp);
-
-            // Yaw (Z-axis rotation)
-            float siny_cosp = 2 * (w * z + x * y);
-            float cosy_cosp = 1 - 2 * (y * y + z * z);
-            eulerAngles.z = atan2(siny_cosp, cosy_cosp);
+            }else{ // Gimbal lock
+                float pY = atan2(rotMatrix[0][1], rotMatrix[1][1]);
+                z = 0.0f; // any angle
+                x = pY - z;
+            }
             break;
         }
         case RotationOrder::XZY: {
-            // Roll (X-axis rotation)
-            float sinr_cosp = 2 * (w * x + y * z);
-            float cosr_cosp = 1 - 2 * (x * x + z * z);
-            eulerAngles.x = atan2(sinr_cosp, cosr_cosp);
-
-            // Yaw (Z-axis rotation)
-            float siny = 2 * (w * z - x * y);
-            if (fabs(siny) >= 1)  // Handle gimbal lock
-                eulerAngles.z = copysign(M_PI / 2, siny);
-            else
-                eulerAngles.z = asin(siny);
-
-            // Pitch (Y-axis rotation)
-            float sinp_cosp = 2 * (w * y + z * x);
-            float cosp_cosp = 1 - 2 * (y * y + z * z);
-            eulerAngles.y = atan2(sinp_cosp, cosp_cosp);
+            z = asin(std::clamp(-rotMatrix[1][0], -1.0f, 1.0f));
+            if (z < M_PI_2){
+                if (z > -M_PI_2){
+                    x = atan2(rotMatrix[1][2], rotMatrix[1][1]);
+                    y = atan2(rotMatrix[2][0], rotMatrix[0][0]);
+                }else{ // Gimbal lock
+                    float mY = atan2(-rotMatrix[0][2], rotMatrix[2][2]);
+                    y = 0.0f; // any angle
+                    x = y - mY;
+                }
+            }else{ // Gimbal lock
+                float pY = atan2(-rotMatrix[0][2], rotMatrix[2][2]);
+                y = 0.0f; // any angle
+                x = pY - y;
+            }
             break;
         }
         case RotationOrder::YXZ: {
-            // Yaw (Y-axis rotation)
-            float siny_cosp = 2 * (w * y + x * z);
-            float cosy_cosp = 1 - 2 * (y * y + z * z);
-            eulerAngles.y = atan2(siny_cosp, cosy_cosp);
-
-            // Roll (X-axis rotation)
-            float sinr = 2 * (w * x - y * z);
-            if (fabs(sinr) >= 1)  // Handle gimbal lock
-                eulerAngles.x = copysign(M_PI / 2, sinr);
-            else
-                eulerAngles.x = asin(sinr);
-
-            // Pitch (Z-axis rotation)
-            float sinp_cosp = 2 * (w * z + x * y);
-            float cosp_cosp = 1 - 2 * (z * z + x * x);
-            eulerAngles.z = atan2(sinp_cosp, cosp_cosp);
+            x = asin(std::clamp(-rotMatrix[2][1], -1.0f, 1.0f));
+            if (x < M_PI_2){
+                if (x > -M_PI_2){
+                    y = atan2(rotMatrix[2][0], rotMatrix[2][2]);
+                    z = atan2(rotMatrix[0][1], rotMatrix[1][1]);
+                }else{ // Gimbal lock
+                    float mY = atan2(-rotMatrix[1][0], rotMatrix[0][0]);
+                    z = 0.0f; // any angle
+                    y = z - mY;
+                }
+            }else{ // Gimbal lock
+                float pY = atan2(-rotMatrix[1][0], rotMatrix[0][0]);
+                z = 0.0f; // any angle
+                y = pY - z;
+            }
             break;
         }
         case RotationOrder::YZX: {
-            // Pitch (Z-axis rotation)
-            float sinp = 2 * (w * z - x * y);
-            if (fabs(sinp) >= 1)  // Handle gimbal lock
-                eulerAngles.z = copysign(M_PI / 2, sinp);
-            else
-                eulerAngles.z = asin(sinp);
-
-            // Yaw (Y-axis rotation)
-            float siny_cosp = 2 * (w * y + z * x);
-            float cosy_cosp = 1 - 2 * (y * y + z * z);
-            eulerAngles.y = atan2(siny_cosp, cosy_cosp);
-
-            // Roll (X-axis rotation)
-            float sinr_cosp = 2 * (w * x + y * z);
-            float cosr_cosp = 1 - 2 * (x * x + z * z);
-            eulerAngles.x = atan2(sinr_cosp, cosr_cosp);
+            z = asin(std::clamp(rotMatrix[0][1], -1.0f, 1.0f));
+            if (z < M_PI_2){
+                if (z > -M_PI_2){
+                    y = atan2(-rotMatrix[0][2], rotMatrix[0][0]);
+                    x = atan2(-rotMatrix[2][1], rotMatrix[1][1]);
+                }else{ // Gimbal lock
+                    float mY = atan2(rotMatrix[1][2], rotMatrix[2][2]);
+                    x = 0.0f; // any angle
+                    y = x - mY;
+                }
+            }else{ // Gimbal lock
+                float pY = atan2(rotMatrix[1][2], rotMatrix[2][2]);
+                x = 0.0f; // any angle
+                y = pY - x;
+            }
             break;
         }
         case RotationOrder::ZXY: {
-            // Roll (X-axis rotation)
-            float sinr = 2 * (w * x - y * z);
-            if (fabs(sinr) >= 1)  // Handle gimbal lock
-                eulerAngles.x = copysign(M_PI / 2, sinr);
-            else
-                eulerAngles.x = asin(sinr);
-
-            // Pitch (Y-axis rotation)
-            float sinp_cosp = 2 * (w * y + z * x);
-            float cosp_cosp = 1 - 2 * (y * y + x * x);
-            eulerAngles.y = atan2(sinp_cosp, cosp_cosp);
-
-            // Yaw (Z-axis rotation)
-            float siny_cosp = 2 * (w * z + x * y);
-            float cosy_cosp = 1 - 2 * (z * z + y * y);
-            eulerAngles.z = atan2(siny_cosp, cosy_cosp);
+            x = asin(std::clamp(rotMatrix[1][2], -1.0f, 1.0f));
+            if (x < M_PI_2){
+                if (x > -M_PI_2){
+                    z = atan2(-rotMatrix[1][0], rotMatrix[1][1]);
+                    y = atan2(-rotMatrix[0][2], rotMatrix[2][2]);
+                }else{ // Gimbal lock
+                    float mY = atan2(rotMatrix[2][0], rotMatrix[0][0]);
+                    y = 0.0f; // any angle
+                    z = y - mY;
+                }
+            }else{ // Gimbal lock
+                float pY = atan2(rotMatrix[2][0], rotMatrix[0][0]);
+                y = 0.0f; // any angle
+                z = pY - y;
+            }
             break;
         }
         case RotationOrder::ZYX: {
-            // Yaw (Z-axis rotation)
-            float siny_cosp = 2 * (w * z + x * y);
-            float cosy_cosp = 1 - 2 * (y * y + z * z);
-            eulerAngles.z = atan2(siny_cosp, cosy_cosp);
-
-            // Pitch (Y-axis rotation)
-            float sinp = 2 * (w * y - z * x);
-            if (fabs(sinp) >= 1)  // Handle gimbal lock
-                eulerAngles.y = copysign(M_PI / 2, sinp);
-            else
-                eulerAngles.y = asin(sinp);
-
-            // Roll (X-axis rotation)
-            float sinr_cosp = 2 * (w * x + y * z);
-            float cosr_cosp = 1 - 2 * (x * x + y * y);
-            eulerAngles.x = atan2(sinr_cosp, cosr_cosp);
+            y = asin(std::clamp(-rotMatrix[0][2], -1.0f, 1.0f));
+            if (y < M_PI_2){
+                if (y > -M_PI_2){
+                    z = atan2(rotMatrix[0][1], rotMatrix[0][0]);
+                    x = atan2(rotMatrix[1][2], rotMatrix[2][2]);
+                }else{ // Gimbal lock
+                    float mY = atan2(-rotMatrix[1][0], rotMatrix[2][0]);
+                    x = 0.0f; // any angle
+                    z = x - mY;
+                }
+            }else{ // Gimbal lock
+                float pY = atan2(-rotMatrix[1][0], rotMatrix[2][0]);
+                x = 0.0f; // any angle
+                z = pY - x;
+            }
             break;
         }
+        default:
+            // Handle unsupported rotation orders or throw an exception
+            x = y = z = 0.0f;
+            break;
     }
 
-    return Vector3(Angle::radToDefault(eulerAngles.x), Angle::radToDefault(eulerAngles.y), Angle::radToDefault(eulerAngles.z));
+    return Vector3(
+        Angle::radToDefault((x == -0.0f) ? 0.0f : x),
+        Angle::radToDefault((y == -0.0f) ? 0.0f : y),
+        Angle::radToDefault((z == -0.0f) ? 0.0f : z)
+    );
 }
 
 Vector3 Quaternion::xAxis(void) const{
