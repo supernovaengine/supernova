@@ -100,23 +100,25 @@ jobs:
       - name: Install dependencies on Windows
         if: ${{ startsWith(matrix.config.os, 'windows') }}
         run: |
-          choco install cmake
+          choco install ninja cmake
+          ninja --version
+          cmake --version
 
       - name: Install dependencies on Ubuntu
         if: ${{ startsWith(matrix.config.os, 'ubuntu') }}
         run: |
           sudo apt-get update
           sudo apt-get install libglfw3-dev libxi-dev libxcursor-dev libgl1-mesa-dev ninja-build cmake
+          ninja --version
+          cmake --version
 
       - name: Install dependencies on macOS
         if: ${{ startsWith(matrix.config.os, 'macos') }}
         run: |
-          brew install cmake ninja
+          brew install ninja cmake
           pip3 install --upgrade --break-system-packages click
-
-      - name: Install dependencies
-        if: ${{ !startsWith(matrix.config.os, 'macos') }}
-        run: pip3 install --upgrade click
+          ninja --version
+          cmake --version
 
       - name: Build
         run: |
