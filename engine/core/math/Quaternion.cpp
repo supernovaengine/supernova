@@ -457,9 +457,9 @@ Vector3 Quaternion::getEulerAngles(const RotationOrder& order) const {
     }
 
     return Vector3(
-        Angle::radToDefault((x == -0.0f) ? 0.0f : x),
-        Angle::radToDefault((y == -0.0f) ? 0.0f : y),
-        Angle::radToDefault((z == -0.0f) ? 0.0f : z)
+        Angle::radToDefault(x),
+        Angle::radToDefault(y),
+        Angle::radToDefault(z)
     );
 }
 
