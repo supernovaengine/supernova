@@ -79,7 +79,7 @@ unsigned int Text::getMaxTextSize() const{
     return textcomp.maxTextSize;
 }
 
-void Text::setText(std::string text){
+void Text::setText(const std::string &text){
     TextComponent& textcomp = getComponent<TextComponent>();
 
     if (textcomp.text != text){
@@ -94,7 +94,7 @@ std::string Text::getText() const{
     return textcomp.text;
 }
 
-void Text::setFont(std::string font){
+void Text::setFont(const std::string &font){
     TextComponent& textcomp = getComponent<TextComponent>();
 
     if (textcomp.font != font){

@@ -30,10 +30,10 @@ namespace Supernova{
         void setMaxTextSize(unsigned int maxTextSize);
         unsigned int getMaxTextSize() const;
 
-        void setText(std::string text);
+        void setText(const std::string& text);
         std::string getText() const;
 
-        void setFont(std::string font);
+        void setFont(const std::string& font);
         std::string getFont() const;
 
         void setFontSize(unsigned int fontSize);
