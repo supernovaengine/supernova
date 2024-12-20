@@ -11,7 +11,7 @@
 namespace Supernova{
 
     struct Material{
-        //Based on shader bytes ordering
+        // --- start shader part
         Vector4 baseColorFactor = Vector4(1.0, 1.0, 1.0, 1.0);  //linear color
     	float metallicFactor = 1.0;
     	float roughnessFactor = 1.0;
@@ -20,12 +20,16 @@ namespace Supernova{
     	uint8_t _pad_44[4];
         Vector3 ambientLight = Vector3(1.0, 1.0, 1.0);
         float ambientFactor = 0.2;
+        // --- end shader part
 
         Texture baseColorTexture;
         Texture emissiveTexture;
         Texture metallicRoughnessTexture;
         Texture occlusionTexture;
         Texture normalTexture;
+
+        // material name or file
+        std::string name = "";
     };
 
 }
