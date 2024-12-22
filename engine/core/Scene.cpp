@@ -81,7 +81,7 @@ Scene::Scene(){
 
 	hasSceneAmbientLight = false;
 	ambientLight = Vector3(1.0, 1.0, 1.0);
-	ambientFactor = 0.2;
+	ambientIntensity = 0.1;
 
 	enableUIEvents = true;
 }
@@ -154,27 +154,31 @@ bool Scene::isShadowsPCF() const{
 	return this->shadowsPCF;
 }
 
-void Scene::setAmbientLight(float ambientFactor, Vector3 ambientLight){
-	this->ambientFactor = ambientFactor;
-	this->ambientLight = ambientLight;
+void Scene::setAmbientLight(float ambientIntensity, Vector3 ambientLight){
+	this->ambientIntensity = ambientIntensity;
+	this->ambientLight = Color::sRGBToLinear(ambientLight);
 	this->hasSceneAmbientLight = true;
 }
 
-void Scene::setAmbientLight(float ambientFactor){
-	this->ambientFactor = ambientFactor;
+void Scene::setAmbientLight(float ambientIntensity){
+	this->ambientIntensity = ambientIntensity;
 	this->hasSceneAmbientLight = true;
 }
 
 void Scene::setAmbientLight(Vector3 ambientLight){
-	this->ambientLight = ambientLight;
+	this->ambientLight = Color::sRGBToLinear(ambientLight);
 	this->hasSceneAmbientLight = true;
 }
 
-float Scene::getAmbientLightFactor() const{
-	return this->ambientFactor;
+float Scene::getAmbientLightIntensity() const{
+	return this->ambientIntensity;
 }
 
 Vector3 Scene::getAmbientLightColor() const{
+	return Color::linearTosRGB(this->ambientLight);
+}
+
+Vector3 Scene::getAmbientLightColorLinear() const{
 	return this->ambientLight;
 }
 

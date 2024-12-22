@@ -50,7 +50,7 @@ uniform u_fs_pbrParams {
         float roughnessFactor;
         vec3 emissiveFactor;
         vec3 ambientLight;
-        float ambientFactor;
+        float ambientIntensity;
     #endif
 } pbrParams;
 
@@ -230,9 +230,8 @@ void main() {
         #ifdef USE_IBL
             //TODO
         #else
-            // Simple ambient light
-            // convert ambientFactor to linear
-            f_diffuse += pbrParams.ambientLight * pow(pbrParams.ambientFactor, GAMMA) * baseColor.rgb;
+            // simple ambient light
+            f_diffuse += pbrParams.ambientLight * pbrParams.ambientIntensity * baseColor.rgb;
         #endif
 
         #ifdef HAS_UV_SET1

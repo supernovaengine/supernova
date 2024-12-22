@@ -961,8 +961,8 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			mesh.submeshes[i].needUpdateTexture = false; // loadDepthTexture is in drawMeshDepth
 
 			if (scene->isSceneAmbientLightEnabled()){
-				mesh.submeshes[i].material.ambientFactor = scene->getAmbientLightFactor();
-				mesh.submeshes[i].material.ambientLight = scene->getAmbientLightColor();
+				mesh.submeshes[i].material.ambientIntensity = scene->getAmbientLightIntensity();
+				mesh.submeshes[i].material.ambientLight = scene->getAmbientLightColorLinear();
 			}
 
 			if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
