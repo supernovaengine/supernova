@@ -18,9 +18,9 @@ namespace Supernova{
         static fonts_t& getMap();
 
     public:
-        static std::shared_ptr<STBText> get(std::string id);
-        static std::shared_ptr<STBText> get(std::string id, std::string fontpath, unsigned int fontSize);
-        static void remove(std::string id);
+        static std::shared_ptr<STBText> get(const std::string& id);
+        static std::shared_ptr<STBText> get(const std::string& id, const std::string& fontpath, unsigned int fontSize);
+        static void remove(const std::string& id);
 
         // necessary for engine shutdown
         static void clear();

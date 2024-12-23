@@ -60,7 +60,7 @@ float Scrollbar::getStep() const{
     return scrollcomp.step;
 }
 
-void Scrollbar::setBarTexture(std::string path){
+void Scrollbar::setBarTexture(const std::string& path){
     getBarObject().setTexture(path);
 }
 

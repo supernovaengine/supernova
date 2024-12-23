@@ -31,7 +31,7 @@ void ExternalBuffer::setData(unsigned char* data, size_t size){
     this->size = size;
 }
 
-void ExternalBuffer::setName(std::string name){
+void ExternalBuffer::setName(const std::string& name){
     this->name = name;
 }
 

@@ -13,7 +13,7 @@ namespace Supernova {
         Audio(Scene* scene);
         virtual ~Audio();
 
-        int loadAudio(std::string filename);
+        int loadAudio(const std::string& filename);
         void destroyAudio();
 
         void play();

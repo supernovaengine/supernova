@@ -17,20 +17,20 @@ namespace Supernova{
         Model(Scene* scene);
         virtual ~Model();
 
-        bool loadModel(std::string filename);
+        bool loadModel(const std::string& filename);
 
-        bool loadOBJ(std::string filename);
-        bool loadGLTF(std::string filename);
+        bool loadOBJ(const std::string& filename);
+        bool loadGLTF(const std::string& filename);
 
         Animation getAnimation(int index);
-        Animation findAnimation(std::string name);
+        Animation findAnimation(const std::string& name);
 
-        Bone getBone(std::string name);
+        Bone getBone(const std::string& name);
         Bone getBone(int id);
 
-        float getMorphWeight(std::string name);
+        float getMorphWeight(const std::string& name);
         float getMorphWeight(int id);
-        void setMorphWeight(std::string name, float value);
+        void setMorphWeight(const std::string& name, float value);
         void setMorphWeight(int id, float value);
     };
 }

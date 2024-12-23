@@ -162,7 +162,7 @@ SBSReader::~SBSReader(){
     }
 }
 
-bool SBSReader::read(std::string filepath){
+bool SBSReader::read(const std::string& filepath){
     File file;
 
     if (file.open(filepath.c_str()) != FileErrors::FILEDATA_OK){

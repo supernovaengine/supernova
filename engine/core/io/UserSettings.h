@@ -25,7 +25,7 @@ namespace Supernova {
         static long getLongForKey(const char *key, long defaultValue);
         static float getFloatForKey(const char *key, float defaultValue);
         static double getDoubleForKey(const char *key, double defaultValue);
-        static std::string getStringForKey(const char *key, std::string defaultValue);
+        static std::string getStringForKey(const char *key, const std::string& defaultValue);
         static Data getDataForKey(const char *key, const Data& defaultValue);
 
         static void setBoolForKey(const char *key, bool value);
@@ -33,7 +33,7 @@ namespace Supernova {
         static void setLongForKey(const char *key, long value);
         static void setFloatForKey(const char *key, float value);
         static void setDoubleForKey(const char *key, double value);
-        static void setStringForKey(const char* key, std::string value);
+        static void setStringForKey(const char* key, const std::string& value);
         static void setDataForKey(const char *key, Data& value);
 
         static void removeKey(const char *key);

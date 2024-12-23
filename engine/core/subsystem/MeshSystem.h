@@ -36,9 +36,9 @@ namespace Supernova{
 		static bool fileExists(const std::string &abs_filename, void *);
 		static bool readWholeFile(std::vector<unsigned char> *out, std::string *err, const std::string &filepath, void *);
 		static bool getFileSizeInBytes(size_t *filesize_out, std::string *err, const std::string &filepath, void *userdata);
-		void addSubmeshAttribute(Submesh& submesh, std::string bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized);
+		void addSubmeshAttribute(Submesh& submesh, const std::string& bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized);
 		bool loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, ModelComponent& model, const int stride, std::vector<std::string>& loadedBuffers);
-		bool loadGLTFTexture(int textureIndex, ModelComponent& model, Texture& texture, std::string textureName);
+		bool loadGLTFTexture(int textureIndex, ModelComponent& model, Texture& texture, const std::string& textureName);
 		std::string getBufferName(int bufferViewIndex, ModelComponent& model);
 		Matrix4 getGLTFNodeMatrix(int nodeIndex, ModelComponent& model);
 		Matrix4 getGLTFMeshGlobalMatrix(int nodeIndex, ModelComponent& model, std::map<int, int>& nodesParent);
@@ -66,8 +66,8 @@ namespace Supernova{
 		void createCylinder(Entity entity, float baseRadius=1, float topRadius=1, float height=2, unsigned int slices=36, unsigned int stacks=18);
 		void createCapsule(Entity entity, float baseRadius=1, float topRadius=1, float height=2, unsigned int slices=36, unsigned int stacks=18);
 		void createTorus(Entity entity, float radius=1, float ringRadius=0.5, unsigned int sides=36, unsigned int rings=16);
-		bool loadGLTF(Entity entity, std::string filename);
-		bool loadOBJ(Entity entity, std::string filename);
+		bool loadGLTF(Entity entity, const std::string& filename);
+		bool loadOBJ(Entity entity, const std::string& filename);
 
 		void createInstancedMesh(Entity entity);
 		void removeInstancedMesh(Entity entity);

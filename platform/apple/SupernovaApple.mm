@@ -208,7 +208,7 @@ Supernova::Data SupernovaApple::getDataForKey(const char* key, const Supernova::
      return defaultValue;
 }
 
-std::string SupernovaApple::getStringForKey(const char *key, std::string defaultValue){
+std::string SupernovaApple::getStringForKey(const char *key, const std::string& defaultValue){
     NSString *str = [[NSUserDefaults standardUserDefaults] stringForKey:[NSString stringWithUTF8String:key]];
     if (str){
         return [str UTF8String];
@@ -241,7 +241,7 @@ void SupernovaApple::setDataForKey(const char* key, Supernova::Data& value){
     [[NSUserDefaults standardUserDefaults] setObject:[NSData dataWithBytes: value.getMemPtr() length: value.length()] forKey:[NSString stringWithUTF8String:key]];
 }
 
-void SupernovaApple::setStringForKey(const char* key, std::string value){
+void SupernovaApple::setStringForKey(const char* key, const std::string& value){
     [[NSUserDefaults standardUserDefaults] setObject:[NSString stringWithUTF8String:value.c_str()] forKey:[NSString stringWithUTF8String:key]];
 }
 
@@ -271,7 +271,7 @@ void SupernovaApple::setMaxAdContentRating(Supernova::AdMobRating rating){
 #endif
 }
 
-void SupernovaApple::loadInterstitialAd(std::string adUnitID){
+void SupernovaApple::loadInterstitialAd(const std::string& adUnitID){
 #if TARGET_OS_IPHONE
     [admob loadInterstitial:[NSString stringWithUTF8String:adUnitID.c_str()]];
 #endif

@@ -201,7 +201,7 @@ Data System::getDataForKey(const char *key, const Data& defaultValue){
     return Data(&decodedData[0], (unsigned int)decodedData.size(), true, true);
 }
 
-std::string System::getStringForKey(const char *key, std::string defaultValue){
+std::string System::getStringForKey(const char *key, const std::string& defaultValue){
     std::string value = XMLUtils::getValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key);
 
     if (value.empty())
@@ -238,7 +238,7 @@ void System::setDataForKey(const char *key, Data& value){
     }
 }
 
-void System::setStringForKey(const char* key, std::string value){
+void System::setStringForKey(const char* key, const std::string& value){
     XMLUtils::setValueForKey(USERSETTINGS_XML_FILE, USERSETTINGS_ROOT, key, value.c_str());
 }
 
@@ -254,7 +254,7 @@ void System::setMaxAdContentRating(AdMobRating rating){
     Log::error("Cannot set AdMob rating in this system");
 }
 
-void System::loadInterstitialAd(std::string adUnitID){
+void System::loadInterstitialAd(const std::string& adUnitID){
     Log::error("Cannot load InterstitialAd in this system");
 }
 
@@ -270,7 +270,7 @@ void System::initializeCrazyGamesSDK(){
     Log::error("Cannot initialize CrazyGames SDK in this system");
 }
 
-void System::showCrazyGamesAd(std::string type){
+void System::showCrazyGamesAd(const std::string& type){
     Log::error("Cannot show CrazyGames ad in this system");
 }
 

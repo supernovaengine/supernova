@@ -16,7 +16,7 @@ Attribute::Attribute(){
     setPerInstance(false);
 }
 
-Attribute::Attribute(AttributeDataType dataType, std::string bufferName, unsigned int elements, size_t offset, bool normalized, bool perInstance){
+Attribute::Attribute(AttributeDataType dataType, const std::string& bufferName, unsigned int elements, size_t offset, bool normalized, bool perInstance){
     setDataType(dataType);
     setBuffer(bufferName);
     setElements(elements);

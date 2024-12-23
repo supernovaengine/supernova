@@ -19,7 +19,7 @@ namespace Supernova{
         Container getHeaderContainerObject() const;
         Text getHeaderTextObject() const;
 
-        void setTitle(std::string text);
+        void setTitle(const std::string& text);
         std::string getTitle() const;
 
         void setTitleAnchorPreset(AnchorPreset titleAnchorPreset);
@@ -29,7 +29,7 @@ namespace Supernova{
         void setTitleColor(const float red, const float green, const float blue, const float alpha);
         Vector4 getTitleColor() const;
 
-        void setTitleFont(std::string font);
+        void setTitleFont(const std::string& font);
         std::string getTitleFont() const;
 
         void setTitleFontSize(unsigned int fontSize);
@@ -40,7 +40,7 @@ namespace Supernova{
         Vector4 getHeaderColor() const;
 
         void setHeaderPatchMargin(int margin);
-        void setHeaderTexture(std::string path);
+        void setHeaderTexture(const std::string& path);
 
         void setHeaderMargin(int left, int top, int right, int bottom);
 

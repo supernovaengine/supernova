@@ -67,7 +67,7 @@ namespace Supernova{
             return metadata.at(entity).signature;
         }
 
-        void setName(Entity entity, std::string name) {
+        void setName(Entity entity, const std::string& name) {
             if (metadata.count(entity)==0){
                 Log::error("Entity does not exist to set name");
             }

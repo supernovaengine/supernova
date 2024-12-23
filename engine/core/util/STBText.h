@@ -47,8 +47,8 @@ namespace Supernova {
         float getLineGap();
         int getLineHeight();
 
-        TextureData* load(std::string fontpath, unsigned int fontSize);
-        void createText(std::string text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
+        TextureData* load(const std::string& fontpath, unsigned int fontSize);
+        void createText(const std::string& text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
                         int& width, int& height, bool fixedWidth, bool fixedHeight, bool multiline, bool invert);
 
         TextureData* getTextureData();

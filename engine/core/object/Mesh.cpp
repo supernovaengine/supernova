@@ -27,7 +27,7 @@ bool Mesh::load(){
     return scene->getSystem<RenderSystem>()->loadMesh(entity, mesh, PIP_DEFAULT | PIP_RTT, instmesh, terrain);
 }
 
-void Mesh::setTexture(std::string path){
+void Mesh::setTexture(const std::string& path){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     mesh.submeshes[0].material.baseColorTexture.setPath(path);

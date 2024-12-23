@@ -28,7 +28,7 @@ Model::~Model(){
 
 }
 
-bool Model::loadModel(std::string filename){
+bool Model::loadModel(const std::string& filename){
     std::string ext = FileData::getFilePathExtension(filename);
 
     if (ext.compare("obj") == 0) {
@@ -42,7 +42,7 @@ bool Model::loadModel(std::string filename){
     return true;
 }
 
-bool Model::loadOBJ(std::string filename){
+bool Model::loadOBJ(const std::string& filename){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     bool ret = scene->getSystem<MeshSystem>()->loadOBJ(entity, filename);
@@ -54,7 +54,7 @@ bool Model::loadOBJ(std::string filename){
     return ret;
 }
 
-bool Model::loadGLTF(std::string filename){
+bool Model::loadGLTF(const std::string& filename){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     bool ret = scene->getSystem<MeshSystem>()->loadGLTF(entity, filename);
@@ -77,7 +77,7 @@ Animation Model::getAnimation(int index){
 	}
 }
 
-Animation Model::findAnimation(std::string name){
+Animation Model::findAnimation(const std::string& name){
     ModelComponent& model = getComponent<ModelComponent>();
 
     for (int i = 0; i < model.animations.size(); i++){
@@ -94,7 +94,7 @@ Animation Model::findAnimation(std::string name){
     throw std::out_of_range("vector animations is out of range");
 }
 
-Bone Model::getBone(std::string name){
+Bone Model::getBone(const std::string& name){
     ModelComponent& model = getComponent<ModelComponent>();
 
     try{
@@ -116,7 +116,7 @@ Bone Model::getBone(int id){
 	}
 }
 
-float Model::getMorphWeight(std::string name){
+float Model::getMorphWeight(const std::string& name){
     ModelComponent& model = getComponent<ModelComponent>();
 
     if (model.morphNameMapping.count(name)){
@@ -140,7 +140,7 @@ float Model::getMorphWeight(int id){
     return 0;
 }
 
-void Model::setMorphWeight(std::string name, float value){
+void Model::setMorphWeight(const std::string& name, float value){
     ModelComponent& model = getComponent<ModelComponent>();
 
     if (model.morphNameMapping.count(name)){

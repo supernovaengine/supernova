@@ -222,7 +222,7 @@ void Points::clearPoints(){
     pointscomp.needUpdate = true;
 }
 
-void Points::setTexture(std::string path){
+void Points::setTexture(const std::string& path){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
 
     pointscomp.texture.setPath(path);
@@ -238,7 +238,7 @@ void Points::setTexture(Framebuffer* framebuffer){
     pointscomp.needUpdateTexture = true;
 }
 
-void Points::addSpriteFrame(int id, std::string name, Rect rect){
+void Points::addSpriteFrame(int id, const std::string& name, Rect rect){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
     if (id >= 0 && id < MAX_SPRITE_FRAMES){
         pointscomp.framesRect[id] = {true, name, rect};
@@ -251,7 +251,7 @@ void Points::addSpriteFrame(int id, std::string name, Rect rect){
     }
 }
 
-void Points::addSpriteFrame(std::string name, float x, float y, float width, float height){
+void Points::addSpriteFrame(const std::string& name, float x, float y, float width, float height){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
 
     int id = 0;
@@ -290,7 +290,7 @@ void Points::removeSpriteFrame(int id){
     }
 }
 
-void Points::removeSpriteFrame(std::string name){
+void Points::removeSpriteFrame(const std::string& name){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
 
     for (int id = 0; id < MAX_SPRITE_FRAMES; id++){

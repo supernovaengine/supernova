@@ -47,7 +47,7 @@ unsigned int FileData::read32(){
     return d;
 }
 
-bool FileData::beginWith(std::string path, std::string prefix){
+bool FileData::beginWith(const std::string& path, const std::string& prefix){
     if (prefix.length() > path.length()) {
         return false;
     }
@@ -66,7 +66,7 @@ bool FileData::beginWith(std::string path, std::string prefix){
     return i == prefix.length();
 }
 
-std::string FileData::getBaseDir(std::string filepath){
+std::string FileData::getBaseDir(const std::string& filepath){
     size_t found;
 
     found=filepath.find_last_of("/\\");
@@ -79,7 +79,7 @@ std::string FileData::getBaseDir(std::string filepath){
     return result + System::instance().getDirSeparator();
 }
 
-std::string FileData::simplifyPath(std::string path) {
+std::string FileData::simplifyPath(const std::string& path) {
 
     std::stack<std::string> st;
 
@@ -170,6 +170,6 @@ std::string FileData::readString(unsigned int stringlen){
     return s;
 }
 
-unsigned int FileData::writeString(std::string s){
+unsigned int FileData::writeString(const std::string& s){
     return write((unsigned char*)&s[0], (unsigned int)s.length());
 }

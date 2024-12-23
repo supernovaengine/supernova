@@ -25,7 +25,7 @@ bool Terrain::createTerrain(){
     return scene->getSystem<MeshSystem>()->createOrUpdateTerrain(terrain, mesh);
 }
 
-void Terrain::setHeightMap(std::string path){
+void Terrain::setHeightMap(const std::string& path){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     terrain.heightMap.setPath(path);
@@ -41,7 +41,7 @@ void Terrain::setHeightMap(Framebuffer* framebuffer){
     terrain.needUpdateTexture = true;
 }
 
-void Terrain::setBlendMap(std::string path){
+void Terrain::setBlendMap(const std::string& path){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     terrain.blendMap.setPath(path);
@@ -57,7 +57,7 @@ void Terrain::setBlendMap(Framebuffer* framebuffer){
     terrain.needUpdateTexture = true;
 }
 
-void Terrain::setTextureDetailRed(std::string path){
+void Terrain::setTextureDetailRed(const std::string& path){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     terrain.textureDetailRed.setPath(path);
@@ -65,7 +65,7 @@ void Terrain::setTextureDetailRed(std::string path){
     terrain.needUpdateTexture = true;
 }
 
-void Terrain::setTextureDetailGreen(std::string path){
+void Terrain::setTextureDetailGreen(const std::string& path){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     terrain.textureDetailGreen.setPath(path);
@@ -73,7 +73,7 @@ void Terrain::setTextureDetailGreen(std::string path){
     terrain.needUpdateTexture = true;
 }
 
-void Terrain::setTextureDetailBlue(std::string path){
+void Terrain::setTextureDetailBlue(const std::string& path){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
     terrain.textureDetailBlue.setPath(path);

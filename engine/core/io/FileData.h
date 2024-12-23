@@ -22,8 +22,8 @@ namespace Supernova {
     class FileData {
 
     protected:
-        static bool beginWith(std::string path, std::string prefix);
-        static std::string simplifyPath(std::string path);
+        static bool beginWith(const std::string& path, const std::string& prefix);
+        static std::string simplifyPath(const std::string& path);
 
     public:
         virtual ~FileData();
@@ -31,7 +31,7 @@ namespace Supernova {
         static FileData* newFile(bool useHandle = false);
         static FileData* newFile(const char *aFilename, bool useHandle = false);
 
-        static std::string getBaseDir(std::string filepath);
+        static std::string getBaseDir(const std::string& filepath);
         static std::string getFilePathExtension(const std::string &filepath);
         static std::string getSystemPath(std::string path);
 
@@ -48,7 +48,7 @@ namespace Supernova {
 
         std::string readString();
         std::string readString(unsigned int stringlen);
-        unsigned int writeString(std::string s);
+        unsigned int writeString(const std::string& s);
     };
     
 }

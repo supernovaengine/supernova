@@ -21,7 +21,7 @@ namespace Supernova{
         void setDisabled(bool disabled);
         bool getDisabled() const;
 
-        void setText(std::string text);
+        void setText(const std::string& text);
         std::string getText() const;
 
         void setTextColor(Vector4 color);
@@ -29,7 +29,7 @@ namespace Supernova{
         void setTextColor(const float red, const float green, const float blue);
         Vector4 getTextColor() const;
 
-        void setTextFont(std::string font);
+        void setTextFont(const std::string& font);
         std::string getTextFont() const;
 
         void setFontSize(unsigned int fontSize);

@@ -22,7 +22,7 @@ Text Button::getLabelObject() const{
     return Text(scene, btcomp.label);
 }
 
-void Button::setLabel(std::string text){
+void Button::setLabel(const std::string& text){
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(btcomp.label);
 
@@ -57,7 +57,7 @@ Vector4 Button::getLabelColor() const{
     return uilabel.color;
 }
 
-void Button::setLabelFont(std::string font){
+void Button::setLabelFont(const std::string& font){
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     getLabelObject().setFont(font);
     btcomp.needUpdateButton = true;
@@ -81,7 +81,7 @@ unsigned int Button::getLabelFontSize() const{
     return getLabelObject().getFontSize();
 }
 
-void Button::setTextureNormal(std::string path){
+void Button::setTextureNormal(const std::string& path){
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     btcomp.textureNormal.setPath(path);
     btcomp.needUpdateButton = true;
@@ -89,13 +89,13 @@ void Button::setTextureNormal(std::string path){
     setTexture(path);
 }
 
-void Button::setTexturePressed(std::string path){
+void Button::setTexturePressed(const std::string& path){
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     btcomp.texturePressed.setPath(path);
     btcomp.needUpdateButton = true;
 }
 
-void Button::setTextureDisabled(std::string path){
+void Button::setTextureDisabled(const std::string& path){
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     btcomp.textureDisabled.setPath(path);
     btcomp.needUpdateButton = true;

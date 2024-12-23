@@ -82,7 +82,7 @@ int STBText::getLineHeight(){
     return lineHeight;
 }
 
-TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
+TextureData* STBText::load(const std::string& fontpath, unsigned int fontSize){
 
     Data fontData;
 
@@ -153,7 +153,7 @@ TextureData* STBText::load(std::string fontpath, unsigned int fontSize){
     return textureData;
 }
 
-void STBText::createText(std::string text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
+void STBText::createText(const std::string& text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
                          int& width, int& height, bool fixedWidth, bool fixedHeight, bool multiline, bool invert){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;

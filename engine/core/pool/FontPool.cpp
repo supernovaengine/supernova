@@ -16,7 +16,7 @@ fonts_t& FontPool::getMap(){
     return *map;
 };
 
-std::shared_ptr<STBText> FontPool::get(std::string id){
+std::shared_ptr<STBText> FontPool::get(const std::string& id){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
@@ -26,7 +26,7 @@ std::shared_ptr<STBText> FontPool::get(std::string id){
 	return NULL;
 }
 
-std::shared_ptr<STBText> FontPool::get(std::string id, std::string fontpath, unsigned int fontSize){
+std::shared_ptr<STBText> FontPool::get(const std::string& id, const std::string& fontpath, unsigned int fontSize){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
@@ -41,7 +41,7 @@ std::shared_ptr<STBText> FontPool::get(std::string id, std::string fontpath, uns
 	return resource;
 }
 
-void FontPool::remove(std::string id){
+void FontPool::remove(const std::string& id){
 	if (getMap().count(id)){
 		auto& shared = getMap()[id];
 		if (shared.use_count() <= 1){

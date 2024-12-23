@@ -53,7 +53,7 @@ void Polygon::clearVertices(){
     pcomp.needUpdatePolygon = true;
 }
 
-void Polygon::setTexture(std::string path){
+void Polygon::setTexture(const std::string& path){
     UIComponent& ui = getComponent<UIComponent>();
 
     ui.texture.setPath(path);

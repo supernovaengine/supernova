@@ -24,7 +24,7 @@ Texture::Texture(){
     this->wrapV = TextureWrap::REPEAT;
 }
 
-Texture::Texture(std::string path){
+Texture::Texture(const std::string& path){
     this->render = NULL;
     this->framebuffer = NULL;
     this->paths[0] = path;
@@ -41,7 +41,7 @@ Texture::Texture(std::string path){
     this->wrapV = TextureWrap::REPEAT;
 }
 
-Texture::Texture(std::string id, TextureData data){
+Texture::Texture(const std::string& id, TextureData data){
     this->render = NULL;
     this->framebuffer = NULL;
     this->data = std::make_shared<std::array<TextureData,6>>();
@@ -146,7 +146,7 @@ Texture::~Texture(){
 
 }
 
-void Texture::setPath(std::string path){
+void Texture::setPath(const std::string& path){
     destroy();
 
     this->paths[0] = path;
@@ -159,7 +159,7 @@ void Texture::setPath(std::string path){
     this->needLoad = true;
 }
 
-void Texture::setData(std::string id, TextureData data){
+void Texture::setData(const std::string& id, TextureData data){
     destroy();
 
     this->data = std::make_shared<std::array<TextureData,6>>();
@@ -174,11 +174,11 @@ void Texture::setData(std::string id, TextureData data){
     this->needLoad = true;
 }
 
-void Texture::setId(std::string id){
+void Texture::setId(const std::string& id){
     this->id = id;
 }
 
-void Texture::setCubePath(size_t index, std::string path){
+void Texture::setCubePath(size_t index, const std::string& path){
     destroy();
 
     this->paths[index] = path;
@@ -197,7 +197,10 @@ void Texture::setCubePath(size_t index, std::string path){
     this->id = id;
 }
 
-void Texture::setCubePaths(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down){
+void Texture::setCubePaths(const std::string& front, const std::string& back,
+    const std::string& left, const std::string& right,
+    const std::string& up, const std::string& down){
+
     destroy();
 
     this->paths[5] = front;
@@ -221,7 +224,7 @@ void Texture::setCubePaths(std::string front, std::string back, std::string left
     this->id = id;
 }
 
-void Texture::setCubeDatas(std::string id, TextureData front, TextureData back, TextureData left, TextureData right, TextureData up, TextureData down){
+void Texture::setCubeDatas(const std::string& id, TextureData front, TextureData back, TextureData left, TextureData right, TextureData up, TextureData down){
     destroy();
 
     this->data = std::make_shared<std::array<TextureData,6>>();

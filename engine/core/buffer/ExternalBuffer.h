@@ -24,7 +24,7 @@ namespace Supernova {
 
         void setData(unsigned char* data, size_t size);
 
-        void setName(std::string name);
+        void setName(const std::string& name);
         std::string getName() const;
     };
 

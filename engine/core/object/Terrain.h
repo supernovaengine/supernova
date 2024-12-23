@@ -17,15 +17,15 @@ namespace Supernova{
 
         bool createTerrain();
 
-        void setHeightMap(std::string path);
+        void setHeightMap(const std::string& path);
         void setHeightMap(Framebuffer* framebuffer);
 
-        void setBlendMap(std::string path);
+        void setBlendMap(const std::string& path);
         void setBlendMap(Framebuffer* framebuffer);
 
-        void setTextureDetailRed(std::string path);
-        void setTextureDetailGreen(std::string path);
-        void setTextureDetailBlue(std::string path);
+        void setTextureDetailRed(const std::string& path);
+        void setTextureDetailGreen(const std::string& path);
+        void setTextureDetailBlue(const std::string& path);
 
         void setSize(float size);
         float getSize() const;
