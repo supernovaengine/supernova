@@ -2237,6 +2237,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			up = Vector3(0, 0, 1);
 		}
 
+		configureLightShadowNearFar(light, camera);
+
 		//TODO: perspective aspect based on shadow map size
 		if (light.type == LightType::DIRECTIONAL){
 			
@@ -2246,8 +2248,6 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			Matrix4 viewMatrix;
 
 			viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, light.worldDirection + transform.worldPosition, up);
-
-			configureLightShadowNearFar(light, camera);
 
 			//TODO: light directional cascades is only considering main camera
 			if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
