@@ -202,7 +202,7 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
 }
 
 bool SokolTexture::createTexture(
-            std::string label, int width, int height, 
+            const std::string& label, int width, int height,
             ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6], 
             TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
 

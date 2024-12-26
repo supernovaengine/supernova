@@ -131,7 +131,7 @@ double SupernovaAndroid::getDoubleForKey(const char *key, double defaultValue){
     return value;
 }
 
-std::string SupernovaAndroid::getStringForKey(const char *key, std::string defaultValue){
+std::string SupernovaAndroid::getStringForKey(const char *key, const std::string& defaultValue){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 
@@ -190,7 +190,7 @@ void SupernovaAndroid::setDoubleForKey(const char *key, double value){
     env->DeleteLocalRef(strKey);
 }
 
-void SupernovaAndroid::setStringForKey(const char* key, std::string value){
+void SupernovaAndroid::setStringForKey(const char* key, const std::string& value){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 
@@ -235,7 +235,7 @@ void SupernovaAndroid::setMaxAdContentRating(Supernova::AdMobRating rating){
     env->CallVoidMethod(jniData.adMobWrapperObjRef, jniData.setMaxAdContentRating, irating);
 }
 
-void SupernovaAndroid::loadInterstitialAd(std::string adUnitID){
+void SupernovaAndroid::loadInterstitialAd(const std::string& adUnitID){
     JniData& jniData = NativeEngine::getInstance()->getJniData();
     JNIEnv* env = NativeEngine::getInstance()->getJniEnv();
 

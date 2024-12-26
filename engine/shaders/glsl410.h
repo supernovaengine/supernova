@@ -16332,7 +16332,7 @@ static const std::string ui_Vc4_glsl410 =
     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAAAFjb2xvcgAAAAAAAAAAAAAAAAAAAAAAAAAA"
     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARkxUNAEAAAAAAAAA";
 
-std::string getBase64Shader(std::string name) {
+std::string getBase64Shader(const std::string& name) {
     if (name == "depth_Ist_glsl410") {
         return depth_Ist_glsl410;
     } else if (name == "depth_MtaIst_glsl410") {

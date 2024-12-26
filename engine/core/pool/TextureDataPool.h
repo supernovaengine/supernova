@@ -20,9 +20,9 @@ namespace Supernova{
         static texturesdata_t& getMap();
 
     public:
-        static std::shared_ptr<std::array<TextureData,6>> get(std::string id);
-        static std::shared_ptr<std::array<TextureData,6>> get(std::string id, std::array<TextureData,6> data);
-        static void remove(std::string id);
+        static std::shared_ptr<std::array<TextureData,6>> get(const std::string& id);
+        static std::shared_ptr<std::array<TextureData,6>> get(const std::string& id, std::array<TextureData,6> data);
+        static void remove(const std::string& id);
 
         // necessary for engine shutdown
         static void clear();

@@ -26,7 +26,7 @@ namespace Supernova{
         void setStep(float step);
         float getStep() const;
 
-        void setBarTexture(std::string path);
+        void setBarTexture(const std::string& path);
         void setBarTexture(Framebuffer* framebuffer);
 
         void setBarColor(Vector4 color);

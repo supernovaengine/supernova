@@ -41,15 +41,19 @@ namespace Supernova{
 
         public:
             Texture();
-            Texture(std::string path);
-            Texture(std::string id, TextureData data);
+            Texture(const std::string& path);
+            Texture(const std::string& id, TextureData data);
 
-            void setPath(std::string path);
-            void setData(std::string id, TextureData data);
-            void setId(std::string id);
-            void setCubePath(size_t index, std::string path);
-            void setCubePaths(std::string front, std::string back, std::string left, std::string right, std::string up, std::string down);
-            void setCubeDatas(std::string id, TextureData front, TextureData back, TextureData left, TextureData right, TextureData up, TextureData down);
+            void setPath(const std::string& path);
+            void setData(const std::string& id, TextureData data);
+            void setId(const std::string& id);
+            void setCubePath(size_t index, const std::string& path);
+
+            void setCubePaths(const std::string& front, const std::string& back,
+                            const std::string& left, const std::string& right,
+                            const std::string& up, const std::string& down);
+
+            void setCubeDatas(const std::string& id, TextureData front, TextureData back, TextureData left, TextureData right, TextureData up, TextureData down);
             void setFramebuffer(Framebuffer* framebuffer);
 
             Texture(const Texture& rhs);

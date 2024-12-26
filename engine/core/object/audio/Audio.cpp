@@ -16,7 +16,7 @@ Audio::~Audio(){
 
 }
 
-int Audio::loadAudio(std::string filename){
+int Audio::loadAudio(const std::string& filename){
     AudioComponent& audio = getComponent<AudioComponent>();
 
     audio.filename = filename;

@@ -144,7 +144,7 @@ namespace Supernova{
 
 		Signature getSignature(Entity entity) const;
 
-		void setEntityName(Entity entity, std::string name);
+		void setEntityName(Entity entity, const std::string& name);
 		std::string getEntityName(Entity entity) const;
 	
 	    // Component methods

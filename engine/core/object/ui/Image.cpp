@@ -110,7 +110,7 @@ int Image::getPatchMarginTop() const{
     return img.patchMarginTop;
 }
 
-void Image::setTexture(std::string path){
+void Image::setTexture(const std::string& path){
     UIComponent& ui = getComponent<UIComponent>();
 
     ui.texture.setPath(path);

@@ -143,7 +143,7 @@ PivotPreset Sprite::getPivotPreset() const{
     return spritecomp.pivotPreset;
 }
 
-void Sprite::addFrame(int id, std::string name, Rect rect){
+void Sprite::addFrame(int id, const std::string& name, Rect rect){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
     if (id >= 0 && id < MAX_SPRITE_FRAMES){
         spritecomp.framesRect[id] = {true, name, rect};
@@ -152,7 +152,7 @@ void Sprite::addFrame(int id, std::string name, Rect rect){
     }
 }
 
-void Sprite::addFrame(std::string name, float x, float y, float width, float height){
+void Sprite::addFrame(const std::string& name, float x, float y, float width, float height){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     int id = 0;
@@ -180,7 +180,7 @@ void Sprite::removeFrame(int id){
     spritecomp.framesRect[id].active = false;
 }
 
-void Sprite::removeFrame(std::string name){
+void Sprite::removeFrame(const std::string& name){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
@@ -203,7 +203,7 @@ void Sprite::setFrame(int id){
     }
 }
 
-void Sprite::setFrame(std::string name){
+void Sprite::setFrame(const std::string& name){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
     int id = 0;
     while ( (!spritecomp.framesRect[id].active) && (id < MAX_SPRITE_FRAMES) ) {
@@ -245,7 +245,7 @@ void Sprite::startAnimation(int startFrame, int endFrame, int interval, bool loo
     animation->start();
 }
 
-void Sprite::startAnimation(std::string name, int interval, bool loop){
+void Sprite::startAnimation(const std::string& name, int interval, bool loop){
     if (!animation){
         animation = new SpriteAnimation(scene);
         animation->setTarget(entity);

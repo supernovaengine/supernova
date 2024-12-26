@@ -46,19 +46,19 @@ namespace Supernova{
         void setPivotPreset(PivotPreset pivotPreset);
         PivotPreset getPivotPreset() const;
 
-        void addFrame(int id, std::string name, Rect rect);
-        void addFrame(std::string name, float x, float y, float width, float height);
+        void addFrame(int id, const std::string& name, Rect rect);
+        void addFrame(const std::string& name, float x, float y, float width, float height);
         void addFrame(float x, float y, float width, float height);
         void addFrame(Rect rect);
         void removeFrame(int id);
-        void removeFrame(std::string name);
+        void removeFrame(const std::string& name);
 
         void setFrame(int id);
-        void setFrame(std::string name);
+        void setFrame(const std::string& name);
 
         void startAnimation(std::vector<int> frames, std::vector<int> framesTime, bool loop);
         void startAnimation(int startFrame, int endFrame, int interval, bool loop);
-        void startAnimation(std::string name, int interval, bool loop);
+        void startAnimation(const std::string& name, int interval, bool loop);
         void pauseAnimation();
         void resumeAnimation();
         void stopAnimation();

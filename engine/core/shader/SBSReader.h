@@ -21,7 +21,7 @@ namespace Supernova {
         SBSReader();
         virtual ~SBSReader();
 
-        bool read(std::string filepath);
+        bool read(const std::string& filepath);
         bool read(std::vector<unsigned char> datashader);
 
         ShaderData& getShaderData();

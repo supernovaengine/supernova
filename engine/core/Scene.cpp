@@ -508,7 +508,7 @@ Signature Scene::getSignature(Entity entity) const{
 	return entityManager.getSignature(entity);
 }
 
-void Scene::setEntityName(Entity entity, std::string name){
+void Scene::setEntityName(Entity entity, const std::string& name){
 	return entityManager.setName(entity, name);
 }
 

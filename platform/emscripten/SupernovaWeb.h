@@ -61,12 +61,12 @@ public:
 
     virtual bool syncFileSystem();
 
-    virtual std::string getStringForKey(const char *key, std::string defaultValue);
-    virtual void setStringForKey(const char* key, std::string value);
+    virtual std::string getStringForKey(const char *key, const std::string& defaultValue);
+    virtual void setStringForKey(const char* key, const std::string& value);
     virtual void removeKey(const char *key);
 
     virtual void initializeCrazyGamesSDK();
-    virtual void showCrazyGamesAd(std::string type);
+    virtual void showCrazyGamesAd(const std::string& type);
     virtual void happytimeCrazyGames();
     virtual void gameplayStartCrazyGames();
     virtual void gameplayStopCrazyGames();

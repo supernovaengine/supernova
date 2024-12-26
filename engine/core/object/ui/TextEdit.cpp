@@ -42,7 +42,7 @@ bool TextEdit::getDisabled() const{
     return  tecomp.disabled;
 }
 
-void TextEdit::setText(std::string text){
+void TextEdit::setText(const std::string& text){
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(tecomp.text);
 
@@ -81,7 +81,7 @@ Vector4 TextEdit::getTextColor() const{
     return Color::linearTosRGB(uitext.color);
 }
 
-void TextEdit::setTextFont(std::string font){
+void TextEdit::setTextFont(const std::string& font){
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
 
     getTextObject().setFont(font);

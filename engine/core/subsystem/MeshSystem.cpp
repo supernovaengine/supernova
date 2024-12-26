@@ -483,7 +483,7 @@ bool MeshSystem::getFileSizeInBytes(size_t *filesize_out, std::string *err, cons
     return true;
 }
 
-void MeshSystem::addSubmeshAttribute(Submesh& submesh, std::string bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized){
+void MeshSystem::addSubmeshAttribute(Submesh& submesh, const std::string& bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized){
     Attribute attData;
 
     attData.setBuffer(bufferName);
@@ -525,7 +525,7 @@ bool MeshSystem::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, ModelC
     return false;
 }
 
-bool MeshSystem::loadGLTFTexture(int textureIndex, ModelComponent& model, Texture& texture, std::string textureName){
+bool MeshSystem::loadGLTFTexture(int textureIndex, ModelComponent& model, Texture& texture, const std::string& textureName){
     if (textureIndex >= 0){
         tinygltf::Texture &tex = model.gltfModel->textures[textureIndex];
         tinygltf::Image &image = model.gltfModel->images[tex.source];
@@ -1591,7 +1591,7 @@ void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsi
     calculateMeshAABB(mesh);
 }
 
-bool MeshSystem::loadGLTF(Entity entity, std::string filename){
+bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
     ModelComponent& model = scene->getComponent<ModelComponent>(entity);
     Transform& transform = scene->getComponent<Transform>(entity);
@@ -2230,7 +2230,7 @@ bool MeshSystem::loadGLTF(Entity entity, std::string filename){
     return true;
 }
 
-bool MeshSystem::loadOBJ(Entity entity, std::string filename){
+bool MeshSystem::loadOBJ(Entity entity, const std::string& filename){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
     ModelComponent& model = scene->getComponent<ModelComponent>(entity);
     Transform& transform = scene->getComponent<Transform>(entity);

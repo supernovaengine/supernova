@@ -16,7 +16,7 @@ textures_t& TexturePool::getMap(){
     return *map;
 };
 
-std::shared_ptr<TextureRender> TexturePool::get(std::string id){
+std::shared_ptr<TextureRender> TexturePool::get(const std::string& id){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
@@ -26,7 +26,7 @@ std::shared_ptr<TextureRender> TexturePool::get(std::string id){
 	return NULL;
 }
 
-std::shared_ptr<TextureRender> TexturePool::get(std::string id, TextureType type, std::array<TextureData,6> data, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
+std::shared_ptr<TextureRender> TexturePool::get(const std::string& id, TextureType type, std::array<TextureData,6> data, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
@@ -55,7 +55,7 @@ std::shared_ptr<TextureRender> TexturePool::get(std::string id, TextureType type
 	return resource;
 }
 
-void TexturePool::remove(std::string id){
+void TexturePool::remove(const std::string& id){
 	if (getMap().count(id)){
 		auto& shared = getMap()[id];
 		if (shared.use_count() <= 1){

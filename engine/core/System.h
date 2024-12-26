@@ -92,7 +92,7 @@ namespace Supernova {
         virtual float getFloatForKey(const char *key, float defaultValue);
         virtual double getDoubleForKey(const char *key, double defaultValue);
         virtual Data getDataForKey(const char *key, const Data& defaultValue);
-        virtual std::string getStringForKey(const char *key, std::string defaultValue);
+        virtual std::string getStringForKey(const char *key, const std::string& defaultValue);
 
         virtual void setBoolForKey(const char *key, bool value);
         virtual void setIntegerForKey(const char *key, int value);
@@ -100,20 +100,20 @@ namespace Supernova {
         virtual void setFloatForKey(const char *key, float value);
         virtual void setDoubleForKey(const char *key, double value);
         virtual void setDataForKey(const char *key, Data& value);
-        virtual void setStringForKey(const char* key, std::string value);
+        virtual void setStringForKey(const char* key, const std::string& value);
 
         virtual void removeKey(const char *key);
 
         // Google AdMob SDK
         virtual void initializeAdMob(bool tagForChildDirectedTreatment = false, bool tagForUnderAgeOfConsent = false);
         virtual void setMaxAdContentRating(AdMobRating rating);
-        virtual void loadInterstitialAd(std::string adUnitID);
+        virtual void loadInterstitialAd(const std::string& adUnitID);
         virtual bool isInterstitialAdLoaded();
         virtual void showInterstitialAd();
 
         // CrazyGames SDK
         virtual void initializeCrazyGamesSDK();
-        virtual void showCrazyGamesAd(std::string type);
+        virtual void showCrazyGamesAd(const std::string& type);
         virtual void happytimeCrazyGames();
         virtual void gameplayStartCrazyGames();
         virtual void gameplayStopCrazyGames();

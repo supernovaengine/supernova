@@ -34,7 +34,7 @@ Text Panel::getHeaderTextObject() const{
     return Text(scene, panelcomp.headertext);
 }
 
-void Panel::setTitle(std::string text){
+void Panel::setTitle(const std::string& text){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
     TextComponent& textcomp = scene->getComponent<TextComponent>(panelcomp.headertext);
 
@@ -84,7 +84,7 @@ Vector4 Panel::getTitleColor() const{
     return uititle.color;
 }
 
-void Panel::setTitleFont(std::string font){
+void Panel::setTitleFont(const std::string& font){
     PanelComponent& panelcomp = getComponent<PanelComponent>();
 
     getHeaderTextObject().setFont(font);
@@ -135,7 +135,7 @@ void Panel::setHeaderPatchMargin(int margin){
     getHeaderImageObject().setPatchMargin(margin);
 }
 
-void Panel::setHeaderTexture(std::string path){
+void Panel::setHeaderTexture(const std::string& path){
     getHeaderImageObject().setTexture(path);
 }
 

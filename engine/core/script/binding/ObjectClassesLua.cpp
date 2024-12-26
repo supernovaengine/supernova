@@ -155,8 +155,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<SkyBox, EntityHandle>("SkyBox")
         .addConstructor <void (Scene*)> ()
         .addFunction("setTextures", 
-            luabridge::overload<std::string,std::string,std::string,std::string,std::string,std::string>(&SkyBox::setTextures),
-            luabridge::overload<std::string,TextureData,TextureData,TextureData,TextureData,TextureData,TextureData>(&SkyBox::setTextures))
+            luabridge::overload<const std::string&,const std::string&,const std::string&,const std::string&,const std::string&,const std::string&>(&SkyBox::setTextures),
+            luabridge::overload<const std::string&,TextureData,TextureData,TextureData,TextureData,TextureData,TextureData>(&SkyBox::setTextures))
         .addFunction("setTextureFront", &SkyBox::setTextureFront)
         .addFunction("setTextureBack", &SkyBox::setTextureBack)
         .addFunction("setTextureLeft", &SkyBox::setTextureLeft)
@@ -292,7 +292,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<Mesh, Object>("Mesh")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setTexture", 
-            luabridge::overload<std::string>(&Mesh::setTexture),
+            luabridge::overload<const std::string&>(&Mesh::setTexture),
             luabridge::overload<Framebuffer*>(&Mesh::setTexture))
         .addProperty("color", &Mesh::getColor, (void(Mesh::*)(Vector4))&Mesh::setColor)
         .addFunction("setColor", 
@@ -390,11 +390,11 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .deriveClass<Terrain, Mesh>("Terrain")
         .addConstructor <void (*) (Scene*)> ()
-        .addFunction("setHeightMap", (void(Terrain::*)(std::string))&Terrain::setHeightMap)
-        .addFunction("setBlendMap", (void(Terrain::*)(std::string))&Terrain::setBlendMap)
-        .addFunction("setTextureDetailRed", (void(Terrain::*)(std::string))&Terrain::setTextureDetailRed)
-        .addFunction("setTextureDetailGreen", (void(Terrain::*)(std::string))&Terrain::setTextureDetailGreen)
-        .addFunction("setTextureDetailBlue", (void(Terrain::*)(std::string))&Terrain::setTextureDetailBlue)
+        .addFunction("setHeightMap", (void(Terrain::*)(const std::string&))&Terrain::setHeightMap)
+        .addFunction("setBlendMap", (void(Terrain::*)(const std::string&))&Terrain::setBlendMap)
+        .addFunction("setTextureDetailRed", (void(Terrain::*)(const std::string&))&Terrain::setTextureDetailRed)
+        .addFunction("setTextureDetailGreen", (void(Terrain::*)(const std::string&))&Terrain::setTextureDetailGreen)
+        .addFunction("setTextureDetailBlue", (void(Terrain::*)(const std::string&))&Terrain::setTextureDetailBlue)
         .addProperty("size", &Terrain::getSize, &Terrain::setSize)
         .addProperty("maxHeight", &Terrain::getMaxHeight, &Terrain::setMaxHeight)
         .addProperty("resolution", &Terrain::getResolution, &Terrain::setResolution)
@@ -416,32 +416,32 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("findTileByString", &Tilemap::findTileByString)
         .addProperty("textureCutFactor", &Tilemap::getTextureCutFactor, &Tilemap::setTextureCutFactor)
         .addFunction("addRect", 
-            luabridge::overload<int, std::string, std::string, TextureFilter, Rect>(&Tilemap::addRect),
-            luabridge::overload<int, std::string, std::string, Rect>(&Tilemap::addRect),
-            luabridge::overload<int, std::string, Rect>(&Tilemap::addRect),
-            luabridge::overload<std::string, float, float, float, float>(&Tilemap::addRect),
+            luabridge::overload<int, const std::string&, const std::string&, TextureFilter, Rect>(&Tilemap::addRect),
+            luabridge::overload<int, const std::string&, const std::string&, Rect>(&Tilemap::addRect),
+            luabridge::overload<int, const std::string&, Rect>(&Tilemap::addRect),
+            luabridge::overload<const std::string&, float, float, float, float>(&Tilemap::addRect),
             luabridge::overload<float, float, float, float>(&Tilemap::addRect),
             luabridge::overload<Rect>(&Tilemap::addRect))
         .addFunction("removeRect", 
             luabridge::overload<int>(&Tilemap::removeRect),
-            luabridge::overload<std::string>(&Tilemap::removeRect))
+            luabridge::overload<const std::string&>(&Tilemap::removeRect))
         .addFunction("clearRects", &Tilemap::clearRects)
         .addFunction("getRect", 
             luabridge::overload<int>(&Tilemap::getRect),
-            luabridge::overload<std::string>(&Tilemap::getRect))
+            luabridge::overload<const std::string&>(&Tilemap::getRect))
         .addFunction("addTile", 
-            luabridge::overload<int, std::string, int, Vector2, float, float>(&Tilemap::addTile),
-            luabridge::overload<std::string, int, Vector2, float, float>(&Tilemap::addTile),
+            luabridge::overload<int, const std::string&, int, Vector2, float, float>(&Tilemap::addTile),
+            luabridge::overload<const std::string&, int, Vector2, float, float>(&Tilemap::addTile),
             luabridge::overload<int, Vector2, float, float>(&Tilemap::addTile),
-            luabridge::overload<std::string, std::string, Vector2, float, float>(&Tilemap::addTile),
-            luabridge::overload<std::string, Vector2, float, float>(&Tilemap::addTile))
+            luabridge::overload<const std::string&, const std::string&, Vector2, float, float>(&Tilemap::addTile),
+            luabridge::overload<const std::string&, Vector2, float, float>(&Tilemap::addTile))
         .addFunction("removeTile", 
             luabridge::overload<int>(&Tilemap::removeTile),
-            luabridge::overload<std::string>(&Tilemap::removeTile))
+            luabridge::overload<const std::string&>(&Tilemap::removeTile))
         .addFunction("clearTiles", &Tilemap::clearTiles)
         .addFunction("getTile", 
             luabridge::overload<int>(&Tilemap::getTile),
-            luabridge::overload<std::string>(&Tilemap::getTile))
+            luabridge::overload<const std::string&>(&Tilemap::getTile))
         .addProperty("reserveTiles", &Tilemap::getReserveTiles, &Tilemap::setReserveTiles)
         .addFunction("clearAll", &Tilemap::clearAll)
         .endClass();
@@ -456,13 +456,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("findAnimation", &Model::findAnimation)
         .addFunction("getBone", 
             luabridge::overload<int>(&Model::getBone),
-            luabridge::overload<std::string>(&Model::getBone))
+            luabridge::overload<const std::string&>(&Model::getBone))
         .addFunction("getMorphWeight", 
             luabridge::overload<int>(&Model::getMorphWeight),
-            luabridge::overload<std::string>(&Model::getMorphWeight))
+            luabridge::overload<const std::string&>(&Model::getMorphWeight))
         .addFunction("setMorphWeight", 
             luabridge::overload<int, float>(&Model::setMorphWeight),
-            luabridge::overload<std::string, float>(&Model::setMorphWeight))
+            luabridge::overload<const std::string&, float>(&Model::setMorphWeight))
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -504,15 +504,15 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getNumPoints", &Points::getNumPoints)
         .addFunction("clearPoints", &Points::clearPoints)
         .addFunction("addSpriteFrame", 
-            luabridge::overload<int, std::string, Rect>(&Points::addSpriteFrame),
-            luabridge::overload<std::string, float, float, float, float>(&Points::addSpriteFrame),
+            luabridge::overload<int, const std::string&, Rect>(&Points::addSpriteFrame),
+            luabridge::overload<const std::string&, float, float, float, float>(&Points::addSpriteFrame),
             luabridge::overload<float, float, float, float>(&Points::addSpriteFrame),
             luabridge::overload<Rect>(&Points::addSpriteFrame))
         .addFunction("removeSpriteFrame", 
             luabridge::overload<int>(&Points::removeSpriteFrame),
-            luabridge::overload<std::string>(&Points::removeSpriteFrame))
+            luabridge::overload<const std::string&>(&Points::removeSpriteFrame))
         .addFunction("setTexture", 
-            luabridge::overload<std::string>(&Points::setTexture),
+            luabridge::overload<const std::string&>(&Points::setTexture),
             luabridge::overload<Framebuffer*>(&Points::setTexture))
         .endClass();
 
@@ -552,20 +552,20 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTextureRect",(void(Sprite::*)(float, float, float, float)) &Sprite::setTextureRect)
         .addProperty("pivotPreset", &Sprite::getPivotPreset, &Sprite::setPivotPreset)
         .addFunction("addFrame", 
-            luabridge::overload<int, std::string, Rect>(&Sprite::addFrame),
-            luabridge::overload<std::string, float, float, float, float>(&Sprite::addFrame),
+            luabridge::overload<int, const std::string&, Rect>(&Sprite::addFrame),
+            luabridge::overload<const std::string&, float, float, float, float>(&Sprite::addFrame),
             luabridge::overload<float, float, float, float>(&Sprite::addFrame),
             luabridge::overload<Rect>(&Sprite::addFrame))
         .addFunction("removeFrame", 
             luabridge::overload<int>(&Sprite::removeFrame),
-            luabridge::overload<std::string>(&Sprite::removeFrame))
+            luabridge::overload<const std::string&>(&Sprite::removeFrame))
         .addFunction("setFrame", 
             luabridge::overload<int>(&Sprite::setFrame),
-            luabridge::overload<std::string>(&Sprite::setFrame))
+            luabridge::overload<const std::string&>(&Sprite::setFrame))
         .addFunction("startAnimation", 
             luabridge::overload<std::vector<int>, std::vector<int>, bool>(&Sprite::startAnimation),
             luabridge::overload<int, int, int, bool>(&Sprite::startAnimation),
-            luabridge::overload<std::string, int, bool>(&Sprite::startAnimation))
+            luabridge::overload<const std::string&, int, bool>(&Sprite::startAnimation))
         .addFunction("pauseAnimation", &Sprite::pauseAnimation)
         .addFunction("stopAnimation", &Sprite::stopAnimation)
         .endClass();
@@ -618,7 +618,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const float, const float, const float, const float>(&Polygon::setColor))
         .addProperty("alpha", &Polygon::getAlpha, &Polygon::setAlpha)
         .addFunction("setTexture", 
-            luabridge::overload<std::string>(&Polygon::setTexture),
+            luabridge::overload<const std::string&>(&Polygon::setTexture),
             luabridge::overload<Framebuffer*>(&Polygon::setTexture))
         .addProperty("flipY", &Polygon::isFlipY, &Polygon::setFlipY)
         .endClass();
@@ -661,7 +661,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("patchMarginRight", &Image::getPatchMarginRight, &Image::setPatchMarginRight)
         .addProperty("patchMarginTop", &Image::getPatchMarginTop, &Image::setPatchMarginTop)
         .addFunction("setTexture", 
-            luabridge::overload<std::string>(&Image::setTexture),
+            luabridge::overload<const std::string&>(&Image::setTexture),
             luabridge::overload<Framebuffer*>(&Image::setTexture))
         .addProperty("textureCutFactor", &Image::getTextureCutFactor, &Image::setTextureCutFactor)
         .addProperty("color", &Image::getColor, (void(Image::*)(Vector4))&Image::setColor)
@@ -682,9 +682,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setLabelColor", (void(Button::*)(const float, const float, const float, const float))&Button::setLabelColor)
         .addProperty("labelFont", &Button::getLabelFont, &Button::setLabelFont)
         .addProperty("labelFontSize", &Button::getLabelFontSize, &Button::setLabelFontSize)
-        .addFunction("setTextureNormal", (void(Button::*)(std::string))&Button::setTextureNormal)
-        .addFunction("setTexturePressed", (void(Button::*)(std::string))&Button::setTexturePressed)
-        .addFunction("setTextureDisabled", (void(Button::*)(std::string))&Button::setTextureDisabled)
+        .addFunction("setTextureNormal", (void(Button::*)(const std::string&))&Button::setTextureNormal)
+        .addFunction("setTexturePressed", (void(Button::*)(const std::string&))&Button::setTexturePressed)
+        .addFunction("setTextureDisabled", (void(Button::*)(const std::string&))&Button::setTextureDisabled)
         .addProperty("colorNormal", &Button::getColorNormal, (void(Button::*)(Vector4))&Button::setColorNormal)
         .addFunction("setColorNormal", 
             luabridge::overload<const float, const float, const float>(&Button::setColorNormal),
@@ -741,7 +741,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("barSize", &Scrollbar::getBarSize, &Scrollbar::setBarSize)
         .addProperty("step", &Scrollbar::getStep, &Scrollbar::setStep)
         .addFunction("setBarTexture", 
-            luabridge::overload<std::string>(&Scrollbar::setBarTexture),
+            luabridge::overload<const std::string&>(&Scrollbar::setBarTexture),
             luabridge::overload<Framebuffer*>(&Scrollbar::setBarTexture))
         .addProperty("barColor", &Scrollbar::getBarColor, (void(Scrollbar::*)(Vector4))&Scrollbar::setBarColor)
         .addFunction("setBarColor", 

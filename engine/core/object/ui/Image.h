@@ -29,7 +29,7 @@ namespace Supernova{
         int getPatchMarginRight() const;
         int getPatchMarginTop() const;
 
-        void setTexture(std::string path);
+        void setTexture(const std::string& path);
         void setTexture(Framebuffer* framebuffer);
 
         void setTextureCutFactor(float textureCutFactor);

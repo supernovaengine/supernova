@@ -35,7 +35,7 @@ public:
     virtual float getFloatForKey(const char *key, float defaultValue);
     virtual double getDoubleForKey(const char *key, double defaultValue);
     virtual Supernova::Data getDataForKey(const char* key, const Supernova::Data& defaultValue);
-    virtual std::string getStringForKey(const char *key, std::string defaultValue);
+    virtual std::string getStringForKey(const char *key, const std::string& defaultValue);
 
     virtual void setBoolForKey(const char *key, bool value);
     virtual void setIntegerForKey(const char *key, int value);
@@ -43,13 +43,13 @@ public:
     virtual void setFloatForKey(const char *key, float value);
     virtual void setDoubleForKey(const char *key, double value);
     virtual void setDataForKey(const char* key, Supernova::Data& value);
-    virtual void setStringForKey(const char* key, std::string value);
+    virtual void setStringForKey(const char* key, const std::string& value);
 
     virtual void removeKey(const char *key);
 
     virtual void initializeAdMob(bool tagForChildDirectedTreatment, bool tagForUnderAgeOfConsent);
     virtual void setMaxAdContentRating(Supernova::AdMobRating rating);
-    virtual void loadInterstitialAd(std::string adUnitID);
+    virtual void loadInterstitialAd(const std::string& adUnitID);
     virtual bool isInterstitialAdLoaded();
     virtual void showInterstitialAd();
 };

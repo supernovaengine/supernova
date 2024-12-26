@@ -83,7 +83,7 @@ void LuaBinding::registerIOClasses(lua_State *L){
             luabridge::overload<const char *, double>(&UserSettings::getDoubleForKey))
         .addStaticFunction("getStringForKey", 
             luabridge::overload<const char*>(&UserSettings::getStringForKey),
-            luabridge::overload<const char *, std::string>(&UserSettings::getStringForKey))
+            luabridge::overload<const char *, const std::string&>(&UserSettings::getStringForKey))
         .addStaticFunction("getDataForKey", 
             luabridge::overload<const char*>(&UserSettings::getDataForKey),
             luabridge::overload<const char *, const Data&>(&UserSettings::getDataForKey))

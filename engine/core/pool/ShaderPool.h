@@ -17,13 +17,13 @@ namespace Supernova{
     private:
         static shaders_t& getMap();
 
-        static std::string getShaderFile(std::string shaderStr);
-        static std::string getShaderName(std::string shaderStr);
-        static std::string getShaderStr(ShaderType shaderType, std::string properties);
+        static std::string getShaderFile(const std::string& shaderStr);
+        static std::string getShaderName(const std::string& shaderStr);
+        static std::string getShaderStr(ShaderType shaderType, const std::string& properties);
 
     public:
-        static std::shared_ptr<ShaderRender> get(ShaderType shaderType, std::string properties);
-        static void remove(ShaderType shaderType, std::string properties);
+        static std::shared_ptr<ShaderRender> get(ShaderType shaderType, const std::string& properties);
+        static void remove(ShaderType shaderType, const std::string& properties);
 
         static std::string getShaderLangStr();
         static std::vector<std::string>& getMissingShaders();

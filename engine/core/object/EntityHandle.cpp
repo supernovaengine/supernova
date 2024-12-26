@@ -45,7 +45,7 @@ Entity EntityHandle::getEntity() const{
     return entity;
 }
 
-void EntityHandle::setName(std::string name){
+void EntityHandle::setName(const std::string& name){
     scene->setEntityName(entity, name);
 }
 

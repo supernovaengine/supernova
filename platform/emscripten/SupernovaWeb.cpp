@@ -707,7 +707,7 @@ int SupernovaWeb::supernova_legacy_input(int code){
     return 0;
 }
 
-std::string SupernovaWeb::getStringForKey(const char *key, std::string defaultValue){
+std::string SupernovaWeb::getStringForKey(const char *key, const std::string& defaultValue){
     char* value = (char*)EM_ASM_INT({
         var key = UTF8ToString($0);
         var val = localStorage.getItem(key);
@@ -729,7 +729,7 @@ std::string SupernovaWeb::getStringForKey(const char *key, std::string defaultVa
     return defaultValue;
 }
 
-void SupernovaWeb::setStringForKey(const char* key, std::string value){
+void SupernovaWeb::setStringForKey(const char* key, const std::string& value){
     EM_ASM_ARGS({
         var key = UTF8ToString($0);
         var value = UTF8ToString($1);
@@ -769,7 +769,7 @@ void SupernovaWeb::initializeCrazyGamesSDK(){
     );
 }
 
-void SupernovaWeb::showCrazyGamesAd(std::string type){
+void SupernovaWeb::showCrazyGamesAd(const std::string& type){
     EM_ASM({
         var adtype = UTF8ToString($0);
         const callbacks = ({

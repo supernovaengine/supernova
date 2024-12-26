@@ -55,7 +55,7 @@ double UserSettings::getDoubleForKey(const char *key, double defaultValue){
     return System::instance().getDoubleForKey(key, defaultValue);
 }
 
-std::string UserSettings::getStringForKey(const char *key, std::string defaultValue){
+std::string UserSettings::getStringForKey(const char *key, const std::string& defaultValue){
     return System::instance().getStringForKey(key, defaultValue);
 }
 
@@ -83,7 +83,7 @@ void UserSettings::setDoubleForKey(const char *key, double value){
     System::instance().setDoubleForKey(key, value);
 }
 
-void UserSettings::setStringForKey(const char* key, std::string value){
+void UserSettings::setStringForKey(const char* key, const std::string& value){
     System::instance().setStringForKey(key, value);
 }
 

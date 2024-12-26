@@ -12,7 +12,7 @@
 
 using namespace Supernova;
 
-void LuaScript::setObject(std::string global, Object* object){
+void LuaScript::setObject(const std::string& global, Object* object){
     lua_State *L = LuaBinding::getLuaState();
 
     if (!luabridge::push<Object*>(L, object))
@@ -21,7 +21,7 @@ void LuaScript::setObject(std::string global, Object* object){
     lua_setglobal(L, global.c_str());
 }
 
-Object* LuaScript::getObject(std::string global){
+Object* LuaScript::getObject(const std::string& global){
     lua_State *L = LuaBinding::getLuaState();
 
     lua_getglobal(L, global.c_str());

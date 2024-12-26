@@ -619,7 +619,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
 
         .addStaticFunction("initializeAdMob", [] () { return System::instance().initializeAdMob(); })
         .addStaticFunction("setMaxAdContentRating", [] (AdMobRating rating) { return System::instance().setMaxAdContentRating(rating); })
-        .addStaticFunction("loadInterstitialAd", [] (std::string adUnitID) { return System::instance().loadInterstitialAd(adUnitID); })
+        .addStaticFunction("loadInterstitialAd", [] (const std::string& adUnitID) { return System::instance().loadInterstitialAd(adUnitID); })
         .addStaticFunction("isInterstitialAdLoaded", [] () { return System::instance().isInterstitialAdLoaded(); })
         .addStaticFunction("showInterstitialAd", [] () { return System::instance().showInterstitialAd(); })
 

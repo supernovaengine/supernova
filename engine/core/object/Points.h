@@ -48,14 +48,14 @@ namespace Supernova{
 
         void clearPoints();
 
-        void addSpriteFrame(int id, std::string name, Rect rect);
-        void addSpriteFrame(std::string name, float x, float y, float width, float height);
+        void addSpriteFrame(int id, const std::string& name, Rect rect);
+        void addSpriteFrame(const std::string& name, float x, float y, float width, float height);
         void addSpriteFrame(float x, float y, float width, float height);
         void addSpriteFrame(Rect rect);
         void removeSpriteFrame(int id);
-        void removeSpriteFrame(std::string name);
+        void removeSpriteFrame(const std::string& name);
 
-        void setTexture(std::string path);
+        void setTexture(const std::string& path);
         void setTexture(Framebuffer* framebuffer);
     };
 }

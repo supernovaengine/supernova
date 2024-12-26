@@ -60,7 +60,7 @@ std::string ShaderPool::getShaderLangStr(){
 }
 
 
-std::string ShaderPool::getShaderFile(std::string shaderStr){
+std::string ShaderPool::getShaderFile(const std::string& shaderStr){
 	std::string filename = getShaderName(shaderStr);
 
 	filename += ".sbs";
@@ -68,7 +68,7 @@ std::string ShaderPool::getShaderFile(std::string shaderStr){
 	return filename;
 }
 
-std::string ShaderPool::getShaderName(std::string shaderStr){
+std::string ShaderPool::getShaderName(const std::string& shaderStr){
 	std::string name = shaderStr;
 
 	name += "_" + getShaderLangStr();
@@ -76,7 +76,7 @@ std::string ShaderPool::getShaderName(std::string shaderStr){
 	return name;
 }
 
-std::string ShaderPool::getShaderStr(ShaderType shaderType, std::string properties){
+std::string ShaderPool::getShaderStr(ShaderType shaderType, const std::string& properties){
 
 	std::string str;
 
@@ -103,7 +103,7 @@ std::string ShaderPool::getShaderStr(ShaderType shaderType, std::string properti
 	return str;
 }
 
-std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, std::string properties){
+std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, const std::string& properties){
 	std::string shaderStr = getShaderStr(shaderType, properties);
 	auto& shared = getMap()[shaderStr];
 
@@ -130,7 +130,7 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, std::string
 	return resource;
 }
 
-void ShaderPool::remove(ShaderType shaderType, std::string properties){
+void ShaderPool::remove(ShaderType shaderType, const std::string& properties){
 	std::string shaderStr = getShaderStr(shaderType, properties);
 	if (getMap().count(shaderStr)){
 		auto& shared = getMap()[shaderStr];

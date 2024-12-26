@@ -20,9 +20,9 @@ namespace Supernova{
         static textures_t& getMap();
 
     public:
-        static std::shared_ptr<TextureRender> get(std::string id);
-        static std::shared_ptr<TextureRender> get(std::string id, TextureType type, std::array<TextureData,6> data, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV);
-        static void remove(std::string id);
+        static std::shared_ptr<TextureRender> get(const std::string& id);
+        static std::shared_ptr<TextureRender> get(const std::string& id, TextureType type, std::array<TextureData,6> data, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV);
+        static void remove(const std::string& id);
 
         // necessary for engine shutdown
         static void clear();

@@ -23037,7 +23037,7 @@ static const std::string ui_Vc4_msl21macos =
     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAABY29sb3IAAAAAAAAAAAAA"
     "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEZMVDQBAAAAAAAAAA==";
 
-std::string getBase64Shader(std::string name) {
+std::string getBase64Shader(const std::string& name) {
     if (name == "depth_Ist_msl21macos") {
         return depth_Ist_msl21macos;
     } else if (name == "depth_MtaIst_msl21macos") {

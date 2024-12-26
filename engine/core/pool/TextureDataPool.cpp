@@ -16,7 +16,7 @@ texturesdata_t& TextureDataPool::getMap(){
     return *map;
 };
 
-std::shared_ptr<std::array<TextureData,6>> TextureDataPool::get(std::string id){
+std::shared_ptr<std::array<TextureData,6>> TextureDataPool::get(const std::string& id){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
@@ -26,7 +26,7 @@ std::shared_ptr<std::array<TextureData,6>> TextureDataPool::get(std::string id){
 	return NULL;
 }
 
-std::shared_ptr<std::array<TextureData,6>> TextureDataPool::get(std::string id, std::array<TextureData,6> data){
+std::shared_ptr<std::array<TextureData,6>> TextureDataPool::get(const std::string& id, std::array<TextureData,6> data){
 	auto& shared = getMap()[id];
 
 	if (shared.use_count() > 0){
@@ -40,7 +40,7 @@ std::shared_ptr<std::array<TextureData,6>> TextureDataPool::get(std::string id, 
 	return resource;
 }
 
-void TextureDataPool::remove(std::string id){
+void TextureDataPool::remove(const std::string& id){
 	if (getMap().count(id)){
 		auto& shared = getMap()[id];
 		if (shared.use_count() <= 1){
