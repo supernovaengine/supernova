@@ -217,6 +217,12 @@ bool SBSReader::read(FileData& file){
 
     ShaderStage* shaderStage;
 
+    unsigned int numTexs = 0;
+    unsigned int numSams = 0;
+    unsigned int numPairs = 0;
+    unsigned int numUBs = 0;
+    unsigned int numSBs = 0;
+
     while (stag == SBS_CHUNK_STAG){
         uint32_t stagPos = file.pos();
 
@@ -292,6 +298,7 @@ bool SBSReader::read(FileData& file){
                 texture.name = std::string(t.name);
                 texture.set = t.set;
                 texture.binding = t.binding;
+                texture.slot = numTexs++;
 
                 if (t.type == SBS_TEXTURE_2D){
                     texture.type = TextureType::TEXTURE_2D;
@@ -328,6 +335,7 @@ bool SBSReader::read(FileData& file){
                 sampler.name = std::string(sm.name);
                 sampler.set = sm.set;
                 sampler.binding = sm.binding;
+                sampler.slot = numSams++;
 
                 if (sm.type == SBS_SAMPLERTYPE_COMPARISON){
                     sampler.type = SamplerType::COMPARISON;
@@ -347,6 +355,7 @@ bool SBSReader::read(FileData& file){
                 texturesampler.textureName = std::string(tsm.texture_name);
                 texturesampler.samplerName = std::string(tsm.sampler_name);
                 texturesampler.binding = tsm.binding;
+                texturesampler.slot = numPairs++;
 
                 shaderStage->textureSamplersPair.push_back(texturesampler);
             }
@@ -360,6 +369,7 @@ bool SBSReader::read(FileData& file){
                 uniformblock.instName = std::string(ub.inst_name);
                 uniformblock.set = ub.set;
                 uniformblock.binding = ub.binding;
+                uniformblock.slot = numUBs++;
                 uniformblock.sizeBytes = ub.size_bytes;
                 uniformblock.flattened = ub.flattened;
 
@@ -408,6 +418,7 @@ bool SBSReader::read(FileData& file){
                 storagebuffer.instName = std::string(sb.inst_name);
                 storagebuffer.set = sb.set;
                 storagebuffer.binding = sb.binding;
+                storagebuffer.slot = numSBs++;
                 storagebuffer.sizeBytes = sb.size_bytes;
                 storagebuffer.readonly = sb.readonly;
                 if (sb.type == SBS_STORAGEBUFFERTYPE_STRUCT){

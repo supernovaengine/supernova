@@ -143,7 +143,7 @@ int ShaderData::getAttrIndex(AttributeType type){
     return attrIndex;
 }
 
-int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stage){
+int ShaderData::getUniformBlockIndex(UniformBlockType type){
     std::string ustr;
     
     if (type == UniformBlockType::PBR_VS_PARAMS){
@@ -193,24 +193,18 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type, ShaderStageType stag
         return -1;
     }
 
-    int sIndex = -1;
     for (int s = 0; s < stages.size(); s++){
-        if (stages[s].type == stage)
-            sIndex = s;
-    }
-
-    int uniIndex = -1;
-    if (sIndex != -1){
-        for (int u = 0; u < stages[sIndex].uniformblocks.size(); u++){
-            if (stages[sIndex].uniformblocks[u].name == ustr)
-                uniIndex = stages[sIndex].uniformblocks[u].binding;
+        for (int u = 0; u < stages[s].uniformblocks.size(); u++){
+            if (stages[s].uniformblocks[u].name == ustr){
+                return stages[s].uniformblocks[u].slot;
+            }
         }
     }
 
-    return uniIndex;
+    return -1;
 }
 
-int ShaderData::getStorageBufferIndex(StorageBufferType type, ShaderStageType stage){
+int ShaderData::getStorageBufferIndex(StorageBufferType type){
     std::string ustr;
     
     if (type == StorageBufferType::VS_VERTEX){
@@ -222,24 +216,18 @@ int ShaderData::getStorageBufferIndex(StorageBufferType type, ShaderStageType st
         return -1;
     }
 
-    int sIndex = -1;
     for (int s = 0; s < stages.size(); s++){
-        if (stages[s].type == stage)
-            sIndex = s;
-    }
-
-    int sbIndex = -1;
-    if (sIndex != -1){
-        for (int u = 0; u < stages[sIndex].storagebuffers.size(); u++){
-            if (stages[sIndex].storagebuffers[u].name == ustr)
-                sbIndex = stages[sIndex].storagebuffers[u].binding;
+        for (int u = 0; u < stages[s].storagebuffers.size(); u++){
+            if (stages[s].storagebuffers[u].name == ustr){
+                return stages[s].storagebuffers[u].slot;
+            }
         }
     }
 
-    return sbIndex;
+    return -1;
 }
 
-std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type, ShaderStageType stage){
+std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type){
     std::string texstr;
     
     if (type == TextureShaderType::BASECOLOR){
@@ -295,39 +283,37 @@ std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type, ShaderSt
         return std::pair(-1, -1);
     }
 
-    int sIndex = -1;
     for (int s = 0; s < stages.size(); s++){
-        if (stages[s].type == stage)
-            sIndex = s;
-    }
-
-
-    int texIndex = -1;
-    int samIndex = -1;
-    if (sIndex != -1){
-
         // get texture index
-        for (int t = 0; t < stages[sIndex].textures.size(); t++){
-            if (stages[sIndex].textures[t].name == texstr)
-                texIndex = stages[sIndex].textures[t].binding;
-        }
-
-        // get sampler name by texture
-        std::string samplerName;
-        for (int ts = 0; ts < stages[sIndex].textureSamplersPair.size(); ts++){
-            if (stages[sIndex].textureSamplersPair[ts].textureName == texstr){
-                samplerName = stages[sIndex].textureSamplersPair[ts].samplerName;
+        int texIndex = -1;
+        for (int te = 0; te < stages[s].textures.size(); te++){
+            if (stages[s].textures[te].name == texstr){
+                texIndex = stages[s].textures[te].slot;
             }
         }
 
-        // get sampler index
-        for (int s = 0; s < stages[sIndex].samplers.size(); s++){
-            if (stages[sIndex].samplers[s].name == samplerName)
-                samIndex = stages[sIndex].samplers[s].binding;
+        if (texIndex != -1){
+            // get sampler name by texture
+            std::string samplerName;
+            for (int ts = 0; ts < stages[s].textureSamplersPair.size(); ts++){
+                if (stages[s].textureSamplersPair[ts].textureName == texstr){
+                    samplerName = stages[s].textureSamplersPair[ts].samplerName;
+                }
+            }
+
+            // get sampler index
+            int samIndex = -1;
+            for (int sa = 0; sa < stages[s].samplers.size(); sa++){
+                if (stages[s].samplers[sa].name == samplerName){
+                    samIndex = stages[s].samplers[sa].slot;
+
+                    return std::pair(texIndex, samIndex);
+                }
+            }
         }
     }
 
-    return std::pair(texIndex, samIndex);
+    return std::pair(-1, -1);
 }
 
 void ShaderData::releaseSourceData(){

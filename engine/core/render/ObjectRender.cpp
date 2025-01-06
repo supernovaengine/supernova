@@ -51,8 +51,8 @@ bool ObjectRender::beginDraw(PipelineType pipType){
     return backend.beginDraw(pipType);
 }
 
-void ObjectRender::applyUniformBlock(int slot, ShaderStageType stage, unsigned int count, void* data){
-    backend.applyUniformBlock(slot, stage, count, data);
+void ObjectRender::applyUniformBlock(int slot, unsigned int count, void* data){
+    backend.applyUniformBlock(slot, count, data);
 }
 
 void ObjectRender::draw(unsigned int vertexCount, unsigned int instanceCount){

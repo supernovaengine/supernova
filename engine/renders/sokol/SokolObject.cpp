@@ -183,9 +183,9 @@ void SokolObject::addStorageBuffer(int slot, ShaderStageType stage, BufferRender
         sg_buffer sbuf = buffer->backend.get();
 
         if (stage == ShaderStageType::VERTEX){
-            bind.vs.storage_buffers[slot] = sbuf;
+            bind.storage_buffers[slot] = sbuf;
         }else if (stage == ShaderStageType::FRAGMENT){
-            bind.fs.storage_buffers[slot] = sbuf;
+            bind.storage_buffers[slot] = sbuf;
         }
     }
 }
@@ -199,11 +199,11 @@ void SokolObject::addTexture(std::pair<int, int> slot, ShaderStageType stage, Te
         sg_image image = texture->backend.get();
         sg_sampler sampler = texture->backend.getSampler();
         if (stage == ShaderStageType::VERTEX){
-            bind.vs.images[slot.first] = image;
-            bind.vs.samplers[slot.second] = sampler;
+            bind.images[slot.first] = image;
+            bind.samplers[slot.second] = sampler;
         }else if (stage == ShaderStageType::FRAGMENT){
-            bind.fs.images[slot.first] = image;
-            bind.fs.samplers[slot.second] = sampler;
+            bind.images[slot.first] = image;
+            bind.samplers[slot.second] = sampler;
         }
     }
 }
@@ -323,16 +323,9 @@ bool SokolObject::beginDraw(PipelineType pipType){
     return true;
 }
 
-void SokolObject::applyUniformBlock(int slot, ShaderStageType stage, unsigned int count, void* data){
+void SokolObject::applyUniformBlock(int slot, unsigned int count, void* data){
     if (slot != -1){
-        sg_shader_stage sg_stage;
-        if (stage == ShaderStageType::VERTEX){
-            sg_stage = SG_SHADERSTAGE_VS;
-        }else if (stage == ShaderStageType::FRAGMENT){
-            sg_stage = SG_SHADERSTAGE_FS;
-        }
-        //SokolCmdQueue::add_command_apply_uniforms(sg_stage, slot, {data, count});
-        sg_apply_uniforms(sg_stage, slot, {data, count});
+        sg_apply_uniforms(slot, {data, count});
     }
 }
 

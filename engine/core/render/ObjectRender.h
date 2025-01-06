@@ -34,7 +34,7 @@ namespace Supernova {
         bool endLoad(uint8_t pipelines, bool enableFaceCulling, CullingMode cullingMode, WindingOrder windingOrder);
 
         bool beginDraw(PipelineType pipType);
-        void applyUniformBlock(int slot, ShaderStageType stage, unsigned int count, void* data);
+        void applyUniformBlock(int slot, unsigned int count, void* data);
         void draw(unsigned int vertexCount, unsigned int instanceCount);
 
         void destroy();

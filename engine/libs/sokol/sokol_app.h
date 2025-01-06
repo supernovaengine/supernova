@@ -94,7 +94,7 @@
     =======================
                         | Windows | macOS | Linux |  iOS  | Android |  HTML5
     --------------------+---------+-------+-------+-------+---------+--------
-    gl 3.x              | YES     | YES   | YES   | ---   | ---     |  ---
+    gl 4.x              | YES     | YES   | YES   | ---   | ---     |  ---
     gles3/webgl2        | ---     | ---   | YES(2)| YES   | YES     |  YES
     metal               | ---     | YES   | ---   | YES   | ---     |  ---
     d3d11               | YES     | ---   | ---   | ---   | ---     |  ---
@@ -130,7 +130,7 @@
     screen keyboard     | ---     | ---   | ---   | YES   | TODO    |  YES
     swap interval       | YES     | YES   | YES   | YES   | TODO    |  YES
     high-dpi            | YES     | YES   | TODO  | YES   | YES     |  YES
-    clipboard           | YES     | YES   | TODO  | ---   | ---     |  YES
+    clipboard           | YES     | YES   | YES   | ---   | ---     |  YES
     MSAA                | YES     | YES   | YES   | YES   | YES     |  YES
     drag'n'drop         | YES     | YES   | YES   | ---   | ---     |  YES
     window icon         | YES     | YES(1)| YES   | ---   | ---     |  YES
@@ -275,10 +275,9 @@
             to various Metal API objects required for rendering, otherwise
             they return a null pointer. These void pointers are actually
             Objective-C ids converted with a (ARC) __bridge cast so that
-            the ids can be tunnel through C code. Also note that the returned
-            pointers to the renderpass-descriptor and drawable may change from one
-            frame to the next, only the Metal device object is guaranteed to
-            stay the same.
+            the ids can be tunneled through C code. Also note that the returned
+            pointers may change from one frame to the next, only the Metal device
+            object is guaranteed to stay the same.
 
         const void* sapp_macos_get_window(void)
             On macOS, get the NSWindow object pointer, otherwise a null pointer.
@@ -338,7 +337,8 @@
     --- Optionally implement the event-callback to handle input events.
         sokol-app provides the following type of input events:
             - a 'virtual key' was pressed down or released
-            - a single text character was entered (provided as UTF-32 code point)
+            - a single text character was entered (provided as UTF-32 encoded
+              UNICODE code point)
             - a mouse button was pressed down or released (left, right, middle)
             - mouse-wheel or 2D scrolling events
             - the mouse was moved
@@ -844,6 +844,8 @@
         - on Linux: highly dependent on the used window manager, but usually
           the window's title bar icon and/or the task bar icon
         - on HTML5: the favicon shown in the page's browser tab
+        - on macOS: the application icon shown in the dock, but only
+          for currently running applications
 
     NOTE that it is not possible to set the actual application icon which is
     displayed by the operating system on the desktop or 'home screen'. Those
@@ -974,7 +976,7 @@
       the browser will not generate UNICODE character events)
     - all other key events *do not* bubble up by default (this prevents side effects
       like F1 opening help, or F7 starting 'caret browsing')
-    - character events do no bubble up (although I haven't noticed any side effects
+    - character events do not bubble up (although I haven't noticed any side effects
       otherwise)
 
     Event bubbling can be enabled for input event categories during initialization
@@ -991,9 +993,10 @@
             };
         }
 
-    This basically opens the floodgates lets *all* input events bubble up to the browser.
+    This basically opens the floodgates and lets *all* input events bubble up to the browser.
+
     To prevent individual events from bubbling, call sapp_consume_event() from within
-    the sokol_app.h event callback.
+    the sokol_app.h event callback when that specific event is reported.
 
     OPTIONAL: DON'T HIJACK main() (#define SOKOL_NO_ENTRY)
     ======================================================
@@ -1603,6 +1606,7 @@ typedef struct sapp_allocator {
     _SAPP_LOGITEM_XMACRO(LINUX_X11_OPEN_DISPLAY_FAILED, "XOpenDisplay() failed") \
     _SAPP_LOGITEM_XMACRO(LINUX_X11_QUERY_SYSTEM_DPI_FAILED, "failed to query system dpi value, assuming default 96.0") \
     _SAPP_LOGITEM_XMACRO(LINUX_X11_DROPPED_FILE_URI_WRONG_SCHEME, "dropped file URL doesn't start with 'file://'") \
+    _SAPP_LOGITEM_XMACRO(LINUX_X11_FAILED_TO_BECOME_OWNER_OF_CLIPBOARD, "X11: Failed to become owner of clipboard selection") \
     _SAPP_LOGITEM_XMACRO(ANDROID_UNSUPPORTED_INPUT_EVENT_INPUT_CB, "unsupported input event encountered in _sapp_android_input_cb()") \
     _SAPP_LOGITEM_XMACRO(ANDROID_UNSUPPORTED_INPUT_EVENT_MAIN_CB, "unsupported input event encountered in _sapp_android_main_cb()") \
     _SAPP_LOGITEM_XMACRO(ANDROID_READ_MSG_FAILED, "failed to read message in _sapp_android_main_cb()") \
@@ -2162,6 +2166,7 @@ inline void sapp_run(const sapp_desc& desc) { return sapp_run(&desc); }
     #include <limits.h> /* LONG_MAX */
     #include <pthread.h>    /* only used a linker-guard, search for _sapp_linux_run() and see first comment */
     #include <time.h>
+    #include <poll.h>
 #endif
 
 #if defined(_SAPP_APPLE)
@@ -2752,6 +2757,8 @@ typedef struct {
     float dpi;
     unsigned char error_code;
     Atom UTF8_STRING;
+    Atom CLIPBOARD;
+    Atom TARGETS;
     Atom WM_PROTOCOLS;
     Atom WM_DELETE_WINDOW;
     Atom WM_STATE;
@@ -8015,7 +8022,7 @@ _SOKOL_PRIVATE void _sapp_win32_run(const sapp_desc* desc) {
     #if defined(SOKOL_D3D11)
         _sapp_d3d11_destroy_default_render_target();
         _sapp_d3d11_destroy_device_and_swapchain();
-    #else
+    #elif defined(SOKOL_GLCORE)
         _sapp_wgl_destroy_context();
         _sapp_wgl_shutdown();
     #endif
@@ -9618,6 +9625,8 @@ _SOKOL_PRIVATE void _sapp_x11_init_extensions(void) {
     _sapp.x11.NET_WM_ICON             = XInternAtom(_sapp.x11.display, "_NET_WM_ICON", False);
     _sapp.x11.NET_WM_STATE            = XInternAtom(_sapp.x11.display, "_NET_WM_STATE", False);
     _sapp.x11.NET_WM_STATE_FULLSCREEN = XInternAtom(_sapp.x11.display, "_NET_WM_STATE_FULLSCREEN", False);
+    _sapp.x11.CLIPBOARD = XInternAtom(_sapp.x11.display, "CLIPBOARD", False);
+    _sapp.x11.TARGETS   = XInternAtom(_sapp.x11.display, "TARGETS", False);
     if (_sapp.drop.enabled) {
         _sapp.x11.xdnd.XdndAware        = XInternAtom(_sapp.x11.display, "XdndAware", False);
         _sapp.x11.xdnd.XdndEnter        = XInternAtom(_sapp.x11.display, "XdndEnter", False);
@@ -10463,6 +10472,75 @@ _SOKOL_PRIVATE void _sapp_x11_lock_mouse(bool lock) {
     XFlush(_sapp.x11.display);
 }
 
+_SOKOL_PRIVATE void _sapp_x11_set_clipboard_string(const char* str) {
+    SOKOL_ASSERT(_sapp.clipboard.enabled && _sapp.clipboard.buffer);
+    if (strlen(str) >= (size_t)_sapp.clipboard.buf_size) {
+        _SAPP_ERROR(CLIPBOARD_STRING_TOO_BIG);
+    }
+    XSetSelectionOwner(_sapp.x11.display, _sapp.x11.CLIPBOARD, _sapp.x11.window, CurrentTime);
+    if (XGetSelectionOwner(_sapp.x11.display, _sapp.x11.CLIPBOARD) != _sapp.x11.window) {
+        _SAPP_ERROR(LINUX_X11_FAILED_TO_BECOME_OWNER_OF_CLIPBOARD);
+    }
+}
+
+_SOKOL_PRIVATE const char* _sapp_x11_get_clipboard_string(void) {
+    SOKOL_ASSERT(_sapp.clipboard.enabled && _sapp.clipboard.buffer);
+    Atom none = XInternAtom(_sapp.x11.display, "SAPP_SELECTION", False);
+    Atom incremental = XInternAtom(_sapp.x11.display, "INCR", False);
+    if (XGetSelectionOwner(_sapp.x11.display, _sapp.x11.CLIPBOARD) == _sapp.x11.window) {
+        // Instead of doing a large number of X round-trips just to put this
+        // string into a window property and then read it back, just return it
+        return _sapp.clipboard.buffer;
+    }
+    XConvertSelection(_sapp.x11.display,
+                      _sapp.x11.CLIPBOARD,
+                      _sapp.x11.UTF8_STRING,
+                      none,
+                      _sapp.x11.window,
+                      CurrentTime);
+    XEvent event;
+    while (!XCheckTypedWindowEvent(_sapp.x11.display, _sapp.x11.window, SelectionNotify, &event)) {
+        // Wait for event data to arrive on the X11 display socket
+        struct pollfd fd = { ConnectionNumber(_sapp.x11.display), POLLIN };
+        while (!XPending(_sapp.x11.display)) {
+            poll(&fd, 1, -1);
+        }
+    }
+    if (event.xselection.property == None) {
+        return NULL;
+    }
+    char* data = NULL;
+    Atom actualType;
+    int actualFormat;
+    unsigned long itemCount, bytesAfter;
+    const bool ret = XGetWindowProperty(_sapp.x11.display,
+                        event.xselection.requestor,
+                        event.xselection.property,
+                        0,
+                        LONG_MAX,
+                        True,
+                        _sapp.x11.UTF8_STRING,
+                        &actualType,
+                        &actualFormat,
+                        &itemCount,
+                        &bytesAfter,
+                        (unsigned char**) &data);
+    if (ret != Success || data == NULL) {
+        if (data != NULL) {
+            XFree(data);
+        }
+        return NULL;
+    }
+    if ((actualType == incremental) || (itemCount >= (size_t)_sapp.clipboard.buf_size)) {
+        _SAPP_ERROR(CLIPBOARD_STRING_TOO_BIG);
+        XFree(data);
+        return NULL;
+    }
+    _sapp_strcpy(data, _sapp.clipboard.buffer, _sapp.clipboard.buf_size);
+    XFree(data);
+    return _sapp.clipboard.buffer;
+}
+
 _SOKOL_PRIVATE void _sapp_x11_update_window_title(void) {
     Xutf8SetWMProperties(_sapp.x11.display,
         _sapp.x11.window,
@@ -11202,6 +11280,48 @@ _SOKOL_PRIVATE void _sapp_x11_on_clientmessage(XEvent* event) {
     }
 }
 
+_SOKOL_PRIVATE void _sapp_x11_on_selectionrequest(XEvent* event) {
+    XSelectionRequestEvent* req = &event->xselectionrequest;
+    if (req->selection != _sapp.x11.CLIPBOARD) {
+        return;
+    }
+    if (!_sapp.clipboard.enabled) {
+        return;
+    }
+    SOKOL_ASSERT(_sapp.clipboard.buffer);
+    XSelectionEvent reply;
+    _sapp_clear(&reply, sizeof(reply));
+    reply.type = SelectionNotify;
+    reply.display = req->display;
+    reply.requestor = req->requestor;
+    reply.selection = req->selection;
+    reply.target = req->target;
+    reply.property = req->property;
+    reply.time = req->time;
+    if (req->target == _sapp.x11.UTF8_STRING) {
+        XChangeProperty(_sapp.x11.display,
+                        req->requestor,
+                        req->property,
+                        _sapp.x11.UTF8_STRING,
+                        8,
+                        PropModeReplace,
+                        (unsigned char*) _sapp.clipboard.buffer,
+                        strlen(_sapp.clipboard.buffer));
+    } else if (req->target == _sapp.x11.TARGETS) {
+        XChangeProperty(_sapp.x11.display,
+                        req->requestor,
+                        req->property,
+                        XA_ATOM,
+                        32,
+                        PropModeReplace,
+                        (unsigned char*) &_sapp.x11.UTF8_STRING,
+                        1);
+    } else {
+        reply.property = None;
+    }
+    XSendEvent(_sapp.x11.display, req->requestor, False, 0, (XEvent*) &reply);
+}
+
 _SOKOL_PRIVATE void _sapp_x11_process_event(XEvent* event) {
     switch (event->type) {
         case GenericEvent:
@@ -11242,6 +11362,9 @@ _SOKOL_PRIVATE void _sapp_x11_process_event(XEvent* event) {
             break;
         case SelectionNotify:
             _sapp_x11_on_selectionnotify(event);
+            break;
+        case SelectionRequest:
+            _sapp_x11_on_selectionrequest(event);
             break;
         case DestroyNotify:
             // not a bug
@@ -11723,6 +11846,8 @@ SOKOL_API_IMPL void sapp_set_clipboard_string(const char* str) {
         _sapp_emsc_set_clipboard_string(str);
     #elif defined(_SAPP_WIN32)
         _sapp_win32_set_clipboard_string(str);
+    #elif defined(_SAPP_LINUX)
+        _sapp_x11_set_clipboard_string(str);
     #else
         /* not implemented */
     #endif
@@ -11739,6 +11864,8 @@ SOKOL_API_IMPL const char* sapp_get_clipboard_string(void) {
         return _sapp.clipboard.buffer;
     #elif defined(_SAPP_WIN32)
         return _sapp_win32_get_clipboard_string();
+    #elif defined(_SAPP_LINUX)
+        return _sapp_x11_get_clipboard_string();
     #else
         /* not implemented */
         return _sapp.clipboard.buffer;

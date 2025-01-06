@@ -30,8 +30,9 @@ namespace Supernova {
     struct ShaderUniformBlock {
         std::string name;
         std::string instName;
-        int  set;
-        int  binding;
+        int set;
+        int binding;
+        unsigned int slot;
         unsigned int sizeBytes;
         bool flattened;
 
@@ -41,8 +42,9 @@ namespace Supernova {
     struct ShaderStorageBuffer {
         std::string name;
         std::string instName;
-        int  set;
-        int  binding;
+        int set;
+        int binding;
+        unsigned int slot;
         unsigned int sizeBytes;
         bool readonly;
 
@@ -53,6 +55,7 @@ namespace Supernova {
         std::string name;
         int set;
         int binding;
+        unsigned int slot;
         TextureType type;
         TextureSamplerType samplerType;
     };
@@ -61,6 +64,7 @@ namespace Supernova {
         std::string name;
         int set;
         int binding;
+        unsigned int slot;
         SamplerType type;
     };
 
@@ -69,6 +73,7 @@ namespace Supernova {
         std::string textureName;
         std::string samplerName;
         int binding;
+        unsigned int slot;
     };
 
     struct ShaderBinSource{
@@ -106,9 +111,9 @@ namespace Supernova {
         ShaderData& operator = (const ShaderData& d);
 
         int getAttrIndex(AttributeType type);
-        int getUniformBlockIndex(UniformBlockType type, ShaderStageType stage);
-        int getStorageBufferIndex(StorageBufferType type, ShaderStageType stage);
-        std::pair<int, int> getTextureIndex(TextureShaderType type, ShaderStageType stage);
+        int getUniformBlockIndex(UniformBlockType type);
+        int getStorageBufferIndex(StorageBufferType type);
+        std::pair<int, int> getTextureIndex(TextureShaderType type);
 
         void releaseSourceData();
     };

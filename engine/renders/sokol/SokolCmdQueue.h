@@ -200,8 +200,7 @@ namespace Supernova {
 			
 			struct
 			{
-				sg_shader_stage stage;
-				int ub_index;
+				int ub_slot;
 				size_t data_size;
 				char buf[16384];
 			} apply_uniforms;
@@ -266,7 +265,7 @@ namespace Supernova {
 		static void add_command_apply_scissor_rect(int x, int y, int width, int height, bool origin_top_left);
 		static void add_command_apply_pipeline(sg_pipeline pipeline);
 		static void add_command_apply_bindings(const sg_bindings& bindings);
-		static void add_command_apply_uniforms(sg_shader_stage stage, int ub_index, const sg_range& data);
+		static void add_command_apply_uniforms(int ub_slot, const sg_range& data);
 		static void add_command_draw(int base_element, int number_of_elements, int number_of_instances);
 		static void add_command_end_pass();
 		static void add_command_commit();
