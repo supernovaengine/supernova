@@ -27,13 +27,14 @@
 
     Optionally provide the following defines with your own implementations:
 
-        SOKOL_ASSERT(c)     - your own assert macro (default: assert(c))
-        SOKOL_UNREACHABLE() - a guard macro for unreachable code (default: assert(false))
-        SOKOL_WIN32_FORCE_MAIN  - define this on Win32 to use a main() entry point instead of WinMain
-        SOKOL_NO_ENTRY      - define this if sokol_app.h shouldn't "hijack" the main() function
-        SOKOL_APP_API_DECL  - public function declaration prefix (default: extern)
-        SOKOL_API_DECL      - same as SOKOL_APP_API_DECL
-        SOKOL_API_IMPL      - public function implementation prefix (default: -)
+        SOKOL_ASSERT(c)             - your own assert macro (default: assert(c))
+        SOKOL_UNREACHABLE()         - a guard macro for unreachable code (default: assert(false))
+        SOKOL_WIN32_FORCE_MAIN      - define this on Win32 to add a main() entry point
+        SOKOL_WIN32_FORCE_WINMAIN   - define this on Win32 to add a WinMain() entry point (enabled by default unless SOKOL_WIN32_FORCE_MAIN or SOKOL_NO_ENTRY is defined)
+        SOKOL_NO_ENTRY              - define this if sokol_app.h shouldn't "hijack" the main() function
+        SOKOL_APP_API_DECL          - public function declaration prefix (default: extern)
+        SOKOL_API_DECL              - same as SOKOL_APP_API_DECL
+        SOKOL_API_IMPL              - public function implementation prefix (default: -)
 
     Optionally define the following to force debug checks and validations
     even in release mode:
@@ -47,6 +48,9 @@
 
     On Windows, SOKOL_DLL will define SOKOL_APP_API_DECL as __declspec(dllexport)
     or __declspec(dllimport) as needed.
+
+    if SOKOL_WIN32_FORCE_MAIN and SOKOL_WIN32_FORCE_WINMAIN are both defined,
+    it is up to the developer to define the desired subsystem.
 
     On Linux, SOKOL_GLCORE can use either GLX or EGL.
     GLX is default, set SOKOL_FORCE_EGL to override.
@@ -998,6 +1002,87 @@
     To prevent individual events from bubbling, call sapp_consume_event() from within
     the sokol_app.h event callback when that specific event is reported.
 
+
+    SETTING THE CANVAS OBJECT ON THE WEB PLATFORM
+    =============================================
+    On the web, sokol_app.h and the Emscripten SDK functions need to find
+    the WebGL/WebGPU canvas intended for rendering and attaching event
+    handlers. This can happen in four ways:
+
+    1. do nothing and just set the id of the canvas object to 'canvas' (preferred)
+    2. via a CSS Selector string (preferred)
+    3. by setting the `Module.canvas` property to the canvas object
+    4. by adding the canvas object to the global variable `specialHTMLTargets[]`
+       (this is a special variable used by the Emscripten runtime to lookup
+       event target objects for which document.querySelector() cannot be used)
+
+    The easiest way is to just name your canvas object 'canvas':
+
+        <canvas id="canvas" ...></canvas>
+
+    This works because the default css selector string used by sokol_app.h
+    is '#canvas'.
+
+    If you name your canvas differently, you need to communicate that name to
+    sokol_app.h via `sapp_desc.html5_canvas_selector` as a regular css selector
+    string that's compatible with `document.querySelector()`. E.g. if your canvas
+    object looks like this:
+
+        <canvas id="bla" ...></canvas>
+
+    The `sapp_desc.html5_canvas_selector` string must be set to '#bla':
+
+        .html5_canvas_selector = "#bla"
+
+    If the canvas object cannot be looked up via `document.querySelector()` you
+    need to use one of the alternative methods, both involve the special
+    Emscripten runtime `Module` object which is usually setup in the index.html
+    like this before the WASM blob is loaded and instantiated:
+
+        <script type='text/javascript'>
+            var Module = {
+                // ...
+            };
+        </script>
+
+    The first option is to set the `Module.canvas` property to your canvas object:
+
+        <script type='text/javascript'>
+            var Module = {
+                canvas: my_canvas_object,
+            };
+        </script>
+
+    When sokol_app.h initializes, it will check the global Module object whether
+    a `Module.canvas` property exists and is an object. This method will add
+    a new entry to the `specialHTMLTargets[]` object
+
+    The other option is to add the canvas under a name chosen by you to the
+    special `specialHTMLTargets[]` map, which is used by the Emscripten runtime
+    to lookup 'event target objects' which are not visible to `document.querySelector()`.
+    Note that `specialHTMLTargets[]` must be updated after the Emscripten runtime
+    has started but before the WASM code is running. A good place for this is
+    the special `Module.preRun` array in index.html:
+
+        <script type='text/javascript'>
+            var Module = {
+                preRun: [
+                    () => {
+                        specialHTMLTargets['my_canvas'] = my_canvas_object;
+                    }
+                ],
+            };
+        </script>
+
+    In that case, pass the same string to sokol_app.h which is used as key
+    in the specialHTMLTargets[] map:
+
+        .html5_canvas_selector = "my_canvas"
+
+    If sokol_app.h can't find your canvas for some reason check for warning
+    messages on the browser console.
+
+
     OPTIONAL: DON'T HIJACK main() (#define SOKOL_NO_ENTRY)
     ======================================================
     NOTE: SOKOL_NO_ENTRY and sapp_run() is currently not supported on Android.
@@ -1146,7 +1231,6 @@
     If you don't want to provide your own custom logger it is highly recommended to use
     the standard logger in sokol_log.h instead, otherwise you won't see any warnings or
     errors.
-
 
     TEMP NOTE DUMP
     ==============
@@ -1717,7 +1801,7 @@ typedef struct sapp_desc {
     bool win32_console_utf8;            // if true, set the output console codepage to UTF-8
     bool win32_console_create;          // if true, attach stdout/stderr to a new console window
     bool win32_console_attach;          // if true, attach stdout/stderr to parent process
-    const char* html5_canvas_name;      // the name (id) of the HTML5 canvas element, default is "canvas"
+    const char* html5_canvas_selector;  // css selector of the HTML5 canvas element, default is "#canvas"
     bool html5_canvas_resize;           // if true, the HTML5 canvas size is set to sapp_desc.width/height, otherwise canvas size is tracked
     bool html5_preserve_drawing_buffer; // HTML5 only: whether to preserve default framebuffer content between frames
     bool html5_premultiplied_alpha;     // HTML5 only: whether the rendered pixels use premultiplied alpha convention
@@ -1919,14 +2003,6 @@ inline void sapp_run(const sapp_desc& desc) { return sapp_run(&desc); }
 
 #endif
 
-// this WinRT specific hack is required when wWinMain is in a static library
-#if defined(_MSC_VER) && defined(UNICODE)
-#include <winapifamily.h>
-#if defined(WINAPI_FAMILY_PARTITION) && !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-#pragma comment(linker, "/include:wWinMain")
-#endif
-#endif
-
 #endif // SOKOL_APP_INCLUDED
 
 // ██ ███    ███ ██████  ██      ███████ ███    ███ ███████ ███    ██ ████████  █████  ████████ ██  ██████  ███    ██
@@ -2105,8 +2181,11 @@ inline void sapp_run(const sapp_desc& desc) { return sapp_run(&desc); }
     #include <windows.h>
     #include <windowsx.h>
     #include <shellapi.h>
-    #if !defined(SOKOL_NO_ENTRY)    // if SOKOL_NO_ENTRY is defined, it's the applications' responsibility to use the right subsystem
-        #if defined(SOKOL_WIN32_FORCE_MAIN)
+    #if !defined(SOKOL_NO_ENTRY)    // if SOKOL_NO_ENTRY is defined, it's the application's responsibility to use the right subsystem
+
+        #if defined(SOKOL_WIN32_FORCE_MAIN) && defined(SOKOL_WIN32_FORCE_WINMAIN)
+            // If both are defined, it's the application's responsibility to use the right subsystem
+        #elif defined(SOKOL_WIN32_FORCE_MAIN)
             #pragma comment (linker, "/subsystem:console")
         #else
             #pragma comment (linker, "/subsystem:windows")
@@ -3115,7 +3194,7 @@ _SOKOL_PRIVATE sapp_desc _sapp_desc_defaults(const sapp_desc* desc) {
             res.gl_minor_version = 3;
         #endif
     }
-    res.html5_canvas_name = _sapp_def(res.html5_canvas_name, "canvas");
+    res.html5_canvas_selector = _sapp_def(res.html5_canvas_selector, "#canvas");
     res.clipboard_size = _sapp_def(res.clipboard_size, 8192);
     res.max_dropped_files = _sapp_def(res.max_dropped_files, 1);
     res.max_dropped_file_path_length = _sapp_def(res.max_dropped_file_path_length, 2048);
@@ -3142,9 +3221,8 @@ _SOKOL_PRIVATE void _sapp_init_state(const sapp_desc* desc) {
     _sapp.framebuffer_height = _sapp.window_height;
     _sapp.sample_count = _sapp.desc.sample_count;
     _sapp.swap_interval = _sapp.desc.swap_interval;
-    _sapp.html5_canvas_selector[0] = '#';
-    _sapp_strcpy(_sapp.desc.html5_canvas_name, &_sapp.html5_canvas_selector[1], sizeof(_sapp.html5_canvas_selector) - 1);
-    _sapp.desc.html5_canvas_name = &_sapp.html5_canvas_selector[1];
+    _sapp_strcpy(_sapp.desc.html5_canvas_selector, _sapp.html5_canvas_selector, sizeof(_sapp.html5_canvas_selector));
+    _sapp.desc.html5_canvas_selector = _sapp.html5_canvas_selector;
     _sapp.html5_ask_leave_site = _sapp.desc.html5_ask_leave_site;
     _sapp.clipboard.enabled = _sapp.desc.enable_clipboard;
     if (_sapp.clipboard.enabled) {
@@ -4780,7 +4858,7 @@ _SOKOL_PRIVATE void _sapp_ios_show_keyboard(bool shown) {
 #if defined(_SAPP_EMSCRIPTEN)
 
 #if defined(EM_JS_DEPS)
-EM_JS_DEPS(sokol_app, "$withStackSave,$stringToUTF8OnStack");
+EM_JS_DEPS(sokol_app, "$withStackSave,$stringToUTF8OnStack,$findCanvasEventTarget");
 #endif
 
 #ifdef __cplusplus
@@ -4930,10 +5008,8 @@ _SOKOL_PRIVATE void _sapp_emsc_set_clipboard_string(const char* str) {
     sapp_js_write_clipboard(str);
 }
 
-EM_JS(void, sapp_js_add_dragndrop_listeners, (const char* canvas_name_cstr), {
+EM_JS(void, sapp_js_add_dragndrop_listeners, (void), {
     Module.sokol_drop_files = [];
-    const canvas_name = UTF8ToString(canvas_name_cstr);
-    const canvas = document.getElementById(canvas_name);
     Module.sokol_dragenter = (event) => {
         event.stopPropagation();
         event.preventDefault();
@@ -4966,6 +5042,8 @@ EM_JS(void, sapp_js_add_dragndrop_listeners, (const char* canvas_name_cstr), {
         // FIXME? see computation of targetX/targetY in emscripten via getClientBoundingRect
         __sapp_emsc_end_drop(event.clientX, event.clientY, mods);
     };
+    \x2F\x2A\x2A @suppress {missingProperties} \x2A\x2F
+    const canvas = Module.sapp_emsc_target;
     canvas.addEventListener('dragenter', Module.sokol_dragenter, false);
     canvas.addEventListener('dragleave', Module.sokol_dragleave, false);
     canvas.addEventListener('dragover',  Module.sokol_dragover, false);
@@ -5005,24 +5083,30 @@ EM_JS(void, sapp_js_fetch_dropped_file, (int index, _sapp_html5_fetch_callback c
     reader.readAsArrayBuffer(files[index]);
 });
 
-EM_JS(void, sapp_js_remove_dragndrop_listeners, (const char* canvas_name_cstr), {
-    const canvas_name = UTF8ToString(canvas_name_cstr);
-    const canvas = document.getElementById(canvas_name);
+EM_JS(void, sapp_js_remove_dragndrop_listeners, (void), {
+    \x2F\x2A\x2A @suppress {missingProperties} \x2A\x2F
+    const canvas = Module.sapp_emsc_target;
     canvas.removeEventListener('dragenter', Module.sokol_dragenter);
     canvas.removeEventListener('dragleave', Module.sokol_dragleave);
     canvas.removeEventListener('dragover',  Module.sokol_dragover);
     canvas.removeEventListener('drop',      Module.sokol_drop);
 });
 
-EM_JS(void, sapp_js_init, (const char* c_str_target), {
-    // lookup and store canvas object by name
-    const target_str = UTF8ToString(c_str_target);
-    Module.sapp_emsc_target = document.getElementById(target_str);
+EM_JS(void, sapp_js_init, (const char* c_str_target_selector), {
+    const target_selector_str = UTF8ToString(c_str_target_selector);
+    if (Module['canvas'] !== undefined) {
+        if (typeof Module['canvas'] === 'object') {
+            specialHTMLTargets[target_selector_str] = Module['canvas'];
+        } else {
+            console.warn("sokol_app.h: Module['canvas'] is set but is not an object");
+        }
+    }
+    Module.sapp_emsc_target = findCanvasEventTarget(target_selector_str);
     if (!Module.sapp_emsc_target) {
-        console.log("sokol_app.h: invalid target:" + target_str);
+        console.warn("sokol_app.h: can't find html5_canvas_selector ", target_selector_str);
     }
     if (!Module.sapp_emsc_target.requestPointerLock) {
-        console.log("sokol_app.h: target doesn't support requestPointerLock:" + target_str);
+        console.warn("sokol_app.h: target doesn't support requestPointerLock: ", target_selector_str);
     }
 });
 
@@ -5853,7 +5937,7 @@ _SOKOL_PRIVATE void _sapp_emsc_register_eventhandlers(void) {
         sapp_js_add_clipboard_listener();
     }
     if (_sapp.drop.enabled) {
-        sapp_js_add_dragndrop_listeners(&_sapp.html5_canvas_selector[1]);
+        sapp_js_add_dragndrop_listeners();
     }
     #if defined(SOKOL_GLES3)
         emscripten_set_webglcontextlost_callback(_sapp.html5_canvas_selector, 0, true, _sapp_emsc_webgl_context_cb);
@@ -5887,7 +5971,7 @@ _SOKOL_PRIVATE void _sapp_emsc_unregister_eventhandlers(void) {
         sapp_js_remove_clipboard_listener();
     }
     if (_sapp.drop.enabled) {
-        sapp_js_remove_dragndrop_listeners(&_sapp.html5_canvas_selector[1]);
+        sapp_js_remove_dragndrop_listeners();
     }
     #if defined(SOKOL_GLES3)
         emscripten_set_webglcontextlost_callback(_sapp.html5_canvas_selector, 0, true, 0);
@@ -5931,7 +6015,7 @@ _SOKOL_PRIVATE void _sapp_emsc_frame_main_loop(void) {
 
 _SOKOL_PRIVATE void _sapp_emsc_run(const sapp_desc* desc) {
     _sapp_init_state(desc);
-    sapp_js_init(&_sapp.html5_canvas_selector[1]);
+    sapp_js_init(_sapp.html5_canvas_selector);
     double w, h;
     if (_sapp.desc.html5_canvas_resize) {
         w = (double) _sapp_def(_sapp.desc.width, _SAPP_FALLBACK_DEFAULT_WINDOW_WIDTH);
@@ -7575,10 +7659,11 @@ _SOKOL_PRIVATE LRESULT CALLBACK _sapp_win32_wndproc(HWND hWnd, UINT uMsg, WPARAM
                     see: https://gamedev.net/forums/topic/672094-keeping-things-moving-during-win32-moveresize-events/5254386/
                 */
                 if (SendMessage(_sapp.win32.hwnd, WM_NCHITTEST, wParam, lParam) == HTCAPTION) {
-                    POINT point;
-                    GetCursorPos(&point);
-                    ScreenToClient(_sapp.win32.hwnd, &point);
-                    PostMessage(_sapp.win32.hwnd, WM_MOUSEMOVE, 0, ((uint32_t)point.x)|(((uint32_t)point.y) << 16));
+                    POINT point = { 0, 0 };
+                    if (GetCursorPos(&point)) {
+                        ScreenToClient(_sapp.win32.hwnd, &point);
+                        PostMessage(_sapp.win32.hwnd, WM_MOUSEMOVE, 0, ((uint32_t)point.x)|(((uint32_t)point.y) << 16));
+                    }
                 }
                 break;
             case WM_DROPFILES:
@@ -8069,7 +8154,8 @@ int main(int argc, char* argv[]) {
     _sapp_win32_run(&desc);
     return 0;
 }
-#else
+#endif /* SOKOL_WIN32_FORCE_MAIN */
+#if defined(SOKOL_WIN32_FORCE_WINMAIN) || !defined(SOKOL_WIN32_FORCE_MAIN)
 int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow) {
     _SOKOL_UNUSED(hInstance);
     _SOKOL_UNUSED(hPrevInstance);
@@ -8082,7 +8168,7 @@ int WINAPI WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _
     _sapp_free(argv_utf8);
     return 0;
 }
-#endif /* SOKOL_WIN32_FORCE_MAIN */
+#endif /* SOKOL_WIN32_FORCE_WINMAIN */
 #endif /* SOKOL_NO_ENTRY */
 
 #ifdef _MSC_VER
