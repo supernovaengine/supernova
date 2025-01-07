@@ -68,11 +68,10 @@ namespace Supernova {
         SamplerType type;
     };
 
-    struct ShaderTextureSampler {
+    struct ShaderTextureSamplerPair {
         std::string name;
         std::string textureName;
         std::string samplerName;
-        int binding;
         unsigned int slot;
     };
 
@@ -93,7 +92,7 @@ namespace Supernova {
         std::vector<ShaderStorageBuffer> storagebuffers;
         std::vector<ShaderTexture> textures;
         std::vector<ShaderSampler> samplers;
-        std::vector<ShaderTextureSampler> textureSamplersPair;
+        std::vector<ShaderTextureSamplerPair> textureSamplerPairs;
     };
 
     class ShaderData {

@@ -81,7 +81,7 @@ struct sbs_chunk_refl {
     uint32_t num_inputs;
     uint32_t num_textures;
     uint32_t num_samplers;
-    uint32_t num_texture_samplers;
+    uint32_t num_texture_sampler_pairs;
     uint32_t num_uniform_blocks;
     uint32_t num_uniforms;
     uint32_t num_storage_buffers;
@@ -110,11 +110,10 @@ struct sbs_refl_sampler {
     uint32_t type;
 }; 
 
-struct sbs_refl_texture_sampler {
+struct sbs_refl_texture_sampler_pair {
     char     name[SBS_NAME_SIZE];
     char     texture_name[SBS_NAME_SIZE];
     char     sampler_name[SBS_NAME_SIZE];
-    int32_t  binding;
 }; 
 
 struct sbs_refl_uniformblock {
@@ -196,7 +195,7 @@ bool SBSReader::read(FileData& file){
     sbs_chunk sinfo;
     file.read((unsigned char*)&sinfo, sizeof(sinfo));
 
-    if (sinfo.sbs_version != 120){
+    if (sinfo.sbs_version != 130){
         Log::error("Invalid sbs file version");
         return false;
     }
@@ -346,18 +345,17 @@ bool SBSReader::read(FileData& file){
                 shaderStage->samplers.push_back(sampler);
             }
 
-            for (uint32_t i = 0; i < refl_chunk.num_texture_samplers; i++) {
-                sbs_refl_texture_sampler tsm;
+            for (uint32_t i = 0; i < refl_chunk.num_texture_sampler_pairs; i++) {
+                sbs_refl_texture_sampler_pair tsm;
                 file.read((unsigned char*)&tsm, sizeof(tsm));
 
-                ShaderTextureSampler texturesampler;
-                texturesampler.name = std::string(tsm.name);
-                texturesampler.textureName = std::string(tsm.texture_name);
-                texturesampler.samplerName = std::string(tsm.sampler_name);
-                texturesampler.binding = tsm.binding;
-                texturesampler.slot = numPairs++;
+                ShaderTextureSamplerPair texturesamplerpair;
+                texturesamplerpair.name = std::string(tsm.name);
+                texturesamplerpair.textureName = std::string(tsm.texture_name);
+                texturesamplerpair.samplerName = std::string(tsm.sampler_name);
+                texturesamplerpair.slot = numPairs++;
 
-                shaderStage->textureSamplersPair.push_back(texturesampler);
+                shaderStage->textureSamplerPairs.push_back(texturesamplerpair);
             }
 
             for (uint32_t i = 0; i < refl_chunk.num_uniform_blocks; i++) {

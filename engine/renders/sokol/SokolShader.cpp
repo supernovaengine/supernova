@@ -221,27 +221,27 @@ bool SokolShader::createShader(ShaderData& shaderData){
         }
 
         // texture sampler pair
-        for (int ts = 0; ts < stage->textureSamplersPair.size(); ts++) {
-            sg_shader_image_sampler_pair* imgsamplerpair = &shader_desc.image_sampler_pairs[stage->textureSamplersPair[ts].slot];
+        for (int ts = 0; ts < stage->textureSamplerPairs.size(); ts++) {
+            sg_shader_image_sampler_pair* imgsamplerpair = &shader_desc.image_sampler_pairs[stage->textureSamplerPairs[ts].slot];
 
             // get texture index
             int texIndex = -1;
             for (int t = 0; t < stage->textures.size(); t++){
-                if (stage->textures[t].name == stage->textureSamplersPair[ts].textureName)
+                if (stage->textures[t].name == stage->textureSamplerPairs[ts].textureName)
                     texIndex = stage->textures[t].slot;
             }
 
             // get sampler index
             int samIndex = -1;
             for (int s = 0; s < stage->samplers.size(); s++){
-                if (stage->samplers[s].name == stage->textureSamplersPair[ts].samplerName)
+                if (stage->samplers[s].name == stage->textureSamplerPairs[ts].samplerName)
                     samIndex = stage->samplers[s].slot;
             }
 
             imgsamplerpair->stage = shader_stage;
             imgsamplerpair->image_slot = texIndex;
             imgsamplerpair->sampler_slot = samIndex;
-            imgsamplerpair->glsl_name = stage->textureSamplersPair[ts].name.c_str();
+            imgsamplerpair->glsl_name = stage->textureSamplerPairs[ts].name.c_str();
         }
     }
 

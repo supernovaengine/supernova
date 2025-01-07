@@ -295,9 +295,9 @@ std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type){
         if (texIndex != -1){
             // get sampler name by texture
             std::string samplerName;
-            for (int ts = 0; ts < stages[s].textureSamplersPair.size(); ts++){
-                if (stages[s].textureSamplersPair[ts].textureName == texstr){
-                    samplerName = stages[s].textureSamplersPair[ts].samplerName;
+            for (int ts = 0; ts < stages[s].textureSamplerPairs.size(); ts++){
+                if (stages[s].textureSamplerPairs[ts].textureName == texstr){
+                    samplerName = stages[s].textureSamplerPairs[ts].samplerName;
                 }
             }
 
