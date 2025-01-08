@@ -299,21 +299,21 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const float, const float, const float>(&Mesh::setColor),
             luabridge::overload<const float, const float, const float, const float>(&Mesh::setColor))
         .addProperty("alpha", &Mesh::getAlpha, &Mesh::setAlpha)
-        .addProperty("primitiveType", &Mesh::getPrimitiveType, &Mesh::setPrimitiveType)
+        .addProperty("primitiveType", (PrimitiveType(Mesh::*)()const)&Mesh::getPrimitiveType, (void(Mesh::*)(PrimitiveType))&Mesh::setPrimitiveType)
         .addFunction("setPrimitiveType", 
             luabridge::overload<PrimitiveType>(&Mesh::setPrimitiveType),
             luabridge::overload<unsigned int, PrimitiveType>(&Mesh::setPrimitiveType))
         .addFunction("getPrimitiveType", 
             luabridge::overload<>(&Mesh::getPrimitiveType),
             luabridge::overload<unsigned int>(&Mesh::getPrimitiveType))
-        .addProperty("faceCulling", &Mesh::isFaceCulling, &Mesh::setFaceCulling)
+        .addProperty("faceCulling", (bool(Mesh::*)()const)&Mesh::isFaceCulling, (void(Mesh::*)(bool))&Mesh::setFaceCulling)
         .addFunction("setFaceCulling", 
             luabridge::overload<bool>(&Mesh::setFaceCulling),
             luabridge::overload<unsigned int, bool>(&Mesh::setFaceCulling))
         .addFunction("isFaceCulling", 
             luabridge::overload<>(&Mesh::isFaceCulling),
             luabridge::overload<unsigned int>(&Mesh::isFaceCulling))
-        .addProperty("castShadowsWithTexture", &Mesh::isCastShadowsWithTexture, &Mesh::setCastShadowsWithTexture)
+        .addProperty("castShadowsWithTexture", (bool(Mesh::*)()const)&Mesh::isCastShadowsWithTexture, (void(Mesh::*)(bool))&Mesh::setCastShadowsWithTexture)
         .addFunction("setCastShadowsWithTexture", 
             luabridge::overload<bool>(&Mesh::setCastShadowsWithTexture),
             luabridge::overload<unsigned int, bool>(&Mesh::setCastShadowsWithTexture))
@@ -828,49 +828,49 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getShapeContacts", &Body2D::getShapeContacts)
         .addFunction("getNumShapes", &Body2D::getNumShapes)
         .addFunction("getShapeType", &Body2D::getShapeType)
-        .addProperty("shapeDensity", &Body2D::getShapeDensity, &Body2D::setShapeDensity)
+        .addProperty("shapeDensity", (float(Body2D::*)()const)&Body2D::getShapeDensity, (void(Body2D::*)(float))&Body2D::setShapeDensity)
         .addFunction("setShapeDensity", 
             luabridge::overload<float>(&Body2D::setShapeDensity),
             luabridge::overload<size_t, float>(&Body2D::setShapeDensity))
         .addFunction("getShapeDensity", 
             luabridge::overload<>(&Body2D::getShapeDensity),
             luabridge::overload<size_t>(&Body2D::getShapeDensity))
-        .addProperty("shapeFriction", &Body2D::getShapeFriction, &Body2D::setShapeFriction)
+        .addProperty("shapeFriction", (float(Body2D::*)()const)&Body2D::getShapeFriction, (void(Body2D::*)(float))&Body2D::setShapeFriction)
         .addFunction("setShapeFriction", 
             luabridge::overload<float>(&Body2D::setShapeFriction),
             luabridge::overload<size_t, float>(&Body2D::setShapeFriction))
         .addFunction("getShapeFriction", 
             luabridge::overload<>(&Body2D::getShapeFriction),
             luabridge::overload<size_t>(&Body2D::getShapeFriction))
-        .addProperty("shapeRestitution", &Body2D::getShapeRestitution, &Body2D::setShapeRestitution)
+        .addProperty("shapeRestitution", (float(Body2D::*)()const)&Body2D::getShapeRestitution, (void(Body2D::*)(float))&Body2D::setShapeRestitution)
         .addFunction("setShapeRestitution", 
             luabridge::overload<float>(&Body2D::setShapeRestitution),
             luabridge::overload<size_t, float>(&Body2D::setShapeRestitution))
         .addFunction("getShapeRestitution", 
             luabridge::overload<>(&Body2D::getShapeRestitution),
             luabridge::overload<size_t>(&Body2D::getShapeRestitution))
-        .addProperty("shapeEnableHitEvents", &Body2D::isShapeEnableHitEvents, &Body2D::setShapeEnableHitEvents)
+        .addProperty("shapeEnableHitEvents", (bool(Body2D::*)()const)&Body2D::isShapeEnableHitEvents, (void(Body2D::*)(bool))&Body2D::setShapeEnableHitEvents)
         .addFunction("setShapeEnableHitEvents", 
             luabridge::overload<bool>(&Body2D::setShapeEnableHitEvents),
             luabridge::overload<size_t, bool>(&Body2D::setShapeEnableHitEvents))
         .addFunction("isShapeEnableHitEvents", 
             luabridge::overload<>(&Body2D::isShapeEnableHitEvents),
             luabridge::overload<size_t>(&Body2D::isShapeEnableHitEvents))
-        .addProperty("shapeContactEvents", &Body2D::isShapeContactEvents, &Body2D::setShapeContactEvents)
+        .addProperty("shapeContactEvents", (bool(Body2D::*)()const)&Body2D::isShapeContactEvents, (void(Body2D::*)(bool))&Body2D::setShapeContactEvents)
         .addFunction("setShapeContactEvents", 
             luabridge::overload<bool>(&Body2D::setShapeContactEvents),
             luabridge::overload<size_t, bool>(&Body2D::setShapeContactEvents))
         .addFunction("isShapeContactEvents", 
             luabridge::overload<>(&Body2D::isShapeContactEvents),
             luabridge::overload<size_t>(&Body2D::isShapeContactEvents))
-        .addProperty("shapePreSolveEvents", &Body2D::isShapePreSolveEvents, &Body2D::setShapePreSolveEvents)
+        .addProperty("shapePreSolveEvents", (bool(Body2D::*)()const)&Body2D::isShapePreSolveEvents, (void(Body2D::*)(bool))&Body2D::setShapePreSolveEvents)
         .addFunction("setShapePreSolveEvents", 
             luabridge::overload<bool>(&Body2D::setShapePreSolveEvents),
             luabridge::overload<size_t, bool>(&Body2D::setShapePreSolveEvents))
         .addFunction("isShapePreSolveEvents", 
             luabridge::overload<>(&Body2D::isShapePreSolveEvents),
             luabridge::overload<size_t>(&Body2D::isShapePreSolveEvents))
-        .addProperty("shapeSensorEvents", &Body2D::isShapeSensorEvents, &Body2D::setShapeSensorEvents)
+        .addProperty("shapeSensorEvents", (bool(Body2D::*)() const)&Body2D::isShapeSensorEvents, (void(Body2D::*)(bool))&Body2D::setShapeSensorEvents)
         .addFunction("setShapeSensorEvents", 
             luabridge::overload<bool>(&Body2D::setShapeSensorEvents),
             luabridge::overload<size_t, bool>(&Body2D::setShapeSensorEvents))
@@ -891,21 +891,21 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setBitsFilter", 
             luabridge::overload<uint16_t, uint16_t>(&Body2D::setBitsFilter),
             luabridge::overload<size_t, uint16_t, uint16_t>(&Body2D::setBitsFilter))
-        .addProperty("categoryBitsFilter", &Body2D::getCategoryBitsFilter, &Body2D::setCategoryBitsFilter)
+        .addProperty("categoryBitsFilter", (uint16_t(Body2D::*)()const)&Body2D::getCategoryBitsFilter, (void(Body2D::*)(uint16_t))&Body2D::setCategoryBitsFilter)
         .addFunction("setCategoryBitsFilter", 
             luabridge::overload<uint16_t>(&Body2D::setCategoryBitsFilter),
             luabridge::overload<size_t, uint16_t>(&Body2D::setCategoryBitsFilter))
         .addFunction("getCategoryBitsFilter", 
             luabridge::overload<>(&Body2D::getCategoryBitsFilter),
             luabridge::overload<size_t>(&Body2D::getCategoryBitsFilter))
-        .addProperty("maskBitsFilter", &Body2D::getMaskBitsFilter, &Body2D::setMaskBitsFilter)
+        .addProperty("maskBitsFilter", (uint16_t(Body2D::*)()const)&Body2D::getMaskBitsFilter, (void(Body2D::*)(uint16_t))&Body2D::setMaskBitsFilter)
         .addFunction("setMaskBitsFilter", 
             luabridge::overload<uint16_t>(&Body2D::setMaskBitsFilter),
             luabridge::overload<size_t, uint16_t>(&Body2D::setMaskBitsFilter))
         .addFunction("getMaskBitsFilter", 
             luabridge::overload<>(&Body2D::getMaskBitsFilter),
             luabridge::overload<size_t>(&Body2D::getMaskBitsFilter))
-        .addProperty("groupIndexFilter", &Body2D::getGroupIndexFilter, &Body2D::setGroupIndexFilter)
+        .addProperty("groupIndexFilter", (int16_t(Body2D::*)()const)&Body2D::getGroupIndexFilter, (void(Body2D::*)(int16_t))&Body2D::setGroupIndexFilter)
         .addFunction("setGroupIndexFilter", 
             luabridge::overload<int16_t>(&Body2D::setGroupIndexFilter),
             luabridge::overload<size_t, int16_t>(&Body2D::setGroupIndexFilter))
@@ -996,7 +996,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<unsigned int>(&Body3D::createHeightFieldShape))
         .addFunction("getNumShapes", &Body3D::getNumShapes)
         .addFunction("getShapeType", &Body3D::getShapeType)
-        .addProperty("shapeDensity", &Body3D::getShapeDensity, &Body3D::setShapeDensity)
+        .addProperty("shapeDensity", (float(Body3D::*)()const)&Body3D::getShapeDensity, (void(Body3D::*)(float))&Body3D::setShapeDensity)
         .addFunction("setShapeDensity", 
             luabridge::overload<float>(&Body3D::setShapeDensity),
             luabridge::overload<size_t, float>(&Body3D::setShapeDensity))

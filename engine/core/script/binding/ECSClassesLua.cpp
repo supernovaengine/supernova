@@ -141,8 +141,9 @@ void LuaBinding::registerECSClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<PhysicsSystem>("PhysicsSystem")
-        .addProperty("gravity", &PhysicsSystem::getGravity,  &PhysicsSystem::setGravity)
-        .addFunction("setGravity", 
+        .addProperty("gravity", (Vector3(PhysicsSystem::*)() const)&PhysicsSystem::getGravity, (void(PhysicsSystem::*)(Vector3))&PhysicsSystem::setGravity)
+        .addFunction("setGravity",
+            luabridge::overload<Vector3>(&PhysicsSystem::setGravity),
             luabridge::overload<float, float>(&PhysicsSystem::setGravity),
             luabridge::overload<float, float, float>(&PhysicsSystem::setGravity))
         .addProperty("pointsToMeterScale2D", &PhysicsSystem::getPointsToMeterScale2D,  &PhysicsSystem::setPointsToMeterScale2D)

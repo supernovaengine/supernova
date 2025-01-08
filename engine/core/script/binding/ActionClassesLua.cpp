@@ -79,10 +79,10 @@ void LuaBinding::registerActionClasses(lua_State *L){
         .addFunction("pause", &Action::pause)
         .addFunction("stop", &Action::stop)
         .addProperty("ownedTarget", &Action::getOwnedTarget, &Action::setOwnedTarget)
+        .addProperty("target", (Entity(Action::*)()const)&Action::getTarget, (void(Action::*)(Entity))&Action::setTarget)
         .addFunction("setTarget", 
             luabridge::overload<Object*>(&Action::setTarget),
             luabridge::overload<Entity>(&Action::setTarget))
-        .addProperty("target", &Action::getTarget, &Action::setTarget)
         .addProperty("speed", &Action::getSpeed, &Action::setSpeed)
         .addFunction("isRunning", &Action::isRunning)
         .addFunction("isStopped", &Action::isStopped)
