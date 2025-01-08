@@ -18,14 +18,14 @@ void b2PrepareOverflowContacts( b2StepContext* context )
 
 	b2World* world = context->world;
 	b2ConstraintGraph* graph = context->graph;
-	b2GraphColor* color = graph->colors + b2_overflowIndex;
+	b2GraphColor* color = graph->colors + B2_OVERFLOW_INDEX;
 	b2ContactConstraint* constraints = color->overflowConstraints;
-	int contactCount = color->contacts.count;
-	b2ContactSim* contacts = color->contacts.data;
+	int contactCount = color->contactSims.count;
+	b2ContactSim* contacts = color->contactSims.data;
 	b2BodyState* awakeStates = context->states;
 
 #if B2_VALIDATE
-	b2Body* bodies = world->bodyArray;
+	b2Body* bodies = world->bodies.data;
 #endif
 
 	// Stiffer for static contacts to avoid bodies getting pushed through the ground
@@ -145,11 +145,12 @@ void b2WarmStartOverflowContacts( b2StepContext* context )
 	b2TracyCZoneNC( warmstart_overflow_contact, "WarmStart Overflow Contact", b2_colorDarkOrange, true );
 
 	b2ConstraintGraph* graph = context->graph;
-	b2GraphColor* color = graph->colors + b2_overflowIndex;
+	b2GraphColor* color = graph->colors + B2_OVERFLOW_INDEX;
 	b2ContactConstraint* constraints = color->overflowConstraints;
-	int contactCount = color->contacts.count;
-	b2SolverSet* awakeSet = context->world->solverSetArray + b2_awakeSet;
-	b2BodyState* states = awakeSet->states.data;
+	int contactCount = color->contactSims.count;
+	b2World* world = context->world;
+	b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
+	b2BodyState* states = awakeSet->bodyStates.data;
 
 	// This is a dummy state to represent a static body because static bodies don't have a solver body.
 	b2BodyState dummyState = b2_identityBodyState;
@@ -208,14 +209,15 @@ void b2SolveOverflowContacts( b2StepContext* context, bool useBias )
 	b2TracyCZoneNC( solve_contact, "Solve Contact", b2_colorAliceBlue, true );
 
 	b2ConstraintGraph* graph = context->graph;
-	b2GraphColor* color = graph->colors + b2_overflowIndex;
+	b2GraphColor* color = graph->colors + B2_OVERFLOW_INDEX;
 	b2ContactConstraint* constraints = color->overflowConstraints;
-	int contactCount = color->contacts.count;
-	b2SolverSet* awakeSet = context->world->solverSetArray + b2_awakeSet;
-	b2BodyState* states = awakeSet->states.data;
+	int contactCount = color->contactSims.count;
+	b2World* world = context->world;
+	b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
+	b2BodyState* states = awakeSet->bodyStates.data;
 
 	float inv_h = context->inv_h;
-	const float pushout = context->world->contactPushoutVelocity;
+	const float pushout = context->world->contactPushSpeed;
 
 	// This is a dummy body to represent a static body since static bodies don't have a solver body.
 	b2BodyState dummyState = b2_identityBodyState;
@@ -342,11 +344,12 @@ void b2ApplyOverflowRestitution( b2StepContext* context )
 	b2TracyCZoneNC( overflow_resitution, "Overflow Restitution", b2_colorViolet, true );
 
 	b2ConstraintGraph* graph = context->graph;
-	b2GraphColor* color = graph->colors + b2_overflowIndex;
+	b2GraphColor* color = graph->colors + B2_OVERFLOW_INDEX;
 	b2ContactConstraint* constraints = color->overflowConstraints;
-	int contactCount = color->contacts.count;
-	b2SolverSet* awakeSet = context->world->solverSetArray + b2_awakeSet;
-	b2BodyState* states = awakeSet->states.data;
+	int contactCount = color->contactSims.count;
+	b2World* world = context->world;
+	b2SolverSet* awakeSet = b2SolverSetArray_Get( &world->solverSets, b2_awakeSet );
+	b2BodyState* states = awakeSet->bodyStates.data;
 
 	float threshold = context->world->restitutionThreshold;
 
@@ -437,10 +440,10 @@ void b2StoreOverflowImpulses( b2StepContext* context )
 	b2TracyCZoneNC( store_impulses, "Store", b2_colorFirebrick, true );
 
 	b2ConstraintGraph* graph = context->graph;
-	b2GraphColor* color = graph->colors + b2_overflowIndex;
+	b2GraphColor* color = graph->colors + B2_OVERFLOW_INDEX;
 	b2ContactConstraint* constraints = color->overflowConstraints;
-	b2ContactSim* contacts = color->contacts.data;
-	int contactCount = color->contacts.count;
+	b2ContactSim* contacts = color->contactSims.data;
+	int contactCount = color->contactSims.count;
 
 	// float hitEventThreshold = context->world->hitEventThreshold;
 
@@ -535,11 +538,14 @@ static inline b2FloatW b2MulW( b2FloatW a, b2FloatW b )
 
 static inline b2FloatW b2MulAddW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
-	return _mm256_add_ps( a, _mm256_mul_ps( b, c ) );
+	// FMA can be emulated: https://github.com/lattera/glibc/blob/master/sysdeps/ieee754/dbl-64/s_fmaf.c#L34
+	// return _mm256_fmadd_ps( b, c, a );
+	return _mm256_add_ps( _mm256_mul_ps( b, c ), a );
 }
 
 static inline b2FloatW b2MulSubW( b2FloatW a, b2FloatW b, b2FloatW c )
 {
+	// return _mm256_fnmadd_ps(b, c, a);
 	return _mm256_sub_ps( a, _mm256_mul_ps( b, c ) );
 }
 
@@ -661,12 +667,26 @@ static inline void b2StoreW( float32_t* data, b2FloatW a )
 
 static inline b2FloatW b2UnpackLoW( b2FloatW a, b2FloatW b )
 {
+#if defined( __aarch64__ )
 	return vzip1q_f32( a, b );
+#else
+	float32x2_t a1 = vget_low_f32( a );
+	float32x2_t b1 = vget_low_f32( b );
+	float32x2x2_t result = vzip_f32( a1, b1 );
+	return vcombine_f32( result.val[0], result.val[1] );
+#endif
 }
 
 static inline b2FloatW b2UnpackHiW( b2FloatW a, b2FloatW b )
 {
+#if defined( __aarch64__ )
 	return vzip2q_f32( a, b );
+#else
+	float32x2_t a1 = vget_high_f32( a );
+	float32x2_t b1 = vget_high_f32( b );
+	float32x2x2_t result = vzip_f32( a1, b1 );
+	return vcombine_f32( result.val[0], result.val[1] );
+#endif
 }
 
 #elif defined( B2_SIMD_SSE2 )
@@ -929,7 +949,7 @@ typedef struct b2SimdBody
 #if defined( B2_SIMD_AVX2 )
 
 // This is a load and 8x8 transpose
-static b2SimdBody b2GatherBodies( const b2BodyState* restrict states, int* restrict indices )
+static b2SimdBody b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
 	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
@@ -974,7 +994,7 @@ static b2SimdBody b2GatherBodies( const b2BodyState* restrict states, int* restr
 }
 
 // This writes everything back to the solver bodies but only the velocities change
-static void b2ScatterBodies( b2BodyState* restrict states, int* restrict indices, const b2SimdBody* restrict simdBody )
+static void b2ScatterBodies( b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices, const b2SimdBody* B2_RESTRICT simdBody )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
 	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
@@ -1018,7 +1038,7 @@ static void b2ScatterBodies( b2BodyState* restrict states, int* restrict indices
 #elif defined( B2_SIMD_NEON )
 
 // This is a load and transpose
-static b2SimdBody b2GatherBodies( const b2BodyState* restrict states, int* restrict indices )
+static b2SimdBody b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
 	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
@@ -1072,7 +1092,7 @@ static b2SimdBody b2GatherBodies( const b2BodyState* restrict states, int* restr
 
 // This writes only the velocities back to the solver bodies
 // https://developer.arm.com/documentation/102107a/0100/Floating-point-4x4-matrix-transposition
-static void b2ScatterBodies( b2BodyState* restrict states, int* restrict indices, const b2SimdBody* restrict simdBody )
+static void b2ScatterBodies( b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices, const b2SimdBody* B2_RESTRICT simdBody )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
 	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
@@ -1124,7 +1144,7 @@ static void b2ScatterBodies( b2BodyState* restrict states, int* restrict indices
 #elif defined( B2_SIMD_SSE2 )
 
 // This is a load and transpose
-static b2SimdBody b2GatherBodies( const b2BodyState* restrict states, int* restrict indices )
+static b2SimdBody b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
 	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
@@ -1176,7 +1196,7 @@ static b2SimdBody b2GatherBodies( const b2BodyState* restrict states, int* restr
 }
 
 // This writes only the velocities back to the solver bodies
-static void b2ScatterBodies( b2BodyState* restrict states, int* restrict indices, const b2SimdBody* restrict simdBody )
+static void b2ScatterBodies( b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices, const b2SimdBody* B2_RESTRICT simdBody )
 {
 	_Static_assert( sizeof( b2BodyState ) == 32, "b2BodyState not 32 bytes" );
 	B2_ASSERT( ( (uintptr_t)states & 0x1F ) == 0 );
@@ -1220,7 +1240,7 @@ static void b2ScatterBodies( b2BodyState* restrict states, int* restrict indices
 #else
 
 // This is a load and transpose
-static b2SimdBody b2GatherBodies( const b2BodyState* restrict states, int* restrict indices )
+static b2SimdBody b2GatherBodies( const b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices )
 {
 	b2BodyState identity = b2_identityBodyState;
 
@@ -1243,7 +1263,7 @@ static b2SimdBody b2GatherBodies( const b2BodyState* restrict states, int* restr
 }
 
 // This writes only the velocities back to the solver bodies
-static void b2ScatterBodies( b2BodyState* restrict states, int* restrict indices, const b2SimdBody* restrict simdBody )
+static void b2ScatterBodies( b2BodyState* B2_RESTRICT states, int* B2_RESTRICT indices, const b2SimdBody* B2_RESTRICT simdBody )
 {
 	if ( indices[0] != B2_NULL_INDEX )
 	{
@@ -1288,7 +1308,7 @@ void b2PrepareContactsTask( int startIndex, int endIndex, b2StepContext* context
 	b2ContactConstraintSIMD* constraints = context->simdContactConstraints;
 	b2BodyState* awakeStates = context->states;
 #if B2_VALIDATE
-	b2Body* bodies = world->bodyArray;
+	b2Body* bodies = world->bodies.data;
 #endif
 
 	// Stiffer for static contacts to avoid bodies getting pushed through the ground
@@ -1562,7 +1582,7 @@ void b2SolveContactsTask( int startIndex, int endIndex, b2StepContext* context, 
 	b2BodyState* states = context->states;
 	b2ContactConstraintSIMD* constraints = context->graph->colors[colorIndex].simdConstraints;
 	b2FloatW inv_h = b2SplatW( context->inv_h );
-	b2FloatW minBiasVel = b2SplatW( -context->world->contactPushoutVelocity );
+	b2FloatW minBiasVel = b2SplatW( -context->world->contactPushSpeed );
 
 	for ( int i = startIndex; i < endIndex; ++i )
 	{
@@ -1862,6 +1882,7 @@ void b2ApplyRestitutionTask( int startIndex, int endIndex, b2StepContext* contex
 
 #if B2_SIMD_WIDTH == 8
 
+// todo try making an inner loop on B2_SIMD_WIDTH to have a single implementation of this function
 void b2StoreImpulsesTask( int startIndex, int endIndex, b2StepContext* context )
 {
 	b2TracyCZoneNC( store_impulses, "Store", b2_colorFirebrick, true );

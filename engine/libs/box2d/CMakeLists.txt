@@ -6,18 +6,15 @@ include_directories ("${CMAKE_CURRENT_SOURCE_DIR}/src")
 set(BOX2D_SOURCE_FILES
 	./src/aabb.c
 	./src/aabb.h
-	./src/allocate.c
-	./src/allocate.h
 	./src/array.c
 	./src/array.h
 	./src/bitset.c
 	./src/bitset.h
-	./src/block_array.c
-	./src/block_array.h
 	./src/body.c
 	./src/body.h
 	./src/broad_phase.c
 	./src/broad_phase.h
+	./src/constants.h
 	./src/constraint_graph.c
 	./src/constraint_graph.h
 	./src/contact.c
@@ -92,7 +89,16 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux"
 endif()
 
 
-# Box2D CMakeLists.txt configuration
+# part of Box2D CMakeLists.txt configuration
+
+# Deterministic math
+# https://box2d.org/posts/2024/08/determinism/
+if (MINGW OR APPLE OR UNIX)
+	add_compile_options(-ffp-contract=off)
+endif()
+
+
+# part of Box2D src/CMakeLists.txt configuration
 
 set(CMAKE_C_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
@@ -107,18 +113,35 @@ set_target_properties(
     C_EXTENSIONS YES
 )
 
+if (BOX2D_PROFILE)
+	target_compile_definitions(box2d PRIVATE BOX2D_PROFILE)
+
+	FetchContent_Declare(
+		tracy
+		GIT_REPOSITORY https://github.com/wolfpld/tracy.git
+		GIT_TAG v0.11.1
+		GIT_SHALLOW TRUE
+		GIT_PROGRESS TRUE
+	)
+	FetchContent_MakeAvailable(tracy)
+
+	target_link_libraries(box2d PUBLIC TracyClient)
+endif()
+
+if (BOX2D_VALIDATE)
+	target_compile_definitions(box2d PRIVATE BOX2D_VALIDATE)
+endif()
+
 if (BOX2D_ENABLE_SIMD)
 	target_compile_definitions(box2d PRIVATE BOX2D_ENABLE_SIMD)
 endif()
 
-# Deterministic math
-# https://box2d.org/posts/2024/08/determinism/
-if (MINGW OR APPLE OR UNIX)
-	add_compile_options(-ffp-contract=off)
-endif()
-
 if (MSVC)
-	#message(STATUS "Box2D on MSVC")
+	message(STATUS "Box2D on MSVC")	
+	if (BUILD_SHARED_LIBS)
+		# this is needed by DLL users to import Box2D symbols
+		target_compile_definitions(box2d INTERFACE BOX2D_DLL)
+	endif()
 
 	# Visual Studio won't load the natvis unless it is in the project
 	target_sources(box2d PRIVATE ./src/box2d.natvis)
@@ -129,26 +152,30 @@ if (MSVC)
 	# Atomics are still considered experimental in Visual Studio 17.8
 	target_compile_options(box2d PRIVATE /experimental:c11atomics)
 
+	# All warnings
+	target_compile_options(box2d PRIVATE /W4)
+
 	if (BOX2D_AVX2)
-		message(STATUS "Box2D using AVX2")
+		message(STATUS "Box2D using AVX2")	
 		target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
 		target_compile_options(box2d PRIVATE /arch:AVX2)
 	endif()
 
 elseif (MINGW)
-	#message(STATUS "Box2D on MinGW")
+	message(STATUS "Box2D on MinGW")
 	if (BOX2D_AVX2)
-		message(STATUS "Box2D using AVX2")
+		message(STATUS "Box2D using AVX2")	
 		target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
 		target_compile_options(box2d PRIVATE -mavx2)
+	else()
 	endif()
 elseif (APPLE)
-	#message(STATUS "Box2D on Apple")
+	message(STATUS "Box2D on Apple")
 elseif (EMSCRIPTEN)
-	#message(STATUS "Box2D on Emscripten")
+	message(STATUS "Box2D on Emscripten")
 	target_compile_options(box2d PRIVATE -msimd128 -msse2)
 elseif (UNIX)
-	#message(STATUS "Box2D using Unix")
+	message(STATUS "Box2D using Unix")
 	if ("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "aarch64")
 		# raspberry pi
 		# -mfpu=neon
@@ -160,6 +187,7 @@ elseif (UNIX)
 			# FMA -mfma -mavx -march=native
 			target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
 			target_compile_options(box2d PRIVATE -mavx2)
+		else()
 		endif()
 	endif()
 endif()

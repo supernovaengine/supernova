@@ -1,18 +1,15 @@
 set(BOX2D_SOURCE_FILES
 	aabb.c
 	aabb.h
-	allocate.c
-	allocate.h
 	array.c
 	array.h
 	bitset.c
 	bitset.h
-	block_array.c
-	block_array.h
 	body.c
 	body.h
 	broad_phase.c
 	broad_phase.h
+	constants.h
 	constraint_graph.c
 	constraint_graph.h
 	contact.c
@@ -106,7 +103,7 @@ if (BOX2D_PROFILE)
 	FetchContent_Declare(
 		tracy
 		GIT_REPOSITORY https://github.com/wolfpld/tracy.git
-		GIT_TAG master
+		GIT_TAG v0.11.1
 		GIT_SHALLOW TRUE
 		GIT_PROGRESS TRUE
 	)
@@ -139,6 +136,9 @@ if (MSVC)
 	# Atomics are still considered experimental in Visual Studio 17.8
 	target_compile_options(box2d PRIVATE /experimental:c11atomics)
 
+	# All warnings
+	target_compile_options(box2d PRIVATE /W4)
+
 	if (BOX2D_AVX2)
 		message(STATUS "Box2D using AVX2")	
 		target_compile_definitions(box2d PRIVATE BOX2D_AVX2)
@@ -155,9 +155,9 @@ elseif (MINGW)
 	endif()
 elseif (APPLE)
 	message(STATUS "Box2D on Apple")
-	target_compile_options(box2d PRIVATE -ffp-contract=off)
 elseif (EMSCRIPTEN)
 	message(STATUS "Box2D on Emscripten")
+	target_compile_options(box2d PRIVATE -msimd128 -msse2)
 elseif (UNIX)
 	message(STATUS "Box2D using Unix")
 	if ("${CMAKE_HOST_SYSTEM_PROCESSOR}" STREQUAL "aarch64")

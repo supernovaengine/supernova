@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "array.h"
 #include "core.h"
 
 #include "box2d/collision.h"
@@ -137,7 +138,7 @@ typedef struct b2ContactSim
 	// b2ContactSimFlags
 	uint32_t simFlags;
 
-	b2DistanceCache cache;
+	b2SimplexCache cache;
 } b2ContactSim;
 
 void b2InitializeContactRegisters( void );
@@ -151,3 +152,8 @@ bool b2ShouldShapesCollide( b2Filter filterA, b2Filter filterB );
 
 bool b2UpdateContact( b2World* world, b2ContactSim* contactSim, b2Shape* shapeA, b2Transform transformA, b2Vec2 centerOffsetA,
 					  b2Shape* shapeB, b2Transform transformB, b2Vec2 centerOffsetB );
+
+b2Manifold b2ComputeManifold( b2Shape* shapeA, b2Transform transformA, b2Shape* shapeB, b2Transform transformB );
+
+B2_ARRAY_INLINE( b2Contact, b2Contact );
+B2_ARRAY_INLINE( b2ContactSim, b2ContactSim );

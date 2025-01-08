@@ -3,15 +3,12 @@
 
 #pragma once
 
+#include "array.h"
+
 #include "box2d/math_functions.h"
 #include "box2d/types.h"
 
-typedef struct b2Polygon b2Polygon;
 typedef struct b2World b2World;
-typedef struct b2JointSim b2JointSim;
-typedef struct b2ContactSim b2ContactSim;
-typedef struct b2Shape b2Shape;
-typedef struct b2Body b2Body;
 
 // Body organizational details that are not used in the solver.
 typedef struct b2Body
@@ -47,6 +44,11 @@ typedef struct b2Body
 	int islandPrev;
 	int islandNext;
 
+	float mass;
+
+	// Rotational inertia about the center of mass.
+	float inertia;
+
 	float sleepThreshold;
 	float sleepTime;
 
@@ -65,7 +67,6 @@ typedef struct b2Body
 	bool fixedRotation;
 	bool isSpeedCapped;
 	bool isMarked;
-	bool automaticMass;
 } b2Body;
 
 // The body state is designed for fast conversion to and from SIMD via scatter-gather.
@@ -111,10 +112,9 @@ typedef struct b2BodySim
 	b2Vec2 force;
 	float torque;
 
-	float mass, invMass;
-
-	// Rotational inertia about the center of mass.
-	float inertia, invInertia;
+	// inverse inertia
+	float invMass;
+	float invInertia;
 
 	float minExtent;
 	float maxExtent;
@@ -125,17 +125,14 @@ typedef struct b2BodySim
 	// body data can be moved around, the id is stable (used in b2BodyId)
 	int bodyId;
 
-	// todo eliminate
+	// This flag is used for debug draw
 	bool isFast;
+
 	bool isBullet;
 	bool isSpeedCapped;
 	bool allowFastRotation;
 	bool enlargeAABB;
 } b2BodySim;
-
-b2Body* b2GetBodyFullId( b2World* world, b2BodyId bodyId );
-
-b2Body* b2GetBody( b2World* world, int bodyId );
 
 // Get a validated body from a world using an id.
 b2Body* b2GetBodyFullId( b2World* world, b2BodyId bodyId );
@@ -167,3 +164,8 @@ static inline b2Sweep b2MakeSweep( const b2BodySim* bodySim )
 	s.localCenter = bodySim->localCenter;
 	return s;
 }
+
+// Define inline functions for arrays
+B2_ARRAY_INLINE( b2Body, b2Body );
+B2_ARRAY_INLINE( b2BodySim, b2BodySim );
+B2_ARRAY_INLINE( b2BodyState, b2BodyState );

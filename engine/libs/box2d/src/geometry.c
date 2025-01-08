@@ -1,8 +1,7 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
-#include "aabb.h"
-#include "core.h"
+#include "constants.h"
 #include "shape.h"
 
 #include "box2d/collision.h"
@@ -11,16 +10,16 @@
 #include <float.h>
 #include <stddef.h>
 
-_Static_assert( b2_maxPolygonVertices > 2, "must be 3 or more" );
+_Static_assert( B2_MAX_POLYGON_VERTICES > 2, "must be 3 or more" );
 
 bool b2IsValidRay( const b2RayCastInput* input )
 {
-	bool isValid = b2Vec2_IsValid( input->origin ) && b2Vec2_IsValid( input->translation ) && b2IsValid( input->maxFraction ) &&
-				   0.0f <= input->maxFraction && input->maxFraction < b2_huge;
+	bool isValid = b2IsValidVec2( input->origin ) && b2IsValidVec2( input->translation ) && b2IsValidFloat( input->maxFraction ) &&
+				   0.0f <= input->maxFraction && input->maxFraction < B2_HUGE;
 	return isValid;
 }
 
-static b2Vec2 b2ComputePolygonCentroid( const b2Vec2* vertices, int32_t count )
+static b2Vec2 b2ComputePolygonCentroid( const b2Vec2* vertices, int count )
 {
 	b2Vec2 center = { 0.0f, 0.0f };
 	float area = 0.0f;
@@ -31,7 +30,7 @@ static b2Vec2 b2ComputePolygonCentroid( const b2Vec2* vertices, int32_t count )
 
 	const float inv3 = 1.0f / 3.0f;
 
-	for ( int32_t i = 1; i < count - 1; ++i )
+	for ( int i = 1; i < count - 1; ++i )
 	{
 		// Triangle edges
 		b2Vec2 e1 = b2Sub( vertices[i], origin );
@@ -89,7 +88,12 @@ b2Polygon b2MakePolygon( const b2Hull* hull, float radius )
 	return shape;
 }
 
-b2Polygon b2MakeOffsetPolygon( const b2Hull* hull, float radius, b2Transform transform )
+b2Polygon b2MakeOffsetPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotation )
+{
+	return b2MakeOffsetRoundedPolygon( hull, position, rotation, 0.0f );
+}
+
+b2Polygon b2MakeOffsetRoundedPolygon( const b2Hull* hull, b2Vec2 position, b2Rot rotation, float radius )
 {
 	B2_ASSERT( b2ValidateHull( hull ) );
 
@@ -98,6 +102,8 @@ b2Polygon b2MakeOffsetPolygon( const b2Hull* hull, float radius, b2Transform tra
 		// Handle a bad hull when assertions are disabled
 		return b2MakeSquare( 0.5f );
 	}
+
+	b2Transform transform = { position, rotation };
 
 	b2Polygon shape = { 0 };
 	shape.count = hull->count;
@@ -124,22 +130,22 @@ b2Polygon b2MakeOffsetPolygon( const b2Hull* hull, float radius, b2Transform tra
 	return shape;
 }
 
-b2Polygon b2MakeSquare( float h )
+b2Polygon b2MakeSquare( float halfWidth )
 {
-	return b2MakeBox( h, h );
+	return b2MakeBox( halfWidth, halfWidth );
 }
 
-b2Polygon b2MakeBox( float hx, float hy )
+b2Polygon b2MakeBox( float halfWidth, float halfHeight )
 {
-	B2_ASSERT( b2IsValid( hx ) && hx > 0.0f );
-	B2_ASSERT( b2IsValid( hy ) && hy > 0.0f );
+	B2_ASSERT( b2IsValidFloat( halfWidth ) && halfWidth > 0.0f );
+	B2_ASSERT( b2IsValidFloat( halfHeight ) && halfHeight > 0.0f );
 
 	b2Polygon shape = { 0 };
 	shape.count = 4;
-	shape.vertices[0] = ( b2Vec2 ){ -hx, -hy };
-	shape.vertices[1] = ( b2Vec2 ){ hx, -hy };
-	shape.vertices[2] = ( b2Vec2 ){ hx, hy };
-	shape.vertices[3] = ( b2Vec2 ){ -hx, hy };
+	shape.vertices[0] = ( b2Vec2 ){ -halfWidth, -halfHeight };
+	shape.vertices[1] = ( b2Vec2 ){ halfWidth, -halfHeight };
+	shape.vertices[2] = ( b2Vec2 ){ halfWidth, halfHeight };
+	shape.vertices[3] = ( b2Vec2 ){ -halfWidth, halfHeight };
 	shape.normals[0] = ( b2Vec2 ){ 0.0f, -1.0f };
 	shape.normals[1] = ( b2Vec2 ){ 1.0f, 0.0f };
 	shape.normals[2] = ( b2Vec2 ){ 0.0f, 1.0f };
@@ -149,31 +155,50 @@ b2Polygon b2MakeBox( float hx, float hy )
 	return shape;
 }
 
-b2Polygon b2MakeRoundedBox( float hx, float hy, float radius )
+b2Polygon b2MakeRoundedBox( float halfWidth, float halfHeight, float radius )
 {
-	b2Polygon shape = b2MakeBox( hx, hy );
+	B2_ASSERT( b2IsValidFloat( radius ) && radius >= 0.0f );
+	b2Polygon shape = b2MakeBox( halfWidth, halfHeight );
 	shape.radius = radius;
 	return shape;
 }
 
-b2Polygon b2MakeOffsetBox( float hx, float hy, b2Vec2 center, b2Rot rotation )
+b2Polygon b2MakeOffsetBox( float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation )
 {
-	b2Transform xf;
-	xf.p = center;
-	xf.q = rotation;
+	b2Transform xf = { center, rotation };
 
 	b2Polygon shape = { 0 };
 	shape.count = 4;
-	shape.vertices[0] = b2TransformPoint( xf, ( b2Vec2 ){ -hx, -hy } );
-	shape.vertices[1] = b2TransformPoint( xf, ( b2Vec2 ){ hx, -hy } );
-	shape.vertices[2] = b2TransformPoint( xf, ( b2Vec2 ){ hx, hy } );
-	shape.vertices[3] = b2TransformPoint( xf, ( b2Vec2 ){ -hx, hy } );
+	shape.vertices[0] = b2TransformPoint( xf, ( b2Vec2 ){ -halfWidth, -halfHeight } );
+	shape.vertices[1] = b2TransformPoint( xf, ( b2Vec2 ){ halfWidth, -halfHeight } );
+	shape.vertices[2] = b2TransformPoint( xf, ( b2Vec2 ){ halfWidth, halfHeight } );
+	shape.vertices[3] = b2TransformPoint( xf, ( b2Vec2 ){ -halfWidth, halfHeight } );
 	shape.normals[0] = b2RotateVector( xf.q, ( b2Vec2 ){ 0.0f, -1.0f } );
 	shape.normals[1] = b2RotateVector( xf.q, ( b2Vec2 ){ 1.0f, 0.0f } );
 	shape.normals[2] = b2RotateVector( xf.q, ( b2Vec2 ){ 0.0f, 1.0f } );
 	shape.normals[3] = b2RotateVector( xf.q, ( b2Vec2 ){ -1.0f, 0.0f } );
 	shape.radius = 0.0f;
-	shape.centroid = center;
+	shape.centroid = xf.p;
+	return shape;
+}
+
+b2Polygon b2MakeOffsetRoundedBox( float halfWidth, float halfHeight, b2Vec2 center, b2Rot rotation, float radius )
+{
+	B2_ASSERT( b2IsValidFloat( radius ) && radius >= 0.0f );
+	b2Transform xf = { center, rotation };
+
+	b2Polygon shape = { 0 };
+	shape.count = 4;
+	shape.vertices[0] = b2TransformPoint( xf, ( b2Vec2 ){ -halfWidth, -halfHeight } );
+	shape.vertices[1] = b2TransformPoint( xf, ( b2Vec2 ){ halfWidth, -halfHeight } );
+	shape.vertices[2] = b2TransformPoint( xf, ( b2Vec2 ){ halfWidth, halfHeight } );
+	shape.vertices[3] = b2TransformPoint( xf, ( b2Vec2 ){ -halfWidth, halfHeight } );
+	shape.normals[0] = b2RotateVector( xf.q, ( b2Vec2 ){ 0.0f, -1.0f } );
+	shape.normals[1] = b2RotateVector( xf.q, ( b2Vec2 ){ 1.0f, 0.0f } );
+	shape.normals[2] = b2RotateVector( xf.q, ( b2Vec2 ){ 0.0f, 1.0f } );
+	shape.normals[3] = b2RotateVector( xf.q, ( b2Vec2 ){ -1.0f, 0.0f } );
+	shape.radius = radius;
+	shape.centroid = xf.p;
 	return shape;
 }
 
@@ -197,7 +222,7 @@ b2MassData b2ComputeCircleMass( const b2Circle* shape, float density )
 	float rr = shape->radius * shape->radius;
 
 	b2MassData massData;
-	massData.mass = density * b2_pi * rr;
+	massData.mass = density * B2_PI * rr;
 	massData.center = shape->center;
 
 	// inertia about the local origin
@@ -215,7 +240,7 @@ b2MassData b2ComputeCapsuleMass( const b2Capsule* shape, float density )
 	float length = b2Length( b2Sub( p2, p1 ) );
 	float ll = length * length;
 
-	float circleMass = density * ( b2_pi * radius * radius );
+	float circleMass = density * ( B2_PI * radius * radius );
 	float boxMass = density * ( 2.0f * radius * length );
 
 	b2MassData massData;
@@ -233,7 +258,7 @@ b2MassData b2ComputeCapsuleMass( const b2Capsule* shape, float density )
 	// I verified this formula by computing the convex hull of a 128 vertex capsule
 
 	// half circle centroid
-	float lc = 4.0f * radius / ( 3.0f * b2_pi );
+	float lc = 4.0f * radius / ( 3.0f * B2_PI );
 
 	// half length of rectangular portion of capsule
 	float h = 0.5f * length;
@@ -293,7 +318,7 @@ b2MassData b2ComputePolygonMass( const b2Polygon* shape, float density )
 		return b2ComputeCapsuleMass( &capsule, density );
 	}
 
-	b2Vec2 vertices[b2_maxPolygonVertices] = { 0 };
+	b2Vec2 vertices[B2_MAX_POLYGON_VERTICES] = { 0 };
 	int32_t count = shape->count;
 	float radius = shape->radius;
 
@@ -470,7 +495,7 @@ bool b2PointInPolygon( b2Vec2 point, const b2Polygon* shape )
 	input.transformB = b2Transform_identity;
 	input.useRadii = false;
 
-	b2DistanceCache cache = { 0 };
+	b2SimplexCache cache = { 0 };
 	b2DistanceOutput output = b2ShapeDistance( &cache, &input, NULL, 0 );
 
 	return output.distance <= shape->radius;
@@ -514,7 +539,7 @@ b2CastOutput b2RayCastCircle( const b2RayCastInput* input, const b2Circle* shape
 		return output;
 	}
 
-	// Pythagorus
+	// Pythagoras
 	float h = sqrtf( rr - cc );
 
 	float fraction = t - h;
@@ -525,6 +550,7 @@ b2CastOutput b2RayCastCircle( const b2RayCastInput* input, const b2Circle* shape
 		return output;
 	}
 
+	// hit point relative to center
 	b2Vec2 hitPoint = b2MulAdd( s, fraction, d );
 
 	output.fraction = fraction / length;

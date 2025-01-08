@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include "block_array.h"
-
 #include "box2d/math_functions.h"
 
 #include <stdbool.h>
@@ -106,10 +104,6 @@ typedef struct b2StepContext
 	int* enlargedShapes;
 	int enlargedShapeCount;
 
-	// Array of fast bodies that need continuous collision handling
-	int* fastBodies;
-	_Atomic int fastBodyCount;
-
 	// Array of bullet bodies that need continuous collision handling
 	int* bulletBodies;
 	_Atomic int bulletBodyCount;
@@ -149,7 +143,7 @@ static inline b2Softness b2MakeSoft( float hertz, float zeta, float h )
 		return ( b2Softness ){ 0.0f, 1.0f, 0.0f };
 	}
 
-	float omega = 2.0f * b2_pi * hertz;
+	float omega = 2.0f * B2_PI * hertz;
 	float a1 = 2.0f * zeta + h * omega;
 	float a2 = h * omega * a1;
 	float a3 = 1.0f / ( 1.0f + a2 );

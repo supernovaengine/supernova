@@ -237,8 +237,7 @@ void Body2D::setShapeDensity(size_t index, float density){
 
     if (index >= 0 && index < body.numShapes){
         if (body.shapes[index].type != Shape2DType::CHAIN){
-            b2Shape_SetDensity(body.shapes[index].shape, density);
-            b2Body_ApplyMassFromShapes(body.body);
+            b2Shape_SetDensity(body.shapes[index].shape, density, true);
         }else{
             Log::error("Cannot set density of chain shape %i", index);
         }

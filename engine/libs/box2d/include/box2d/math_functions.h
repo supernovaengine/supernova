@@ -15,9 +15,6 @@
  * @{
  */
 
-/// https://en.wikipedia.org/wiki/Pi
-#define b2_pi 3.14159265359f
-
 /// 2D vector
 /// This can be used to represent a point or free vector
 typedef struct b2Vec2
@@ -25,6 +22,15 @@ typedef struct b2Vec2
 	/// coordinates
 	float x, y;
 } b2Vec2;
+
+/// Cosine and sine pair
+/// This uses a custom implementation designed for cross-platform determinism
+typedef struct b2CosSin
+{
+	/// cosine and sine
+	float cosine;
+	float sine;
+} b2CosSin;
 
 /// 2D rotation
 /// This is similar to using a complex number for rotation
@@ -62,15 +68,37 @@ typedef struct b2AABB
  * @{
  */
 
+/// https://en.wikipedia.org/wiki/Pi
+#define B2_PI 3.14159265359f
+
 static const b2Vec2 b2Vec2_zero = { 0.0f, 0.0f };
 static const b2Rot b2Rot_identity = { 1.0f, 0.0f };
 static const b2Transform b2Transform_identity = { { 0.0f, 0.0f }, { 1.0f, 0.0f } };
 static const b2Mat22 b2Mat22_zero = { { 0.0f, 0.0f }, { 0.0f, 0.0f } };
 
-/// Compute an approximate arctangent in the range [-pi, pi]
-/// This is hand coded for cross platform determinism. The atan2f
-///	function in the standard library is not cross platform deterministic.
-B2_API float b2Atan2( float y, float x );
+/// @return the minimum of two integers
+B2_INLINE int b2MinInt( int a, int b )
+{
+	return a < b ? a : b;
+}
+
+/// @return the maximum of two integers
+B2_INLINE int b2MaxInt( int a, int b )
+{
+	return a > b ? a : b;
+}
+
+/// @return the absolute value of an integer
+B2_INLINE int b2AbsInt( int a )
+{
+	return a < 0 ? -a : a;
+}
+
+/// @return an integer clamped between a lower and upper bound
+B2_INLINE int b2ClampInt( int a, int lower, int upper )
+{
+	return a < lower ? lower : ( a > upper ? upper : a );
+}
 
 /// @return the minimum of two floats
 B2_INLINE float b2MinFloat( float a, float b )
@@ -96,29 +124,15 @@ B2_INLINE float b2ClampFloat( float a, float lower, float upper )
 	return a < lower ? lower : ( a > upper ? upper : a );
 }
 
-/// @return the minimum of two integers
-B2_INLINE int b2MinInt( int a, int b )
-{
-	return a < b ? a : b;
-}
+/// Compute an approximate arctangent in the range [-pi, pi]
+/// This is hand coded for cross-platform determinism. The atan2f
+/// function in the standard library is not cross-platform deterministic.
+///	Accurate to around 0.0023 degrees
+B2_API float b2Atan2( float y, float x );
 
-/// @return the maximum of two integers
-B2_INLINE int b2MaxInt( int a, int b )
-{
-	return a > b ? a : b;
-}
-
-/// @return the absolute value of an integer
-B2_INLINE int b2AbsInt( int a )
-{
-	return a < 0 ? -a : a;
-}
-
-/// @return an integer clamped between a lower and upper bound
-B2_INLINE int b2ClampInt( int a, int lower, int upper )
-{
-	return a < lower ? lower : ( a > upper ? upper : a );
-}
+/// Compute the cosine and sine of an angle in radians. Implemented
+/// for cross-platform determinism.
+B2_API b2CosSin b2ComputeCosSin( float radians );
 
 /// Vector dot product
 B2_INLINE float b2Dot( b2Vec2 a, b2Vec2 b )
@@ -270,7 +284,7 @@ B2_INLINE b2Vec2 b2Normalize( b2Vec2 v )
 }
 
 /// Convert a vector into a unit vector if possible, otherwise returns the zero vector. Also
-///	outputs the length.
+/// outputs the length.
 B2_INLINE b2Vec2 b2GetLengthAndNormalize( float* length, b2Vec2 v )
 {
 	*length = b2Length( v );
@@ -294,8 +308,8 @@ B2_INLINE b2Rot b2NormalizeRot( b2Rot q )
 }
 
 /// Integration rotation from angular velocity
-///	@param q1 initial rotation
-///	@param deltaAngle the angular displacement in radians
+/// @param q1 initial rotation
+/// @param deltaAngle the angular displacement in radians
 B2_INLINE b2Rot b2IntegrateRotation( b2Rot q1, float deltaAngle )
 {
 	// dc/dt = -omega * sin(t)
@@ -323,7 +337,14 @@ B2_INLINE float b2DistanceSquared( b2Vec2 a, b2Vec2 b )
 }
 
 /// Make a rotation using an angle in radians
-B2_API b2Rot b2MakeRot( float angle );
+B2_INLINE b2Rot b2MakeRot( float radians )
+{
+	b2CosSin cs = b2ComputeCosSin( radians );
+	return B2_LITERAL( b2Rot ){ cs.cosine, cs.sine };
+}
+
+/// Compute the rotation between two unit vectors
+B2_API b2Rot b2ComputeRotationBetweenUnitVectors( b2Vec2 v1, b2Vec2 v2 );
 
 /// Is this rotation normalized?
 B2_INLINE bool b2IsNormalized( b2Rot q )
@@ -335,6 +356,7 @@ B2_INLINE bool b2IsNormalized( b2Rot q )
 
 /// Normalized linear interpolation
 /// https://fgiesen.wordpress.com/2012/08/15/linear-interpolation-past-present-and-future/
+///	https://web.archive.org/web/20170825184056/http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/
 B2_INLINE b2Rot b2NLerp( b2Rot q1, b2Rot q2, float t )
 {
 	float omt = 1.0f - t;
@@ -346,11 +368,10 @@ B2_INLINE b2Rot b2NLerp( b2Rot q1, b2Rot q2, float t )
 	return b2NormalizeRot( q );
 }
 
-
 /// Compute the angular velocity necessary to rotate between two rotations over a give time
-///	@param q1 initial rotation
-///	@param q2 final rotation
-///	@param inv_h inverse time step
+/// @param q1 initial rotation
+/// @param q2 final rotation
+/// @param inv_h inverse time step
 B2_INLINE float b2ComputeAngularVelocity( b2Rot q1, b2Rot q2, float inv_h )
 {
 	// ds/dt = omega * cos(t)
@@ -424,34 +445,34 @@ B2_INLINE float b2RelativeAngle( b2Rot b, b2Rot a )
 }
 
 /// Convert an angle in the range [-2*pi, 2*pi] into the range [-pi, pi]
-B2_INLINE float b2UnwindAngle( float angle )
+B2_INLINE float b2UnwindAngle( float radians )
 {
-	if ( angle < -b2_pi )
+	if ( radians < -B2_PI )
 	{
-		return angle + 2.0f * b2_pi;
+		return radians + 2.0f * B2_PI;
 	}
-	else if ( angle > b2_pi )
+	else if ( radians > B2_PI )
 	{
-		return angle - 2.0f * b2_pi;
+		return radians - 2.0f * B2_PI;
 	}
 
-	return angle;
+	return radians;
 }
 
 /// Convert any into the range [-pi, pi] (slow)
-B2_INLINE float b2UnwindLargeAngle( float angle )
+B2_INLINE float b2UnwindLargeAngle( float radians )
 {
-	while ( angle > b2_pi )
+	while ( radians > B2_PI )
 	{
-		angle -= 2.0f * b2_pi;
+		radians -= 2.0f * B2_PI;
 	}
 
-	while ( angle < -b2_pi )
+	while ( radians < -B2_PI )
 	{
-		angle += 2.0f * b2_pi;
+		radians += 2.0f * B2_PI;
 	}
 
-	return angle;
+	return radians;
 }
 
 /// Rotate a vector
@@ -483,6 +504,9 @@ B2_INLINE b2Vec2 b2InvTransformPoint( b2Transform t, const b2Vec2 p )
 	return B2_LITERAL( b2Vec2 ){ t.q.c * vx + t.q.s * vy, -t.q.s * vx + t.q.c * vy };
 }
 
+/// Multiply two transforms. If the result is applied to a point p local to frame B,
+/// the transform would first convert p to a point local to frame A, then into a point
+/// in the world frame.
 /// v2 = A.q.Rot(B.q.Rot(v1) + B.p) + A.p
 ///    = (A.q * B.q).Rot(v1) + A.q.Rot(B.p) + A.p
 B2_INLINE b2Transform b2MulTransforms( b2Transform A, b2Transform B )
@@ -493,6 +517,7 @@ B2_INLINE b2Transform b2MulTransforms( b2Transform A, b2Transform B )
 	return C;
 }
 
+/// Creates a transform that converts a local point in frame B to a local point in frame A.
 /// v2 = A.q' * (B.q * v1 + B.p - A.p)
 ///    = A.q' * B.q * v1 + A.q' * (B.p - A.p)
 B2_INLINE b2Transform b2InvMulTransforms( b2Transform A, b2Transform B )
@@ -581,21 +606,31 @@ B2_INLINE b2AABB b2AABB_Union( b2AABB a, b2AABB b )
 }
 
 /// Is this a valid number? Not NaN or infinity.
-B2_API bool b2IsValid( float a );
+B2_API bool b2IsValidFloat( float a );
 
 /// Is this a valid vector? Not NaN or infinity.
-B2_API bool b2Vec2_IsValid( b2Vec2 v );
+B2_API bool b2IsValidVec2( b2Vec2 v );
 
 /// Is this a valid rotation? Not NaN or infinity. Is normalized.
-B2_API bool b2Rot_IsValid( b2Rot q );
+B2_API bool b2IsValidRotation( b2Rot q );
 
 /// Is this a valid bounding box? Not Nan or infinity. Upper bound greater than or equal to lower bound.
-B2_API bool b2AABB_IsValid( b2AABB aabb );
+B2_API bool b2IsValidAABB( b2AABB aabb );
 
 /// Box2D bases all length units on meters, but you may need different units for your game.
 /// You can set this value to use different units. This should be done at application startup
-///	and only modified once. Default value is 1.
-///	@warning This must be modified before any calls to Box2D
+/// and only modified once. Default value is 1.
+/// For example, if your game uses pixels for units you can use pixels for all length values
+/// sent to Box2D. There should be no extra cost. However, Box2D has some internal tolerances
+/// and thresholds that have been tuned for meters. By calling this function, Box2D is able
+/// to adjust those tolerances and thresholds to improve accuracy.
+/// A good rule of thumb is to pass the height of your player character to this function. So
+/// if your player character is 32 pixels high, then pass 32 to this function. Then you may
+/// confidently use pixels for all the length values sent to Box2D. All length values returned
+/// from Box2D will also be pixels because Box2D does not do any scaling internally.
+/// However, you are now on the hook for coming up with good values for gravity, density, and
+/// forces.
+/// @warning This must be modified before any calls to Box2D
 B2_API void b2SetLengthUnitsPerMeter( float lengthUnits );
 
 /// Get the current length units per meter.

@@ -3,6 +3,7 @@
 
 #include "box2d/types.h"
 
+#include "constants.h"
 #include "core.h"
 
 b2WorldDef b2DefaultWorldDef( void )
@@ -12,13 +13,15 @@ b2WorldDef b2DefaultWorldDef( void )
 	def.gravity.y = -10.0f;
 	def.hitEventThreshold = 1.0f * b2_lengthUnitsPerMeter;
 	def.restitutionThreshold = 1.0f * b2_lengthUnitsPerMeter;
-	def.contactPushoutVelocity = 3.0f * b2_lengthUnitsPerMeter;
+	def.contactPushSpeed = 3.0f * b2_lengthUnitsPerMeter;
 	def.contactHertz = 30.0;
 	def.contactDampingRatio = 10.0f;
 	def.jointHertz = 60.0;
 	def.jointDampingRatio = 2.0f;
 	// 400 meters per second, faster than the speed of sound
-	def.maximumLinearVelocity = 400.0f * b2_lengthUnitsPerMeter;
+	def.maximumLinearSpeed = 400.0f * b2_lengthUnitsPerMeter;
+	def.frictionMixingRule = b2_mixGeometricMean;
+	def.restitutionMixingRule = b2_mixMaximum;
 	def.enableSleep = true;
 	def.enableContinuous = true;
 	def.internalValue = B2_SECRET_COOKIE;
@@ -35,20 +38,19 @@ b2BodyDef b2DefaultBodyDef( void )
 	def.enableSleep = true;
 	def.isAwake = true;
 	def.isEnabled = true;
-	def.automaticMass = true;
 	def.internalValue = B2_SECRET_COOKIE;
 	return def;
 }
 
 b2Filter b2DefaultFilter( void )
 {
-	b2Filter filter = { 0x0001ULL, UINT64_MAX, 0 };
+	b2Filter filter = { B2_DEFAULT_CATEGORY_BITS, B2_DEFAULT_MASK_BITS, 0 };
 	return filter;
 }
 
 b2QueryFilter b2DefaultQueryFilter( void )
 {
-	b2QueryFilter filter = { 0x0001ULL, UINT64_MAX };
+	b2QueryFilter filter = { B2_DEFAULT_CATEGORY_BITS, B2_DEFAULT_MASK_BITS };
 	return filter;
 }
 
@@ -59,7 +61,7 @@ b2ShapeDef b2DefaultShapeDef( void )
 	def.density = 1.0f;
 	def.filter = b2DefaultFilter();
 	def.enableSensorEvents = true;
-	def.enableContactEvents = true;
+	def.updateBodyMass = true;
 	def.internalValue = B2_SECRET_COOKIE;
 	return def;
 }
@@ -103,15 +105,6 @@ static void b2EmptyDrawCircle( b2Vec2 center, float radius, b2HexColor color, vo
 static void b2EmptyDrawSolidCircle( b2Transform transform, float radius, b2HexColor color, void* context )
 {
 	B2_MAYBE_UNUSED( transform );
-	B2_MAYBE_UNUSED( radius );
-	B2_MAYBE_UNUSED( color );
-	B2_MAYBE_UNUSED( context );
-}
-
-static void b2EmptyDrawCapsule( b2Vec2 p1, b2Vec2 p2, float radius, b2HexColor color, void* context )
-{
-	B2_MAYBE_UNUSED( p1 );
-	B2_MAYBE_UNUSED( p2 );
 	B2_MAYBE_UNUSED( radius );
 	B2_MAYBE_UNUSED( color );
 	B2_MAYBE_UNUSED( context );
@@ -164,7 +157,6 @@ b2DebugDraw b2DefaultDebugDraw(void)
 	draw.DrawSolidPolygon = b2EmptyDrawSolidPolygon;
 	draw.DrawCircle = b2EmptyDrawCircle;
 	draw.DrawSolidCircle = b2EmptyDrawSolidCircle;
-	draw.DrawCapsule = b2EmptyDrawCapsule;
 	draw.DrawSolidCapsule = b2EmptyDrawSolidCapsule;
 	draw.DrawSegment = b2EmptyDrawSegment;
 	draw.DrawTransform = b2EmptyDrawTransform;

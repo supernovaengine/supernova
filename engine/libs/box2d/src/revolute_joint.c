@@ -1,7 +1,9 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+#if defined( _MSC_VER ) && !defined( _CRT_SECURE_NO_WARNINGS )
 #define _CRT_SECURE_NO_WARNINGS
+#endif
 
 #include "body.h"
 #include "core.h"
@@ -207,29 +209,19 @@ void b2PrepareRevoluteJoint( b2JointSim* base, b2StepContext* context )
 	int idB = base->bodyIdB;
 
 	b2World* world = context->world;
-	b2Body* bodies = world->bodyArray;
 
-	b2CheckIndex( bodies, idA );
-	b2CheckIndex( bodies, idB );
-
-	b2Body* bodyA = bodies + idA;
-	b2Body* bodyB = bodies + idB;
+	b2Body* bodyA = b2BodyArray_Get(&world->bodies, idA);
+	b2Body* bodyB = b2BodyArray_Get(&world->bodies, idB);
 
 	B2_ASSERT( bodyA->setIndex == b2_awakeSet || bodyB->setIndex == b2_awakeSet );
-	b2CheckIndex( world->solverSetArray, bodyA->setIndex );
-	b2CheckIndex( world->solverSetArray, bodyB->setIndex );
-
-	b2SolverSet* setA = world->solverSetArray + bodyA->setIndex;
-	b2SolverSet* setB = world->solverSetArray + bodyB->setIndex;
+	b2SolverSet* setA = b2SolverSetArray_Get( &world->solverSets, bodyA->setIndex );
+	b2SolverSet* setB = b2SolverSetArray_Get( &world->solverSets, bodyB->setIndex );
 
 	int localIndexA = bodyA->localIndex;
 	int localIndexB = bodyB->localIndex;
 
-	B2_ASSERT( 0 <= localIndexA && localIndexA <= setA->sims.count );
-	B2_ASSERT( 0 <= localIndexB && localIndexB <= setB->sims.count );
-
-	b2BodySim* bodySimA = setA->sims.data + bodyA->localIndex;
-	b2BodySim* bodySimB = setB->sims.data + bodyB->localIndex;
+	b2BodySim* bodySimA = b2BodySimArray_Get( &setA->bodySims, localIndexA );
+	b2BodySim* bodySimB = b2BodySimArray_Get( &setB->bodySims, localIndexB );
 
 	float mA = bodySimA->invMass;
 	float iA = bodySimA->invInertia;
@@ -501,7 +493,7 @@ void b2DrawRevoluteJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform trans
 	b2Vec2 pA = b2TransformPoint( transformA, base->localOriginAnchorA );
 	b2Vec2 pB = b2TransformPoint( transformB, base->localOriginAnchorB );
 
-	b2HexColor c1 = b2_colorGray7;
+	b2HexColor c1 = b2_colorGray;
 	b2HexColor c2 = b2_colorGreen;
 	b2HexColor c3 = b2_colorRed;
 
@@ -521,7 +513,7 @@ void b2DrawRevoluteJoint( b2DebugDraw* draw, b2JointSim* base, b2Transform trans
 	{
 		float jointAngle = b2UnwindAngle( angle - joint->referenceAngle );
 		char buffer[32];
-		snprintf( buffer, 32, " %.1f deg", 180.0f * jointAngle / b2_pi );
+		snprintf( buffer, 32, " %.1f deg", 180.0f * jointAngle / B2_PI );
 		draw->DrawString( pC, buffer, draw->context );
 	}
 

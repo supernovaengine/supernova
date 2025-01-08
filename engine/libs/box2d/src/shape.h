@@ -3,12 +3,11 @@
 
 #pragma once
 
-#include "world.h"
+#include "array.h"
 
 #include "box2d/types.h"
 
 typedef struct b2BroadPhase b2BroadPhase;
-typedef struct b2World b2World;
 
 typedef struct b2Shape
 {
@@ -46,7 +45,6 @@ typedef struct b2Shape
 	bool enableHitEvents;
 	bool enablePreSolveEvents;
 	bool enlargedAABB;
-	bool isFast;
 } b2Shape;
 
 typedef struct b2ChainShape
@@ -54,8 +52,10 @@ typedef struct b2ChainShape
 	int id;
 	int bodyId;
 	int nextChainId;
-	int* shapeIndices;
 	int count;
+	int* shapeIndices;
+	float friction;
+	float restitution;
 	uint16_t revision;
 } b2ChainShape;
 
@@ -73,10 +73,12 @@ b2ShapeExtent b2ComputeShapeExtent( const b2Shape* shape, b2Vec2 localCenter );
 b2AABB b2ComputeShapeAABB( const b2Shape* shape, b2Transform transform );
 b2Vec2 b2GetShapeCentroid( const b2Shape* shape );
 float b2GetShapePerimeter( const b2Shape* shape );
+float b2GetShapeProjectedPerimeter( const b2Shape* shape, b2Vec2 line );
 
-b2DistanceProxy b2MakeShapeDistanceProxy( const b2Shape* shape );
+b2ShapeProxy b2MakeShapeDistanceProxy( const b2Shape* shape );
 
 b2CastOutput b2RayCastShape( const b2RayCastInput* input, const b2Shape* shape, b2Transform transform );
 b2CastOutput b2ShapeCastShape( const b2ShapeCastInput* input, const b2Shape* shape, b2Transform transform );
 
-b2Transform b2GetOwnerTransform( b2World* world, b2Shape* shape );
+B2_ARRAY_INLINE( b2ChainShape, b2ChainShape );
+B2_ARRAY_INLINE( b2Shape, b2Shape );

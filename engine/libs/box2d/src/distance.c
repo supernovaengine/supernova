@@ -2,6 +2,7 @@
 // SPDX-FileCopyrightText: 2023 Erin Catto
 // SPDX-License-Identifier: MIT
 
+#include "constants.h"
 #include "core.h"
 
 #include "box2d/collision.h"
@@ -38,8 +39,8 @@ b2SegmentDistanceResult b2SegmentDistance( b2Vec2 p1, b2Vec2 q1, b2Vec2 p2, b2Ve
 	b2Vec2 r = b2Sub( p1, p2 );
 	float dd1 = b2Dot( d1, d1 );
 	float dd2 = b2Dot( d2, d2 );
-	float rd2 = b2Dot( r, d2 );
 	float rd1 = b2Dot( r, d1 );
+	float rd2 = b2Dot( r, d2 );
 
 	const float epsSqr = FLT_EPSILON * FLT_EPSILON;
 
@@ -106,10 +107,10 @@ b2SegmentDistanceResult b2SegmentDistance( b2Vec2 p1, b2Vec2 q1, b2Vec2 p2, b2Ve
 
 // GJK using Voronoi regions (Christer Ericson) and Barycentric coordinates.
 // todo try not copying
-b2DistanceProxy b2MakeProxy( const b2Vec2* vertices, int count, float radius )
+b2ShapeProxy b2MakeProxy( const b2Vec2* vertices, int count, float radius )
 {
-	count = b2MinInt( count, b2_maxPolygonVertices );
-	b2DistanceProxy proxy;
+	count = b2MinInt( count, B2_MAX_POLYGON_VERTICES );
+	b2ShapeProxy proxy;
 	for ( int i = 0; i < count; ++i )
 	{
 		proxy.points[i] = vertices[i];
@@ -129,7 +130,7 @@ static b2Vec2 b2Weight3( float a1, b2Vec2 w1, float a2, b2Vec2 w2, float a3, b2V
 	return ( b2Vec2 ){ a1 * w1.x + a2 * w2.x + a3 * w3.x, a1 * w1.y + a2 * w2.y + a3 * w3.y };
 }
 
-static int b2FindSupport( const b2DistanceProxy* proxy, b2Vec2 direction )
+static int b2FindSupport( const b2ShapeProxy* proxy, b2Vec2 direction )
 {
 	int bestIndex = 0;
 	float bestValue = b2Dot( proxy->points[0], direction );
@@ -146,8 +147,8 @@ static int b2FindSupport( const b2DistanceProxy* proxy, b2Vec2 direction )
 	return bestIndex;
 }
 
-static b2Simplex b2MakeSimplexFromCache( const b2DistanceCache* cache, const b2DistanceProxy* proxyA, b2Transform transformA,
-										 const b2DistanceProxy* proxyB, b2Transform transformB )
+static b2Simplex b2MakeSimplexFromCache( const b2SimplexCache* cache, const b2ShapeProxy* proxyA, b2Transform transformA,
+										 const b2ShapeProxy* proxyB, b2Transform transformB )
 {
 	B2_ASSERT( cache->count <= 3 );
 	b2Simplex s;
@@ -189,7 +190,7 @@ static b2Simplex b2MakeSimplexFromCache( const b2DistanceCache* cache, const b2D
 	return s;
 }
 
-static void b2MakeSimplexCache( b2DistanceCache* cache, const b2Simplex* simplex )
+static void b2MakeSimplexCache( b2SimplexCache* cache, const b2Simplex* simplex )
 {
 	cache->count = (uint16_t)simplex->count;
 	const b2SimplexVertex* vertices[] = { &simplex->v1, &simplex->v2, &simplex->v3 };
@@ -456,13 +457,13 @@ void b2SolveSimplex3( b2Simplex* s )
 	s->count = 3;
 }
 
-b2DistanceOutput b2ShapeDistance( b2DistanceCache* cache, const b2DistanceInput* input, b2Simplex* simplexes,
+b2DistanceOutput b2ShapeDistance( b2SimplexCache* cache, const b2DistanceInput* input, b2Simplex* simplexes,
 								  int simplexCapacity )
 {
 	b2DistanceOutput output = { 0 };
 
-	const b2DistanceProxy* proxyA = &input->proxyA;
-	const b2DistanceProxy* proxyB = &input->proxyB;
+	const b2ShapeProxy* proxyA = &input->proxyA;
+	const b2ShapeProxy* proxyB = &input->proxyB;
 
 	b2Transform transformA = input->transformA;
 	b2Transform transformB = input->transformB;
@@ -627,17 +628,17 @@ b2CastOutput b2ShapeCast( const b2ShapeCastPairInput* input )
 	b2CastOutput output = { 0 };
 	output.fraction = input->maxFraction;
 
-	b2DistanceProxy proxyA = input->proxyA;
+	b2ShapeProxy proxyA = input->proxyA;
 
 	b2Transform xfA = input->transformA;
 	b2Transform xfB = input->transformB;
 	b2Transform xf = b2InvMulTransforms( xfA, xfB );
 
 	// Put proxyB in proxyA's frame to reduce round-off error
-	b2DistanceProxy proxyB;
+	b2ShapeProxy proxyB;
 	proxyB.count = input->proxyB.count;
 	proxyB.radius = input->proxyB.radius;
-	B2_ASSERT( proxyB.count <= b2_maxPolygonVertices );
+	B2_ASSERT( proxyB.count <= B2_MAX_POLYGON_VERTICES );
 
 	for ( int i = 0; i < proxyB.count; ++i )
 	{
@@ -665,7 +666,7 @@ b2CastOutput b2ShapeCast( const b2ShapeCastPairInput* input )
 	b2Vec2 v = b2Sub( wA, wB );
 
 	// Sigma is the target distance between proxies
-	const float linearSlop = b2_linearSlop;
+	const float linearSlop = B2_LINEAR_SLOP;
 	const float sigma = b2MaxFloat( linearSlop, radius - linearSlop );
 
 	// Main iteration loop.
@@ -780,8 +781,12 @@ b2CastOutput b2ShapeCast( const b2ShapeCastPairInput* input )
 // Warning: writing to these globals significantly slows multithreading performance
 #if B2_TOI_DEBUG
 float b2_toiTime, b2_toiMaxTime;
-int b2_toiCalls, b2_toiIters, b2_toiMaxIters;
-int b2_toiRootIters, b2_toiMaxRootIters;
+int b2_toiCalls, b2_toiDistanceIterations, b2_toiMaxDistanceIterations;
+int b2_toiRootIterations, b2_toiMaxRootIterations;
+int b2_toiFailedCount;
+int b2_toiOverlappedCount;
+int b2_toiHitCount;
+int b2_toiSeparatedCount;
 #endif
 
 typedef enum b2SeparationType
@@ -793,16 +798,16 @@ typedef enum b2SeparationType
 
 typedef struct b2SeparationFunction
 {
-	const b2DistanceProxy* proxyA;
-	const b2DistanceProxy* proxyB;
+	const b2ShapeProxy* proxyA;
+	const b2ShapeProxy* proxyB;
 	b2Sweep sweepA, sweepB;
 	b2Vec2 localPoint;
 	b2Vec2 axis;
 	b2SeparationType type;
 } b2SeparationFunction;
 
-b2SeparationFunction b2MakeSeparationFunction( const b2DistanceCache* cache, const b2DistanceProxy* proxyA, const b2Sweep* sweepA,
-											   const b2DistanceProxy* proxyB, const b2Sweep* sweepB, float t1 )
+b2SeparationFunction b2MakeSeparationFunction( const b2SimplexCache* cache, const b2ShapeProxy* proxyA, const b2Sweep* sweepA,
+											   const b2ShapeProxy* proxyB, const b2Sweep* sweepB, float t1 )
 {
 	b2SeparationFunction f;
 
@@ -1005,29 +1010,35 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 
 	b2TOIOutput output;
 	output.state = b2_toiStateUnknown;
-	output.t = input->tMax;
-
-	const b2DistanceProxy* proxyA = &input->proxyA;
-	const b2DistanceProxy* proxyB = &input->proxyB;
+	output.fraction = input->maxFraction;
 
 	b2Sweep sweepA = input->sweepA;
 	b2Sweep sweepB = input->sweepB;
 	B2_ASSERT( b2IsNormalized( sweepA.q1 ) && b2IsNormalized( sweepA.q2 ) );
 	B2_ASSERT( b2IsNormalized( sweepB.q1 ) && b2IsNormalized( sweepB.q2 ) );
 
-	float tMax = input->tMax;
+	// todo_erin
+	// c1 can be at the origin yet the points are far away
+	// b2Vec2 origin = b2Add(sweepA.c1, input->proxyA.points[0]);
+
+	const b2ShapeProxy* proxyA = &input->proxyA;
+	const b2ShapeProxy* proxyB = &input->proxyB;
+
+	float tMax = input->maxFraction;
 
 	float totalRadius = proxyA->radius + proxyB->radius;
-	float target = b2MaxFloat( b2_linearSlop, totalRadius - b2_linearSlop );
-	float tolerance = 0.25f * b2_linearSlop;
+	// todo_erin consider different target
+	// float target = b2MaxFloat( B2_LINEAR_SLOP, totalRadius );
+	float target = b2MaxFloat( B2_LINEAR_SLOP, totalRadius - B2_LINEAR_SLOP );
+	float tolerance = 0.25f * B2_LINEAR_SLOP;
 	B2_ASSERT( target > tolerance );
 
 	float t1 = 0.0f;
 	const int k_maxIterations = 20;
-	int iter = 0;
+	int distanceIterations = 0;
 
 	// Prepare input for distance query.
-	b2DistanceCache cache = { 0 };
+	b2SimplexCache cache = { 0 };
 	b2DistanceInput distanceInput;
 	distanceInput.proxyA = input->proxyA;
 	distanceInput.proxyB = input->proxyB;
@@ -1046,20 +1057,31 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 		distanceInput.transformB = xfB;
 		b2DistanceOutput distanceOutput = b2ShapeDistance( &cache, &distanceInput, NULL, 0 );
 
+		distanceIterations += 1;
+#if B2_TOI_DEBUG
+		b2_toiDistanceIterations += 1;
+#endif
+
 		// If the shapes are overlapped, we give up on continuous collision.
 		if ( distanceOutput.distance <= 0.0f )
 		{
 			// Failure!
 			output.state = b2_toiStateOverlapped;
-			output.t = 0.0f;
+#if B2_TOI_DEBUG
+			b2_toiOverlappedCount += 1;
+#endif
+			output.fraction = 0.0f;
 			break;
 		}
 
-		if ( distanceOutput.distance < target + tolerance )
+		if ( distanceOutput.distance <= target + tolerance )
 		{
 			// Victory!
 			output.state = b2_toiStateHit;
-			output.t = t1;
+#if B2_TOI_DEBUG
+			b2_toiHitCount += 1;
+#endif
+			output.fraction = t1;
 			break;
 		}
 
@@ -1095,7 +1117,7 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 		// resolving the deepest point. This loop is bounded by the number of vertices.
 		bool done = false;
 		float t2 = tMax;
-		int pushBackIter = 0;
+		int pushBackIterations = 0;
 		for ( ;; )
 		{
 			// Find the deepest point at t2. Store the witness point indices.
@@ -1107,7 +1129,10 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 			{
 				// Victory!
 				output.state = b2_toiStateSeparated;
-				output.t = tMax;
+#if B2_TOI_DEBUG
+				b2_toiSeparatedCount += 1;
+#endif
+				output.fraction = tMax;
 				done = true;
 				break;
 			}
@@ -1128,7 +1153,10 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 			if ( s1 < target - tolerance )
 			{
 				output.state = b2_toiStateFailed;
-				output.t = t1;
+#if B2_TOI_DEBUG
+				b2_toiFailedCount += 1;
+#endif
+				output.fraction = t1;
 				done = true;
 				break;
 			}
@@ -1138,19 +1166,22 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 			{
 				// Victory! t1 should hold the TOI (could be 0.0).
 				output.state = b2_toiStateHit;
-				output.t = t1;
+#if B2_TOI_DEBUG
+				b2_toiHitCount += 1;
+#endif
+				output.fraction = t1;
 				done = true;
 				break;
 			}
 
 			// Compute 1D root of: f(x) - target = 0
-			int rootIterCount = 0;
+			int rootIterationCount = 0;
 			float a1 = t1, a2 = t2;
 			for ( ;; )
 			{
 				// Use a mix of the secant rule and bisection.
 				float t;
-				if ( rootIterCount & 1 )
+				if ( rootIterationCount & 1 )
 				{
 					// Secant rule to improve convergence.
 					t = a1 + ( target - s1 ) * ( a2 - a1 ) / ( s2 - s1 );
@@ -1161,10 +1192,10 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 					t = 0.5f * ( a1 + a2 );
 				}
 
-				++rootIterCount;
+				rootIterationCount += 1;
 
 #if B2_TOI_DEBUG
-				++b2_toiRootIters;
+				++b2_toiRootIterations;
 #endif
 
 				float s = b2EvaluateSeparation( &fcn, indexA, indexB, t );
@@ -1188,45 +1219,43 @@ b2TOIOutput b2TimeOfImpact( const b2TOIInput* input )
 					s2 = s;
 				}
 
-				if ( rootIterCount == 50 )
+				if ( rootIterationCount == 50 )
 				{
 					break;
 				}
 			}
 
 #if B2_TOI_DEBUG
-			b2_toiMaxRootIters = b2MaxInt( b2_toiMaxRootIters, rootIterCount );
+			b2_toiMaxRootIterations = b2MaxInt( b2_toiMaxRootIterations, rootIterationCount );
 #endif
 
-			++pushBackIter;
+			pushBackIterations += 1;
 
-			if ( pushBackIter == b2_maxPolygonVertices )
+			if ( pushBackIterations == B2_MAX_POLYGON_VERTICES )
 			{
 				break;
 			}
 		}
-
-		++iter;
-#if B2_TOI_DEBUG
-		++b2_toiIters;
-#endif
 
 		if ( done )
 		{
 			break;
 		}
 
-		if ( iter == k_maxIterations )
+		if ( distanceIterations == k_maxIterations )
 		{
 			// Root finder got stuck. Semi-victory.
 			output.state = b2_toiStateFailed;
-			output.t = t1;
+#if B2_TOI_DEBUG
+			b2_toiFailedCount += 1;
+#endif
+			output.fraction = t1;
 			break;
 		}
 	}
 
 #if B2_TOI_DEBUG
-	b2_toiMaxIters = b2MaxInt( b2_toiMaxIters, iter );
+	b2_toiMaxDistanceIterations = b2MaxInt( b2_toiMaxDistanceIterations, distanceIterations );
 
 	float time = b2GetMilliseconds( &timer );
 	b2_toiMaxTime = b2MaxFloat( b2_toiMaxTime, time );

@@ -1026,7 +1026,7 @@ int PhysicsSystem::loadShape2D(Body2DComponent& body, void* shape, Shape2DType t
 
 void PhysicsSystem::destroyShape2D(Body2DComponent& body, size_t index){
     if (b2Shape_IsValid(body.shapes[index].shape)){
-        b2DestroyShape(body.shapes[index].shape);
+        b2DestroyShape(body.shapes[index].shape, true);
 
         body.shapes[index].shape = b2_nullShapeId;
     }

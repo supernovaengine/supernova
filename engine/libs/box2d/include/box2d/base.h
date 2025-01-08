@@ -15,7 +15,7 @@
 	// using the Windows DLL
 	#define BOX2D_EXPORT __declspec( dllimport )
 #elif defined( box2d_EXPORTS )
-	// building or using the Box2D shared library
+	// building or using the shared library
 	#define BOX2D_EXPORT __attribute__( ( visibility( "default" ) ) )
 #else
 	// static library
@@ -44,27 +44,51 @@
  */
 
 /// Prototype for user allocation function
-///	@param size the allocation size in bytes
-///	@param alignment the required alignment, guaranteed to be a power of 2
+/// @param size the allocation size in bytes
+/// @param alignment the required alignment, guaranteed to be a power of 2
 typedef void* b2AllocFcn( unsigned int size, int alignment );
 
 /// Prototype for user free function
-///	@param mem the memory previously allocated through `b2AllocFcn`
+/// @param mem the memory previously allocated through `b2AllocFcn`
 typedef void b2FreeFcn( void* mem );
 
 /// Prototype for the user assert callback. Return 0 to skip the debugger break.
 typedef int b2AssertFcn( const char* condition, const char* fileName, int lineNumber );
 
 /// This allows the user to override the allocation functions. These should be
-///	set during application startup.
+/// set during application startup.
 B2_API void b2SetAllocator( b2AllocFcn* allocFcn, b2FreeFcn* freeFcn );
 
 /// @return the total bytes allocated by Box2D
 B2_API int b2GetByteCount( void );
 
 /// Override the default assert callback
-///	@param assertFcn a non-null assert callback
+/// @param assertFcn a non-null assert callback
 B2_API void b2SetAssertFcn( b2AssertFcn* assertFcn );
+
+// see https://github.com/scottt/debugbreak
+#if defined( _MSC_VER )
+#define B2_BREAKPOINT __debugbreak()
+#elif defined( __GNUC__ ) || defined( __clang__ )
+#define B2_BREAKPOINT __builtin_trap()
+#else
+// Unknown compiler
+#include <assert.h>
+#define B2_BREAKPOINT assert( 0 )
+#endif
+
+#if !defined( NDEBUG ) || defined( B2_ENABLE_ASSERT )
+B2_API int b2InternalAssertFcn( const char* condition, const char* fileName, int lineNumber );
+#define B2_ASSERT( condition )                                                                                                   \
+	do                                                                                                                           \
+	{                                                                                                                            \
+		if ( !( condition ) && b2InternalAssertFcn( #condition, __FILE__, (int)__LINE__ ) )                                          \
+			B2_BREAKPOINT;                                                                                                       \
+	}                                                                                                                            \
+	while ( 0 )
+#else
+#define B2_ASSERT( ... ) ( (void)0 )
+#endif
 
 /// Version numbering scheme.
 /// See https://semver.org/
@@ -91,9 +115,11 @@ typedef struct b2Timer
 {
 #if defined( _WIN32 )
 	int64_t start;
-#elif defined( __linux__ ) || defined( __APPLE__ )
-	unsigned long long start_sec;
-	unsigned long long start_usec;
+#elif defined( __linux__ ) || defined( __EMSCRIPTEN__ )
+	int64_t tv_sec;
+	int64_t tv_nsec;
+#elif defined( __APPLE__ )
+	uint64_t start;
 #else
 	int32_t dummy;
 #endif
