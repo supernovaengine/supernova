@@ -221,57 +221,57 @@ void NativeEngine::gameLoop() {
     //mApp->onInputEvent = _handle_input_proxy;
 
     GameActivity_setWindowFlags(mApp->activity,
-                              AWINDOW_FLAG_KEEP_SCREEN_ON | AWINDOW_FLAG_TURN_SCREEN_ON |
-                              AWINDOW_FLAG_FULLSCREEN |
-                              AWINDOW_FLAG_SHOW_WHEN_LOCKED,
-                              0);
+                                AWINDOW_FLAG_KEEP_SCREEN_ON | AWINDOW_FLAG_TURN_SCREEN_ON |
+                                AWINDOW_FLAG_FULLSCREEN |
+                                AWINDOW_FLAG_SHOW_WHEN_LOCKED,
+                                0);
     updateSystemBarOffset();
 
     while (1) {
         int events;
         struct android_poll_source *source;
-            // If not animating, block until we get an event; if animating, don't block.
-            while ((ALooper_pollAll(isAnimating() ? 0 : -1, NULL, &events, (void **) &source)) >= 0) {
 
-              // process event
-              if (source != NULL) {
-                  source->process(mApp, source);
-              }
+        // If not animating, block until we get an event; if animating, don't block.
+        while ((ALooper_pollOnce(isAnimating() ? 0 : -1, NULL, &events, (void **) &source)) >= 0) {
+            // process event
+            if (source != NULL) {
+                source->process(mApp, source);
+            }
 
-              // are we exiting?
-              if (mApp->destroyRequested) {
-                  return;
-              }
+            // are we exiting?
+            if (mApp->destroyRequested) {
+                return;
+            }
         }
 
         handleGameActivityInput();
 
         if (mApp->textInputState) {
-                GameActivity_getTextInputState(mApp->activity, [](void *context, const GameTextInputState *state) {
-                    if (!context || !state) return;
+            GameActivity_getTextInputState(mApp->activity, [](void *context, const GameTextInputState *state) {
+                if (!context || !state) return;
 
-                    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
-                    std::wstring utf16Text = convert.from_bytes(state->text_UTF8);
+                std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
+                std::wstring utf16Text = convert.from_bytes(state->text_UTF8);
 
-                    while (textInputBuffer.length() > utf16Text.length()){
-                        textInputBuffer.pop_back();
-                        Supernova::Engine::systemCharInput('\b');
-                    }
+                while (textInputBuffer.length() > utf16Text.length()){
+                    textInputBuffer.pop_back();
+                    Supernova::Engine::systemCharInput('\b');
+                }
 
-                    int pos = 0;
-                    while (textInputBuffer[pos] == utf16Text[pos] and pos < textInputBuffer.length()){
-                        pos++;
-                    }
+                int pos = 0;
+                while (textInputBuffer[pos] == utf16Text[pos] and pos < textInputBuffer.length()){
+                    pos++;
+                }
 
-                    for (int i = pos; i < textInputBuffer.length(); i++){
-                        Supernova::Engine::systemCharInput('\b');
-                    }
-                    for (int i = pos; i < utf16Text.length(); i++){
-                        Supernova::Engine::systemCharInput(utf16Text[i]);
-                    }
-                    textInputBuffer = utf16Text;
+                for (int i = pos; i < textInputBuffer.length(); i++){
+                    Supernova::Engine::systemCharInput('\b');
+                }
+                for (int i = pos; i < utf16Text.length(); i++){
+                    Supernova::Engine::systemCharInput(utf16Text[i]);
+                }
+                textInputBuffer = utf16Text;
 
-                }, this);
+            }, this);
             mApp->textInputState = 0;
         }
 
