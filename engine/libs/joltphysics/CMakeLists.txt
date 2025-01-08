@@ -534,14 +534,15 @@ target_include_directories(joltphysics PUBLIC
 	$<BUILD_INTERFACE:${PHYSICS_REPO_ROOT}>
 	$<INSTALL_INTERFACE:include/>)
 
+### commenting this because it may cause error in Android Studio
 # Code coverage doesn't work when using precompiled headers
-if (CMAKE_GENERATOR STREQUAL "Ninja Multi-Config" AND MSVC)
-	# The Ninja Multi-Config generator errors out when selectively disabling precompiled headers for certain configurations.
-	# See: https://github.com/jrouwe/JoltPhysics/issues/1211
-	target_precompile_headers(joltphysics PRIVATE "${JOLT_PHYSICS_ROOT}/Jolt.h")
-else()
-	target_precompile_headers(joltphysics PRIVATE "$<$<NOT:$<CONFIG:ReleaseCoverage>>:${JOLT_PHYSICS_ROOT}/Jolt.h>")
-endif()
+#if (CMAKE_GENERATOR STREQUAL "Ninja Multi-Config" AND MSVC)
+#	# The Ninja Multi-Config generator errors out when selectively disabling precompiled headers for certain configurations.
+#	# See: https://github.com/jrouwe/JoltPhysics/issues/1211
+#	target_precompile_headers(joltphysics PRIVATE "${JOLT_PHYSICS_ROOT}/Jolt.h")
+#else()
+#	target_precompile_headers(joltphysics PRIVATE "$<$<NOT:$<CONFIG:ReleaseCoverage>>:${JOLT_PHYSICS_ROOT}/Jolt.h>")
+#endif()
 
 if (NOT CPP_EXCEPTIONS_ENABLED)
 	# Disable use of exceptions in MSVC's STL
