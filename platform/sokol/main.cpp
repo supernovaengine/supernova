@@ -27,11 +27,12 @@ int convMouseButtom(sapp_mousebutton mouse_button){
 }
 
 static void sokol_event(const sapp_event* e) {
-    if (e->type == SAPP_EVENTTYPE_RESIZED)
+    if (e->type == SAPP_EVENTTYPE_RESIZED){
         Supernova::Engine::systemViewChanged();
-    else if (e->type == SAPP_EVENTTYPE_CHAR)
-        Supernova::Engine::systemCharInput(e->char_code);
-    else if (e->type == SAPP_EVENTTYPE_KEY_DOWN){
+    }else if (e->type == SAPP_EVENTTYPE_CHAR){
+        if (e->char_code != 127) // fix macos backspace
+            Supernova::Engine::systemCharInput(e->char_code);
+    }else if (e->type == SAPP_EVENTTYPE_KEY_DOWN){
         if (e->key_code == SAPP_KEYCODE_TAB)
             Supernova::Engine::systemCharInput('\t');
         if (e->key_code == SAPP_KEYCODE_BACKSPACE)
@@ -40,29 +41,30 @@ static void sokol_event(const sapp_event* e) {
             Supernova::Engine::systemCharInput('\r');
         if (e->key_code == SAPP_KEYCODE_ESCAPE)
             Supernova::Engine::systemCharInput('\33'); // removed 'e' to avoid warnings
-        //Use same keycode of GLFW
+        // use same keycode of GLFW
         Supernova::Engine::systemKeyDown(e->key_code, e->key_repeat, e->modifiers);
-    }else if (e->type == SAPP_EVENTTYPE_KEY_UP)
-        //Use same keycode of GLFW
+    }else if (e->type == SAPP_EVENTTYPE_KEY_UP){
+        // use same keycode of GLFW
         Supernova::Engine::systemKeyUp(e->key_code, e->key_repeat, e->modifiers);
-    else if (e->type == SAPP_EVENTTYPE_SUSPENDED)
+    }else if (e->type == SAPP_EVENTTYPE_SUSPENDED){
         Supernova::Engine::systemPause();
-    else if (e->type == SAPP_EVENTTYPE_RESUMED)
+    }else if (e->type == SAPP_EVENTTYPE_RESUMED){
         Supernova::Engine::systemResume();  
-    else if (e->type == SAPP_EVENTTYPE_MOUSE_UP)
+    }else if (e->type == SAPP_EVENTTYPE_MOUSE_UP){
         Supernova::Engine::systemMouseUp(convMouseButtom(e->mouse_button), e->mouse_x, e->mouse_y, e->modifiers);  
-    else if (e->type == SAPP_EVENTTYPE_MOUSE_DOWN)
+    }else if (e->type == SAPP_EVENTTYPE_MOUSE_DOWN){
         Supernova::Engine::systemMouseDown(convMouseButtom(e->mouse_button), e->mouse_x, e->mouse_y, e->modifiers);
-    else if (e->type == SAPP_EVENTTYPE_MOUSE_UP)
+    }else if (e->type == SAPP_EVENTTYPE_MOUSE_UP){
         Supernova::Engine::systemMouseUp(convMouseButtom(e->mouse_button), e->mouse_x, e->mouse_y, e->modifiers);
-    else if (e->type == SAPP_EVENTTYPE_MOUSE_MOVE)
+    }else if (e->type == SAPP_EVENTTYPE_MOUSE_MOVE){
         Supernova::Engine::systemMouseMove(e->mouse_x, e->mouse_y, e->modifiers);
-    else if (e->type == SAPP_EVENTTYPE_MOUSE_SCROLL)
+    }else if (e->type == SAPP_EVENTTYPE_MOUSE_SCROLL){
         Supernova::Engine::systemMouseScroll(e->scroll_x, e->scroll_y, e->modifiers);
-    else if (e->type == SAPP_EVENTTYPE_MOUSE_ENTER)
+    }else if (e->type == SAPP_EVENTTYPE_MOUSE_ENTER){
         Supernova::Engine::systemMouseEnter();
-    else if (e->type == SAPP_EVENTTYPE_MOUSE_LEAVE)
+    }else if (e->type == SAPP_EVENTTYPE_MOUSE_LEAVE){
         Supernova::Engine::systemMouseLeave();
+    }
 }
 
 void sokol_cleanup(void) {
