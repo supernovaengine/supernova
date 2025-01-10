@@ -562,6 +562,8 @@ void Engine::systemViewChanged(){
 }
 
 void Engine::systemDraw(){
+    const int MAX_UPDATES_PER_FRAME = 100;
+
     //Deltatime in seconds
     deltatime = stm_sec(stm_laptime(&lastTime));
     framerate = 1 / deltatime;
@@ -572,12 +574,12 @@ void Engine::systemDraw(){
 
     // avoid increment updateTimeCount after resume
     if (!paused) {
-        int updateLoops = 0;
+        // clamp deltaTime to prevent large jumps
+        //deltatime = std::min(deltatime, 0.25);  // bad for physics?
         updateTimeCount += deltatime;
-        while (updateTimeCount >= updateTime && updateLoops <= 100) {
-            updateLoops++;
-            updateTimeCount -= updateTime;
 
+        int updateLoops = 0;
+        while (updateTimeCount >= updateTime && updateLoops < MAX_UPDATES_PER_FRAME) {
             Engine::onUpdate.call();
 
             if (isFixedTimeSceneUpdate()) {
@@ -586,9 +588,14 @@ void Engine::systemDraw(){
                 }
                 Engine::onPostUpdate.call();
             }
+
+            updateTimeCount -= updateTime;
+            updateLoops++;
         }
-        if (updateLoops > 100) {
-            Log::warn("More than 100 updates in a frame");
+
+        if (updateLoops == MAX_UPDATES_PER_FRAME && updateLoops >= updateTime) {
+            Log::warn("Dropping frames - More than %i updates per frame", MAX_UPDATES_PER_FRAME);
+            //updateTimeCount = 0;  // bad for physics?
         }
 
         if (!isFixedTimeSceneUpdate()) {
