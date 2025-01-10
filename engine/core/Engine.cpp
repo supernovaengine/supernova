@@ -593,7 +593,7 @@ void Engine::systemDraw(){
             updateLoops++;
         }
 
-        if (updateLoops == MAX_UPDATES_PER_FRAME && updateLoops >= updateTime) {
+        if (updateLoops == MAX_UPDATES_PER_FRAME && updateTimeCount >= updateTime) {
             Log::warn("Dropping frames - More than %i updates per frame", MAX_UPDATES_PER_FRAME);
             //updateTimeCount = 0;  // bad for physics?
         }
