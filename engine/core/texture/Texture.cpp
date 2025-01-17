@@ -13,6 +13,9 @@ using namespace Supernova;
 Texture::Texture(){
     this->render = NULL;
     this->framebuffer = NULL;
+
+    this->id = "";
+    this->type = TextureType::TEXTURE_2D;
     this->numFaces = 1;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = true;
@@ -27,7 +30,9 @@ Texture::Texture(){
 Texture::Texture(const std::string& path){
     this->render = NULL;
     this->framebuffer = NULL;
+
     this->paths[0] = path;
+
     this->id = path;
     this->type = TextureType::TEXTURE_2D;
     this->numFaces = 1;
@@ -44,9 +49,11 @@ Texture::Texture(const std::string& path){
 Texture::Texture(const std::string& id, TextureData data){
     this->render = NULL;
     this->framebuffer = NULL;
+
     this->data = std::make_shared<std::array<TextureData,6>>();
     this->data->at(0) = data;
     //this->data = TextureDataPool::get(id, *this->data.get());
+
     this->id = id;
     this->type = TextureType::TEXTURE_2D;
     this->numFaces = 1;
