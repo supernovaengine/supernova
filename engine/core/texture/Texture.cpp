@@ -132,7 +132,7 @@ bool Texture::operator != ( const Texture& rhs ) const{
         paths[3] != rhs.paths[3] ||
         paths[4] != rhs.paths[4] ||
         paths[5] != rhs.paths[5] ||
-        numFaces == rhs.numFaces ||
+        numFaces != rhs.numFaces ||
         loadFromPath != rhs.loadFromPath ||
         releaseDataAfterLoad != rhs.releaseDataAfterLoad ||
         minFilter != rhs.minFilter ||
