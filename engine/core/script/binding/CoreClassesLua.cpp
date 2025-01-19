@@ -347,6 +347,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("getRender", &Texture::getRender)
         .addFunction("getPath", &Texture::getPath)
         .addFunction("getData", &Texture::getData)
+        .addFunction("getId", &Texture::getId)
         .addFunction("getWidth", &Texture::getWidth)
         .addFunction("getHeight", &Texture::getHeight)
         .addFunction("isTransparent", &Texture::isTransparent)

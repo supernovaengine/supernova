@@ -362,12 +362,16 @@ TextureRender* Texture::getRender(){
     return NULL;
 }
 
-std::string Texture::getPath(size_t index){
+std::string Texture::getPath(size_t index) const{
     return paths[index];
 }
 
-TextureData& Texture::getData(size_t index){
+TextureData& Texture::getData(size_t index) const{
     return data->at(index);
+}
+
+std::string Texture::getId() const{
+    return id;
 }
 
 int Texture::getWidth(){
