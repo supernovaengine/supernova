@@ -6,6 +6,8 @@ endif()
 
 project(${APP_NAME})
 
+set(SUPERNOVA_SHARED OFF)
+
 if(NOT SUPERNOVA_ROOT)
     set(SUPERNOVA_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 endif()

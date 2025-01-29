@@ -18,8 +18,8 @@ namespace Supernova {
 
 	class ComponentManager {
 	private:
-		std::unordered_map<const char*, ComponentId> componentTypeIds{};
-		std::unordered_map<const char*, std::shared_ptr<ComponentArrayBase>> componentArrays{};
+		std::unordered_map<std::string, ComponentId> componentTypeIds{};
+		std::unordered_map<std::string, std::shared_ptr<ComponentArrayBase>> componentArrays{};
 		ComponentId nextComponentIdId{};
 
 	public:

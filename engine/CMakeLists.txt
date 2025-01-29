@@ -1,5 +1,15 @@
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
+option(SUPERNOVA_SHARED "Build supernova as a shared library" OFF)
+
+if(SUPERNOVA_SHARED)
+    set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+    set(SUPERNOVA_LIB_TYPE SHARED)
+else()
+    set(SUPERNOVA_LIB_TYPE STATIC)
+endif()
+
+
 include_directories(shaders)
 
 include_directories(libs)
@@ -43,7 +53,7 @@ file(GLOB RENDER_SOKOL_SRC renders/sokol/*.cpp)
 add_library(
     supernova
 
-    STATIC
+    ${SUPERNOVA_LIB_TYPE}
 
     ${RENDER_SOKOL_SRC}
     ${SUPERNOVA_SRCS}
@@ -70,5 +80,7 @@ set_target_properties(
 
     PROPERTIES
 
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     CXX_STANDARD 17
 )
