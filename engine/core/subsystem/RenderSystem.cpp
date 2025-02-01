@@ -64,10 +64,11 @@ void RenderSystem::load(){
 }
 
 void RenderSystem::destroy(){
-	emptyWhite.destroyTexture();
-	emptyBlack.destroyTexture();
-	emptyCubeBlack.destroyTexture();
-	emptyNormal.destroyTexture();
+	// cannot destroy static textures because it affects other scenes
+	//emptyWhite.destroyTexture();
+	//emptyBlack.destroyTexture();
+	//emptyCubeBlack.destroyTexture();
+	//emptyNormal.destroyTexture();
 
 	emptyTexturesCreated = false;
 
