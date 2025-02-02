@@ -15,7 +15,7 @@
 
 namespace Supernova{
 
-    class Texture{
+    class SUPERNOVA_API Texture{
         private:
             std::shared_ptr<TextureRender> render = NULL;
             Framebuffer* framebuffer;

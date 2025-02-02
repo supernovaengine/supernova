@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    class Joint2D: public EntityHandle{
+    class SUPERNOVA_API Joint2D: public EntityHandle{
     public:
         Joint2D(Scene* scene);
         Joint2D(Scene* scene, Entity entity);

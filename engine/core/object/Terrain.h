@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    class Terrain: public Mesh{
+    class SUPERNOVA_API Terrain: public Mesh{
 
     public:
         Terrain(Scene* scene);

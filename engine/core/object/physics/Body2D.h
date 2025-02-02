@@ -15,7 +15,7 @@ namespace Supernova{
     class Contact2D;
     class Object;
 
-    class Body2D: public EntityHandle{
+    class SUPERNOVA_API Body2D: public EntityHandle{
     protected:
         void checkBody(const Body2DComponent& body) const;
 

@@ -13,7 +13,7 @@
 
 namespace Supernova{
 
-    class Contact2D{
+    class SUPERNOVA_API Contact2D{
     private:
         Scene* scene;
         b2ContactData contact;

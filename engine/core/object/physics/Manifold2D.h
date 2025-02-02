@@ -10,7 +10,7 @@
 
 namespace Supernova{
 
-    class Manifold2D{
+    class SUPERNOVA_API Manifold2D{
         private:
             Scene* scene;
             const b2Manifold* manifold;

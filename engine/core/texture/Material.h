@@ -10,7 +10,7 @@
 
 namespace Supernova{
 
-    struct Material{
+    struct SUPERNOVA_API Material{
         // --- start shader part
         Vector4 baseColorFactor = Vector4(1.0, 1.0, 1.0, 1.0);  // linear color
         float metallicFactor = 1.0;

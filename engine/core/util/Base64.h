@@ -7,11 +7,12 @@
 #ifndef BASE64_H
 #define BASE64_H
 
+#include "Export.h"
 #include <vector>
 #include <string>
 
 namespace Supernova {
-    class Base64 {
+    class SUPERNOVA_API Base64 {
     private:
         static const std::string base64_chars;
         static bool is_base64(unsigned char c);

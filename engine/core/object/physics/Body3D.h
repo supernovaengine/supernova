@@ -17,7 +17,7 @@ namespace Supernova{
 
     class Object;
 
-    class Body3D: public EntityHandle{
+    class SUPERNOVA_API Body3D: public EntityHandle{
     protected:
         void checkBody(const Body3DComponent& body) const;
 

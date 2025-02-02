@@ -12,7 +12,7 @@
 
 namespace Supernova{
 
-    class CollideShapeResult3D{
+    class SUPERNOVA_API CollideShapeResult3D{
     private:
         Scene* scene;
         const JPH::Body* body1;

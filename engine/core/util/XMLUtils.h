@@ -5,11 +5,12 @@
 #ifndef XMLUTILS_H
 #define XMLUTILS_H
 
+#include "Export.h"
 #include "tinyxml2.h"
 #include <string>
 
 namespace Supernova {
-    class XMLUtils {
+    class SUPERNOVA_API XMLUtils {
     private:
         static tinyxml2::XMLElement* getNodeForKey(const char* XMLFilePath, const char* rootName, const char* key, tinyxml2::XMLElement** rootNode, tinyxml2::XMLDocument* doc);
 

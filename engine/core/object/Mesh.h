@@ -11,7 +11,7 @@
 
 namespace Supernova{
 
-    class Mesh: public Object{
+    class SUPERNOVA_API Mesh: public Object{
     public:
         Mesh(Scene* scene);
         virtual ~Mesh();

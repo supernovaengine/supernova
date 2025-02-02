@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    class Framebuffer{
+    class SUPERNOVA_API Framebuffer{
 
         private:
             FramebufferRender render;

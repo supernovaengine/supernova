@@ -11,7 +11,7 @@
 
 namespace Supernova{
 
-    class Camera: public Object{
+    class SUPERNOVA_API Camera: public Object{
 
     private:
         void applyOrthoDefaults(CameraComponent& cameraComponent);

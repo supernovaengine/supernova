@@ -10,7 +10,7 @@
 
 namespace Supernova{
 
-    class Points: public Object{
+    class SUPERNOVA_API Points: public Object{
     public:
         Points(Scene* scene);
         virtual ~Points();

@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    class Shape: public Mesh{
+    class SUPERNOVA_API Shape: public Mesh{
     public:
         Shape(Scene* scene);
         virtual ~Shape();

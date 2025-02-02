@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    class Lines: public Object{
+    class SUPERNOVA_API Lines: public Object{
     public:
         Lines(Scene* scene);
         virtual ~Lines();

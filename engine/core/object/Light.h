@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    class Light: public Object{
+    class SUPERNOVA_API Light: public Object{
     public:
         Light(Scene* scene);
         virtual ~Light();

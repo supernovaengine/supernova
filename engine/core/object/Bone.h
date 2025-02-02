@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    class Bone: public Object{
+    class SUPERNOVA_API Bone: public Object{
     public:
         Bone(Scene* scene, Entity entity);
         virtual ~Bone();

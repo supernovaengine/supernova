@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    class Tilemap: public Mesh{
+    class SUPERNOVA_API Tilemap: public Mesh{
 
     public:
         Tilemap(Scene* scene);

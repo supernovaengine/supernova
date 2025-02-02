@@ -10,7 +10,7 @@
 
 namespace Supernova{
 
-    class Fog: public EntityHandle {
+    class SUPERNOVA_API Fog: public EntityHandle {
 
     public:
         Fog(Scene* scene);

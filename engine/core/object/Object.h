@@ -12,7 +12,7 @@
 
 namespace Supernova{
 
-    class Object: public EntityHandle{
+    class SUPERNOVA_API Object: public EntityHandle{
     public:
         Object(Scene* scene);
         Object(Scene* scene, Entity entity);

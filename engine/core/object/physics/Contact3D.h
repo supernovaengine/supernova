@@ -13,7 +13,7 @@
 
 namespace Supernova{
 
-    class Contact3D{
+    class SUPERNOVA_API Contact3D{
     private:
         Scene* scene;
         const JPH::Body* body1;

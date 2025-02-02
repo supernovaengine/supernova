@@ -16,7 +16,7 @@
 
 namespace Supernova{
 
-    class InterleavedBuffer: public Buffer{
+    class SUPERNOVA_API InterleavedBuffer: public Buffer{
 
     private:
         std::vector<unsigned char> vectorBuffer;
