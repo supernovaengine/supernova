@@ -154,8 +154,6 @@ namespace Supernova {
         static CursorType mouseCursorType;
         static bool showCursor;
 
-        thread_local static bool asyncThread;
-
         static Semaphore drawSemaphore;
 
         static Framebuffer* framebuffer;

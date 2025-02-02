@@ -17,6 +17,8 @@
 
 #include "sokol_time.h"
 
+thread_local static bool asyncThread = false;
+
 using namespace Supernova;
 
 //-----Supernova user config-----
@@ -59,7 +61,6 @@ std::atomic<bool> Engine::paused = false;
 CursorType Engine::mouseCursorType = CursorType::ARROW;
 bool Engine::showCursor = true;
 
-thread_local bool Engine::asyncThread = false;
 Semaphore Engine::drawSemaphore;
 
 Framebuffer* Engine::framebuffer = nullptr;
