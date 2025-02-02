@@ -8,7 +8,7 @@
 #include "UILayout.h"
 
 namespace Supernova{
-    class Image: public UILayout{
+    class SUPERNOVA_API Image: public UILayout{
     public:
         Image(Scene* scene);
         Image(Scene* scene, Entity entity);

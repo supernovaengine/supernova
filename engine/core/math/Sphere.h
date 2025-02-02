@@ -9,7 +9,7 @@ namespace Supernova{
     class Plane;
     class AABB;
 
-    class Sphere {
+    class SUPERNOVA_API Sphere {
     public:
         Vector3 center;
         float radius;

@@ -18,7 +18,7 @@ namespace Supernova {
         ZYX
     };
 
-    class Quaternion {
+    class SUPERNOVA_API Quaternion {
     public:
 
         float w, x, y, z;

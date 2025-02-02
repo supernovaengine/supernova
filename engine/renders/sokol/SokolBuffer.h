@@ -6,7 +6,6 @@
 #define SokolBuffer_h
 
 #include "render/Render.h"
-
 #include "sokol_gfx.h"
 
 namespace Supernova{

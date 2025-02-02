@@ -38,24 +38,20 @@ using namespace Supernova;
 System& System::instance(){
 #ifdef SUPERNOVA_ANDROID
     static System* instance = new SupernovaAndroid();
-#endif
-#ifdef  SUPERNOVA_IOS
+#elif defined(SUPERNOVA_IOS)
     static System* instance = new SupernovaIOS();
-#endif
-#ifdef  SUPERNOVA_WEB
+#elif defined(SUPERNOVA_WEB)
     static System* instance = new SupernovaWeb();
-#endif
-#ifdef  SUPERNOVA_SOKOL
+#elif defined(SUPERNOVA_SOKOL)
     static System* instance = new SupernovaSokol();
-#endif
-#ifdef  SUPERNOVA_GLFW
+#elif defined(SUPERNOVA_GLFW)
     static System* instance = new SupernovaGLFW();
-#endif
-#ifdef  SUPERNOVA_APPLE
+#elif defined(SUPERNOVA_APPLE)
     static System* instance = new SupernovaApple();
-#endif
-#ifdef  SUPERNOVA_EDITOR
+#elif defined(SUPERNOVA_EDITOR)
     static System* instance = new Editor::Platform();
+#else
+    static System* instance = nullptr;
 #endif
 
     return *instance;

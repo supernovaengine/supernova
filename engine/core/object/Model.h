@@ -12,7 +12,7 @@
 namespace tinygltf {class Model;}
 
 namespace Supernova{
-    class Model: public Mesh{
+    class SUPERNOVA_API Model: public Mesh{
     public:
         Model(Scene* scene);
         virtual ~Model();

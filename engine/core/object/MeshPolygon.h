@@ -8,7 +8,7 @@
 #include "Mesh.h"
 
 namespace Supernova{
-    class MeshPolygon: public Mesh{
+    class SUPERNOVA_API MeshPolygon: public Mesh{
 
     public:
         MeshPolygon(Scene* scene);

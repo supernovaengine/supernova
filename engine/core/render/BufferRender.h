@@ -9,7 +9,7 @@
 #include "sokol/SokolBuffer.h"
 
 namespace Supernova{
-    class BufferRender{
+    class SUPERNOVA_API BufferRender{
 
     public:
         //***Backend***

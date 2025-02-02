@@ -53,6 +53,7 @@
 #define MAX_BROADPHASELAYER_3D 6
 #endif
 
+#include "Export.h"
 #include "System.h"
 #include "util/FunctionSubscribe.h"
 #include "math/Rect.h"
@@ -64,7 +65,7 @@ void init();
 
 namespace Supernova {
 
-    class Scene;
+    class SUPERNOVA_API Scene;
     //class Rect;
 
     enum class Scaling{
@@ -107,7 +108,7 @@ namespace Supernova {
         DYNAMIC
     };
 
-    class Engine {
+    class SUPERNOVA_API Engine {
         
     private:
         //-----Supernova config-----

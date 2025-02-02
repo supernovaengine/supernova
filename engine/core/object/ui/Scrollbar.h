@@ -10,7 +10,7 @@
 #include "Container.h"
 
 namespace Supernova{
-    class Scrollbar: public Image{
+    class SUPERNOVA_API Scrollbar: public Image{
 
     public:
         Scrollbar(Scene* scene);

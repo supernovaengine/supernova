@@ -8,10 +8,11 @@
 #include <array>
 #include <string>
 #include "render/Render.h"
+#include "Export.h"
 
 namespace Supernova {
 
-    class Attribute {
+    class SUPERNOVA_API Attribute {
 
         friend class Buffer;
 

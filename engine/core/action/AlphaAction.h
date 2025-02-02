@@ -8,7 +8,7 @@
 #include "TimedAction.h"
 
 namespace Supernova{
-    class AlphaAction: public TimedAction{
+    class SUPERNOVA_API AlphaAction: public TimedAction{
 
     public:
         AlphaAction(Scene* scene);

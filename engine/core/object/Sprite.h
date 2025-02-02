@@ -12,7 +12,7 @@
 #include "Mesh.h"
 
 namespace Supernova{
-    class Sprite: public Mesh{
+    class SUPERNOVA_API Sprite: public Mesh{
 
     private:
         SpriteAnimation* animation;

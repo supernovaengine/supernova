@@ -10,6 +10,7 @@
 #define S_LOG_WARN 3
 #define S_LOG_ERROR 4
 
+#include "Export.h"
 #include <stdio.h>
 #include <string>
 #include <vector>
@@ -37,7 +38,7 @@ namespace Supernova {
         NOT_ALLOWED
     };
 
-    class System {
+    class SUPERNOVA_API System {
     protected:
 
         System() {}

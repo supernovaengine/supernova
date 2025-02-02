@@ -5,6 +5,7 @@
 #ifndef SUBSYSTEM_H
 #define SUBSYSTEM_H
 
+#include "Export.h"
 #include "Entity.h"
 #include "Signature.h"
 #include <set>
@@ -13,7 +14,7 @@ namespace Supernova{
 
 	class Scene;
 
-	class SubSystem {
+	class SUPERNOVA_API SubSystem {
 
 	protected:
 		Signature signature;

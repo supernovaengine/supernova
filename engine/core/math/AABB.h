@@ -9,7 +9,7 @@ namespace Supernova{
 
     class Plane;
     
-    class AABB{
+    class SUPERNOVA_API AABB{
 
     public:
 

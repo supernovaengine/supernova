@@ -8,9 +8,9 @@
 #include "Render.h"
 #include "sokol/SokolTexture.h"
 
-namespace Supernova{
+namespace Supernova {
 
-    class TextureRender{
+    class SUPERNOVA_API TextureRender{
 
     public:
         //***Backend***

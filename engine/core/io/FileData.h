@@ -7,6 +7,7 @@
 #ifndef FILEDATA_H
 #define FILEDATA_H
 
+#include "Export.h"
 #include <stdio.h>
 #include <string>
 
@@ -19,7 +20,7 @@ namespace Supernova {
         OUT_OF_MEMORY    = 3
     };
 
-    class FileData {
+    class SUPERNOVA_API FileData {
 
     protected:
         static bool beginWith(const std::string& path, const std::string& prefix);

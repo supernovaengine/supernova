@@ -7,7 +7,6 @@
 
 #include "render/Render.h"
 #include "shader/ShaderData.h"
-
 #include "sokol_gfx.h"
 
 namespace Supernova{

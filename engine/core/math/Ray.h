@@ -28,7 +28,7 @@ namespace Supernova {
         }
     };
 
-    class Ray{
+    class SUPERNOVA_API Ray{
 
     private:
 

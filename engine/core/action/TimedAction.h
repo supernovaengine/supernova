@@ -9,7 +9,7 @@
 #include "Ease.h"
 
 namespace Supernova{
-    class TimedAction: public Action{
+    class SUPERNOVA_API TimedAction: public Action{
 
     protected:
         void setAction(float duration, bool loop);

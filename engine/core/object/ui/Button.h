@@ -9,7 +9,7 @@
 #include "Text.h"
 
 namespace Supernova{
-    class Button: public Image{
+    class SUPERNOVA_API Button: public Image{
 
     public:
         Button(Scene* scene);

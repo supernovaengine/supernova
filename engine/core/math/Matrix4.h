@@ -11,7 +11,7 @@ namespace Supernova {
     class Quaternion;
     class AABB;
 
-    class Matrix4{
+    class SUPERNOVA_API Matrix4{
 
     private:
 

@@ -12,7 +12,7 @@
 
 namespace Supernova {
 
-    class ObjectRender{
+    class SUPERNOVA_API ObjectRender{
 
     public:
 

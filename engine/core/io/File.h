@@ -15,7 +15,7 @@
 
 namespace Supernova {
 
-    class File: public FileData {
+    class SUPERNOVA_API File: public FileData {
     protected:
         FILE *fileHandle;
 

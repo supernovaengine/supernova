@@ -8,7 +8,7 @@
 #include "action/Action.h"
 
 namespace Supernova{
-    class ScaleTracks: public Action{
+    class SUPERNOVA_API ScaleTracks: public Action{
 
     public:
         ScaleTracks(Scene* scene);

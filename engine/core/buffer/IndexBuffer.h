@@ -10,7 +10,7 @@
 
 namespace Supernova {
 
-    class IndexBuffer: public Buffer {
+    class SUPERNOVA_API IndexBuffer: public Buffer {
 
     private:
         std::vector<unsigned char> vectorBuffer;

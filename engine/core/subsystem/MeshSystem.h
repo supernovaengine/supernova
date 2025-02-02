@@ -7,6 +7,7 @@
 
 #include "SubSystem.h"
 
+
 #include "component/MeshComponent.h"
 #include "component/ModelComponent.h"
 #include "component/SpriteComponent.h"
@@ -17,7 +18,7 @@
 
 namespace Supernova{
 
-	class MeshSystem : public SubSystem {
+	class SUPERNOVA_API MeshSystem : public SubSystem {
 
     private:
         void createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera);

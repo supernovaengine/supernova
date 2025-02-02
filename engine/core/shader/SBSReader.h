@@ -11,7 +11,7 @@
 
 namespace Supernova {
 
-    class SBSReader {
+    class SUPERNOVA_API SBSReader {
     private:
         ShaderData shaderData;
 

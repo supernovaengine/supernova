@@ -5,7 +5,7 @@
 
 namespace Supernova {
 
-    class Matrix3 {
+    class SUPERNOVA_API Matrix3 {
 
     private:
 

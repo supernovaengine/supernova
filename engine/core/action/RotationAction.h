@@ -8,7 +8,7 @@
 #include "TimedAction.h"
 
 namespace Supernova{
-    class RotationAction: public TimedAction{
+    class SUPERNOVA_API RotationAction: public TimedAction{
 
     public:
         RotationAction(Scene* scene);

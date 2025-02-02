@@ -12,7 +12,7 @@
 
 namespace Supernova {
 
-    class Rect{
+    class SUPERNOVA_API Rect{
     private:
         
         float x, y, width, height;

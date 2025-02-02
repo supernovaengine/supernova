@@ -1,6 +1,7 @@
 #ifndef vector3_h
 #define vector3_h
 
+#include "Export.h"
 #include <math.h>
 #include <string>
 
@@ -13,7 +14,7 @@ namespace Supernova {
     class Vector2;
     class Vector4;
 
-    class Vector3
+    class SUPERNOVA_API Vector3
     {
     public:
         float x, y, z;

@@ -5,11 +5,12 @@
 #ifndef USERSETTINGS_H
 #define USERSETTINGS_H
 
+#include "Export.h"
 #include <string>
 #include "io/Data.h"
 
 namespace Supernova {
-    class UserSettings {
+    class SUPERNOVA_API UserSettings {
     public:
 
         static bool getBoolForKey(const char *key);

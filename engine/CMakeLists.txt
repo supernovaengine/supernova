@@ -84,3 +84,11 @@ set_target_properties(
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     CXX_STANDARD 17
 )
+
+if(SUPERNOVA_SHARED)
+    target_compile_definitions(supernova 
+        PRIVATE 
+        SUPERNOVA_EXPORTS
+        SUPERNOVA_SHARED
+    )
+endif()

@@ -8,7 +8,7 @@
 #include "action/Action.h"
 
 namespace Supernova{
-    class RotateTracks: public Action{
+    class SUPERNOVA_API RotateTracks: public Action{
 
     public:
         RotateTracks(Scene* scene);

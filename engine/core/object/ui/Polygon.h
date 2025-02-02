@@ -8,7 +8,7 @@
 #include "UILayout.h"
 
 namespace Supernova{
-    class Polygon: public UILayout{
+    class SUPERNOVA_API Polygon: public UILayout{
 
     public:
         Polygon(Scene* scene);

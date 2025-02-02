@@ -8,7 +8,7 @@
 #include "object/EntityHandle.h"
 
 namespace Supernova{
-    class SkyBox: public EntityHandle{
+    class SUPERNOVA_API SkyBox: public EntityHandle{
 
     public:
         SkyBox(Scene* scene);

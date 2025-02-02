@@ -8,7 +8,7 @@
 #include "UILayout.h"
 
 namespace Supernova{
-    class Container: public UILayout{
+    class SUPERNOVA_API Container: public UILayout{
 
     public:
         Container(Scene* scene);

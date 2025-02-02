@@ -5,9 +5,11 @@
 #ifndef angle_h
 #define angle_h
 
+#include "Export.h"
+
 namespace Supernova {
 
-    class Angle {
+    class SUPERNOVA_API Angle {
     public:
         static float radToDefault(float radians);
         static float degToDefault(float degrees);

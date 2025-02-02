@@ -8,7 +8,7 @@
 
 namespace Supernova {
 
-    class Audio: public Object{
+    class SUPERNOVA_API Audio: public Object{
     public:
         Audio(Scene* scene);
         virtual ~Audio();

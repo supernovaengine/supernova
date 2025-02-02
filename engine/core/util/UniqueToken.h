@@ -5,11 +5,12 @@
 #ifndef UNIQUETOKEN_H
 #define UNIQUETOKEN_H
 
+#include "Export.h"
 #include <string>
 
 namespace Supernova {
 
-    class UniqueToken {
+    class SUPERNOVA_API UniqueToken {
     private:
         static int id;
 

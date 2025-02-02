@@ -18,7 +18,7 @@
 
 namespace Supernova {
 
-    class Buffer {
+    class SUPERNOVA_API Buffer {
 
     protected:
         std::map<AttributeType, Attribute> attributes;

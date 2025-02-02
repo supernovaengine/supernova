@@ -11,12 +11,13 @@
 #ifndef DATA_H
 #define DATA_H
 
+#include "Export.h"
 #include "FileData.h"
 #include "File.h"
 
 namespace Supernova {
 
-    class Data: public FileData {
+    class SUPERNOVA_API Data: public FileData {
 
     protected:
         unsigned char *dataPtr;

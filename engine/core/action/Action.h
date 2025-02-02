@@ -9,7 +9,7 @@
 #include "object/Object.h"
 
 namespace Supernova{
-    class Action: public EntityHandle{
+    class SUPERNOVA_API Action: public EntityHandle{
     public:
         Action(Scene* scene);
         Action(Scene* scene, Entity entity);

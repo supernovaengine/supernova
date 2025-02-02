@@ -10,7 +10,7 @@
 #include "Polygon.h"
 
 namespace Supernova{
-    class TextEdit: public Image{
+    class SUPERNOVA_API TextEdit: public Image{
 
     public:
         TextEdit(Scene* scene);

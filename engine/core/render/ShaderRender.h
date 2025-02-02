@@ -9,7 +9,7 @@
 #include "sokol/SokolShader.h"
 
 namespace Supernova{
-    class ShaderRender{
+    class SUPERNOVA_API ShaderRender{
 
     private:
         // render callback clean function

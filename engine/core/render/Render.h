@@ -5,6 +5,8 @@
 #ifndef Render_h
 #define Render_h
 
+#include "Export.h"
+
 
 namespace Supernova{
 

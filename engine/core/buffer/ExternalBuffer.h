@@ -10,7 +10,7 @@
 
 namespace Supernova {
 
-    class ExternalBuffer : public Buffer {
+    class SUPERNOVA_API ExternalBuffer : public Buffer {
 
     protected:
         std::string name;

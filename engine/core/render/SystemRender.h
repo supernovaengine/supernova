@@ -5,10 +5,11 @@
 #ifndef SystemRender_h
 #define SystemRender_h
 
+#include "Export.h"
 #include <stdint.h>
 
 namespace Supernova{
-    class SystemRender{        
+    class SUPERNOVA_API SystemRender{
     public:
         static void setup();
         static void commitQueue();

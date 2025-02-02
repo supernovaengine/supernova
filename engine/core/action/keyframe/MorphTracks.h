@@ -8,7 +8,7 @@
 #include "action/Action.h"
 
 namespace Supernova{
-    class MorphTracks: public Action{
+    class SUPERNOVA_API MorphTracks: public Action{
 
     public:
         MorphTracks(Scene* scene);

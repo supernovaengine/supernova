@@ -6,7 +6,7 @@
 
 namespace Supernova{
     
-    class Plane{
+    class SUPERNOVA_API Plane{
 
     public:
 

@@ -8,7 +8,7 @@
 #include "action/Action.h"
 
 namespace Supernova{
-    class TranslateTracks: public Action{
+    class SUPERNOVA_API TranslateTracks: public Action{
 
     public:
         TranslateTracks(Scene* scene);

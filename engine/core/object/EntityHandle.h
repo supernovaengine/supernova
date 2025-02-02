@@ -9,7 +9,7 @@
 #include "Entity.h"
 
 namespace Supernova{
-    class EntityHandle{
+    class SUPERNOVA_API EntityHandle{
 
     protected:
         Entity entity;

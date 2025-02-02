@@ -10,7 +10,7 @@
 
 namespace Supernova {
 
-    class TextureData {
+    class SUPERNOVA_API TextureData {
     private:
 
         int width;

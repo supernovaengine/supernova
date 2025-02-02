@@ -11,7 +11,7 @@
 
 namespace Supernova {
 
-    class Color {
+    class SUPERNOVA_API Color {
     private:
         static float GAMMA;
         static float INV_GAMMA;

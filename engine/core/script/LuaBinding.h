@@ -5,12 +5,14 @@
 #ifndef luabinding_h
 #define luabinding_h
 
+#include "Export.h"
+
 typedef struct lua_State lua_State;
 typedef int (*lua_CFunction) (lua_State *L);
 
 namespace Supernova {
 
-    class LuaBinding {
+    class SUPERNOVA_API LuaBinding {
         
         friend class Engine;
         

@@ -5,9 +5,11 @@
 #ifndef log_h
 #define log_h
 
+#include "Export.h"
+
 namespace Supernova {
 
-    class Log {
+    class SUPERNOVA_API Log {
     public:
         static void print(const char* text, ...);
 

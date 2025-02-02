@@ -8,7 +8,7 @@
 #include "Object.h"
 
 namespace Supernova{
-    class UILayout: public Object{
+    class SUPERNOVA_API UILayout: public Object{
 
     public:
         UILayout(Scene* scene);

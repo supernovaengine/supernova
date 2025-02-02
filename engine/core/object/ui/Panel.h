@@ -10,7 +10,7 @@
 #include "Container.h"
 
 namespace Supernova{
-    class Panel: public Image{
+    class SUPERNOVA_API Panel: public Image{
 
     public:
         Panel(Scene* scene);

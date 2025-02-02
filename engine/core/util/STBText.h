@@ -15,7 +15,7 @@
 
 namespace Supernova {
 
-    class STBText {
+    class SUPERNOVA_API STBText {
 
     private:
 

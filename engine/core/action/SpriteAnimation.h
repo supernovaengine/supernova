@@ -8,7 +8,7 @@
 #include "Action.h"
 
 namespace Supernova{
-    class SpriteAnimation: public Action{
+    class SUPERNOVA_API SpriteAnimation: public Action{
 
     public:
         SpriteAnimation(Scene* scene);

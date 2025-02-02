@@ -6,9 +6,7 @@
 #define SokolTexture_h
 
 #include "render/Render.h"
-
 #include "sokol_gfx.h"
-
 #include <string>
 
 namespace Supernova{

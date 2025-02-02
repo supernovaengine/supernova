@@ -9,7 +9,7 @@
 #include "sokol/SokolFramebuffer.h"
 
 namespace Supernova{
-    class FramebufferRender{
+    class SUPERNOVA_API FramebufferRender{
 
     public:
         //***Backend***

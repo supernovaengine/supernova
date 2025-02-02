@@ -5,11 +5,12 @@
 #ifndef CameraRender_h
 #define CameraRender_h
 
+#include "Engine.h"
 #include "math/Rect.h"
 #include "sokol/SokolCamera.h"
 
 namespace Supernova{
-    class CameraRender{        
+    class SUPERNOVA_API CameraRender{
     public:
         //***Backend***
         SokolCamera backend;
