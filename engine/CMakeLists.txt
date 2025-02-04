@@ -9,11 +9,6 @@ else()
     set(SUPERNOVA_LIB_TYPE STATIC)
 endif()
 
-# Add OpenGL handling for macOS
-if(APPLE)
-    find_package(OpenGL REQUIRED)
-endif()
-
 include_directories(shaders)
 
 include_directories(libs)
@@ -39,6 +34,12 @@ add_subdirectory(libs/tinygltf)
 add_subdirectory(libs/tinyxml2)
 add_subdirectory(libs/box2d)
 add_subdirectory(libs/joltphysics)
+
+if (MSVC)
+    add_compile_options(/bigobj)
+else ()
+    add_compile_options(-Wa,-mbig-obj)
+endif()
 
 if(DEFINED NO_LUA_INIT)
     add_definitions("-DNO_LUA_INIT=${NO_LUA_INIT}")
@@ -73,18 +74,10 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux"
     )
 endif()
 
-# Base libraries
-set(SUPERNOVA_LIBS sokol lua stb tinyobjloader tinygltf tinyxml2 soloud box2d joltphysics)
-
-# Add OpenGL framework for macOS
-if(APPLE)
-    list(APPEND SUPERNOVA_LIBS "-framework OpenGL")
-endif()
-
 target_link_libraries(
     supernova
 
-    ${SUPERNOVA_LIBS}
+    sokol lua stb tinyobjloader tinygltf tinyxml2 soloud box2d joltphysics
 )
 
 set_target_properties(

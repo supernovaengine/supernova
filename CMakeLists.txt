@@ -198,12 +198,6 @@ endif()
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     add_definitions("-DSUPERNOVA_SOKOL")
 
-    if (MSVC)
-        add_compile_options(/bigobj)
-    else ()
-        add_compile_options(-Wa,-mbig-obj)
-    endif()
-
     if(GRAPHIC_BACKEND STREQUAL "glcore")
         add_definitions("-DSOKOL_GLCORE")
     elseif(GRAPHIC_BACKEND STREQUAL "d3d11")
