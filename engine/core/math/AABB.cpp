@@ -5,7 +5,7 @@
 
 using namespace Supernova;
 
-const AABB SUPERNOVA_API AABB::ZERO = AABB( 0, 0, 0, 0, 0, 0 );
+const AABB AABB::ZERO(0, 0, 0, 0, 0, 0);
 
 
 AABB::AABB()

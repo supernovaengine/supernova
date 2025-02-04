@@ -89,6 +89,7 @@ if(SUPERNOVA_SHARED)
     target_compile_definitions(supernova 
         PRIVATE 
         SUPERNOVA_EXPORTS
+        PUBLIC
         SUPERNOVA_SHARED
     )
 endif()
