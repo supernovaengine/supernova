@@ -80,7 +80,5 @@ endif()
 target_link_libraries(
     sokol
 
-    PUBLIC
-
     ${SOKOL_LINK_LIBRARIES}
 )
