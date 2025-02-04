@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct BoneComponent{
+    struct SUPERNOVA_API BoneComponent{
         Entity model = NULL_ENTITY;
 
         int index;

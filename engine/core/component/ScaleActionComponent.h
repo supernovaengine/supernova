@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct ScaleActionComponent{
+    struct SUPERNOVA_API ScaleActionComponent{
         Vector3 endScale;
         Vector3 startScale;
     };

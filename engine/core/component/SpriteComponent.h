@@ -22,7 +22,7 @@ namespace Supernova{
         BOTTOM_RIGHT
     };
 
-    struct SpriteComponent{
+    struct SUPERNOVA_API SpriteComponent{
         int width = 0;
         int height = 0;
 

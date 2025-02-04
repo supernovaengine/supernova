@@ -61,7 +61,7 @@ namespace Supernova{
 		Entity entity;
 	} check_load_t;
 
-	class RenderSystem : public SubSystem {
+	class SUPERNOVA_API RenderSystem : public SubSystem {
 	private:
 		struct TransparentMeshesData{
 			MeshComponent* mesh;

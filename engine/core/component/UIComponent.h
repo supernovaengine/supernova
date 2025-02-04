@@ -13,7 +13,7 @@
 
 namespace Supernova{
 
-    struct UIComponent{
+    struct SUPERNOVA_API UIComponent{
         // Render part
         bool loaded = false;
         bool loadCalled = false;

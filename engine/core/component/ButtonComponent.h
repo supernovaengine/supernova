@@ -10,7 +10,7 @@
 
 namespace Supernova{
 
-    struct ButtonComponent{
+    struct SUPERNOVA_API ButtonComponent{
         Entity label = NULL_ENTITY;
 
         Texture textureNormal;

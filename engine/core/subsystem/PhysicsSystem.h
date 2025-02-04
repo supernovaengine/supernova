@@ -29,7 +29,7 @@ namespace Supernova{
 	class JoltContactListener;
 	
 
-	class PhysicsSystem : public SubSystem {
+	class SUPERNOVA_API PhysicsSystem : public SubSystem {
 
 	private:
 		Vector3 gravity;

@@ -23,7 +23,7 @@ namespace Supernova{
         HEIGHTFIELD
     };
 
-    struct Shape3D{
+    struct SUPERNOVA_API Shape3D{
         JPH::ShapeRefC shape = NULL;
         Vector3 position = Vector3::ZERO;
         Quaternion rotation = Quaternion::IDENTITY;

@@ -16,7 +16,7 @@ namespace Supernova {
 	using ComponentId = unsigned char;
 
 
-	class ComponentManager {
+	class SUPERNOVA_API ComponentManager {
 	private:
 		std::unordered_map<std::string, ComponentId> componentTypeIds{};
 		std::unordered_map<std::string, std::shared_ptr<ComponentArrayBase>> componentArrays{};

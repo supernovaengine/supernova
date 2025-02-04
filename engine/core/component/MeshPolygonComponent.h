@@ -11,7 +11,7 @@
 
 namespace Supernova{
 
-    struct MeshPolygonComponent{
+    struct SUPERNOVA_API MeshPolygonComponent{
         int width = 0;
         int height = 0;
 

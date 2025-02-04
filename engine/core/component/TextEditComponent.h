@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct TextEditComponent{
+    struct SUPERNOVA_API TextEditComponent{
         Entity text = NULL_ENTITY;
         Entity cursor = NULL_ENTITY;
 

@@ -18,7 +18,7 @@ namespace Supernova{
         LEFT
     };
 
-    struct PanelComponent{
+    struct SUPERNOVA_API PanelComponent{
         Entity headerimage = NULL_ENTITY;
         Entity headercontainer = NULL_ENTITY;
         Entity headertext = NULL_ENTITY;

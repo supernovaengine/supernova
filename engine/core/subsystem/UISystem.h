@@ -22,7 +22,7 @@
 
 namespace Supernova{
 
-	class UISystem : public SubSystem {
+	class SUPERNOVA_API UISystem : public SubSystem {
 
     private:
 

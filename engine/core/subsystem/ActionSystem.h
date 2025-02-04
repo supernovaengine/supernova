@@ -32,7 +32,7 @@
 
 namespace Supernova{
 
-	class ActionSystem : public SubSystem {
+	class SUPERNOVA_API ActionSystem : public SubSystem {
 
     private:
 

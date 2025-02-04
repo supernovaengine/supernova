@@ -20,7 +20,7 @@ namespace Supernova{
         CHAIN // chain is a different type in Box2D 3.x
     };
 
-    struct Shape2D{
+    struct SUPERNOVA_API Shape2D{
         b2ShapeId shape = b2_nullShapeId;
         b2ChainId chain = b2_nullChainId;
 

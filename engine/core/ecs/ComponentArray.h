@@ -18,7 +18,7 @@
 
 namespace Supernova {
 
-	class ComponentArrayBase{
+	class SUPERNOVA_API ComponentArrayBase{
 	public:
 		virtual ~ComponentArrayBase() = default;
 		virtual void entityDestroyed(Entity entity) = 0;

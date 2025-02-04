@@ -12,7 +12,7 @@ namespace Supernova{
         Vector4 color;
     };
 
-    struct PolygonComponent{
+    struct SUPERNOVA_API PolygonComponent{
         std::vector<PolygonPoint> points;
 
         bool needUpdatePolygon = true;

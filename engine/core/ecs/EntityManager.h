@@ -18,7 +18,7 @@ namespace Supernova{
         Signature signature;
     };
 
-    class EntityManager {
+    class SUPERNOVA_API EntityManager {
     private:
         unsigned lastEntity = 0;
         std::map<Entity, EntityMetadata> metadata;

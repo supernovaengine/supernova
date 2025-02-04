@@ -169,7 +169,7 @@ namespace Supernova{
         float time = 0;
     };
 
-    struct ParticlesComponent{
+    struct SUPERNOVA_API ParticlesComponent{
         std::vector<ParticleData> particles;
 
         unsigned int maxParticles = 100;

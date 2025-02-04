@@ -7,7 +7,7 @@
 
 namespace Supernova{
 
-    struct ImageComponent{
+    struct SUPERNOVA_API ImageComponent{
         //Nine patch rect
         int patchMarginLeft = 0;
         int patchMarginRight = 0;

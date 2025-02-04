@@ -23,7 +23,7 @@ namespace Supernova{
         float height;
     };
 
-    struct TilemapComponent{
+    struct SUPERNOVA_API TilemapComponent{
         int width = 0;
         int height = 0;
 

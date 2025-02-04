@@ -33,7 +33,7 @@ namespace Supernova{
         FULL_LAYOUT
     };
 
-    struct UILayoutComponent{
+    struct SUPERNOVA_API UILayoutComponent{
         // UI part
         int width = 0;
         int height = 0;

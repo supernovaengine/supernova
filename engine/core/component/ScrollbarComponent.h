@@ -14,7 +14,7 @@ namespace Supernova{
         HORIZONTAL
     };
 
-    struct ScrollbarComponent{
+    struct SUPERNOVA_API ScrollbarComponent{
         Entity bar = NULL_ENTITY;
         ScrollbarType type = ScrollbarType::VERTICAL;
 

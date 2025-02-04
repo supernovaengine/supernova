@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct RotateTracksComponent{
+    struct SUPERNOVA_API RotateTracksComponent{
         std::vector<Quaternion> values;
     };
 

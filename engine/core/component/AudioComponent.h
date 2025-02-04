@@ -26,7 +26,7 @@ namespace Supernova{
         EXPONENTIAL_DISTANCE
     };
 
-    struct AudioComponent{
+    struct SUPERNOVA_API AudioComponent{
         SoLoud::Wav* sample = nullptr;
         unsigned int handle; //Soloud handle
 

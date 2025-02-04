@@ -15,7 +15,7 @@ namespace Supernova{
         Stopped
     };
 
-    struct ActionComponent{
+    struct SUPERNOVA_API ActionComponent{
         ActionState state = ActionState::Stopped;
         float timecount = 0;
 

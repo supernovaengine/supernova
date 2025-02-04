@@ -23,7 +23,7 @@
 
 namespace Supernova{
 
-    struct Submesh{
+    struct SUPERNOVA_API Submesh{
         Material material;
         std::map<AttributeType, Attribute> attributes;
 

@@ -24,7 +24,7 @@ namespace Supernova{
         Rect textureRect;
     };
 
-    struct InstancedMeshComponent{
+    struct SUPERNOVA_API InstancedMeshComponent{
         ExternalBuffer buffer;
 
         std::vector<InstanceData> instances;

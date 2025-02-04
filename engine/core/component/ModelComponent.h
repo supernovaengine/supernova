@@ -13,7 +13,7 @@ namespace tinygltf {class Model;}
 
 namespace Supernova{
 
-    struct ModelComponent{
+    struct SUPERNOVA_API ModelComponent{
         tinygltf::Model* gltfModel = NULL;
 
         Matrix4 inverseDerivedTransform;

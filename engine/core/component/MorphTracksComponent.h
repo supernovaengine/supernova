@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct MorphTracksComponent{
+    struct SUPERNOVA_API MorphTracksComponent{
         std::vector<std::vector<float>> values;
     };
 

@@ -12,7 +12,7 @@
 
 namespace Supernova{
 
-    struct Transform{
+    struct SUPERNOVA_API Transform{
         Vector3 position;
         Quaternion rotation;
         Vector3 scale = Vector3(1.0, 1.0, 1.0);

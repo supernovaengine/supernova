@@ -26,7 +26,7 @@ namespace Supernova{
         Rect textureRect;
     };
 
-    struct PointsComponent{
+    struct SUPERNOVA_API PointsComponent{
         bool loaded = false;
         bool loadCalled = false;
 

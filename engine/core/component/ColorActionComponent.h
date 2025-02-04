@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct ColorActionComponent{
+    struct SUPERNOVA_API ColorActionComponent{
         Vector3 endColor;
         Vector3 startColor;
 

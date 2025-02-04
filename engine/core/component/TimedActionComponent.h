@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct TimedActionComponent{
+    struct SUPERNOVA_API TimedActionComponent{
         float time = 0;
         float value = 0;
         

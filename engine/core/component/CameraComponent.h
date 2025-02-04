@@ -33,7 +33,7 @@ namespace Supernova{
         FRUSTUM_PLANE_BOTTOM = 5
     };
 
-    struct CameraComponent{
+    struct SUPERNOVA_API CameraComponent{
 
         CameraType type = CameraType::CAMERA_2D;
         

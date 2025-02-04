@@ -15,7 +15,7 @@ namespace Supernova{
 		EXPONENTIALSQUARED
     };
 
-    struct FogComponent{
+    struct SUPERNOVA_API FogComponent{
         FogType type = FogType::LINEAR;
 		Vector3 color = Color::sRGBToLinear(Vector3(0.8, 0.8, 0.8)); // linear color
 		float density = 0.01; // for exponential fog

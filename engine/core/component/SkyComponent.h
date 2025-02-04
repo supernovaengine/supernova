@@ -10,7 +10,7 @@
 
 namespace Supernova{
 
-    struct SkyComponent{
+    struct SUPERNOVA_API SkyComponent{
         bool loaded = false;
         bool loadCalled = false;
 

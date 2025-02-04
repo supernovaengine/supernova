@@ -29,7 +29,7 @@ namespace Supernova{
         }
     };
 
-    struct LinesComponent{
+    struct SUPERNOVA_API LinesComponent{
         bool loaded = false;
         bool loadCalled = false;
 

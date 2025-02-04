@@ -15,7 +15,7 @@ namespace SoLoud{
 
 namespace Supernova{
 
-	class AudioSystem : public SubSystem {
+	class SUPERNOVA_API AudioSystem : public SubSystem {
 
     private:
         static SoLoud::Soloud& getSoloud();

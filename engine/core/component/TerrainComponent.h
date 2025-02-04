@@ -32,7 +32,7 @@ namespace Supernova{
         float visible = false;
     };
 
-    struct TerrainComponent{
+    struct SUPERNOVA_API TerrainComponent{
         // 0 for fullRes and 1 for halfRes
         InterleavedBuffer nodesbuffer[2];
 

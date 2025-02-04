@@ -29,7 +29,7 @@ namespace Supernova{
         Vector2 nearFar = Vector2(0.0, 0.0);
     };
 
-    struct LightComponent{
+    struct SUPERNOVA_API LightComponent{
         LightType type = LightType::DIRECTIONAL;
 
         Vector3 direction;

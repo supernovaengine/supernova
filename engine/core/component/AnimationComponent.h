@@ -15,7 +15,7 @@ namespace Supernova{
         Entity action = NULL_ENTITY;
     };
 
-    struct AnimationComponent{
+    struct SUPERNOVA_API AnimationComponent{
         std::vector<ActionFrame> actions;
         bool ownedActions = false;
         bool loop = false;

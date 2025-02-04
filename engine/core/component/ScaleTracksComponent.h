@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct ScaleTracksComponent{
+    struct SUPERNOVA_API ScaleTracksComponent{
         std::vector<Vector3> values;
     };
 

@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct RotationActionComponent{
+    struct SUPERNOVA_API RotationActionComponent{
         Quaternion endRotation;
         Quaternion startRotation;
 

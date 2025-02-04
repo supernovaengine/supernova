@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct SpriteAnimationComponent{
+    struct SUPERNOVA_API SpriteAnimationComponent{
         std::string name;
 
         bool loop = true;

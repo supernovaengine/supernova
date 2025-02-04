@@ -21,7 +21,7 @@ namespace Supernova{
         MOTOR
     };
 
-    struct Joint2DComponent{
+    struct SUPERNOVA_API Joint2DComponent{
         b2JointId joint;
         Joint2DType type = Joint2DType::DISTANCE;
     };

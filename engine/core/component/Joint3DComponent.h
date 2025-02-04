@@ -25,7 +25,7 @@ namespace Supernova{
         PULLEY
     };
 
-    struct Joint3DComponent{
+    struct SUPERNOVA_API Joint3DComponent{
         JPH::TwoBodyConstraint* joint = NULL;
         Joint3DType type = Joint3DType::FIXED;
     };

@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct TranslateTracksComponent{
+    struct SUPERNOVA_API TranslateTracksComponent{
         std::vector<Vector3> values;
     };
 

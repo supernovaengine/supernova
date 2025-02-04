@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct PositionActionComponent{
+    struct SUPERNOVA_API PositionActionComponent{
         Vector3 endPosition;
         Vector3 startPosition;
     };

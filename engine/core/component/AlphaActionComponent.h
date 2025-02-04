@@ -7,7 +7,7 @@
 
 namespace Supernova{
 
-    struct AlphaActionComponent{
+    struct SUPERNOVA_API AlphaActionComponent{
         float endAlpha;
         float startAlpha;
     };

@@ -12,7 +12,7 @@ namespace Supernova{
 
     class STBText;
 
-    struct TextComponent{
+    struct SUPERNOVA_API TextComponent{
         bool loaded = false;
 
         std::string font = "";

@@ -24,7 +24,7 @@ namespace Supernova{
         bool expand = true;
     };
 
-    struct UIContainerComponent{
+    struct SUPERNOVA_API UIContainerComponent{
         ContainerType type = ContainerType::VERTICAL;
 
         ContainerBox boxes[MAX_CONTAINER_BOXES];

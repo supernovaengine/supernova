@@ -9,6 +9,7 @@
 #include "SubSystem.h"
 #include "EntityManager.h"
 #include "ComponentManager.h"
+#include "Export.h"
 #include <vector>
 #include <unordered_map>
 
@@ -61,7 +62,7 @@ namespace Supernova{
 
 	class Camera;
 
-	class Scene{
+	class SUPERNOVA_API Scene{
 	private:
 
 		Entity camera;
@@ -78,7 +79,7 @@ namespace Supernova{
 
 	    EntityManager entityManager;
 	    ComponentManager componentManager;
-		std::vector<std::pair<const char*, std::shared_ptr<SubSystem>>> systems;
+		std::vector<std::pair<std::string, std::shared_ptr<SubSystem>>> systems;
 
 		Entity createDefaultCamera();
 		void sortComponentsByTransform(Signature entitySignature);

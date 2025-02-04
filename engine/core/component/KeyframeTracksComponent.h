@@ -9,7 +9,7 @@
 
 namespace Supernova{
 
-    struct KeyframeTracksComponent{
+    struct SUPERNOVA_API KeyframeTracksComponent{
         std::vector<float> times;
         int index = 0;
         float interpolation = 0;
