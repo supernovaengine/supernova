@@ -44,6 +44,7 @@ namespace Supernova {
         System() {}
 
     public:
+        static System* external;
         
         std::vector<std::string> args;
 

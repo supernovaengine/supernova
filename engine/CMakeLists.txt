@@ -38,6 +38,7 @@ add_subdirectory(libs/joltphysics)
 if (WIN32)
     if (MSVC)
         add_compile_options(/bigobj)
+        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     else()
         add_compile_options(-Wa,-mbig-obj)
     endif()
@@ -90,6 +91,7 @@ set_target_properties(
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     CXX_STANDARD 17
+    CXX_STANDARD_REQUIRED ON
 )
 
 if(SUPERNOVA_SHARED)

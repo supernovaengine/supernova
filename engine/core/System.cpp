@@ -10,6 +10,8 @@
 
 using namespace Supernova;
 
+System* System::external = nullptr;
+
 #define USERSETTINGS_ROOT "userSettings"
 #define USERSETTINGS_XML_FILE "data://UserSettings.xml"
 
@@ -51,7 +53,7 @@ System& System::instance(){
 #elif defined(SUPERNOVA_EDITOR)
     static System* instance = new Editor::Platform();
 #else
-    static System* instance = nullptr;
+    static System* instance = external;
 #endif
 
     return *instance;
