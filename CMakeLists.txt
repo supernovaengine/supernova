@@ -226,8 +226,13 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
         list(APPEND PLATFORM_LIBS
             -static -static-libgcc -static-libstdc++
         )
-    else()
-        set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    endif()
+    if(MSVC)
+        if(SUPERNOVA_SHARED)
+            set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
+        else()
+            set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+        endif()
     endif()
 endif()
 
