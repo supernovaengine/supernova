@@ -27,11 +27,11 @@ namespace Supernova{
         uint32_t id;
         size_t offset;
 
-        bool const operator==(const BufferInfo &o) const {
-        return id == o.id && offset == o.offset;
+        bool operator==(const BufferInfo &o) const {
+            return id == o.id && offset == o.offset;
         }
 
-        bool const operator<(const BufferInfo &o) const {
+        bool operator<(const BufferInfo &o) const {
             return id < o.id || (id == o.id && offset < o.offset);
         }
     };
