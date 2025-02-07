@@ -33,9 +33,6 @@ System* System::external = nullptr;
 #ifdef SUPERNOVA_APPLE
 #include "SupernovaApple.h"
 #endif
-#ifdef SUPERNOVA_EDITOR
-#include "editor/Platform.h"
-#endif
 
 System& System::instance(){
 #ifdef SUPERNOVA_ANDROID
@@ -50,13 +47,15 @@ System& System::instance(){
     static System* instance = new SupernovaGLFW();
 #elif defined(SUPERNOVA_APPLE)
     static System* instance = new SupernovaApple();
-#elif defined(SUPERNOVA_EDITOR)
-    static System* instance = new Editor::Platform();
 #else
     static System* instance = external;
 #endif
 
     return *instance;
+}
+
+void System::setExternalSystem(System* system){
+    external = system;
 }
 
 sg_environment System::getSokolEnvironment(){

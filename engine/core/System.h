@@ -39,18 +39,22 @@ namespace Supernova {
     };
 
     class SUPERNOVA_API System {
+    private:
+
+        static System* external;
+
     protected:
 
         System() {}
 
     public:
-        static System* external;
-        
         std::vector<std::string> args;
 
         static System& instance();
 
         virtual ~System() {}
+
+        static void setExternalSystem(System* system);
 
         // *******
         // Used for user and Lua
