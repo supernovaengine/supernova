@@ -40,8 +40,8 @@ namespace Supernova{
         float range = 0.0;
         float intensity = 1.0;
 
-        float innerConeCos = 0.766044438; // cos(Angle::defaultToRad(80 / 2));
-        float outerConeCos = 0.642787635; // cos(Angle::defaultToRad(100 / 2));
+        float innerConeCos = 0.766044438f; // cos(Angle::defaultToRad(80 / 2));
+        float outerConeCos = 0.642787635f; // cos(Angle::defaultToRad(100 / 2));
 
         bool shadows = false;
         float shadowBias = 0.001f;

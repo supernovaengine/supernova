@@ -62,11 +62,11 @@ namespace Supernova {
 
         static inline float easeInOutQuad(float time){
             if ((time *= 2) < 1) {
-                return 0.5 * time * time;
+                return 0.5f * time * time;
             }
 
             time--;
-            return - 0.5 * (time * (time - 2) - 1);
+            return - 0.5f * (time * (time - 2) - 1);
         }
 
         static inline float easeInCubic(float time){
@@ -80,10 +80,10 @@ namespace Supernova {
 
         static inline float easeInOutCubic(float time){
             if ((time *= 2) < 1) {
-                return 0.5 * time * time * time;
+                return 0.5f * time * time * time;
             }
             time -= 2;
-            return 0.5 * (time * time * time + 2);
+            return 0.5f * (time * time * time + 2);
         }
 
         static inline float easeInQuart(float time){
@@ -97,10 +97,10 @@ namespace Supernova {
 
         static inline float easeInOutQuart(float time){
             if ((time *= 2) < 1) {
-                return 0.5 * time * time * time * time;
+                return 0.5f * time * time * time * time;
             }
             time -= 2;
-            return - 0.5 * (time * time * time * time - 2);
+            return - 0.5f * (time * time * time * time - 2);
         }
 
         static inline float easeInQuint(float time){
@@ -114,31 +114,31 @@ namespace Supernova {
 
         static inline float easeInOutQuint(float time){
             if ((time *= 2) < 1) {
-                return 0.5 * time * time * time * time * time;
+                return 0.5f * time * time * time * time * time;
             }
 
             time -= 2;
-            return 0.5 * (time * time * time * time * time + 2);
+            return 0.5f * (time * time * time * time * time + 2);
         }
 
         static inline float easeInSine(float time){
-            return 1 - cos(time * M_PI / 2);
+            return 1 - (float)cos(time * M_PI / 2);
         }
 
         static inline float easeOutSine(float time){
-            return sin(time * M_PI / 2);
+            return (float)sin(time * M_PI / 2);
         }
 
         static inline float easeInOutSine(float time){
-            return 0.5 * (1 - cos(M_PI * time));
+            return 0.5f * (1 - (float)cos(M_PI * time));
         }
 
         static inline float easeInExpo(float time){
-            return time == 0 ? 0 : pow(1024, time - 1);
+            return time == 0 ? 0 : (float)pow(1024, time - 1);
         }
 
         static inline float easeOutExpo(float time){
-            return time == 1 ? 1 : 1 - pow(2, - 10 * time);
+            return time == 1 ? 1 : 1 - (float)pow(2, - 10 * time);
         }
 
         static inline float easeInOutExpo(float time){
@@ -151,10 +151,10 @@ namespace Supernova {
             }
 
             if ((time *= 2) < 1) {
-                return 0.5 * pow(1024, time - 1);
+                return 0.5f * (float)pow(1024, time - 1);
             }
 
-            return 0.5 * (- pow(2, - 10 * (time - 1)) + 2);
+            return 0.5f * (- (float)pow(2, - 10 * (time - 1)) + 2);
         }
 
         static inline float easeInCirc(float time){
@@ -168,11 +168,11 @@ namespace Supernova {
 
         static inline float easeInOutCirc(float time){
             if ((time *= 2) < 1) {
-                return - 0.5 * (sqrt(1 - time * time) - 1);
+                return - 0.5f * (sqrt(1 - time * time) - 1);
             }
 
             time -= 2;
-            return 0.5 * (sqrt(1 - time * time) + 1);
+            return 0.5f * (sqrt(1 - time * time) + 1);
         }
 
         static inline float easeInElastic(float time){
@@ -184,7 +184,7 @@ namespace Supernova {
                 return 1;
             }
 
-            return -pow(2, 10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI);
+            return -(float)pow(2, 10 * (time - 1)) * (float)sin((time - 1.1) * 5 * M_PI);
         }
 
         static inline float easeOutElastic(float time){
@@ -196,7 +196,7 @@ namespace Supernova {
                 return 1;
             }
 
-            return pow(2, -10 * time) * sin((time - 0.1) * 5 * M_PI) + 1;
+            return (float)pow(2, -10 * time) * (float)sin((time - 0.1f) * 5 * M_PI) + 1;
         }
 
         static inline float easeInOutElastic(float time){
@@ -211,48 +211,48 @@ namespace Supernova {
             time *= 2;
 
             if (time < 1) {
-                return -0.5 * pow(2, 10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI);
+                return -0.5f * (float)pow(2, 10 * (time - 1)) * (float)sin((time - 1.1f) * 5 * M_PI);
             }
 
-            return 0.5 * pow(2, -10 * (time - 1)) * sin((time - 1.1) * 5 * M_PI) + 1;
+            return 0.5f * (float)pow(2, -10 * (time - 1)) * (float)sin((time - 1.1f) * 5 * M_PI) + 1;
         }
 
         static inline float easeInBack(float time){
-            float s = 1.70158;
+            float s = 1.70158f;
 
             return time * time * ((s + 1) * time - s);
         }
 
         static inline float easeOutBack(float time){
-            float s = 1.70158;
+            float s = 1.70158f;
 
             time--;
             return time * time * ((s + 1) * time + s) + 1;
         }
 
         static inline float easeInOutBack(float time){
-            float s = 1.70158 * 1.525;
+            float s = 1.70158f * 1.525f;
 
             if ((time *= 2) < 1) {
-                return 0.5 * (time * time * ((s + 1) * time - s));
+                return 0.5f * (time * time * ((s + 1) * time - s));
             }
 
             time -= 2;
-            return 0.5 * (time * time * ((s + 1) * time + s) + 2);
+            return 0.5f * (time * time * ((s + 1) * time + s) + 2);
         }
 
         static inline float easeOutBounce(float time){
-            if (time < (1 / 2.75)) {
-                return 7.5625 * time * time;
-            } else if (time < (2 / 2.75)) {
-                time -= (1.5 / 2.75);
-                return 7.5625 * time * time + 0.75;
-            } else if (time < (2.5 / 2.75)) {
-                time -= (2.25 / 2.75);
-                return 7.5625 * time * time + 0.9375;
+            if (time < (1 / 2.75f)) {
+                return 7.5625f * time * time;
+            } else if (time < (2 / 2.75f)) {
+                time -= (1.5f / 2.75f);
+                return 7.5625f * time * time + 0.75f;
+            } else if (time < (2.5f / 2.75f)) {
+                time -= (2.25f / 2.75f);
+                return 7.5625f * time * time + 0.9375f;
             } else {
-                time -= (2.625 / 2.75);
-                return 7.5625 * time * time + 0.984375;
+                time -= (2.625f / 2.75f);
+                return 7.5625f * time * time + 0.984375f;
             }
         }
 
@@ -261,11 +261,11 @@ namespace Supernova {
         }
 
         static inline float easeInOutBounce(float time){
-            if (time < 0.5) {
-                return easeInBounce(time * 2) * 0.5;
+            if (time < 0.5f) {
+                return easeInBounce(time * 2) * 0.5f;
             }
 
-            return easeOutBounce(time * 2 - 1) * 0.5 + 0.5;
+            return easeOutBounce(time * 2 - 1) * 0.5f + 0.5f;
         }
 
         static inline std::function<float(float)> getFunction(EaseType functionType){

@@ -12,14 +12,14 @@ namespace Supernova{
 
     struct SUPERNOVA_API Material{
         // --- start shader part
-        Vector4 baseColorFactor = Vector4(1.0, 1.0, 1.0, 1.0);  // linear color
-        float metallicFactor = 1.0;
-        float roughnessFactor = 1.0;
+        Vector4 baseColorFactor = Vector4(1.0f, 1.0f, 1.0f, 1.0f);  // linear color
+        float metallicFactor = 1.0f;
+        float roughnessFactor = 1.0f;
         uint8_t _pad_24[8];
-        Vector3 emissiveFactor = Vector3(0.0, 0.0, 0.0);  // linear color
+        Vector3 emissiveFactor = Vector3(0.0f, 0.0f, 0.0f);  // linear color
         uint8_t _pad_44[4];
-        Vector3 ambientLight = Vector3(1.0, 1.0, 1.0);  // linear color
-        float ambientIntensity = 0.1;
+        Vector3 ambientLight = Vector3(1.0f, 1.0f, 1.0f);  // linear color
+        float ambientIntensity = 0.1f;
         // --- end shader part
 
         Texture baseColorTexture;

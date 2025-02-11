@@ -13,9 +13,9 @@ namespace Supernova{
         Entity text = NULL_ENTITY;
         Entity cursor = NULL_ENTITY;
 
-        float cursorBlink = 0.6;
+        float cursorBlink = 0.6f;
         float cursorWidth = 2;
-        Vector4 cursorColor = Vector4(0.0, 0.0, 0.0, 1.0); //linear
+        Vector4 cursorColor = Vector4(0.0f, 0.0f, 0.0f, 1.0f); //linear
 
         float cursorBlinkTimer = 0;
         bool disabled = false;
