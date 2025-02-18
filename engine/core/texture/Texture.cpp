@@ -374,7 +374,7 @@ std::string Texture::getId() const{
     return id;
 }
 
-int Texture::getWidth(){
+int Texture::getWidth() const{
     if (this->framebuffer){
         return framebuffer->getWidth();
     }
@@ -384,7 +384,7 @@ int Texture::getWidth(){
     return getData().getOriginalWidth();
 }
 
-int Texture::getHeight(){
+int Texture::getHeight() const{
     if (this->framebuffer){
         return framebuffer->getHeight();
     }
@@ -394,7 +394,7 @@ int Texture::getHeight(){
     return getData().getOriginalHeight();
 }
 
-bool Texture::isTransparent(){
+bool Texture::isTransparent() const{
     if (!data){
         return false;
     }
@@ -415,21 +415,21 @@ void Texture::releaseData(){
     }
 }
 
-bool Texture::empty(){
+bool Texture::empty() const{
     if (!needLoad && !render)
         return true;
 
     return false;
 }
 
-bool Texture::isFramebuffer(){
+bool Texture::isFramebuffer() const{
     if (framebuffer)
         return true;
 
     return false;
 }
 
-bool Texture::isFramebufferOutdated(){
+bool Texture::isFramebufferOutdated() const{
     if (framebuffer){
         return (lastFramebufferVersion != framebuffer->getVersion());
     }

@@ -72,18 +72,18 @@ namespace Supernova{
             TextureData& getData(size_t index = 0) const;
             std::string getId() const;
 
-            int getWidth();
-            int getHeight();
-            bool isTransparent();
+            int getWidth() const;
+            int getHeight() const;
+            bool isTransparent() const;
 
             void setReleaseDataAfterLoad(bool releaseDataAfterLoad);
             bool isReleaseDataAfterLoad() const;
 
             void releaseData();
 
-            bool empty();
-            bool isFramebuffer();
-            bool isFramebufferOutdated();
+            bool empty() const;
+            bool isFramebuffer() const;
+            bool isFramebufferOutdated() const;
 
             void setMinFilter(TextureFilter filter);
             TextureFilter getMinFilter() const;
