@@ -41,23 +41,23 @@ namespace Supernova {
 		}
 
 		template<typename T>
-		ComponentId getComponentId() {
+		ComponentId getComponentId() const{
 			const char* typeName = typeid(T).name();
 
 			if (componentTypeIds.find(typeName) == componentTypeIds.end())
 				Log::error("Component not registered before use");
 
-			return componentTypeIds[typeName];
+			return componentTypeIds.at(typeName);
 		}
 
 		template<typename T>
-		std::shared_ptr<ComponentArray<T>> getComponentArray() {
+		std::shared_ptr<ComponentArray<T>> getComponentArray() const {
 			const char* typeName = typeid(T).name();
 
 			if (componentTypeIds.find(typeName) == componentTypeIds.end())
 				Log::error("Component not registered before use");
 
-			return std::static_pointer_cast<ComponentArray<T>>(componentArrays[typeName]);
+			return std::static_pointer_cast<ComponentArray<T>>(componentArrays.at(typeName));
 		}
 
 		template<typename T>
@@ -71,22 +71,22 @@ namespace Supernova {
 		}
 
 		template<typename T>
-		T* findComponent(Entity entity) {
+		T* findComponent(Entity entity) const {
 			return getComponentArray<T>()->findComponent(entity);
 		}
 
 		template<typename T>
-		T& getComponent(Entity entity) {
+		T& getComponent(Entity entity) const {
 			return getComponentArray<T>()->getComponent(entity);
 		}
 
 		template<typename T>
-	    T* findComponentFromIndex(size_t index) {
+	    T* findComponentFromIndex(size_t index) const{
 		    return getComponentArray<T>()->findComponentFromIndex(index);
 	    }
 
 		template<typename T>
-	    T& getComponentFromIndex(size_t index) {
+	    T& getComponentFromIndex(size_t index) const {
 		    return getComponentArray<T>()->getComponentFromIndex(index);
 	    }
 

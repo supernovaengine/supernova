@@ -177,7 +177,7 @@ namespace Supernova{
 	    }
 	
 	    template<typename T>
-	    T& getComponent(Entity entity) {
+	    T& getComponent(Entity entity) const {
 		    return componentManager.getComponent<T>(entity);
 	    }
 
@@ -192,7 +192,7 @@ namespace Supernova{
 	    }
 
 	    template<typename T>
-	    ComponentId getComponentId(){
+	    ComponentId getComponentId() const{
 		    return componentManager.getComponentId<T>();
 	    }
 
