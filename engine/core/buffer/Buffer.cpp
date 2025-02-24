@@ -84,6 +84,11 @@ void Buffer::clear(){
     count = 0;
 }
 
+void Buffer::importData(void* data, size_t size){
+    increase(size);
+    memcpy(this->data, data, size);
+}
+
 BufferRender* Buffer::getRender(){
     return &render;
 }
@@ -373,6 +378,10 @@ void Buffer::setStride(unsigned int stride){
 
 unsigned int Buffer::getStride() const{
     return stride;
+}
+
+void Buffer::setCount(unsigned int count){
+    this->count = count;
 }
 
 unsigned int Buffer::getCount() const{

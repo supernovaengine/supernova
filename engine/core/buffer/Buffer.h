@@ -45,6 +45,8 @@ namespace Supernova {
         virtual bool increase(size_t newSize);
         virtual void clear();
 
+        void importData(void* data, size_t size);
+
         void clearAll();
 
         void addAttribute(AttributeType attribute, AttributeDataType dataType, unsigned int elements, size_t offset);
@@ -100,6 +102,7 @@ namespace Supernova {
         void setStride(unsigned int stride);
         unsigned int getStride() const;
 
+        void setCount(unsigned int count);
         unsigned int getCount() const;
 
         void setType(BufferType type);
