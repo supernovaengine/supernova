@@ -133,7 +133,7 @@ Attribute* Buffer::getAttribute(AttributeType attribute){
     return NULL;
 }
 
-std::map<AttributeType, Attribute> Buffer::getAttributes(){
+std::map<AttributeType, Attribute> Buffer::getAttributes() const{
     return attributes;
 }
 
@@ -357,11 +357,11 @@ Vector4 Buffer::getVector4(Attribute* attribute, unsigned int index){
     return ret;
 }
 
-unsigned char* Buffer::getData(){
+unsigned char* Buffer::getData() const{
     return &data[0];
 }
 
-size_t Buffer::getSize(){
+size_t Buffer::getSize() const{
     return size;
 }
 
@@ -369,11 +369,11 @@ void Buffer::setStride(unsigned int stride){
     this->stride = stride;
 }
 
-unsigned int Buffer::getStride(){
+unsigned int Buffer::getStride() const{
     return stride;
 }
 
-unsigned int Buffer::getCount(){
+unsigned int Buffer::getCount() const{
     return count;
 }
 
@@ -381,7 +381,7 @@ void Buffer::setType(BufferType type){
     this->type = type;
 }
 
-BufferType Buffer::getType(){
+BufferType Buffer::getType() const{
     return type;
 }
 
@@ -389,7 +389,7 @@ void Buffer::setUsage(BufferUsage usage){
     this->usage = usage;
 }
 
-BufferUsage Buffer::getUsage(){
+BufferUsage Buffer::getUsage() const{
     return usage;
 }
 

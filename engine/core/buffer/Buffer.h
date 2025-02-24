@@ -55,7 +55,7 @@ namespace Supernova {
         BufferRender* getRender();
 
         Attribute* getAttribute(AttributeType attribute);
-        std::map<AttributeType, Attribute> getAttributes();
+        std::map<AttributeType, Attribute> getAttributes() const;
 
         void addUInt16(AttributeType attribute, uint16_t value);
         void addUInt32(AttributeType attribute, uint32_t value);
@@ -94,19 +94,19 @@ namespace Supernova {
         Vector3 getVector3(Attribute* attribute, unsigned int index);
         Vector4 getVector4(Attribute* attribute, unsigned int index);
 
-        unsigned char* getData();
-        size_t getSize();
+        unsigned char* getData() const;
+        size_t getSize() const;
 
         void setStride(unsigned int stride);
-        unsigned int getStride();
+        unsigned int getStride() const;
 
-        unsigned int getCount();
+        unsigned int getCount() const;
 
         void setType(BufferType type);
-        BufferType getType();
+        BufferType getType() const;
 
         void setUsage(BufferUsage usage);
-        BufferUsage getUsage();
+        BufferUsage getUsage() const;
 
         bool isRenderAttributes() const;
         void setRenderAttributes(bool renderAttributes);

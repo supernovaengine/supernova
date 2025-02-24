@@ -757,15 +757,15 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
     	}
 
 		for (auto const& attr : mesh.submeshes[i].attributes){
-			if (bufferNameToRender.count(attr.second.getBuffer())){
+			if (bufferNameToRender.count(attr.second.getBufferName())){
 				if (attr.first == AttributeType::INDEX){
 					indexCount = attr.second.getCount();
-					render.addIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
+					render.addIndex(bufferNameToRender[attr.second.getBufferName()], attr.second.getDataType(), attr.second.getOffset());
 				}else{
-					render.addAttribute(shaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+					render.addAttribute(shaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBufferName()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBufferName()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 				}
 			}else{
-				Log::error("Cannot load submesh attribute from buffer name: %s", attr.second.getBuffer().c_str());
+				Log::error("Cannot load submesh attribute from buffer name: %s", attr.second.getBufferName().c_str());
 			}
 		}
 
@@ -849,15 +849,15 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
     		}
 
 			for (auto const& attr : mesh.submeshes[i].attributes){
-				if (bufferNameToRender.count(attr.second.getBuffer())){
+				if (bufferNameToRender.count(attr.second.getBufferName())){
 					if (attr.first == AttributeType::INDEX){
-						depthRender.addIndex(bufferNameToRender[attr.second.getBuffer()], attr.second.getDataType(), attr.second.getOffset());
+						depthRender.addIndex(bufferNameToRender[attr.second.getBufferName()], attr.second.getDataType(), attr.second.getOffset());
 					}else if (attr.first == AttributeType::POSITION){
-						depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+						depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBufferName()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBufferName()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 					}
 					if (mesh.submeshes[i].hasSkinning){
 						if (attr.first == AttributeType::BONEIDS || attr.first == AttributeType::BONEWEIGHTS){
-							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBufferName()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBufferName()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 						}
 					}
 					if (mesh.submeshes[i].hasMorphTarget){
@@ -868,11 +868,11 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 							attr.first == AttributeType::MORPHNORMAL0 || attr.first == AttributeType::MORPHNORMAL1 ||
 							attr.first == AttributeType::MORPHNORMAL2 || attr.first == AttributeType::MORPHNORMAL3 ||
 							attr.first == AttributeType::MORPHTANGENT0 || attr.first == AttributeType::MORPHTANGENT1){
-							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBuffer()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBuffer()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+							depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBufferName()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBufferName()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 						}
 					}
 				}else{
-					Log::error("Cannot load (depth) submesh attribute from buffer name: %s", attr.second.getBuffer().c_str());
+					Log::error("Cannot load (depth) submesh attribute from buffer name: %s", attr.second.getBufferName().c_str());
 				}
 			}
 

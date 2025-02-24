@@ -18,7 +18,7 @@ namespace Supernova {
 
     private:
         AttributeDataType dataType;
-        std::string buffer;
+        std::string bufferName;
         unsigned int elements;
         size_t offset;
         unsigned int count;
@@ -37,8 +37,8 @@ namespace Supernova {
         AttributeDataType getDataType() const;
         void setDataType(AttributeDataType dataType);
 
-        const std::string &getBuffer() const;
-        void setBuffer(const std::string &buffer);
+        const std::string &getBufferName() const;
+        void setBufferName(const std::string &bufferName);
 
         unsigned int getElements() const;
         void setElements(unsigned int elements);

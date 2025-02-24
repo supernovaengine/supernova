@@ -18,7 +18,7 @@ namespace Supernova {
         static bool is_base64(unsigned char c);
 
     public:
-        static std::string encode(const unsigned char* buf, unsigned int bufLen);
+        static std::string encode(const unsigned char* buf, size_t bufLen);
         static std::vector<unsigned char> decode(std::string const& encoded_string);
     };
 }

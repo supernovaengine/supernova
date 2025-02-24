@@ -8,7 +8,7 @@ using namespace Supernova;
 
 Attribute::Attribute(){
     setDataType(AttributeDataType::FLOAT);
-    setBuffer("");
+    setBufferName("");
     setElements(0);
     setOffset(0);
     setCount(0);
@@ -18,7 +18,7 @@ Attribute::Attribute(){
 
 Attribute::Attribute(AttributeDataType dataType, const std::string& bufferName, unsigned int elements, size_t offset, bool normalized, bool perInstance){
     setDataType(dataType);
-    setBuffer(bufferName);
+    setBufferName(bufferName);
     setElements(elements);
     setOffset(offset);
     setCount(0);
@@ -32,7 +32,7 @@ Attribute::~Attribute(){
 
 Attribute::Attribute(const Attribute& a){
     this->dataType = a.dataType;
-    this->buffer = a.buffer;
+    this->bufferName = a.bufferName;
     this->elements = a.elements;
     this->offset = a.offset;
     this->count = a.count;
@@ -42,7 +42,7 @@ Attribute::Attribute(const Attribute& a){
 
 Attribute& Attribute::operator = (const Attribute& a){
     this->dataType = a.dataType;
-    this->buffer = a.buffer;
+    this->bufferName = a.bufferName;
     this->elements = a.elements;
     this->offset = a.offset;
     this->count = a.count;
@@ -60,12 +60,12 @@ void Attribute::setDataType(AttributeDataType dataType) {
     Attribute::dataType = dataType;
 }
 
-const std::string &Attribute::getBuffer() const{
-    return buffer;
+const std::string &Attribute::getBufferName() const{
+    return bufferName;
 }
 
-void Attribute::setBuffer(const std::string &buffer){
-    this->buffer = buffer;
+void Attribute::setBufferName(const std::string &bufferName){
+    this->bufferName = bufferName;
 }
 
 unsigned int Attribute::getElements() const{

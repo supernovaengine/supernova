@@ -486,7 +486,7 @@ bool MeshSystem::getFileSizeInBytes(size_t *filesize_out, std::string *err, cons
 void MeshSystem::addSubmeshAttribute(Submesh& submesh, const std::string& bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized){
     Attribute attData;
 
-    attData.setBuffer(bufferName);
+    attData.setBufferName(bufferName);
     attData.setDataType(dataType);
     attData.setElements(elements);
     attData.setCount(size);
@@ -760,7 +760,7 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
     for (size_t i = 0; i < mesh.numSubmeshes; i++) {
         for (auto const& attr : mesh.submeshes[i].attributes){
             if (attr.first == AttributeType::POSITION){
-                vertexBuffer = buffers[attr.second.getBuffer()];
+                vertexBuffer = buffers[attr.second.getBufferName()];
                 vertexAttr = attr.second;
             }
         }

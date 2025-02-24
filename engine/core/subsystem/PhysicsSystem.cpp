@@ -588,7 +588,7 @@ int PhysicsSystem::createConvexHullShape3D(Entity entity, MeshComponent& mesh, T
             for (size_t i = 0; i < mesh.numSubmeshes; i++) {
                 for (auto const& attr : mesh.submeshes[i].attributes){
                     if (attr.first == AttributeType::POSITION){
-                        vertexBuffer = buffers[attr.second.getBuffer()];
+                        vertexBuffer = buffers[attr.second.getBufferName()];
                         vertexAttr = attr.second;
                     }
                 }
@@ -693,11 +693,11 @@ int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh, Transfo
             for (size_t i = 0; i < mesh.numSubmeshes; i++) {
                 for (auto const& attr : mesh.submeshes[i].attributes){
                     if (attr.first == AttributeType::INDEX){
-                        indexBuffer = buffers[attr.second.getBuffer()];
+                        indexBuffer = buffers[attr.second.getBufferName()];
                         indexAttr = attr.second;
                     }
                     if (attr.first == AttributeType::POSITION){
-                        vertexBuffer = buffers[attr.second.getBuffer()];
+                        vertexBuffer = buffers[attr.second.getBufferName()];
                         vertexAttr = attr.second;
                     }
                 }
