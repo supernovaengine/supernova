@@ -40,18 +40,19 @@ InterleavedBuffer& InterleavedBuffer::operator=(const InterleavedBuffer& rhs){
     return *this;
 }
 
-bool InterleavedBuffer::resize(size_t pos) {
-    Buffer::resize(pos);
-
-    if (pos >= vectorBuffer.size()) {
-        vectorBuffer.resize(pos);
-
-        if (vectorBuffer.size() > 0)
-            data = &vectorBuffer[0];
-        size = vectorBuffer.size();
+bool InterleavedBuffer::increase(size_t newSize) {
+    if (newSize >= vectorBuffer.size()) {
+        try {
+            vectorBuffer.resize(newSize);
+            data = vectorBuffer.empty() ? nullptr : &vectorBuffer[0];
+            return Buffer::increase(newSize);
+        }
+        catch (const std::bad_alloc& e) {
+            Log::error("Failed to increase buffer: out of memory");
+            return false;
+        }
     }
-
-    return true;
+    return false;
 }
 
 void InterleavedBuffer::clearAll(){

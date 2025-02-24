@@ -60,12 +60,14 @@ Buffer& Buffer::operator=(const Buffer& rhs){
     return *this;
 }
 
-bool Buffer::resize(size_t pos){
-    if (pos >= size) {
-        return false;
+bool Buffer::increase(size_t newSize){
+    if (newSize >= size) {
+        size = newSize;
+
+        return true;
     }
 
-    return true;
+    return false;
 }
 
 void Buffer::clearAll(){
@@ -229,15 +231,15 @@ void Buffer::setValues(unsigned int index, Attribute* attribute, unsigned int nu
 
         unsigned pos = (index * stride) + attribute->offset;
 
-        if (resize(pos + (numValues * typesize))) {
-            for (int i = 0; i < numValues; i++) {
-                memcpy(&data[pos], &vector[i*typesize], typesize);
-                pos += typesize;
-            }
+        increase(pos + (numValues * typesize));
 
-            if (attribute->count > count)
-                count = attribute->count;
+        for (int i = 0; i < numValues; i++) {
+            memcpy(&data[pos], &vector[i*typesize], typesize);
+            pos += typesize;
         }
+
+        if (attribute->count > count)
+            count = attribute->count;
     }else{
         Log::error("Error add value, attribute not exist");
     }
@@ -358,7 +360,7 @@ Vector4 Buffer::getVector4(Attribute* attribute, unsigned int index){
 }
 
 unsigned char* Buffer::getData() const{
-    return &data[0];
+    return data ? &data[0] : nullptr;
 }
 
 size_t Buffer::getSize() const{

@@ -42,7 +42,7 @@ namespace Supernova {
         Buffer(const Buffer& rhs);
         Buffer& operator=(const Buffer& rhs);
 
-        virtual bool resize(size_t pos);
+        virtual bool increase(size_t newSize);
         virtual void clear();
 
         void clearAll();

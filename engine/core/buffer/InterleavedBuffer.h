@@ -29,7 +29,7 @@ namespace Supernova{
         InterleavedBuffer(const InterleavedBuffer& rhs);
         InterleavedBuffer& operator=(const InterleavedBuffer& rhs);
 
-        virtual bool resize(size_t pos);
+        virtual bool increase(size_t newSize);
         virtual void clearAll();
         virtual void clear();
 
