@@ -240,12 +240,20 @@ void Scene::updateSizeFromCamera(){
 	getSystem<RenderSystem>()->updateCameraSize(getCamera());
 }
 
+Entity Scene::createEntityInternal(Entity entity){
+	return entityManager.createEntityInternal(entity);
+}
+
+void Scene::setLastEntityInternal(Entity lastEntity){
+	entityManager.setLastEntityInternal(lastEntity);
+}
+
 Entity Scene::createEntity(){
     return entityManager.createEntity();
 }
 
-Entity Scene::createEntityInternal(Entity entity){
-	return entityManager.createEntityInternal(entity);
+bool Scene::isEntityCreated(Entity entity){
+	return entityManager.isCreated(entity);
 }
 
 void Scene::destroyEntity(Entity entity){

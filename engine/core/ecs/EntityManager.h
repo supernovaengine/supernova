@@ -25,6 +25,16 @@ namespace Supernova{
 
     public:
 
+        Entity createEntityInternal(Entity entity) { // for internal editor use only
+            metadata[entity];
+
+            return entity;
+        }
+
+        void setLastEntityInternal(Entity lastEntity){ // for internal editor use only
+            this->lastEntity = lastEntity;
+        }
+
         Entity createEntity() {
             lastEntity++;
             metadata[lastEntity];
@@ -32,10 +42,8 @@ namespace Supernova{
             return lastEntity;
         }
 
-        Entity createEntityInternal(Entity entity) { // for internal editor use only
-            metadata[entity];
-
-            return entity;
+        bool isCreated(Entity entity) const {
+            return metadata.count(entity) > 0;
         }
 
         void destroy(Entity entity) {
@@ -60,8 +68,8 @@ namespace Supernova{
 
         Signature getSignature(Entity entity) const{
             if (metadata.count(entity)==0){
-                 Log::error("Entity does not exist to get signature");
-                 return Signature();
+                    Log::error("Entity does not exist to get signature");
+                    return Signature();
             }
 
             return metadata.at(entity).signature;
@@ -77,8 +85,8 @@ namespace Supernova{
 
         std::string getName(Entity entity) const{
             if (metadata.count(entity)==0){
-                 Log::error("Entity does not exist to get name");
-                 return std::string();
+                    Log::error("Entity does not exist to get name");
+                    return std::string();
             }
 
             return metadata.at(entity).name;

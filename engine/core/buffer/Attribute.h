@@ -28,7 +28,7 @@ namespace Supernova {
     public:
 
         Attribute();
-        Attribute(AttributeDataType dataType, const std::string& bufferName, unsigned int elements, size_t offset, bool normalized, bool perInstance);
+        Attribute(AttributeDataType dataType, const std::string& bufferName, unsigned int elements, size_t offset, unsigned int count, bool normalized, bool perInstance);
         Attribute(const Attribute& a);
         virtual ~Attribute();
 

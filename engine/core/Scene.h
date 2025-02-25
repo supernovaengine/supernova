@@ -126,12 +126,16 @@ namespace Supernova{
 		void setEnableUIEvents(bool enableUIEvents);
 
 		size_t findBranchLastIndex(Entity entity);
-	
+
 		//Entity methods
 
-	    Entity createEntity();
 		Entity createEntityInternal(Entity entity); // for internal editor use only
-	
+		void setLastEntityInternal(Entity lastEntity); // for internal editor use only
+
+		Entity createEntity();
+
+		bool isEntityCreated(Entity entity);
+
 		void destroyEntity(Entity entity);
 
 		void addEntityChild(Entity parent, Entity child, bool changeTransform);
@@ -147,70 +151,70 @@ namespace Supernova{
 
 		void setEntityName(Entity entity, const std::string& name);
 		std::string getEntityName(Entity entity) const;
-	
-	    // Component methods
 
-	    template<typename T>
-	    void registerComponent(){
-		    componentManager.registerComponent<T>();
-	    }
-	
-	    template<typename T>
-	    void addComponent(Entity entity, T component){
-		    componentManager.addComponent<T>(entity, component);
-		    auto signature = entityManager.getSignature(entity);
-		    signature.set(componentManager.getComponentId<T>(), true);
-		    entityManager.setSignature(entity, signature);
-	    }
-	
-	    template<typename T>
-	    void removeComponent(Entity entity){
-		    componentManager.removeComponent<T>(entity);
-		    auto signature = entityManager.getSignature(entity);
-		    signature.set(componentManager.getComponentId<T>(), false);
-		    entityManager.setSignature(entity, signature); 
-	    }
+		// Component methods
 
 		template<typename T>
-	    T* findComponent(Entity entity) {
-		    return componentManager.findComponent<T>(entity);
-	    }
-	
-	    template<typename T>
-	    T& getComponent(Entity entity) const {
-		    return componentManager.getComponent<T>(entity);
-	    }
+		void registerComponent(){
+			componentManager.registerComponent<T>();
+		}
 
 		template<typename T>
-	    T* findComponentFromIndex(size_t index) {
-		    return componentManager.findComponentFromIndex<T>(index);
-	    }
+		void addComponent(Entity entity, T component){
+			componentManager.addComponent<T>(entity, component);
+			auto signature = entityManager.getSignature(entity);
+			signature.set(componentManager.getComponentId<T>(), true);
+			entityManager.setSignature(entity, signature);
+		}
 
 		template<typename T>
-	    T& getComponentFromIndex(size_t index) {
-		    return componentManager.getComponentFromIndex<T>(index);
-	    }
+		void removeComponent(Entity entity){
+			componentManager.removeComponent<T>(entity);
+			auto signature = entityManager.getSignature(entity);
+			signature.set(componentManager.getComponentId<T>(), false);
+			entityManager.setSignature(entity, signature); 
+		}
 
-	    template<typename T>
-	    ComponentId getComponentId() const{
-		    return componentManager.getComponentId<T>();
-	    }
+		template<typename T>
+		T* findComponent(Entity entity) {
+			return componentManager.findComponent<T>(entity);
+		}
+
+		template<typename T>
+		T& getComponent(Entity entity) const {
+			return componentManager.getComponent<T>(entity);
+		}
+
+		template<typename T>
+		T* findComponentFromIndex(size_t index) {
+			return componentManager.findComponentFromIndex<T>(index);
+		}
+
+		template<typename T>
+		T& getComponentFromIndex(size_t index) {
+			return componentManager.getComponentFromIndex<T>(index);
+		}
+
+		template<typename T>
+		ComponentId getComponentId() const{
+			return componentManager.getComponentId<T>();
+		}
 
 		template<typename T>
 		std::shared_ptr<ComponentArray<T>> getComponentArray() {
 			return componentManager.getComponentArray<T>();
 		}
-	
+
 		// System methods
-	
+
 		template<typename T>
 		std::shared_ptr<T> registerSystem(){
 			const char* typeName = typeid(T).name();
-	
+
 			auto it = std::find_if(systems.begin(), systems.end(), [&](const auto& pair) { return pair.first == typeName; });
 
 			assert(it == systems.end() && "Registering system more than once");
-	
+
 			auto system = std::make_shared<T>(this);
 			systems.push_back(std::make_pair(typeName, system));
 			return system;
