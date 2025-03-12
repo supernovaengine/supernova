@@ -556,6 +556,13 @@ Ray Camera::screenToRay(float x, float y){
     return Ray(near_point_ray, vector_between);
 }
 
+float Camera::getDistanceFromTarget() const {
+    Transform& transform = getComponent<Transform>();
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return (transform.position - camera.target).length();
+}
+
 void Camera::updateCamera(){
     Transform& transform = getComponent<Transform>();
     CameraComponent& camera = getComponent<CameraComponent>();

@@ -99,6 +99,8 @@ namespace Supernova{
 
         Ray screenToRay(float x, float y);
 
+        float getDistanceFromTarget() const;
+
         void updateCamera();
     };
 
