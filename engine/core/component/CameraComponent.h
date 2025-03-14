@@ -45,8 +45,8 @@ namespace Supernova{
         Vector3 worldTarget;
 
         Vector3 up = Vector3(0, 1, 0);
-        Vector3 direction;
-        Vector3 right;
+        Vector3 direction = Vector3(0, 0, 1);
+        Vector3 right = Vector3(1, 0, 0);
 
         Vector3 worldUp;
         Vector3 worldDirection;
