@@ -958,8 +958,12 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			if (mesh.submeshes[i].needUpdateTexture || needUpdateFramebuffer){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
 				loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
+
+				mesh.submeshes[i].needUpdateTexture = false; // loadDepthTexture is in drawMeshDepth
+				if (mesh.submeshes[i].shaderProperties.find("Uv1") == std::string::npos && mesh.submeshes[i].shaderProperties.find("Uv2") == std::string::npos){
+					mesh.needReload = true;
+				}
 			}
-			mesh.submeshes[i].needUpdateTexture = false; // loadDepthTexture is in drawMeshDepth
 
 			if (scene->isSceneAmbientLightEnabled()){
 				mesh.submeshes[i].material.ambientIntensity = scene->getAmbientLightIntensity();
@@ -1243,6 +1247,9 @@ bool RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool rend
 				uirender.render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI), ShaderStageType::FRAGMENT, textureRender);
 
 			uirender.needUpdateTexture = false;
+			if (uirender.shaderProperties.find("Tex") == std::string::npos) {
+				uirender.needReload = true;
+			}
 		}
 
 		if (uirender.needUpdateBuffer){
@@ -1445,6 +1452,9 @@ bool RenderSystem::drawPoints(PointsComponent& points, Transform& transform, Tra
 				points.render.addTexture(shaderData.getTextureIndex(TextureShaderType::POINTS), ShaderStageType::FRAGMENT, textureRender);
 
 			points.needUpdateTexture = false;
+			if (points.shaderProperties.find("Tex") == std::string::npos){
+				points.needReload = true;
+			}
 		}
 
 		if (points.needUpdateBuffer){
