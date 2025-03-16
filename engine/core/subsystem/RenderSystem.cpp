@@ -2650,17 +2650,15 @@ void RenderSystem::update(double dt){
 			}
 		}else if (signature.test(scene->getComponentId<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
-			if (!ui.loaded){
+			if (ui.loaded && ui.needReload){
+				destroyUI(entity, ui);
+			}
+			if (!ui.loadCalled){
 				bool isText = false;
 				if (signature.test(scene->getComponentId<TextComponent>())){
 					isText = true;
 				}
-				if (ui.loaded && ui.needReload){
-					destroyUI(entity, ui);
-				}
-				if (!ui.loadCalled){
-					loadUI(entity, ui, pipelines, isText);
-				}
+				loadUI(entity, ui, pipelines, isText);
 			}
 		}else if (signature.test(scene->getComponentId<PointsComponent>())){
 			PointsComponent& points = scene->getComponent<PointsComponent>(entity);
