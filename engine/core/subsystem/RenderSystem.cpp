@@ -2724,6 +2724,12 @@ void RenderSystem::update(double dt){
 				mesh.worldAABB = transform.modelMatrix * mesh.aabb;
 			}
 
+			if (signature.test(scene->getComponentId<UIComponent>())){
+				UIComponent& ui = scene->getComponent<UIComponent>(entity);
+
+				ui.worldAABB = transform.modelMatrix * ui.aabb;
+			}
+
 			if (signature.test(scene->getComponentId<ModelComponent>())){
 				ModelComponent& model = scene->getComponent<ModelComponent>(entity);
 

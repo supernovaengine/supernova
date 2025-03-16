@@ -10,6 +10,7 @@
 #include "render/ObjectRender.h"
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
+#include "math/AABB.h"
 
 namespace Supernova{
 
@@ -32,6 +33,9 @@ namespace Supernova{
 
         PrimitiveType primitiveType = PrimitiveType::TRIANGLES;
         unsigned int vertexCount = 0;
+
+        AABB aabb = AABB::ZERO;
+        AABB worldAABB; // initially NULL
 
         Texture texture;
         Vector4 color = Vector4(1.0, 1.0, 1.0, 1.0); //linear color

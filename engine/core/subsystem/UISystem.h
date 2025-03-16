@@ -35,9 +35,10 @@ namespace Supernova{
 		void createOrUpdateUiComponent(double dt, UILayoutComponent& layout, Entity entity, Signature signature);
 		void getPanelEdges(const PanelComponent& panel, const UILayoutComponent& layout, const Transform& transform, const UILayoutComponent& headerlayout,  Rect& edgeRight, Rect& edgeRightBottom, Rect& edgeBottom, Rect& edgeLeftBottom, Rect& edgeLeft);
 		Rect fitOnPanel(Rect uiRect, Entity parentPanel);
+		void calculateUIAABB(UIComponent& ui);
 
 		//Image
-		bool createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
+		void createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
 
 		// Text
 		bool loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutComponent& layout);

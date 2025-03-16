@@ -263,3 +263,15 @@ bool Text::isPivotCentered() const{
 
     return textcomp.pivotCentered;
 }
+
+AABB Text::getAABB() const{
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return ui.aabb;
+}
+
+AABB Text::getWorldAABB() const{
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return ui.worldAABB;
+}

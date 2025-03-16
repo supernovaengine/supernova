@@ -115,3 +115,15 @@ bool Polygon::isFlipY() const{
 
     return ui.flipY;
 }
+
+AABB Polygon::getAABB() const{
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return ui.aabb;
+}
+
+AABB Polygon::getWorldAABB() const{
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return ui.worldAABB;
+}

@@ -30,7 +30,7 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
 UISystem::~UISystem(){
 }
 
-bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
+void UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
 
     ui.texture.load();
     unsigned int texWidth = ui.texture.getWidth();
@@ -48,7 +48,7 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
 
     if ((layout.width == 0 || layout.height == 0)){
         //Log::warn("Cannot create UI image without size");
-        return false;
+        return;
     }
 
     ui.primitiveType = PrimitiveType::TRIANGLES;
@@ -172,7 +172,7 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
     if (ui.loaded)
         ui.needUpdateBuffer = true;
 
-    return true;
+    calculateUIAABB(ui);
 }
 
 bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
@@ -255,6 +255,8 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
 
     if (ui.loaded)
         ui.needUpdateBuffer = true;
+
+    calculateUIAABB(ui);
 }
 
 void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
@@ -670,6 +672,8 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
 
     if (ui.loaded)
         ui.needUpdateBuffer = true;
+
+    calculateUIAABB(ui);
 }
 
 bool UISystem::createOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout){
@@ -1118,6 +1122,15 @@ Rect UISystem::fitOnPanel(Rect uiRect, Entity parentPanel){
     float height = (panellayout.height - (panelimage.patchMarginTop + panelimage.patchMarginBottom)) * paneltransform.worldScale.y;
 
     return uiRect.fitOnRect(Rect(x, y, width, height));
+}
+
+void UISystem::calculateUIAABB(UIComponent& ui){
+    Attribute* vertexAttr = ui.buffer.getAttribute(AttributeType::POSITION);
+    for (int i = 0; i < ui.buffer.getCount(); i++){
+        Vector3 vertice = ui.buffer.getVector3(vertexAttr, i);
+
+        ui.aabb.merge(vertice);
+    }
 }
 
 void UISystem::update(double dt){

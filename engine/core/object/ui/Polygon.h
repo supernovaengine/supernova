@@ -34,6 +34,9 @@ namespace Supernova{
 
         void setFlipY(bool flipY);
         bool isFlipY() const;
+
+        AABB getAABB() const;
+        AABB getWorldAABB() const;
     };
 }
 

@@ -64,6 +64,9 @@ namespace Supernova{
 
         void setPivotCentered(bool pivotCentered);
         bool isPivotCentered() const;
+
+        AABB getAABB() const;
+        AABB getWorldAABB() const;
     };
 }
 

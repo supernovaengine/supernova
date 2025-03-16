@@ -187,3 +187,15 @@ bool Image::isFlipY() const{
 
     return ui.flipY;
 }
+
+AABB Image::getAABB() const{
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return ui.aabb;
+}
+
+AABB Image::getWorldAABB() const{
+    UIComponent& ui = getComponent<UIComponent>();
+
+    return ui.worldAABB;
+}

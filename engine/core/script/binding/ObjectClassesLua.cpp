@@ -622,6 +622,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const std::string&>(&Polygon::setTexture),
             luabridge::overload<Framebuffer*>(&Polygon::setTexture))
         .addProperty("flipY", &Polygon::isFlipY, &Polygon::setFlipY)
+        .addFunction("getAABB", &Polygon::getAABB)
+        .addFunction("getWorldAABB", &Polygon::getWorldAABB)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -649,6 +651,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("flipY", &Text::isFlipY, &Text::setFlipY)
         .addProperty("pivotBaseline", &Text::isPivotBaseline, &Text::setPivotBaseline)
         .addProperty("pivotCentered", &Text::isPivotCentered, &Text::setPivotCentered)
+        .addFunction("getAABB", &Text::getAABB)
+        .addFunction("getWorldAABB", &Text::getWorldAABB)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -671,6 +675,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const float, const float, const float, const float>(&Image::setColor))
         .addProperty("alpha", &Image::getAlpha, &Image::setAlpha)
         .addProperty("flipY", &Image::isFlipY, &Image::setFlipY)
+        .addFunction("getAABB", &Image::getAABB)
+        .addFunction("getWorldAABB", &Image::getWorldAABB)
         .addFunction("getUIComponent", &Image::getComponent<UIComponent>)
         .endClass();
 
