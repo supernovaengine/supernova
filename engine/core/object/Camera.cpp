@@ -526,34 +526,43 @@ bool Camera::isTransparentSort() const{
 Ray Camera::screenToRay(float x, float y){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    float normalized_x, normalized_y;
+    // Calculate normalized screen coordinates [-1, 1]
+    float normalized_x = ((2.0f * x) / Engine::getCanvasWidth()) - 1.0f;
+    float normalized_y;
 
-    if (camera.type == CameraType::CAMERA_2D){
-        normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
-        normalized_y = ((2 * y) / Engine::getCanvasHeight()) -1;
-    }else{
-        normalized_x = ((2 * x) / Engine::getCanvasWidth()) -1;
-        normalized_y = -(((2 * y) / Engine::getCanvasHeight()) -1);
+    // Handle Y coordinate inversion properly for different camera types
+    if (camera.type == CameraType::CAMERA_2D) {
+        normalized_y = ((2.0f * y) / Engine::getCanvasHeight()) - 1.0f;
+    } else {
+        normalized_y = -(((2.0f * y) / Engine::getCanvasHeight()) - 1.0f);
     }
 
-    Vector4 near_point_ndc = {normalized_x, normalized_y, -1, 1};
-    Vector4 far_point_ndc = {normalized_x, normalized_y,  1, 1};
+    // Points in NDC space
+    Vector4 near_point_ndc = {normalized_x, normalized_y, -1.0f, 1.0f};
+    Vector4 far_point_ndc = {normalized_x, normalized_y, 1.0f, 1.0f};
 
-    Vector4 near_point_world, far_point_world;
+    // Transform from NDC to world space using inverse view-projection matrix
     Matrix4 inverseViewProjection = camera.viewProjectionMatrix.inverse();
+    Vector4 near_point_world = inverseViewProjection * near_point_ndc;
+    Vector4 far_point_world = inverseViewProjection * far_point_ndc;
 
-    near_point_world = inverseViewProjection * near_point_ndc;
-    far_point_world = inverseViewProjection * far_point_ndc;
-
+    // Perspective division
     near_point_world.divideByW();
     far_point_world.divideByW();
 
-    Vector3 near_point_ray = {near_point_world[0], near_point_world[1], near_point_world[2]};
-    Vector3 far_point_ray = {far_point_world[0], far_point_world[1], far_point_world[2]};
-    Vector3 vector_between;
-    vector_between = far_point_ray - near_point_ray;
+    Vector3 ray_origin = {near_point_world[0], near_point_world[1], near_point_world[2]};
+    Vector3 ray_end = {far_point_world[0], far_point_world[1], far_point_world[2]};
 
-    return Ray(near_point_ray, vector_between);
+    Vector3 ray_direction = ray_end - ray_origin;
+
+    // For orthographic cameras, ensure the ray length is appropriate
+    if (camera.type == CameraType::CAMERA_ORTHO) {
+        // Scale the direction to match the far-near distance
+        float length = camera.farClip - camera.nearClip;
+        ray_direction = ray_direction.normalize() * length;
+    }
+
+    return Ray(ray_origin, ray_direction);
 }
 
 float Camera::getDistanceFromTarget() const {
