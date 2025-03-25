@@ -1150,16 +1150,16 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
 
-bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, uint8_t pipelines, bool isText){
+bool RenderSystem::loadUI(Entity entity, UIComponent& ui, uint8_t pipelines, bool isText){
 
 	if (!Engine::isViewLoaded()) 
 		return false;
 
-	ObjectRender& render = uirender.render;
+	ObjectRender& render = ui.render;
 
-	render.beginLoad(uirender.primitiveType);
+	render.beginLoad(ui.primitiveType);
 
-	TextureRender* textureRender = uirender.texture.getRender();
+	TextureRender* textureRender = ui.texture.getRender();
 
 	bool p_hasTexture = false;
 	bool p_vertexColorVec4 = true;
@@ -1173,141 +1173,141 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& uirender, uint8_t pipeline
 		}
 	}
 
-	uirender.shaderProperties = ShaderPool::getUIProperties(p_hasTexture, p_hasFontAtlasTexture, false, p_vertexColorVec4);
-	uirender.shader = ShaderPool::get(ShaderType::UI, uirender.shaderProperties);
-	if (!uirender.shader->isCreated())
+	ui.shaderProperties = ShaderPool::getUIProperties(p_hasTexture, p_hasFontAtlasTexture, false, p_vertexColorVec4);
+	ui.shader = ShaderPool::get(ShaderType::UI, ui.shaderProperties);
+	if (!ui.shader->isCreated())
 		return false;
-	render.addShader(uirender.shader.get());
-	ShaderData& shaderData = uirender.shader.get()->shaderData;
+	render.addShader(ui.shader.get());
+	ShaderData& shaderData = ui.shader.get()->shaderData;
 
-	uirender.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_VS_PARAMS);
-	uirender.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_FS_PARAMS);
+	ui.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_VS_PARAMS);
+	ui.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_FS_PARAMS);
 
 	size_t bufferSize;
 	size_t minBufferSize;
 
-	bufferSize = uirender.buffer.getSize();
-	minBufferSize = uirender.minBufferCount * uirender.buffer.getStride();
+	bufferSize = ui.buffer.getSize();
+	minBufferSize = ui.minBufferCount * ui.buffer.getStride();
 	if (minBufferSize > bufferSize)
 		bufferSize = minBufferSize;
 
 	if (bufferSize == 0)
 		return false;
 
-	uirender.buffer.getRender()->createBuffer(bufferSize, uirender.buffer.getData(), uirender.buffer.getType(), uirender.buffer.getUsage());
-	if (uirender.buffer.isRenderAttributes()) {
-        for (auto const &attr : uirender.buffer.getAttributes()) {
-			render.addAttribute(shaderData.getAttrIndex(attr.first), uirender.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), uirender.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
+	ui.buffer.getRender()->createBuffer(bufferSize, ui.buffer.getData(), ui.buffer.getType(), ui.buffer.getUsage());
+	if (ui.buffer.isRenderAttributes()) {
+        for (auto const &attr : ui.buffer.getAttributes()) {
+			render.addAttribute(shaderData.getAttrIndex(attr.first), ui.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), ui.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
         }
     }
-	if (uirender.buffer.getUsage() != BufferUsage::IMMUTABLE){
-		uirender.needUpdateBuffer = true;
+	if (ui.buffer.getUsage() != BufferUsage::IMMUTABLE){
+		ui.needUpdateBuffer = true;
 	}
 
-	bufferSize = uirender.indices.getSize();
-	minBufferSize = uirender.minIndicesCount * uirender.indices.getStride();
+	bufferSize = ui.indices.getSize();
+	minBufferSize = ui.minIndicesCount * ui.indices.getStride();
 	if (minBufferSize > bufferSize)
 		bufferSize = minBufferSize;
 
-	if (uirender.indices.getCount() > 0){
-		uirender.indices.getRender()->createBuffer(bufferSize, uirender.indices.getData(), uirender.indices.getType(), uirender.indices.getUsage());
-		uirender.vertexCount = uirender.indices.getCount();
-		Attribute indexattr = uirender.indices.getAttributes()[AttributeType::INDEX];
-		render.addIndex(uirender.indices.getRender(), indexattr.getDataType(), indexattr.getOffset());
-		if (uirender.indices.getUsage() != BufferUsage::IMMUTABLE){
-			uirender.needUpdateBuffer = true;
+	if (ui.indices.getCount() > 0){
+		ui.indices.getRender()->createBuffer(bufferSize, ui.indices.getData(), ui.indices.getType(), ui.indices.getUsage());
+		ui.vertexCount = ui.indices.getCount();
+		Attribute indexattr = ui.indices.getAttributes()[AttributeType::INDEX];
+		render.addIndex(ui.indices.getRender(), indexattr.getDataType(), indexattr.getOffset());
+		if (ui.indices.getUsage() != BufferUsage::IMMUTABLE){
+			ui.needUpdateBuffer = true;
 		}
 	}else{
-		uirender.vertexCount = uirender.buffer.getCount();
+		ui.vertexCount = ui.buffer.getCount();
 	}
 
 	if (textureRender)
 		render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI), ShaderStageType::FRAGMENT, textureRender);
 	
-	uirender.needUpdateTexture = false;
+	ui.needUpdateTexture = false;
 
 	if (!render.endLoad(pipelines, false, CullingMode::BACK, WindingOrder::CCW)){
 		return false;
 	}
 
-	uirender.needReload = false;
-	uirender.loadCalled = true;
+	ui.needReload = false;
+	ui.loadCalled = true;
 	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
 	return true;
 }
 
-bool RenderSystem::drawUI(UIComponent& uirender, Transform& transform, bool renderToTexture){
-	if (uirender.loaded && uirender.buffer.getSize() > 0){
+bool RenderSystem::drawUI(UIComponent& ui, Transform& transform, bool renderToTexture){
+	if (ui.loaded && ui.buffer.getSize() > 0){
 
-		if (uirender.needUpdateTexture || uirender.texture.isFramebufferOutdated()){
-			ShaderData& shaderData = uirender.shader.get()->shaderData;
-			TextureRender* textureRender = uirender.texture.getRender();
+		if (ui.needUpdateTexture || ui.texture.isFramebufferOutdated()){
+			ShaderData& shaderData = ui.shader.get()->shaderData;
+			TextureRender* textureRender = ui.texture.getRender();
 			if (textureRender)
-				uirender.render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI), ShaderStageType::FRAGMENT, textureRender);
+				ui.render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI), ShaderStageType::FRAGMENT, textureRender);
 
-			uirender.needUpdateTexture = false;
-			if (uirender.shaderProperties.find("Tex") == std::string::npos) {
-				uirender.needReload = true;
+			ui.needUpdateTexture = false;
+			if (ui.shaderProperties.find("Tex") == std::string::npos) {
+				ui.needReload = true;
 			}
 		}
 
-		if (uirender.needUpdateBuffer){
-			uirender.buffer.getRender()->updateBuffer(uirender.buffer.getSize(), uirender.buffer.getData());
+		if (ui.needUpdateBuffer){
+			ui.buffer.getRender()->updateBuffer(ui.buffer.getSize(), ui.buffer.getData());
 
-			if (uirender.indices.getCount() > 0){
-				uirender.indices.getRender()->updateBuffer(uirender.indices.getSize(), uirender.indices.getData());
-				uirender.vertexCount = uirender.indices.getCount();
+			if (ui.indices.getCount() > 0){
+				ui.indices.getRender()->updateBuffer(ui.indices.getSize(), ui.indices.getData());
+				ui.vertexCount = ui.indices.getCount();
 			}else{
-				uirender.vertexCount = uirender.buffer.getCount();
+				ui.vertexCount = ui.buffer.getCount();
 			}
 
-			uirender.needUpdateBuffer = false;
+			ui.needUpdateBuffer = false;
 		}
 
-		ObjectRender& render = uirender.render;
+		ObjectRender& render = ui.render;
 
 		if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
-			uirender.needReload = true;
+			ui.needReload = true;
 			return false;
 		}
-		render.applyUniformBlock(uirender.slotVSParams, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
+		render.applyUniformBlock(ui.slotVSParams, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
 		//Color
-		render.applyUniformBlock(uirender.slotFSParams, sizeof(float) * 4, &uirender.color);
-		render.draw(uirender.vertexCount, 1);
+		render.applyUniformBlock(ui.slotFSParams, sizeof(float) * 4, &ui.color);
+		render.draw(ui.vertexCount, 1);
 
 	}
 
 	return true;
 }
 
-void RenderSystem::destroyUI(Entity entity, UIComponent& uirender){
-	if (!uirender.loaded)
+void RenderSystem::destroyUI(Entity entity, UIComponent& ui){
+	if (!ui.loaded)
 		return;
 
 	//Destroy shader
-	uirender.shader.reset();
-	ShaderPool::remove(ShaderType::UI, uirender.shaderProperties);
+	ui.shader.reset();
+	ShaderPool::remove(ShaderType::UI, ui.shaderProperties);
 
 	//Destroy texture
-	uirender.texture.destroy();
+	ui.texture.destroy();
 
 	//Destroy render
-	uirender.render.destroy();
+	ui.render.destroy();
 
 	//Destroy buffer
-	if (uirender.buffer.getSize() > 0){
-		//uirender.buffer.clearAll();
-		uirender.buffer.getRender()->destroyBuffer();
+	if (ui.buffer.getSize() > 0){
+		//ui.buffer.clearAll();
+		ui.buffer.getRender()->destroyBuffer();
 	}
-	if (uirender.indices.getSize() > 0){
-		//uirender.indices.clearAll();
-		uirender.indices.getRender()->destroyBuffer();
+	if (ui.indices.getSize() > 0){
+		//ui.indices.clearAll();
+		ui.indices.getRender()->destroyBuffer();
 	}
 
 	//Shaders uniforms
-	uirender.slotVSParams = -1;
-	uirender.slotFSParams = -1;
+	ui.slotVSParams = -1;
+	ui.slotFSParams = -1;
 
 	SystemRender::addQueueCommand(&changeDestroy, new check_load_t{scene, entity});
 }
@@ -2400,9 +2400,9 @@ void RenderSystem::changeLoaded(void* data){
 		mesh.loaded = true;
 
 	}else if (signature.test(scene->getComponentId<UIComponent>())){
-		UIComponent& uirender = scene->getComponent<UIComponent>(entity);
+		UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-		uirender.loaded = true;
+		ui.loaded = true;
 
 	}else if (signature.test(scene->getComponentId<PointsComponent>())){
 		PointsComponent& points = scene->getComponent<PointsComponent>(entity);
@@ -2438,10 +2438,10 @@ void RenderSystem::changeDestroy(void* data){
 		mesh.loadCalled = false;
 
 	}else if (signature.test(scene->getComponentId<UIComponent>())){
-		UIComponent& uirender = scene->getComponent<UIComponent>(entity);
+		UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
-		uirender.loaded = false;
-		uirender.loadCalled = false;
+		ui.loaded = false;
+		ui.loadCalled = false;
 
 	}else if (signature.test(scene->getComponentId<PointsComponent>())){
 		PointsComponent& points = scene->getComponent<PointsComponent>(entity);

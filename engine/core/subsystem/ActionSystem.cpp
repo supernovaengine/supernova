@@ -277,12 +277,12 @@ void ActionSystem::colorActionMeshUpdate(double dt, ActionComponent& action, Tim
     }
 }
 
-void ActionSystem::colorActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, UIComponent& uirender){
+void ActionSystem::colorActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, ColorActionComponent& coloraction, UIComponent& ui){
     Vector3 color = (coloraction.endColor - coloraction.startColor) * timedaction.value;
     if (coloraction.useSRGB){
-        uirender.color = Color::sRGBToLinear(coloraction.startColor + color);
+        ui.color = Color::sRGBToLinear(coloraction.startColor + color);
     }else{
-        uirender.color = coloraction.startColor + color;
+        ui.color = coloraction.startColor + color;
     }
 }
 
@@ -292,10 +292,10 @@ void ActionSystem::alphaActionMeshUpdate(double dt, ActionComponent& action, Tim
     mesh.submeshes[0].material.baseColorFactor.w = alphaaction.startAlpha + alpha;
 }
 
-void ActionSystem::alphaActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, UIComponent& uirender){
+void ActionSystem::alphaActionUIUpdate(double dt, ActionComponent& action, TimedActionComponent& timedaction, AlphaActionComponent& alphaaction, UIComponent& ui){
     float alpha = (alphaaction.endAlpha - alphaaction.startAlpha) * timedaction.value;
 
-    uirender.color.w = alphaaction.startAlpha + alpha;
+    ui.color.w = alphaaction.startAlpha + alpha;
 }
 
 int ActionSystem::findUnusedParticle(ParticlesComponent& particles){
@@ -1087,9 +1087,9 @@ void ActionSystem::update(double dt){
                         colorActionMeshUpdate(dt, action, timedaction, coloraction, mesh);
                     }
                     if (targetSignature.test(scene->getComponentId<UIComponent>())){
-                        UIComponent& uirender = scene->getComponent<UIComponent>(action.target);
+                        UIComponent& ui = scene->getComponent<UIComponent>(action.target);
 
-                        colorActionUIUpdate(dt, action, timedaction, coloraction, uirender);
+                        colorActionUIUpdate(dt, action, timedaction, coloraction, ui);
                     }
                 }
 
@@ -1103,9 +1103,9 @@ void ActionSystem::update(double dt){
                         alphaActionMeshUpdate(dt, action, timedaction, alphaaction, mesh);
                     }
                     if (targetSignature.test(scene->getComponentId<UIComponent>())){
-                        UIComponent& uirender = scene->getComponent<UIComponent>(action.target);
+                        UIComponent& ui = scene->getComponent<UIComponent>(action.target);
 
-                        alphaActionUIUpdate(dt, action, timedaction, alphaaction, uirender);
+                        alphaActionUIUpdate(dt, action, timedaction, alphaaction, ui);
                     }
                 }
 
