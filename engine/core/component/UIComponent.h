@@ -54,6 +54,7 @@ namespace Supernova{
 
         bool needReload = false;
 
+        bool needUpdateAABB = false;
         bool needUpdateBuffer = false;
         bool needUpdateTexture = false;
     };

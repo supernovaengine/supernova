@@ -133,10 +133,10 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needUpdateBuffer = true; // buffer is not immutable
-
-    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
@@ -190,10 +190,10 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
     polygon.width = (int)(max_X - min_X);
     polygon.height = (int)(max_Y - min_Y);
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needReload = true;
-
-    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
@@ -319,6 +319,8 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
         //}
     }
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded){
         if (tilemap.numTiles < numTiles){
             mesh.needReload = true;
@@ -326,10 +328,7 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
             mesh.needUpdateBuffer = true; // buffer is not immutable
         }
     }
-
     tilemap.numTiles = numTiles;
-
-    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh){
@@ -748,8 +747,6 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
     Buffer* vertexBuffer = NULL;
     Attribute vertexAttr;
 
-    mesh.verticesAABB = AABB::ZERO;
-
     for (auto const& buf : buffers){
         if (buf.second->getAttribute(AttributeType::POSITION)) {
             vertexBuffer = buf.second;
@@ -770,6 +767,7 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
             return;
         }
 
+        mesh.verticesAABB = AABB::ZERO;
         int verticesize = int(vertexAttr.getCount());
         for (int i = 0; i < verticesize; i++){
             Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i);
@@ -779,6 +777,8 @@ void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
     }
 
     mesh.aabb = mesh.verticesAABB;
+
+    mesh.needUpdateAABB = true;
 }
 
 void MeshSystem::createPlaneNodeSubmesh(unsigned int submeshIndex, TerrainComponent& terrain, MeshComponent& mesh, int width, int height, int widthSegments, int heightSegments){
@@ -1071,10 +1071,10 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needReload = true;
-
-    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createBox(Entity entity, float width, float height, float depth, unsigned int tiles){
@@ -1202,10 +1202,10 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         36, (char*)&indices_array[0], sizeof(uint16_t));
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needReload = true;
-
-    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, unsigned int stacks){
@@ -1295,10 +1295,10 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needReload = true;
-
-    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
@@ -1426,10 +1426,10 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needReload = true;
-
-    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
@@ -1511,10 +1511,10 @@ void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius,
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needReload = true;
-
-    calculateMeshAABB(mesh);
 }
 
 void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsigned int sides, unsigned int rings){
@@ -1585,10 +1585,10 @@ void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsi
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needReload = true;
-
-    calculateMeshAABB(mesh);
 }
 
 bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
@@ -2222,10 +2222,10 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
 */
     std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needReload = true;
-
-    calculateMeshAABB(mesh);
 
     return true;
 }
@@ -2401,10 +2401,10 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string& filename){
         std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
     }
 
+    calculateMeshAABB(mesh);
+
     if (mesh.loaded)
         mesh.needReload = true;
-
-    calculateMeshAABB(mesh);
 
     return true;
 }

@@ -106,6 +106,7 @@ namespace Supernova{
         CullingMode cullingMode = CullingMode::BACK;
         WindingOrder windingOrder = WindingOrder::CCW;
 
+        bool needUpdateAABB = false;
         bool needUpdateBuffer = false;
         bool needReload = false;
     };

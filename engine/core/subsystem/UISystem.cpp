@@ -169,10 +169,10 @@ void UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
         0, ui.indices.getAttribute(AttributeType::INDEX),
         54, (char*)&indices_array[0], sizeof(uint16_t));
 
+    calculateUIAABB(ui);
+
     if (ui.loaded)
         ui.needUpdateBuffer = true;
-
-    calculateUIAABB(ui);
 }
 
 bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
@@ -253,10 +253,10 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
             0, ui.indices.getAttribute(AttributeType::INDEX),
             indices_array.size(), (char*)&indices_array[0], sizeof(uint16_t));
 
+    calculateUIAABB(ui);
+
     if (ui.loaded)
         ui.needUpdateBuffer = true;
-
-    calculateUIAABB(ui);
 }
 
 void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
@@ -670,10 +670,10 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
     layout.width = (int)(max_X - min_X);
     layout.height = (int)(max_Y - min_Y);
 
+    calculateUIAABB(ui);
+
     if (ui.loaded)
         ui.needUpdateBuffer = true;
-
-    calculateUIAABB(ui);
 }
 
 bool UISystem::createOrUpdatePolygon(PolygonComponent& polygon, UIComponent& ui, UILayoutComponent& layout){
@@ -1125,12 +1125,15 @@ Rect UISystem::fitOnPanel(Rect uiRect, Entity parentPanel){
 }
 
 void UISystem::calculateUIAABB(UIComponent& ui){
+    ui.aabb = AABB::ZERO;
     Attribute* vertexAttr = ui.buffer.getAttribute(AttributeType::POSITION);
     for (int i = 0; i < ui.buffer.getCount(); i++){
         Vector3 vertice = ui.buffer.getVector3(vertexAttr, i);
 
         ui.aabb.merge(vertice);
     }
+
+    ui.needUpdateAABB = true;
 }
 
 void UISystem::update(double dt){

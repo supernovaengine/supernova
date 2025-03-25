@@ -2160,7 +2160,7 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 		}
 	}
 
-	mesh.worldAABB = transform.modelMatrix * mesh.aabb;
+	mesh.needUpdateAABB = true;
 
 	if (instmesh.numVisible > 0){
 		instmesh.buffer.setData((unsigned char*)(&instmesh.renderInstances.at(0)), sizeof(InstanceRenderData)*instmesh.numVisible);
@@ -2658,6 +2658,10 @@ void RenderSystem::update(double dt){
 			if (!mesh.loadCalled){
 				loadMesh(entity, mesh, pipelines, instmesh, terrain);
 			}
+			if (mesh.needUpdateAABB || transform.needUpdate){
+				mesh.worldAABB = transform.modelMatrix * mesh.aabb;
+				mesh.needUpdateAABB = false;
+			}
 		}else if (signature.test(scene->getComponentId<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
 			if (ui.loaded && ui.needReload){
@@ -2669,6 +2673,10 @@ void RenderSystem::update(double dt){
 					isText = true;
 				}
 				loadUI(entity, ui, pipelines, isText);
+			}
+			if (ui.needUpdateAABB || transform.needUpdate){
+				ui.worldAABB = transform.modelMatrix * ui.aabb;
+				ui.needUpdateAABB = false;
 			}
 		}else if (signature.test(scene->getComponentId<PointsComponent>())){
 			PointsComponent& points = scene->getComponent<PointsComponent>(entity);
@@ -2717,18 +2725,6 @@ void RenderSystem::update(double dt){
 		}
 
 		if (transform.needUpdate){
-
-			if (signature.test(scene->getComponentId<MeshComponent>())){
-				MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
-				mesh.worldAABB = transform.modelMatrix * mesh.aabb;
-			}
-
-			if (signature.test(scene->getComponentId<UIComponent>())){
-				UIComponent& ui = scene->getComponent<UIComponent>(entity);
-
-				ui.worldAABB = transform.modelMatrix * ui.aabb;
-			}
 
 			if (signature.test(scene->getComponentId<ModelComponent>())){
 				ModelComponent& model = scene->getComponent<ModelComponent>(entity);
