@@ -78,9 +78,8 @@ namespace Supernova{
 
         void setExtents(float mx, float my, float mz, float Mx, float My, float Mz );
 
-        const Vector3* getAllCorners(void) const;
-
         Vector3 getCorner(CornerEnum cornerToGet) const;
+        const Vector3* getCorners(void) const;
 
         AABB& merge( const AABB& rhs );
         AABB& merge( const Vector3& point );

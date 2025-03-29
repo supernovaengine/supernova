@@ -176,27 +176,6 @@ void AABB::setExtents(float mx, float my, float mz, float Mx, float My, float Mz
     mMaximum.z = Mz;
 }
 
-const Vector3* AABB::getAllCorners(void) const {
-    //TODO: Put error
-    //Can't get corners of a null or infinite AAB
-    assert( mBoxType == BOXTYPE_FINITE );
-
-    if (!mCorners)
-        mCorners = new Vector3[8];
-
-    mCorners[0] = mMinimum;
-    mCorners[1].x = mMinimum.x; mCorners[1].y = mMaximum.y; mCorners[1].z = mMinimum.z;
-    mCorners[2].x = mMaximum.x; mCorners[2].y = mMaximum.y; mCorners[2].z = mMinimum.z;
-    mCorners[3].x = mMaximum.x; mCorners[3].y = mMinimum.y; mCorners[3].z = mMinimum.z;
-
-    mCorners[4] = mMaximum;
-    mCorners[5].x = mMinimum.x; mCorners[5].y = mMaximum.y; mCorners[5].z = mMaximum.z;
-    mCorners[6].x = mMinimum.x; mCorners[6].y = mMinimum.y; mCorners[6].z = mMaximum.z;
-    mCorners[7].x = mMaximum.x; mCorners[7].y = mMinimum.y; mCorners[7].z = mMaximum.z;
-
-    return mCorners;
-}
-
 Vector3 AABB::getCorner(CornerEnum cornerToGet) const {
     switch(cornerToGet)
     {
@@ -219,6 +198,27 @@ Vector3 AABB::getCorner(CornerEnum cornerToGet) const {
         default:
             return Vector3();
     }
+}
+
+const Vector3* AABB::getCorners(void) const {
+    //TODO: Put error
+    //Can't get corners of a null or infinite AAB
+    assert( mBoxType == BOXTYPE_FINITE );
+
+    if (!mCorners)
+        mCorners = new Vector3[8];
+
+    mCorners[0] = mMinimum;
+    mCorners[1].x = mMinimum.x; mCorners[1].y = mMaximum.y; mCorners[1].z = mMinimum.z;
+    mCorners[2].x = mMaximum.x; mCorners[2].y = mMaximum.y; mCorners[2].z = mMinimum.z;
+    mCorners[3].x = mMaximum.x; mCorners[3].y = mMinimum.y; mCorners[3].z = mMinimum.z;
+
+    mCorners[4] = mMaximum;
+    mCorners[5].x = mMinimum.x; mCorners[5].y = mMaximum.y; mCorners[5].z = mMaximum.z;
+    mCorners[6].x = mMinimum.x; mCorners[6].y = mMinimum.y; mCorners[6].z = mMaximum.z;
+    mCorners[7].x = mMaximum.x; mCorners[7].y = mMinimum.y; mCorners[7].z = mMaximum.z;
+
+    return mCorners;
 }
 
 AABB& AABB::merge( const AABB& rhs ) {

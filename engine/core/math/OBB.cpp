@@ -17,7 +17,8 @@ OBB::OBB()
       mHalfExtents(Vector3(0.5f, 0.5f, 0.5f)),
       mAxisX(Vector3::UNIT_X),
       mAxisY(Vector3::UNIT_Y),
-      mAxisZ(Vector3::UNIT_Z) {
+      mAxisZ(Vector3::UNIT_Z),
+      mCorners(0) {
 }
 
 OBB::OBB(const OBB& obb)
@@ -25,7 +26,8 @@ OBB::OBB(const OBB& obb)
       mHalfExtents(obb.mHalfExtents),
       mAxisX(obb.mAxisX),
       mAxisY(obb.mAxisY),
-      mAxisZ(obb.mAxisZ) {
+      mAxisZ(obb.mAxisZ),
+      mCorners(0) {
 }
 
 OBB::OBB(const Vector3& center, const Vector3& halfExtents)
@@ -33,7 +35,8 @@ OBB::OBB(const Vector3& center, const Vector3& halfExtents)
       mHalfExtents(halfExtents),
       mAxisX(Vector3::UNIT_X),
       mAxisY(Vector3::UNIT_Y),
-      mAxisZ(Vector3::UNIT_Z) {
+      mAxisZ(Vector3::UNIT_Z),
+      mCorners(0) {
 }
 
 OBB::OBB(const Vector3& center, const Vector3& halfExtents, 
@@ -42,7 +45,8 @@ OBB::OBB(const Vector3& center, const Vector3& halfExtents,
     mHalfExtents(halfExtents),
     mAxisX(axisX.normalized()),
     mAxisY(axisY.normalized()),
-    mAxisZ(axisZ.normalized()) {
+    mAxisZ(axisZ.normalized()),
+    mCorners(0) {
 }
 
 OBB::OBB(const AABB& aabb)
@@ -50,7 +54,8 @@ OBB::OBB(const AABB& aabb)
       mHalfExtents(aabb.getHalfSize()),
       mAxisX(Vector3::UNIT_X),
       mAxisY(Vector3::UNIT_Y),
-      mAxisZ(Vector3::UNIT_Z) {
+      mAxisZ(Vector3::UNIT_Z),
+      mCorners(0) {
 }
 
 OBB::OBB(const AABB& aabb, const Matrix4& transform) {
@@ -67,14 +72,25 @@ OBB::OBB(const AABB& aabb, const Matrix4& transform) {
 }
 
 OBB::~OBB() {
+    if (mCorners)
+        delete[] mCorners;
 }
 
 OBB& OBB::operator=(const OBB& rhs) {
+    if (this == &rhs) return *this; // Self-assignment check
+
     mCenter = rhs.mCenter;
     mHalfExtents = rhs.mHalfExtents;
     mAxisX = rhs.mAxisX;
     mAxisY = rhs.mAxisY;
     mAxisZ = rhs.mAxisZ;
+
+    // Reset corners (they'll be recalculated when needed)
+    if (mCorners) {
+        delete[] mCorners;
+        mCorners = 0;
+    }
+
     return *this;
 }
 
@@ -183,8 +199,7 @@ AABB OBB::toAABB() const {
     Vector3 max(std::numeric_limits<float>::lowest());
 
     // Get corners and find min/max points
-    Vector3 corners[8];
-    getCorners(corners);
+    const Vector3* corners = getCorners();
 
     for (int i = 0; i < 8; ++i) {
         min.makeFloor(corners[i]);
@@ -209,26 +224,43 @@ Matrix4 OBB::toMatrix() const {
     return transform;
 }
 
-Vector3 OBB::getCorner(unsigned int index) const {
-    assert(index < 8);
-
-    // Calculate corner based on index (using binary representation)
-    float xSign = (index & 1) ? 1.0f : -1.0f;
-    float ySign = (index & 2) ? 1.0f : -1.0f;
-    float zSign = (index & 4) ? 1.0f : -1.0f;
-
-    return mCenter + mAxisX * (xSign * mHalfExtents.x) +
-                     mAxisY * (ySign * mHalfExtents.y) +
-                     mAxisZ * (zSign * mHalfExtents.z);
+Vector3 OBB::getCorner(CornerEnum cornerToGet) const {
+    switch(cornerToGet) {
+        case FAR_LEFT_BOTTOM:
+            return mCenter - mAxisX * mHalfExtents.x - mAxisY * mHalfExtents.y - mAxisZ * mHalfExtents.z;
+        case FAR_LEFT_TOP:
+            return mCenter - mAxisX * mHalfExtents.x + mAxisY * mHalfExtents.y - mAxisZ * mHalfExtents.z;
+        case FAR_RIGHT_TOP:
+            return mCenter + mAxisX * mHalfExtents.x + mAxisY * mHalfExtents.y - mAxisZ * mHalfExtents.z;
+        case FAR_RIGHT_BOTTOM:
+            return mCenter + mAxisX * mHalfExtents.x - mAxisY * mHalfExtents.y - mAxisZ * mHalfExtents.z;
+        case NEAR_RIGHT_BOTTOM:
+            return mCenter + mAxisX * mHalfExtents.x - mAxisY * mHalfExtents.y + mAxisZ * mHalfExtents.z;
+        case NEAR_LEFT_BOTTOM:
+            return mCenter - mAxisX * mHalfExtents.x - mAxisY * mHalfExtents.y + mAxisZ * mHalfExtents.z;
+        case NEAR_LEFT_TOP:
+            return mCenter - mAxisX * mHalfExtents.x + mAxisY * mHalfExtents.y + mAxisZ * mHalfExtents.z;
+        case NEAR_RIGHT_TOP:
+            return mCenter + mAxisX * mHalfExtents.x + mAxisY * mHalfExtents.y + mAxisZ * mHalfExtents.z;
+        default:
+            return Vector3();
+    }
 }
 
-void OBB::getCorners(Vector3* corners) const {
-    assert(corners);
+const Vector3* OBB::getCorners() const {
+    if (!mCorners)
+        mCorners = new Vector3[8];
 
-    // Calculate all 8 corners
-    for (int i = 0; i < 8; ++i) {
-        corners[i] = getCorner(i);
-    }
+    mCorners[FAR_LEFT_BOTTOM] = getCorner(FAR_LEFT_BOTTOM);
+    mCorners[FAR_LEFT_TOP] = getCorner(FAR_LEFT_TOP);
+    mCorners[FAR_RIGHT_TOP] = getCorner(FAR_RIGHT_TOP);
+    mCorners[FAR_RIGHT_BOTTOM] = getCorner(FAR_RIGHT_BOTTOM);
+    mCorners[NEAR_RIGHT_TOP] = getCorner(NEAR_RIGHT_TOP);
+    mCorners[NEAR_LEFT_TOP] = getCorner(NEAR_LEFT_TOP);
+    mCorners[NEAR_LEFT_BOTTOM] = getCorner(NEAR_LEFT_BOTTOM);
+    mCorners[NEAR_RIGHT_BOTTOM] = getCorner(NEAR_RIGHT_BOTTOM);
+
+    return mCorners;
 }
 
 bool OBB::intersects(const OBB& other) const {
@@ -433,8 +465,7 @@ bool OBB::contains(const Vector3& point) const {
 
 bool OBB::contains(const OBB& other) const {
     // Get corners of the other OBB
-    Vector3 corners[8];
-    other.getCorners(corners);
+    const Vector3* corners = other.getCorners();
 
     // Check if all corners are inside this OBB
     for (int i = 0; i < 8; ++i) {

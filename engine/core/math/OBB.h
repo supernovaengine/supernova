@@ -19,8 +19,20 @@ namespace Supernova {
         Vector3 mAxisX;          // Local X axis direction (normalized)
         Vector3 mAxisY;          // Local Y axis direction (normalized)
         Vector3 mAxisZ;          // Local Z axis direction (normalized)
+        mutable Vector3* mCorners;
 
     public:
+        enum CornerEnum {
+            FAR_LEFT_BOTTOM = 0,
+            FAR_LEFT_TOP = 1,
+            FAR_RIGHT_TOP = 2,
+            FAR_RIGHT_BOTTOM = 3,
+            NEAR_RIGHT_BOTTOM = 7,
+            NEAR_LEFT_BOTTOM = 6,
+            NEAR_LEFT_TOP = 5,
+            NEAR_RIGHT_TOP = 4
+        };
+
         static const OBB ZERO;
 
         OBB();
@@ -64,8 +76,8 @@ namespace Supernova {
         Matrix4 toMatrix() const;
 
         // Get corners of the OBB
-        Vector3 getCorner(unsigned int index) const;
-        void getCorners(Vector3* corners) const;
+        Vector3 getCorner(CornerEnum cornerToGet) const;
+        const Vector3* getCorners() const;
 
         // Testing
         bool intersects(const OBB& other) const;

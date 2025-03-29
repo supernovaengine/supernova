@@ -401,8 +401,8 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("setExtents", 
             luabridge::overload<const Vector3&, const Vector3&>(&AABB::setExtents),
             luabridge::overload<float, float, float, float, float, float>(&AABB::setExtents))
-        .addFunction("getAllCorners", &AABB::getAllCorners)
         .addFunction("getCorner", &AABB::getCorner)
+        .addFunction("getCorners", &AABB::getCorners)
         .addFunction("merge", 
             luabridge::overload<const AABB&>(&AABB::merge),
             luabridge::overload<const Vector3&>(&AABB::merge))
@@ -453,7 +453,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
                 .addVariable("NEAR_RIGHT_TOP", AABB::CornerEnum::NEAR_RIGHT_TOP);
             table.pop();
             return table;
-            })
+        })
         .endClass();
 
     luabridge::getGlobalNamespace(L)
@@ -491,6 +491,21 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("distance", &OBB::distance)
         .addFunction("volume", &OBB::volume)
         .addFunction("closestPoint", &OBB::closestPoint)
+        .addStaticProperty("CornerEnum", [](lua_State* L) {
+            auto table = luabridge::newTable(L);
+            table.push(L);
+            luabridge::getNamespaceFromStack(L)
+                .addVariable("FAR_LEFT_BOTTOM", OBB::CornerEnum::FAR_LEFT_BOTTOM)
+                .addVariable("FAR_LEFT_TOP", OBB::CornerEnum::FAR_LEFT_TOP)
+                .addVariable("FAR_RIGHT_TOP", OBB::CornerEnum::FAR_RIGHT_TOP)
+                .addVariable("FAR_RIGHT_BOTTOM", OBB::CornerEnum::FAR_RIGHT_BOTTOM)
+                .addVariable("NEAR_RIGHT_BOTTOM", OBB::CornerEnum::NEAR_RIGHT_BOTTOM)
+                .addVariable("NEAR_LEFT_BOTTOM", OBB::CornerEnum::NEAR_LEFT_BOTTOM)
+                .addVariable("NEAR_LEFT_TOP", OBB::CornerEnum::NEAR_LEFT_TOP)
+                .addVariable("NEAR_RIGHT_TOP", OBB::CornerEnum::NEAR_RIGHT_TOP);
+            table.pop();
+            return table;
+        })
         .endClass();
 
     luabridge::getGlobalNamespace(L)
