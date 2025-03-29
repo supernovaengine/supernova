@@ -182,14 +182,7 @@ void Object::setLocalMatrix(Matrix4 localMatrix){
     if (transform.localMatrix != localMatrix){
         transform.localMatrix = localMatrix;
 
-        Vector3 position;
-        Vector3 scale;
-        Quaternion rotation;
-        localMatrix.decompose(position, scale, rotation);
-
-        transform.position = position;
-        transform.scale = scale;
-        transform.rotation = rotation;
+        localMatrix.decompose(transform.position, transform.scale, transform.rotation);
 
         transform.needUpdate = true;
     }

@@ -675,6 +675,12 @@ Quaternion& Quaternion::normalize(void){
     return *this;
 }
 
+Quaternion Quaternion::normalized() const {
+    Quaternion result = *this;
+    result.normalize();
+    return result;
+}
+
 float Quaternion::normalizeL(void){
     float len = norm();
     float factor = 1.0f / sqrt(len);

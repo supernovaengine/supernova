@@ -8,6 +8,7 @@ namespace Supernova{
 
     class Plane;
     class AABB;
+    class OBB;
 
     class SUPERNOVA_API Sphere {
     public:
@@ -28,6 +29,7 @@ namespace Supernova{
 
         bool intersects(const Sphere& other) const;
         bool intersects(const AABB& aabb) const;
+        bool intersects(const OBB& obb) const;
         bool intersects(const Plane& plane) const;
         bool intersects(const Vector3& v) const;
 

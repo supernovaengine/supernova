@@ -1,10 +1,11 @@
 #ifndef ray_h
 #define ray_h
 
-#include "math/Vector3.h"
-#include "math/Plane.h"
-#include "math/AABB.h"
-#include "math/Sphere.h"
+#include "Vector3.h"
+#include "Plane.h"
+#include "AABB.h"
+#include "Sphere.h"
+#include "OBB.h"
 #include "object/physics/Body2D.h"
 #include "object/physics/Body3D.h"
 
@@ -56,6 +57,7 @@ namespace Supernova {
 
         RayReturn intersects(Plane plane);
         RayReturn intersects(AABB box);
+        RayReturn intersects(OBB obb);
         RayReturn intersects(Sphere sphere);
         RayReturn intersects(Body2D body);
         RayReturn intersects(Body2D body, size_t shape);

@@ -5,6 +5,7 @@
 
 #include "Plane.h"
 #include "AABB.h"
+#include "OBB.h"
 
 using namespace Supernova;
 
@@ -53,6 +54,12 @@ bool Sphere::intersects(const Sphere& other) const {
 
 bool Sphere::intersects(const AABB& aabb) const{
     return aabb.intersects(*this);
+}
+
+bool Sphere::intersects(const OBB& obb) const {
+    Vector3 closestPt = obb.closestPoint(center);
+    float distanceSquared = closestPt.squaredDistance(center);
+    return distanceSquared <= (radius * radius);
 }
 
 bool Sphere::intersects(const Plane& plane) const{

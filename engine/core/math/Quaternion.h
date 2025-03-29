@@ -91,6 +91,7 @@ namespace Supernova {
         static Quaternion squad (float fT, const Quaternion& rkP, const Quaternion& rkA, const Quaternion& rkB, const Quaternion& rkQ);
 
         Quaternion& normalize(void);
+        Quaternion normalized() const;
         float normalizeL(void);
         float getRoll() const;
         float getPitch() const;

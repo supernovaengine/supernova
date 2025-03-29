@@ -5,6 +5,8 @@
 #include "AABB.h"
 
 namespace Supernova{
+
+    class OBB;
     
     class SUPERNOVA_API Plane{
 
@@ -35,6 +37,7 @@ namespace Supernova{
         Side getSide (const Vector3& rkPoint) const;
         Side getSide (const Vector3& centre, const Vector3& halfSize) const;
         Side getSide (const AABB& rkBox) const;
+        Side getSide (const OBB& obb) const;
 
         float getDistance (const Vector3& rkPoint) const;
 
@@ -43,7 +46,8 @@ namespace Supernova{
 
         Vector3 projectVector(const Vector3& v) const;
 
-        float normalize(void);
+        Plane& normalize(void);
+        Plane normalized() const;
     
     };
     

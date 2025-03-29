@@ -67,6 +67,7 @@ namespace Supernova {
         float squaredDistance(const Vector3& rhs) const;
 
         Vector3& normalize();
+        Vector3 normalized() const;
         float normalizeL();
 
         Vector3 crossProduct( const Vector3& v ) const;

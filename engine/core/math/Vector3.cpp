@@ -169,6 +169,12 @@ Vector3& Vector3::normalize(){
     return *this;
 }
 
+Vector3 Vector3::normalized() const {
+    Vector3 result = *this;
+    result.normalize();
+    return result;
+}
+
 float Vector3::normalizeL(){
     float length = (float)sqrt( x * x + y * y + z * z );
 

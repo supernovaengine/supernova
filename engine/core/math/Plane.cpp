@@ -1,6 +1,7 @@
 #include "Plane.h"
 
 #include "Matrix3.h"
+#include "OBB.h"
 
 using namespace Supernova;
 
@@ -81,6 +82,25 @@ Plane::Side Plane::getSide (const AABB& box) const {
     return getSide(box.getCenter(), box.getHalfSize());
 }
 
+Plane::Side Plane::getSide (const OBB& obb) const {
+    // First, find the extent of the OBB along the plane's normal
+    float r = obb.getHalfExtents().x * std::abs(normal.dotProduct(obb.getAxisX())) +
+              obb.getHalfExtents().y * std::abs(normal.dotProduct(obb.getAxisY())) +
+              obb.getHalfExtents().z * std::abs(normal.dotProduct(obb.getAxisZ()));
+
+    // Now find the distance of the center from the plane
+    float distance = getDistance(obb.getCenter());
+
+    // Determine which side the OBB is on
+    if (distance < -r)
+        return Plane::NEGATIVE_SIDE;
+
+    if (distance > r)
+        return Plane::POSITIVE_SIDE;
+
+    return Plane::BOTH_SIDE;
+}
+
 void Plane::redefine(const Vector3& rkPoint0, const Vector3& rkPoint1, const Vector3& rkPoint2) {
     Vector3 kEdge1 = rkPoint1 - rkPoint0;
     Vector3 kEdge2 = rkPoint2 - rkPoint0;
@@ -108,7 +128,7 @@ Vector3 Plane::projectVector(const Vector3& p) const {
     return xform * p;
 }
 
-float Plane::normalize(void) {
+Plane& Plane::normalize(void) {
     float fLength = normal.length();
 
     if ( fLength > 0.0 ) {
@@ -117,5 +137,11 @@ float Plane::normalize(void) {
         d *= fInvLength;
     }
 
-    return fLength;
+    return *this;
+}
+
+Plane Plane::normalized() const{
+    Plane result = *this;
+    result.normalize();
+    return result;
 }

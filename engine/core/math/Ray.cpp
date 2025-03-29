@@ -179,6 +179,111 @@ RayReturn Ray::intersects(AABB box){
     return NO_HIT;
 }
 
+RayReturn Ray::intersects(OBB obb) {
+    // First transform the ray into the OBB's local space
+    Vector3 localOrigin = origin - obb.getCenter();
+
+    // Get the OBB axes
+    Vector3 dirX = obb.getAxisX();
+    Vector3 dirY = obb.getAxisY();
+    Vector3 dirZ = obb.getAxisZ();
+
+    // Convert ray origin and direction to OBB space
+    Vector3 obbSpaceOrigin(
+        localOrigin.dotProduct(dirX),
+        localOrigin.dotProduct(dirY),
+        localOrigin.dotProduct(dirZ)
+    );
+
+    Vector3 obbSpaceDirection(
+        direction.dotProduct(dirX),
+        direction.dotProduct(dirY),
+        direction.dotProduct(dirZ)
+    );
+
+    // Now we can treat it as an AABB intersection test in the OBB's local space
+    Vector3 halfExtents = obb.getHalfExtents();
+    Vector3 min = -halfExtents;
+    Vector3 max = halfExtents;
+
+    // Ray-AABB intersection algorithm (slab method)
+    float tmin = -std::numeric_limits<float>::infinity();
+    float tmax = std::numeric_limits<float>::infinity();
+
+    // Track which axis/face causes the intersection
+    int minAxis = -1;
+    bool isMinFace = true; // true if it's the "min" face of the axis, false if it's the "max" face
+
+    // Check intersection with each pair of planes
+    for (int i = 0; i < 3; ++i) {
+        if (std::abs(obbSpaceDirection[i]) < 1e-6f) {
+            // Ray is parallel to the slab, check if ray origin is inside slab
+            if (obbSpaceOrigin[i] < min[i] || obbSpaceOrigin[i] > max[i]) {
+                return NO_HIT;
+            }
+        } else {
+            // Compute intersection with the planes
+            float ood = 1.0f / obbSpaceDirection[i];
+            float t1 = (min[i] - obbSpaceOrigin[i]) * ood;
+            float t2 = (max[i] - obbSpaceOrigin[i]) * ood;
+
+            // Make t1 the intersection with the near plane, t2 with far plane
+            bool flipped = false;
+            if (t1 > t2) {
+                std::swap(t1, t2);
+                flipped = true;
+            }
+
+            // Update tmin and tmax
+            if (t1 > tmin) {
+                tmin = t1;
+                minAxis = i;
+                isMinFace = !flipped;
+            }
+            tmax = std::min(tmax, t2);
+
+            // Exit early if no intersection
+            if (tmin > tmax) {
+                return NO_HIT;
+            }
+        }
+    }
+
+    // If tmax < 0, the ray is intersecting the OBB but the whole OBB is behind the ray origin
+    if (tmax < 0) {
+        return NO_HIT;
+    }
+
+    // If tmin < 0, the ray origin is inside the OBB, use tmax and the exit normal
+    float t = (tmin >= 0) ? tmin : tmax;
+    if (t > 1.0f) { // Beyond the ray length
+        return NO_HIT;
+    }
+
+    // Calculate the hit point in world space
+    Vector3 hitPoint = getPoint(t);
+
+    // Determine the normal in OBB space
+    Vector3 obbNormal = Vector3::ZERO;
+    if (minAxis == 0) {
+        obbNormal = isMinFace ? Vector3(-1, 0, 0) : Vector3(1, 0, 0);
+    } else if (minAxis == 1) {
+        obbNormal = isMinFace ? Vector3(0, -1, 0) : Vector3(0, 1, 0);
+    } else if (minAxis == 2) {
+        obbNormal = isMinFace ? Vector3(0, 0, -1) : Vector3(0, 0, 1);
+    }
+
+    // Transform the normal back to world space
+    Vector3 worldNormal = (
+        obbNormal.x * dirX +
+        obbNormal.y * dirY +
+        obbNormal.z * dirZ
+    );
+    worldNormal.normalize();
+
+    return {true, t, hitPoint, worldNormal, NULL_ENTITY, 0};
+}
+
 RayReturn Ray::intersects(Sphere sphere) {
     Vector3 rayorig = origin - sphere.center;
     float radius = sphere.radius;

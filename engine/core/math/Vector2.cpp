@@ -248,7 +248,6 @@ float Vector2::dotProduct(const Vector2& vec) const{
     return x * vec.x + y * vec.y;
 }
 
-
 Vector2& Vector2::normalize(){
     float fLength = sqrt( x * x + y * y);
     
@@ -260,6 +259,12 @@ Vector2& Vector2::normalize(){
     }
     
     return *this;
+}
+
+Vector2 Vector2::normalized() const {
+    Vector2 result = *this;
+    result.normalize();
+    return result;
 }
 
 float Vector2::normalizeL(){

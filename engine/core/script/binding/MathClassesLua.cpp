@@ -20,6 +20,7 @@
 #include "Sphere.h"
 #include "Plane.h"
 #include "AABB.h"
+#include "OBB.h"
 
 using namespace Supernova;
 
@@ -80,6 +81,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("squaredDistance", &Vector2::squaredDistance)
         .addFunction("dotProduct", &Vector2::dotProduct)
         .addFunction("normalize", &Vector2::normalize)
+        .addFunction("normalized", &Vector2::normalized)
         .addFunction("normalizeL", &Vector2::normalizeL)
         .addFunction("midPoint", &Vector2::midPoint)
         .addFunction("makeFloor", &Vector2::makeFloor)
@@ -123,6 +125,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("distance", &Vector3::distance)
         .addFunction("squaredDistance", &Vector3::squaredDistance)
         .addFunction("normalize", &Vector3::normalize)
+        .addFunction("normalized", &Vector3::normalized)
         .addFunction("normalizeL", &Vector3::normalizeL)
         .addFunction("crossProduct", &Vector3::crossProduct)
         .addFunction("midPoint", &Vector3::midPoint)
@@ -197,6 +200,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("intersects", 
             luabridge::overload<const Sphere&>(&Sphere::intersects),
             luabridge::overload<const AABB&>(&Sphere::intersects),
+            luabridge::overload<const OBB&>(&Sphere::intersects),
             luabridge::overload<const Plane&>(&Sphere::intersects),
             luabridge::overload<const Vector3&>(&Sphere::intersects))
         .addFunction("merge", &Sphere::merge)
@@ -334,6 +338,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<float, const Quaternion&, const Quaternion&, bool>(&Quaternion::nlerp))
         .addStaticFunction("squad", &Quaternion::squad)
         .addFunction("normalize", &Quaternion::normalize)
+        .addFunction("normalized", &Quaternion::normalized)
         .addFunction("normalizeL", &Quaternion::normalizeL)
         .addFunction("getRoll", &Quaternion::getRoll)
         .addFunction("getPitch", &Quaternion::getPitch)
@@ -353,13 +358,15 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("getSide", 
             luabridge::overload<const Vector3&>(&Plane::getSide),
             luabridge::overload<const Vector3&, const Vector3&>(&Plane::getSide),
-            luabridge::overload<const AABB&>(&Plane::getSide))
+            luabridge::overload<const AABB&>(&Plane::getSide),
+            luabridge::overload<const OBB&>(&Plane::getSide))
         .addFunction("getDistance", &Plane::getDistance)
         .addFunction("redefine", 
             luabridge::overload<const Vector3&, const Vector3&, const Vector3&>(&Plane::redefine),
             luabridge::overload<const Vector3&, const Vector3&>(&Plane::redefine))
         .addFunction("projectVector", &Plane::projectVector)
         .addFunction("normalize", &Plane::normalize)
+        .addFunction("normalized", &Plane::normalized)
         .addStaticProperty("Side", [](lua_State* L) {
             auto table = luabridge::newTable(L);
             table.push(L);
@@ -407,6 +414,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("setInfinite", &AABB::isNull)
         .addFunction("intersects", 
             luabridge::overload<const AABB&>(&AABB::intersects),
+            luabridge::overload<const OBB&>(&AABB::intersects),
             luabridge::overload<const Plane&>(&AABB::intersects),
             luabridge::overload<const Sphere&>(&AABB::intersects),
             luabridge::overload<const Vector3&>(&AABB::intersects))
@@ -449,6 +457,43 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .beginClass<OBB>("OBB")
+        .addConstructor<
+            void(), 
+            void(const Vector3&, const Vector3&),
+            void(const Vector3&, const Vector3&, const Vector3&, const Vector3&, const Vector3&)>()
+        .addFunction("toString", &OBB::toString)
+        .addProperty("center", &OBB::getCenter, &OBB::setCenter)
+        .addProperty("halfExtents", &OBB::getHalfExtents, &OBB::setHalfExtents)
+        .addFunction("getAxisX", &OBB::getAxisX)
+        .addFunction("getAxisY", &OBB::getAxisY)
+        .addFunction("getAxisZ", &OBB::getAxisZ)
+        .addFunction("setAxes", 
+            luabridge::overload<const Quaternion&>(&OBB::setAxes),
+            luabridge::overload<const Vector3&, const Vector3&, const Vector3&>(&OBB::setAxes))
+        .addProperty("orientation", &OBB::getOrientation, &OBB::setOrientation)
+        .addFunction("transform", 
+            luabridge::overload<const Matrix4&>(&OBB::transform),
+            luabridge::overload<const Vector3&, const Quaternion&, const Vector3&>(&OBB::transform))
+        .addFunction("toAABB", &OBB::toAABB)
+        .addFunction("toMatrix", &OBB::toMatrix)
+        .addFunction("getCorner", &OBB::getCorner)
+        .addFunction("getCorners", &OBB::getCorners)
+        .addFunction("intersects", 
+            luabridge::overload<const OBB&>(&OBB::intersects),
+            luabridge::overload<const AABB&>(&OBB::intersects),
+            luabridge::overload<const Sphere&>(&OBB::intersects),
+            luabridge::overload<const Plane&>(&OBB::intersects))
+        .addFunction("contains", 
+            luabridge::overload<const Vector3&>(&OBB::contains),
+            luabridge::overload<const OBB&>(&OBB::contains))
+        .addFunction("squaredDistance", &OBB::squaredDistance)
+        .addFunction("distance", &OBB::distance)
+        .addFunction("volume", &OBB::volume)
+        .addFunction("closestPoint", &OBB::closestPoint)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginNamespace("RayFilter")
         .addVariable("BODY_2D", RayFilter::BODY_2D)
         .addVariable("BODY_3D", RayFilter::BODY_3D)
@@ -473,6 +518,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("getPoint", &Ray::getPoint)
         .addFunction("intersects", 
             luabridge::overload<AABB>(&Ray::intersects),
+            luabridge::overload<OBB>(&Ray::intersects),
             luabridge::overload<Plane>(&Ray::intersects),
             luabridge::overload<Body2D>(&Ray::intersects),
             luabridge::overload<Body2D, size_t>(&Ray::intersects),

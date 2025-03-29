@@ -8,6 +8,7 @@
 namespace Supernova{
 
     class Plane;
+    class OBB;
     
     class SUPERNOVA_API AABB{
 
@@ -53,6 +54,8 @@ namespace Supernova{
         bool operator== (const AABB& rhs) const;
         bool operator!= (const AABB& rhs) const;
 
+        OBB getOBB() const;
+
         const Vector3& getMinimum() const;
         Vector3& getMinimum();
 
@@ -91,6 +94,7 @@ namespace Supernova{
         bool isInfinite(void) const;
 
         bool intersects(const AABB& b2) const;
+        bool intersects(const OBB& obb) const;
         bool intersects(const Plane& p) const;
         bool intersects(const Sphere& sp) const;
         bool intersects(const Vector3& v) const;

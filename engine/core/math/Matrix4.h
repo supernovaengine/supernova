@@ -10,6 +10,7 @@ namespace Supernova {
 
     class Quaternion;
     class AABB;
+    class OBB;
 
     class SUPERNOVA_API Matrix4{
 
@@ -37,6 +38,7 @@ namespace Supernova {
         Vector3 operator*(const Vector3 &) const;
         Vector4 operator*(const Vector4 &) const;
         AABB operator*(const AABB &) const;
+        OBB operator*(const OBB &) const;
         const float *operator[](int iCol) const;
         float *operator[](int iCol);
         bool operator==(const Matrix4 &) const;

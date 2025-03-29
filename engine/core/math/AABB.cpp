@@ -2,6 +2,7 @@
 
 #include "Plane.h"
 #include "Log.h"
+#include "OBB.h"
 
 using namespace Supernova;
 
@@ -73,6 +74,17 @@ bool AABB::operator!= (const AABB& rhs) const {
     return !(*this == rhs);
 }
 
+OBB AABB::getOBB() const {
+    if (isNull()) {
+        return OBB();
+    }
+
+    if (isInfinite()) {
+        return OBB(getCenter(), Vector3(std::numeric_limits<float>::max()));
+    }
+
+    return OBB(getCenter(), getHalfSize());
+}
 
 const Vector3& AABB::getMinimum() const {
     return mMinimum;
@@ -339,7 +351,13 @@ bool AABB::intersects(const AABB& b2) const {
         return false;
 
     return true;
+}
 
+bool AABB::intersects(const OBB& obb) const {
+    if (isNull()) return false;
+    if (isInfinite()) return true;
+
+    return getOBB().intersects(obb);
 }
 
 bool AABB::intersects(const Plane& p) const {

@@ -88,6 +88,7 @@ namespace Supernova {
         float dotProduct(const Vector2& vec) const;
 
         Vector2& normalize();
+        Vector2 normalized() const;
         float normalizeL();
 
         Vector2 midPoint( const Vector2& vec ) const;
