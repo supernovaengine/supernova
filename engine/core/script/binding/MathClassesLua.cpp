@@ -479,6 +479,9 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("toMatrix", &OBB::toMatrix)
         .addFunction("getCorner", &OBB::getCorner)
         .addFunction("getCorners", &OBB::getCorners)
+        .addFunction("enclose", 
+            luabridge::overload<const Vector3&>(&OBB::enclose),
+            luabridge::overload<const OBB&>(&OBB::enclose))
         .addFunction("intersects", 
             luabridge::overload<const OBB&>(&OBB::intersects),
             luabridge::overload<const AABB&>(&OBB::intersects),

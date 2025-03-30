@@ -10,11 +10,11 @@
 
 using namespace Supernova;
 
-const OBB OBB::ZERO(Vector3::ZERO, Vector3(0.5f, 0.5f, 0.5f));
+const OBB OBB::ZERO(Vector3::ZERO, Vector3(0.0f, 0.0f, 0.0f));
 
 OBB::OBB() 
     : mCenter(Vector3::ZERO),
-      mHalfExtents(Vector3(0.5f, 0.5f, 0.5f)),
+      mHalfExtents(Vector3(0.0f, 0.0f, 0.0f)),
       mAxisX(Vector3::UNIT_X),
       mAxisY(Vector3::UNIT_Y),
       mAxisZ(Vector3::UNIT_Z),
@@ -261,6 +261,61 @@ const Vector3* OBB::getCorners() const {
     mCorners[NEAR_RIGHT_BOTTOM] = getCorner(NEAR_RIGHT_BOTTOM);
 
     return mCorners;
+}
+
+void OBB::enclose(const OBB& other) {
+    // Handle null OBBs
+    if (mHalfExtents.x <= 0.0f || mHalfExtents.y <= 0.0f || mHalfExtents.z <= 0.0f) {
+        *this = other;
+        return;
+    }
+
+    if (other.mHalfExtents.x <= 0.0f || other.mHalfExtents.y <= 0.0f || other.mHalfExtents.z <= 0.0f) {
+        return;
+    }
+
+    // Get corners of the other OBB
+    const Vector3* otherCorners = other.getCorners();
+
+    // Expand this OBB to include all corners of the other OBB
+    for (int i = 0; i < 8; ++i) {
+        enclose(otherCorners[i]);
+    }
+
+    // Clear corners so they'll be recalculated
+    if (mCorners) {
+        delete[] mCorners;
+        mCorners = nullptr;
+    }
+}
+
+void OBB::enclose(const Vector3& point) {
+    // Transform point to OBB's local space
+    Vector3 localPoint = point - mCenter;
+
+    // Project point onto each axis
+    float x = localPoint.dotProduct(mAxisX);
+    float y = localPoint.dotProduct(mAxisY);
+    float z = localPoint.dotProduct(mAxisZ);
+
+    // Find new extents
+    Vector3 minExtents = Vector3(-mHalfExtents.x, -mHalfExtents.y, -mHalfExtents.z);
+    Vector3 maxExtents = mHalfExtents;
+
+    // Update min/max extents
+    if (x < minExtents.x) minExtents.x = x;
+    if (x > maxExtents.x) maxExtents.x = x;
+    if (y < minExtents.y) minExtents.y = y;
+    if (y > maxExtents.y) maxExtents.y = y;
+    if (z < minExtents.z) minExtents.z = z;
+    if (z > maxExtents.z) maxExtents.z = z;
+
+    // Calculate new center and half extents in local space
+    Vector3 localCenter = (minExtents + maxExtents) * 0.5f;
+    mHalfExtents = (maxExtents - minExtents) * 0.5f;
+
+    // Transform center back to world space
+    mCenter = mCenter + mAxisX * localCenter.x + mAxisY * localCenter.y + mAxisZ * localCenter.z;
 }
 
 bool OBB::intersects(const OBB& other) const {

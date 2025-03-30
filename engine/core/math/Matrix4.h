@@ -31,10 +31,12 @@ namespace Supernova {
         std::string toString() const;
 
         Matrix4 &operator=(const Matrix4 &);
-        Matrix4  operator*(const Matrix4 &) const;
-        Matrix4  operator+(const Matrix4 &) const;
-        Matrix4  operator-(const Matrix4 &) const;
+        Matrix4 operator*(const Matrix4 &) const;
+        Matrix4 operator*(float scalar) const;
+        Matrix4 operator+(const Matrix4 &) const;
+        Matrix4 operator-(const Matrix4 &) const;
         Matrix4 &operator*=(const Matrix4 &);
+        Matrix4 &operator*=(float scalar);
         Vector3 operator*(const Vector3 &) const;
         Vector4 operator*(const Vector4 &) const;
         AABB operator*(const AABB &) const;
@@ -54,13 +56,13 @@ namespace Supernova {
         void setRow(const unsigned int row, const Vector4& vec);
         void setColumn(const unsigned int column, const Vector4& vec);
 
-        void identity();
-        void translateInPlace(float x, float y, float z);
+        Matrix4& identity();
+        Matrix4& translateInPlace(float x, float y, float z);
 
         Matrix3 linear() const;
 
-        Matrix4 inverse();
-        Matrix4 transpose();
+        Matrix4 inverse() const;
+        Matrix4 transpose() const;
         float determinant() const;
 
         static Matrix4 translateMatrix(const float x, const float y, const float z);

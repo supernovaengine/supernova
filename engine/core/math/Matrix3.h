@@ -27,7 +27,9 @@ namespace Supernova {
         Matrix3  operator+(const Matrix3 &) const;
         Matrix3  operator-(const Matrix3 &) const;
         Matrix3 &operator*=(const Matrix3 &);
+        Matrix3 &operator*=(float scalar);
         Vector3 operator*(const Vector3 &) const;
+        Matrix3 operator*(float scalar) const;
         const float *operator[](int iCol) const;
         float *operator[](int iCol);
         bool operator==(const Matrix3 &) const;
@@ -43,13 +45,13 @@ namespace Supernova {
         void setRow(const unsigned int row, const Vector3& vec);
         void setColumn(const unsigned int column, const Vector3& vec);
 
-        void identity();
+        Matrix3& identity();
 
         bool calcInverse(Matrix3& rkInverse, float fTolerance) const;
 
-        Matrix3 inverse(float fTolerance);
-        Matrix3 transpose();
-        float determinant();
+        Matrix3 inverse(float fTolerance) const;
+        Matrix3 transpose() const;
+        float determinant() const;
 
         static Matrix3 rotateMatrix(const float angle, const Vector3 &axis);
         static Matrix3 rotateMatrix(const float azimuth, const float elevation);

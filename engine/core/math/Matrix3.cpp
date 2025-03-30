@@ -90,6 +90,15 @@ Matrix3& Matrix3::operator*=(const Matrix3 &m) {
     return (*this) = (*this)*m;
 }
 
+Matrix3& Matrix3::operator*=(float scalar) {
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            matrix[i][j] *= scalar;
+        }
+    }
+    return *this;
+}
+
 Vector3 Matrix3::operator*(const Vector3 &v) const {
     float prod[3] = { 0,0,0 };
 
@@ -101,6 +110,16 @@ Vector3 Matrix3::operator*(const Vector3 &v) const {
     }
 
     return Vector3(prod[0] ,prod[1] ,prod[2]);
+}
+
+Matrix3 Matrix3::operator*(float scalar) const {
+    Matrix3 result;
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            result.matrix[i][j] = matrix[i][j] * scalar;
+        }
+    }
+    return result;
 }
 
 const float* Matrix3::operator[](int iCol) const {
@@ -162,14 +181,22 @@ void Matrix3::setColumn(const unsigned int column, const Vector3& vec){
     matrix[column][2] = vec.z;
 }
 
-void Matrix3::identity() {
+Matrix3& Matrix3::identity() {
     int i, j;
     for(i=0; i<3; ++i)
         for(j=0; j<3; ++j)
             set(i,j,(i==j ? 1.f : 0.f));
+
+    return *this;
 }
 
-Matrix3 Matrix3::transpose() {
+Matrix3 Matrix3::inverse(float fTolerance) const{
+    Matrix3 kInverse(0,0,0,0,0,0,0,0,0);
+    calcInverse(kInverse,fTolerance);
+    return kInverse;
+}
+
+Matrix3 Matrix3::transpose() const{
     Matrix3 tmp;
 
     for (int i=0;i<3;i++)
@@ -177,6 +204,19 @@ Matrix3 Matrix3::transpose() {
             tmp.set(j,i,get(i,j));
 
     return tmp;
+}
+
+float Matrix3::determinant() const{
+    float fCofactor00 = matrix[1][1]*matrix[2][2] - matrix[2][1]*matrix[1][2];
+    float fCofactor01 = matrix[2][1]*matrix[0][2] - matrix[0][1]*matrix[2][2];
+    float fCofactor02 = matrix[0][1]*matrix[1][2] - matrix[1][1]*matrix[0][2];
+
+    float fDet =
+            matrix[0][0]*fCofactor00 +
+            matrix[1][0]*fCofactor01 +
+            matrix[2][0]*fCofactor02;
+
+    return fDet;
 }
 
 bool Matrix3::calcInverse(Matrix3& rkInverse, float fTolerance) const {
@@ -206,25 +246,6 @@ bool Matrix3::calcInverse(Matrix3& rkInverse, float fTolerance) const {
     }
 
     return true;
-}
-
-Matrix3 Matrix3::inverse(float fTolerance) {
-    Matrix3 kInverse(0,0,0,0,0,0,0,0,0);
-    calcInverse(kInverse,fTolerance);
-    return kInverse;
-}
-
-float Matrix3::determinant() {
-    float fCofactor00 = matrix[1][1]*matrix[2][2] - matrix[2][1]*matrix[1][2];
-    float fCofactor01 = matrix[2][1]*matrix[0][2] - matrix[0][1]*matrix[2][2];
-    float fCofactor02 = matrix[0][1]*matrix[1][2] - matrix[1][1]*matrix[0][2];
-
-    float fDet =
-            matrix[0][0]*fCofactor00 +
-            matrix[1][0]*fCofactor01 +
-            matrix[2][0]*fCofactor02;
-
-    return fDet;
 }
 
 Matrix3 Matrix3::rotateMatrix(const float angle, const Vector3 &axis){

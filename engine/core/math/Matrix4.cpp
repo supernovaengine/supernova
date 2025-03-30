@@ -67,6 +67,16 @@ Matrix4 Matrix4::operator *(const Matrix4 &m) const{
     return prod;
 }
 
+Matrix4 Matrix4::operator*(float scalar) const {
+    Matrix4 result;
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            result.matrix[i][j] = matrix[i][j] * scalar;
+        }
+    }
+    return result;
+}
+
 std::string Matrix4::toString() const{
     return "Matrix4("+
         std::to_string(matrix[0][0]) + ", " + std::to_string(matrix[0][1]) + ", " + std::to_string(matrix[0][2]) + ", " + std::to_string(matrix[0][3]) + ", " +
@@ -107,6 +117,15 @@ Matrix4 Matrix4::operator -(const Matrix4 &m) const{
 Matrix4& Matrix4::operator*=(const Matrix4 &m){
 
     return (*this) = (*this)*m;
+}
+
+Matrix4& Matrix4::operator*=(float scalar) {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            matrix[i][j] *= scalar;
+        }
+    }
+    return *this;
 }
 
 Vector3 Matrix4::operator*(const Vector3 &v) const{
@@ -215,14 +234,16 @@ void Matrix4::setColumn(const unsigned int column, const Vector4& vec){
     matrix[column][3] = vec.w;
 }
 
-void Matrix4::identity(){
+Matrix4& Matrix4::identity(){
     int i, j;
     for(i=0; i<4; ++i)
         for(j=0; j<4; ++j)
             set(i,j,(i==j ? 1.f : 0.f));
+
+    return *this;
 }
 
-void Matrix4::translateInPlace(float x, float y, float z){
+Matrix4& Matrix4::translateInPlace(float x, float y, float z){
     Vector4 t = Vector4(x, y, z, 0);
     Vector4 r = Vector4();
     int i;
@@ -230,6 +251,8 @@ void Matrix4::translateInPlace(float x, float y, float z){
         r = row(i);
         set(3, i, get(3, i) + r.dotProduct(t));
     }
+
+    return *this;
 }
 
 Matrix3 Matrix4::linear() const{
@@ -239,33 +262,7 @@ Matrix3 Matrix4::linear() const{
         matrix[0][2], matrix[1][2], matrix[2][2]);
 }
 
-Matrix4 Matrix4::transpose(){
-    Matrix4 tmp;
-
-    for (int i=0;i<4;i++)
-        for (int j=0;j<4;j++)
-            tmp.set(j,i,get(i,j));
-
-    return tmp;
-}
-
-float Matrix4::determinant() const{
-    return
-         matrix[0][3] * matrix[1][2] * matrix[2][1] * matrix[3][0] - matrix[0][2] * matrix[1][3] * matrix[2][1] * matrix[3][0] -
-         matrix[0][3] * matrix[1][1] * matrix[2][2] * matrix[3][0] + matrix[0][1] * matrix[1][3] * matrix[2][2] * matrix[3][0] +
-         matrix[0][2] * matrix[1][1] * matrix[2][3] * matrix[3][0] - matrix[0][1] * matrix[1][2] * matrix[2][3] * matrix[3][0] -
-         matrix[0][3] * matrix[1][2] * matrix[2][0] * matrix[3][1] + matrix[0][2] * matrix[1][3] * matrix[2][0] * matrix[3][1] +
-         matrix[0][3] * matrix[1][0] * matrix[2][2] * matrix[3][1] - matrix[0][0] * matrix[1][3] * matrix[2][2] * matrix[3][1] -
-         matrix[0][2] * matrix[1][0] * matrix[2][3] * matrix[3][1] + matrix[0][0] * matrix[1][2] * matrix[2][3] * matrix[3][1] +
-         matrix[0][3] * matrix[1][1] * matrix[2][0] * matrix[3][2] - matrix[0][1] * matrix[1][3] * matrix[2][0] * matrix[3][2] -
-         matrix[0][3] * matrix[1][0] * matrix[2][1] * matrix[3][2] + matrix[0][0] * matrix[1][3] * matrix[2][1] * matrix[3][2] +
-         matrix[0][1] * matrix[1][0] * matrix[2][3] * matrix[3][2] - matrix[0][0] * matrix[1][1] * matrix[2][3] * matrix[3][2] -
-         matrix[0][2] * matrix[1][1] * matrix[2][0] * matrix[3][3] + matrix[0][1] * matrix[1][2] * matrix[2][0] * matrix[3][3] +
-         matrix[0][2] * matrix[1][0] * matrix[2][1] * matrix[3][3] - matrix[0][0] * matrix[1][2] * matrix[2][1] * matrix[3][3] -
-         matrix[0][1] * matrix[1][0] * matrix[2][2] * matrix[3][3] + matrix[0][0] * matrix[1][1] * matrix[2][2] * matrix[3][3];
-}
-
-Matrix4 Matrix4::inverse(){
+Matrix4 Matrix4::inverse() const{
     float s[6];
     float c[6];
     s[0] = get(0,0)*get(1,1) - get(1,0)*get(0,1);
@@ -307,6 +304,32 @@ Matrix4 Matrix4::inverse(){
     t.set(3,3, ( get(2,0) * s[3] - get(2,1) * s[1] + get(2,2) * s[0]) * idet);
 
     return t;
+}
+
+Matrix4 Matrix4::transpose() const{
+    Matrix4 tmp;
+
+    for (int i=0;i<4;i++)
+        for (int j=0;j<4;j++)
+            tmp.set(j,i,get(i,j));
+
+    return tmp;
+}
+
+float Matrix4::determinant() const{
+    return
+         matrix[0][3] * matrix[1][2] * matrix[2][1] * matrix[3][0] - matrix[0][2] * matrix[1][3] * matrix[2][1] * matrix[3][0] -
+         matrix[0][3] * matrix[1][1] * matrix[2][2] * matrix[3][0] + matrix[0][1] * matrix[1][3] * matrix[2][2] * matrix[3][0] +
+         matrix[0][2] * matrix[1][1] * matrix[2][3] * matrix[3][0] - matrix[0][1] * matrix[1][2] * matrix[2][3] * matrix[3][0] -
+         matrix[0][3] * matrix[1][2] * matrix[2][0] * matrix[3][1] + matrix[0][2] * matrix[1][3] * matrix[2][0] * matrix[3][1] +
+         matrix[0][3] * matrix[1][0] * matrix[2][2] * matrix[3][1] - matrix[0][0] * matrix[1][3] * matrix[2][2] * matrix[3][1] -
+         matrix[0][2] * matrix[1][0] * matrix[2][3] * matrix[3][1] + matrix[0][0] * matrix[1][2] * matrix[2][3] * matrix[3][1] +
+         matrix[0][3] * matrix[1][1] * matrix[2][0] * matrix[3][2] - matrix[0][1] * matrix[1][3] * matrix[2][0] * matrix[3][2] -
+         matrix[0][3] * matrix[1][0] * matrix[2][1] * matrix[3][2] + matrix[0][0] * matrix[1][3] * matrix[2][1] * matrix[3][2] +
+         matrix[0][1] * matrix[1][0] * matrix[2][3] * matrix[3][2] - matrix[0][0] * matrix[1][1] * matrix[2][3] * matrix[3][2] -
+         matrix[0][2] * matrix[1][1] * matrix[2][0] * matrix[3][3] + matrix[0][1] * matrix[1][2] * matrix[2][0] * matrix[3][3] +
+         matrix[0][2] * matrix[1][0] * matrix[2][1] * matrix[3][3] - matrix[0][0] * matrix[1][2] * matrix[2][1] * matrix[3][3] -
+         matrix[0][1] * matrix[1][0] * matrix[2][2] * matrix[3][3] + matrix[0][0] * matrix[1][1] * matrix[2][2] * matrix[3][3];
 }
 
 Matrix4 Matrix4::translateMatrix(const Vector3& position){

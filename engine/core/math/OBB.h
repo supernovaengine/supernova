@@ -79,6 +79,9 @@ namespace Supernova {
         Vector3 getCorner(CornerEnum cornerToGet) const;
         const Vector3* getCorners() const;
 
+        void enclose(const OBB& other);
+        void enclose(const Vector3& point);
+
         // Testing
         bool intersects(const OBB& other) const;
         bool intersects(const AABB& aabb) const;
