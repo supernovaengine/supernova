@@ -54,11 +54,11 @@ Vector3 Ray::getDirection() const{
     return direction;
 }
 
-Vector3 Ray::getPoint(float distance){
+Vector3 Ray::getPoint(float distance) const{
     return Vector3(origin + (direction * distance));
 }
 
-RayReturn Ray::intersects(Plane plane) {
+RayReturn Ray::intersects(const Plane& plane) const{
     float denom = plane.normal.dotProduct(getDirection());
 
     if (abs(denom) < std::numeric_limits<float>::epsilon()) {
@@ -74,7 +74,7 @@ RayReturn Ray::intersects(Plane plane) {
     return NO_HIT;
 }
 
-RayReturn Ray::intersects(AABB box){
+RayReturn Ray::intersects(const AABB& box) const{
 
     if (box.isNull()) return NO_HIT;
     if (box.isInfinite()) return NO_HIT;
@@ -179,7 +179,7 @@ RayReturn Ray::intersects(AABB box){
     return NO_HIT;
 }
 
-RayReturn Ray::intersects(OBB obb) {
+RayReturn Ray::intersects(const OBB& obb) const{
     // First transform the ray into the OBB's local space
     Vector3 localOrigin = origin - obb.getCenter();
 
@@ -284,7 +284,7 @@ RayReturn Ray::intersects(OBB obb) {
     return {true, t, hitPoint, worldNormal, NULL_ENTITY, 0};
 }
 
-RayReturn Ray::intersects(Sphere sphere) {
+RayReturn Ray::intersects(const Sphere& sphere) const{
     Vector3 rayorig = origin - sphere.center;
     float radius = sphere.radius;
 
@@ -314,7 +314,7 @@ RayReturn Ray::intersects(Sphere sphere) {
     return NO_HIT;
 }
 
-RayReturn Ray::intersects(Body2D body){
+RayReturn Ray::intersects(const Body2D& body) const{
     Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
 
     float ptmScale = body.getPointsToMeterScale();
@@ -356,7 +356,7 @@ RayReturn Ray::intersects(Body2D body){
     return NO_HIT;
 }
 
-RayReturn Ray::intersects(Body2D body, size_t shape){
+RayReturn Ray::intersects(const Body2D& body, size_t shape) const{
     Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
 
     float ptmScale = body.getPointsToMeterScale();
@@ -381,7 +381,7 @@ RayReturn Ray::intersects(Body2D body, size_t shape){
     return NO_HIT;
 }
 
-RayReturn Ray::intersects(Body3D body){
+RayReturn Ray::intersects(const Body3D& body) const{
     Body3DComponent& bodycomp = body.getComponent<Body3DComponent>();
     std::shared_ptr<PhysicsSystem> physicsSystem = body.getScene()->getSystem<PhysicsSystem>();
     JPH::PhysicsSystem* world = physicsSystem->getWorld3D();
@@ -405,7 +405,7 @@ RayReturn Ray::intersects(Body3D body){
     return NO_HIT;
 }
 
-RayReturn Ray::intersects(Body3D body, size_t shape){
+RayReturn Ray::intersects(const Body3D& body, size_t shape) const{
     Body3DComponent& bodycomp = body.getComponent<Body3DComponent>();
 
     if (!bodycomp.body.IsInvalid()){
@@ -425,19 +425,19 @@ RayReturn Ray::intersects(Body3D body, size_t shape){
     return NO_HIT;
 }
 
-RayReturn Ray::intersects(Scene* scene, RayFilter raytest){
+RayReturn Ray::intersects(Scene* scene, RayFilter raytest) const{
     return intersects(scene, raytest, false);
 }
 
-RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic){
+RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic) const{
     return intersects(scene, raytest, onlyStatic, (uint16_t)~0u, (uint16_t)~0u);
 }
 
-RayReturn Ray::intersects(Scene* scene, RayFilter raytest, uint16_t categoryBits, uint16_t maskBits){
+RayReturn Ray::intersects(Scene* scene, RayFilter raytest, uint16_t categoryBits, uint16_t maskBits) const{
     return intersects(scene, raytest, false, categoryBits, maskBits);
 }
 
-RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint16_t categoryBits, uint16_t maskBits){
+RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint16_t categoryBits, uint16_t maskBits) const{
     if (raytest == RayFilter::BODY_2D){
 
         b2WorldId world = scene->getSystem<PhysicsSystem>()->getWorld2D();
@@ -513,11 +513,11 @@ RayReturn Ray::intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint
     return NO_HIT;
 }
 
-RayReturn Ray::intersects(Scene* scene, uint8_t broadPhaseLayer3D){
+RayReturn Ray::intersects(Scene* scene, uint8_t broadPhaseLayer3D) const{
     return intersects(scene, broadPhaseLayer3D, (uint16_t)~0u, (uint16_t)~0u);
 }
 
-RayReturn Ray::intersects(Scene* scene, uint8_t broadPhaseLayer3D, uint16_t categoryBits, uint16_t maskBits){
+RayReturn Ray::intersects(Scene* scene, uint8_t broadPhaseLayer3D, uint16_t categoryBits, uint16_t maskBits) const{
     std::shared_ptr<PhysicsSystem> physicsSystem = scene->getSystem<PhysicsSystem>();
     JPH::PhysicsSystem* world = physicsSystem->getWorld3D();
 

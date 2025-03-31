@@ -53,22 +53,22 @@ namespace Supernova {
         void setDirection(Vector3 direction);
         Vector3 getDirection() const;
 
-        Vector3 getPoint(float distance);
+        Vector3 getPoint(float distance) const;
 
-        RayReturn intersects(Plane plane);
-        RayReturn intersects(AABB box);
-        RayReturn intersects(OBB obb);
-        RayReturn intersects(Sphere sphere);
-        RayReturn intersects(Body2D body);
-        RayReturn intersects(Body2D body, size_t shape);
-        RayReturn intersects(Body3D body);
-        RayReturn intersects(Body3D body, size_t shape);
-        RayReturn intersects(Scene* scene, RayFilter raytest);
-        RayReturn intersects(Scene* scene, RayFilter raytest, bool onlyStatic);
-        RayReturn intersects(Scene* scene, RayFilter raytest, uint16_t categoryBits, uint16_t maskBits);
-        RayReturn intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint16_t categoryBits, uint16_t maskBits);
-        RayReturn intersects(Scene* scene, uint8_t broadPhaseLayer3D); // only 3D bodies
-        RayReturn intersects(Scene* scene, uint8_t broadPhaseLayer3D, uint16_t categoryBits, uint16_t maskBits); // only 3D bodies
+        RayReturn intersects(const Plane& plane) const;
+        RayReturn intersects(const AABB& box) const;
+        RayReturn intersects(const OBB& obb) const;
+        RayReturn intersects(const Sphere& sphere) const;
+        RayReturn intersects(const Body2D& body) const;
+        RayReturn intersects(const Body2D& body, size_t shape) const;
+        RayReturn intersects(const Body3D& body) const;
+        RayReturn intersects(const Body3D& body, size_t shape) const;
+        RayReturn intersects(Scene* scene, RayFilter raytest) const;
+        RayReturn intersects(Scene* scene, RayFilter raytest, bool onlyStatic) const;
+        RayReturn intersects(Scene* scene, RayFilter raytest, uint16_t categoryBits, uint16_t maskBits) const;
+        RayReturn intersects(Scene* scene, RayFilter raytest, bool onlyStatic, uint16_t categoryBits, uint16_t maskBits) const;
+        RayReturn intersects(Scene* scene, uint8_t broadPhaseLayer3D) const; // only 3D bodies
+        RayReturn intersects(Scene* scene, uint8_t broadPhaseLayer3D, uint16_t categoryBits, uint16_t maskBits) const; // only 3D bodies
     };
     
 }
