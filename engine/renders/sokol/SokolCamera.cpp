@@ -54,12 +54,12 @@ void SokolCamera::startRenderPass(){
 
 void SokolCamera::applyViewport(Rect rect){
     //SokolCmdQueue::add_command_apply_viewport((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), false);
-    sg_apply_viewport((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), false);
+    sg_apply_viewport(std::floor(rect.getX()), std::floor(rect.getY()), std::ceil(rect.getWidth()), std::ceil(rect.getHeight()), false);
 }
 
 void SokolCamera::applyScissor(Rect rect){
     //SokolCmdQueue::add_command_apply_scissor_rect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), false);
-    sg_apply_scissor_rect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), false);
+    sg_apply_scissor_rect(std::floor(rect.getX()), std::floor(rect.getY()), std::ceil(rect.getWidth()), std::ceil(rect.getHeight()), false);
 }
 
 void SokolCamera::endRenderPass(){

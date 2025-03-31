@@ -1699,10 +1699,10 @@ void RenderSystem::destroyCamera(CameraComponent& camera, bool entityDestroyed){
 }
 
 Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, CameraComponent& camera){
-	int objScreenPosX = 0;
-	int objScreenPosY = 0;
-	int objScreenWidth = 0;
-	int objScreenHeight = 0;
+	float objScreenPosX = 0;
+	float objScreenPosY = 0;
+	float objScreenWidth = 0;
+	float objScreenHeight = 0;
 
 	if (!camera.renderToTexture) {
 
@@ -1712,13 +1712,19 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
 		float tempX = (2 * transform.worldPosition.x / (float) Engine::getCanvasWidth()) - 1;
 		float tempY = (2 * transform.worldPosition.y / (float) Engine::getCanvasHeight()) - 1;
 
+		float camScaleX = Engine::getCanvasWidth() / (camera.rightClip - camera.leftClip);
+		float camScaleY = Engine::getCanvasHeight() / (camera.topClip - camera.bottomClip);
+
+		float camOffsetX = -(camera.worldTarget.x + camera.leftClip);
+		float camOffsetY = -(camera.worldTarget.y + camera.bottomClip);
+
 		float widthRatio = scaleX * (Engine::getViewRect().getWidth() / (float) Engine::getCanvasWidth());
 		float heightRatio = scaleY * (Engine::getViewRect().getHeight() / (float) Engine::getCanvasHeight());
 
-		objScreenPosX = (tempX * Engine::getViewRect().getWidth() + (float) System::instance().getScreenWidth()) / 2;
-		objScreenPosY = (tempY * Engine::getViewRect().getHeight() + (float) System::instance().getScreenHeight()) / 2;
-		objScreenWidth = layout.width * widthRatio;
-		objScreenHeight = layout.height * heightRatio;
+		objScreenPosX = (camOffsetX + (tempX * Engine::getViewRect().getWidth() + (float) System::instance().getScreenWidth()) / 2)  * camScaleX;
+		objScreenPosY = (camOffsetY + (tempY * Engine::getViewRect().getHeight() + (float) System::instance().getScreenHeight()) / 2) * camScaleY;
+		objScreenWidth = layout.width * widthRatio * camScaleX;
+		objScreenHeight = layout.height * heightRatio * camScaleY;
 
 		if (camera.type == CameraType::CAMERA_2D)
 			objScreenPosY = (float) System::instance().getScreenHeight() - objScreenHeight - objScreenPosY;
