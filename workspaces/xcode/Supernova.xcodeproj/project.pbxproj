@@ -443,6 +443,9 @@
 		715253542CD057C400D294D8 /* Sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = 715253522CD057C400D294D8 /* Sphere.h */; };
 		715253552CD057C400D294D8 /* Sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715253532CD057C400D294D8 /* Sphere.cpp */; };
 		715253562CD057C400D294D8 /* Sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715253532CD057C400D294D8 /* Sphere.cpp */; };
+		7157344B2D9A23A40078952E /* OBB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157344A2D9A23A40078952E /* OBB.cpp */; };
+		7157344C2D9A23A40078952E /* OBB.h in Headers */ = {isa = PBXBuildFile; fileRef = 715734492D9A23A40078952E /* OBB.h */; };
+		7157344D2D9A23A40078952E /* OBB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157344A2D9A23A40078952E /* OBB.cpp */; };
 		7157764E2B050C230049C970 /* FontPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 7157764C2B050C230049C970 /* FontPool.h */; };
 		7157764F2B050C230049C970 /* FontPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157764D2B050C230049C970 /* FontPool.cpp */; };
 		715776502B050C230049C970 /* FontPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157764D2B050C230049C970 /* FontPool.cpp */; };
@@ -1787,6 +1790,8 @@
 		7151E79E2D2E01CB00FC3F38 /* TaperedCylinderShape.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TaperedCylinderShape.cpp; sourceTree = "<group>"; };
 		715253522CD057C400D294D8 /* Sphere.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Sphere.h; sourceTree = "<group>"; };
 		715253532CD057C400D294D8 /* Sphere.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sphere.cpp; sourceTree = "<group>"; };
+		715734492D9A23A40078952E /* OBB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OBB.h; sourceTree = "<group>"; };
+		7157344A2D9A23A40078952E /* OBB.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OBB.cpp; sourceTree = "<group>"; };
 		7157764C2B050C230049C970 /* FontPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontPool.h; sourceTree = "<group>"; };
 		7157764D2B050C230049C970 /* FontPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FontPool.cpp; sourceTree = "<group>"; };
 		7158F43D259C2C82006E55D3 /* Renderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Renderer.h; sourceTree = "<group>"; };
@@ -3372,6 +3377,8 @@
 				7162FC5125962A0E0075B97D /* Matrix3.cpp */,
 				7162FC5425962A0E0075B97D /* Matrix4.h */,
 				7162FC4D25962A0E0075B97D /* Matrix4.cpp */,
+				715734492D9A23A40078952E /* OBB.h */,
+				7157344A2D9A23A40078952E /* OBB.cpp */,
 				7162FC5225962A0E0075B97D /* Plane.h */,
 				7162FC5C25962A0E0075B97D /* Plane.cpp */,
 				7162FC4F25962A0E0075B97D /* Quaternion.h */,
@@ -4223,6 +4230,7 @@
 				71ABBD1E277A31BA001CE3AF /* Text.h in Headers */,
 				7126757E2B65F4470031089C /* LinesComponent.h in Headers */,
 				71E54505284D5BB700C68FAB /* TranslateTracks.h in Headers */,
+				7157344C2D9A23A40078952E /* OBB.h in Headers */,
 				71EA6DA62AE20B8C00CA9A75 /* CollideShapeResult3D.h in Headers */,
 				71E54517284D5BE000C68FAB /* TranslateTracksComponent.h in Headers */,
 				71E54514284D5BE000C68FAB /* ScaleTracksComponent.h in Headers */,
@@ -5375,6 +5383,7 @@
 				713E581027BA9CE400376680 /* Polygon.cpp in Sources */,
 				717AD9852919E1CB007D7DB5 /* UILayout.cpp in Sources */,
 				713D8292259D307E00567F9F /* Log.cpp in Sources */,
+				7157344B2D9A23A40078952E /* OBB.cpp in Sources */,
 				7105A56928B305B20092EA05 /* ECSClassesLua.cpp in Sources */,
 				71451BDD270CA17F00712643 /* RotationAction.cpp in Sources */,
 				71ABBD0F277A313C001CE3AF /* AlphaAction.cpp in Sources */,
@@ -5539,6 +5548,7 @@
 				713E580F27BA9CE400376680 /* Polygon.cpp in Sources */,
 				717AD9842919E1CB007D7DB5 /* UILayout.cpp in Sources */,
 				7162FE0D2596A5BE0075B97D /* SokolBuffer.cpp in Sources */,
+				7157344D2D9A23A40078952E /* OBB.cpp in Sources */,
 				7105A56828B305B20092EA05 /* ECSClassesLua.cpp in Sources */,
 				71451BDC270CA17F00712643 /* RotationAction.cpp in Sources */,
 				71ABBD0E277A313C001CE3AF /* AlphaAction.cpp in Sources */,
