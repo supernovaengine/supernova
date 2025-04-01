@@ -8,6 +8,7 @@
 #include "SokolCmdQueue.h"
 
 #include "sokol_gfx.h"
+#include <cmath>
 
 using namespace Supernova;
 
@@ -53,13 +54,31 @@ void SokolCamera::startRenderPass(){
 }
 
 void SokolCamera::applyViewport(Rect rect){
-    //SokolCmdQueue::add_command_apply_viewport((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), false);
-    sg_apply_viewport(std::floor(rect.getX()), std::floor(rect.getY()), std::ceil(rect.getWidth()), std::ceil(rect.getHeight()), false);
+    float x = rect.getX();
+    float y = rect.getY();
+    float flooredX = std::floor(x);
+    float flooredY = std::floor(y);
+
+    // Add truncated fractional parts to width and height
+    float adjustedWidth = rect.getWidth() + (x - flooredX);
+    float adjustedHeight = rect.getHeight() + (y - flooredY);
+
+    //SokolCmdQueue::add_command_apply_viewport(flooredX, flooredY, std::ceil(adjustedWidth), std::ceil(adjustedHeight), false);
+    sg_apply_viewport(flooredX, flooredY, std::ceil(adjustedWidth), std::ceil(adjustedHeight), false);
 }
 
 void SokolCamera::applyScissor(Rect rect){
-    //SokolCmdQueue::add_command_apply_scissor_rect((int)rect.getX(), (int)rect.getY(), (int)rect.getWidth(), (int)rect.getHeight(), false);
-    sg_apply_scissor_rect(std::floor(rect.getX()), std::floor(rect.getY()), std::ceil(rect.getWidth()), std::ceil(rect.getHeight()), false);
+    float x = rect.getX();
+    float y = rect.getY();
+    float flooredX = std::floor(x);
+    float flooredY = std::floor(y);
+
+    // Add truncated fractional parts to width and height
+    float adjustedWidth = rect.getWidth() + (x - flooredX);
+    float adjustedHeight = rect.getHeight() + (y - flooredY);
+
+    //SokolCmdQueue::add_command_apply_scissor_rect(flooredX, flooredY, std::ceil(adjustedWidth), std::ceil(adjustedHeight), false);
+    sg_apply_scissor_rect(flooredX, flooredY, std::ceil(adjustedWidth), std::ceil(adjustedHeight), false);
 }
 
 void SokolCamera::endRenderPass(){
