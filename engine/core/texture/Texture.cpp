@@ -376,24 +376,24 @@ std::string Texture::getId() const{
     return id;
 }
 
-int Texture::getWidth() const{
+unsigned int Texture::getWidth() const{
     if (this->framebuffer){
         return framebuffer->getWidth();
     }
     if (!data){
         return 0;
     }
-    return getData().getOriginalWidth();
+    return static_cast<unsigned int>(getData().getOriginalWidth());
 }
 
-int Texture::getHeight() const{
+unsigned int Texture::getHeight() const{
     if (this->framebuffer){
         return framebuffer->getHeight();
     }
     if (!data){
         return 0;
     }
-    return getData().getOriginalHeight();
+    return static_cast<unsigned int>(getData().getOriginalHeight());
 }
 
 bool Texture::isTransparent() const{

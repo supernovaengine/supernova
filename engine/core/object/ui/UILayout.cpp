@@ -15,7 +15,7 @@ UILayout::UILayout(Scene* scene): Object(scene){
 UILayout::UILayout(Scene* scene, Entity entity): Object(scene, entity){
 }
 
-void UILayout::setSize(int width, int height){
+void UILayout::setSize(unsigned int width, unsigned int height){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
     layout.width = width;
@@ -24,7 +24,7 @@ void UILayout::setSize(int width, int height){
     layout.needUpdateSizes = true;
 }
 
-void UILayout::setWidth(int width){
+void UILayout::setWidth(unsigned int width){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
     layout.width = width;
@@ -32,7 +32,7 @@ void UILayout::setWidth(int width){
     layout.needUpdateSizes = true;
 }
 
-void UILayout::setHeight(int height){
+void UILayout::setHeight(unsigned int height){
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
     layout.height = height;
@@ -40,13 +40,13 @@ void UILayout::setHeight(int height){
     layout.needUpdateSizes = true;
 }
 
-int UILayout::getWidth() const{
+unsigned int UILayout::getWidth() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
     return layout.width;
 }
 
-int UILayout::getHeight() const{
+unsigned int UILayout::getHeight() const{
     UILayoutComponent& layout = getComponent<UILayoutComponent>();
 
     return layout.height;

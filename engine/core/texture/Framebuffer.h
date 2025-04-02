@@ -13,8 +13,8 @@ namespace Supernova{
 
         private:
             FramebufferRender render;
-            int width;
-            int height;
+            unsigned int width;
+            unsigned int height;
             TextureFilter minFilter;
             TextureFilter magFilter;
             TextureWrap wrapU;
@@ -36,11 +36,11 @@ namespace Supernova{
             FramebufferRender& getRender();
             unsigned long getVersion();
 
-            void setWidth(int width);
-            int getWidth() const;
+            void setWidth(unsigned int width);
+            unsigned int getWidth() const;
 
-            void setHeight(int height);
-            int getHeight() const;
+            void setHeight(unsigned int height);
+            unsigned int getHeight() const;
 
             void setMinFilter(TextureFilter filter);
             TextureFilter getMinFilter() const;

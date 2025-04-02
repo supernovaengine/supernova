@@ -20,8 +20,8 @@ namespace Supernova{
 
         void clearVertices();
 
-        int getWidth();
-        int getHeight();
+        unsigned int getWidth();
+        unsigned int getHeight();
 
         void setFlipY(bool flipY);
         bool isFlipY() const;

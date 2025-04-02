@@ -242,9 +242,9 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
         mesh.buffer.addVector3(attVertex, Vector3(tilemap.tiles[i].position.x, tilemap.tiles[i].position.y + tilemap.tiles[i].height, 0));
 
         if (tilemap.width < tilemap.tiles[i].position.x + tilemap.tiles[i].width)
-            tilemap.width = tilemap.tiles[i].position.x + tilemap.tiles[i].width;
+            tilemap.width = static_cast<unsigned int>(tilemap.tiles[i].position.x + tilemap.tiles[i].width);
         if (tilemap.height < tilemap.tiles[i].position.y + tilemap.tiles[i].height)
-            tilemap.height = tilemap.tiles[i].position.y + tilemap.tiles[i].height;
+            tilemap.height = static_cast<unsigned int>(tilemap.tiles[i].position.y + tilemap.tiles[i].height);
 
         TileRectData& rectData = tilemap.tilesRect[tilemap.tiles[i].rectId];
         Rect& tileRect = rectData.rect;

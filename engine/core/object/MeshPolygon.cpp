@@ -45,13 +45,13 @@ void MeshPolygon::clearVertices(){
     pcomp.needUpdatePolygon = true;
 }
 
-int MeshPolygon::getWidth(){
+unsigned int MeshPolygon::getWidth(){
     MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
 
     return pcomp.width;
 }
 
-int MeshPolygon::getHeight(){
+unsigned int MeshPolygon::getHeight(){
     MeshPolygonComponent& pcomp = getComponent<MeshPolygonComponent>();
 
     return pcomp.height;

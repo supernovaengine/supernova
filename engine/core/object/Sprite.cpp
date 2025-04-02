@@ -39,7 +39,7 @@ bool Sprite::createSprite(){
     return scene->getSystem<MeshSystem>()->createOrUpdateSprite(spritecomp, mesh);
 }
 
-void Sprite::setSize(int width, int height){
+void Sprite::setSize(unsigned int width, unsigned int height){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     if ((spritecomp.width != width) || (spritecomp.height != height)){
@@ -50,7 +50,7 @@ void Sprite::setSize(int width, int height){
     }
 }
 
-void Sprite::setWidth(int width){
+void Sprite::setWidth(unsigned int width){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     if (spritecomp.width != width){
@@ -60,7 +60,7 @@ void Sprite::setWidth(int width){
     }
 }
 
-void Sprite::setHeight(int height){
+void Sprite::setHeight(unsigned int height){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     if (spritecomp.height != height){
@@ -70,13 +70,13 @@ void Sprite::setHeight(int height){
     }
 }
 
-int Sprite::getWidth() const{
+unsigned int Sprite::getWidth() const{
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     return spritecomp.width;
 }
 
-int Sprite::getHeight() const{
+unsigned int Sprite::getHeight() const{
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
     return spritecomp.height;

@@ -14,12 +14,12 @@ namespace Supernova{
         UILayout(Scene* scene);
         UILayout(Scene* scene, Entity entity);
 
-        void setSize(int width, int height);
-        void setWidth(int width);
-        void setHeight(int height);
+        void setSize(unsigned int width, unsigned int height);
+        void setWidth(unsigned int width);
+        void setHeight(unsigned int height);
 
-        int getWidth() const;
-        int getHeight() const;
+        unsigned int getWidth() const;
+        unsigned int getHeight() const;
 
         void setAnchorPoints(float left, float top, float right, float bottom);
         void setAnchorPointLeft(float left);

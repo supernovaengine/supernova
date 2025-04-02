@@ -25,8 +25,8 @@ namespace Supernova{
 
         AnchorPreset titleAnchorPreset = AnchorPreset::CENTER;
 
-        int minWidth = 0;
-        int minHeight = 0;
+        unsigned int minWidth = 0;
+        unsigned int minHeight = 0;
 
         int headerMarginLeft = 0;
         int headerMarginTop = 0;

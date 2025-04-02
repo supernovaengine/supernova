@@ -272,6 +272,18 @@ unsigned int Tilemap::getReserveTiles() const{
     return tilemap.reserveTiles;
 }
 
+unsigned int Tilemap::getWidth(){
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+
+    return tilemap.width;
+}
+
+unsigned int Tilemap::getHeight(){
+    TilemapComponent& tilemap = getComponent<TilemapComponent>();
+
+    return tilemap.height;
+}
+
 void Tilemap::clearAll(){
     clearTiles();
     clearRects();

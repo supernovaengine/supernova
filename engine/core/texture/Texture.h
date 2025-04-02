@@ -72,8 +72,8 @@ namespace Supernova{
             TextureData& getData(size_t index = 0) const;
             std::string getId() const;
 
-            int getWidth() const;
-            int getHeight() const;
+            unsigned int getWidth() const;
+            unsigned int getHeight() const;
             bool isTransparent() const;
 
             void setReleaseDataAfterLoad(bool releaseDataAfterLoad);

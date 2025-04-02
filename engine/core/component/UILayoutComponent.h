@@ -35,8 +35,8 @@ namespace Supernova{
 
     struct SUPERNOVA_API UILayoutComponent{
         // UI part
-        int width = 0;
-        int height = 0;
+        unsigned int width = 0;
+        unsigned int height = 0;
 
         float anchorPointLeft = 0;
         float anchorPointTop = 0;

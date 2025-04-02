@@ -462,10 +462,10 @@ void UISystem::updatePanel(Entity entity, PanelComponent& panel, ImageComponent&
         panel.minHeight = layout.height;
     }
     if (panel.minWidth < (img.patchMarginLeft + img.patchMarginRight + 1)){
-        panel.minWidth = img.patchMarginLeft + img.patchMarginRight + 1;
+        panel.minWidth = static_cast<unsigned int>(img.patchMarginLeft + img.patchMarginRight + 1);
     }
     if (panel.minHeight < (img.patchMarginTop + img.patchMarginBottom + 1)){
-        panel.minHeight = img.patchMarginTop + img.patchMarginBottom + 1;
+        panel.minHeight = static_cast<unsigned int>(img.patchMarginTop + img.patchMarginBottom + 1);
     }
 
     UILayoutComponent& titlelayout = scene->getComponent<UILayoutComponent>(panel.headertext);
@@ -667,8 +667,8 @@ void UISystem::createUIPolygon(PolygonComponent& polygon, UIComponent& ui, UILay
         ui.buffer.addVector2(AttributeType::TEXCOORD1, Vector2(u, v));
     }
 
-    layout.width = (int)(max_X - min_X);
-    layout.height = (int)(max_Y - min_Y);
+    layout.width = static_cast<unsigned int>(max_X - min_X);
+    layout.height = static_cast<unsigned int>(max_Y - min_Y);
 
     calculateUIAABB(ui);
 
@@ -1218,8 +1218,8 @@ void UISystem::update(double dt){
                         }
                         totalWidth += container.boxes[b].rect.getWidth();
                         totalHeight += container.boxes[b].rect.getHeight();
-                        container.maxHeight = std::max(container.maxHeight, (int)container.boxes[b].rect.getHeight());
-                        container.maxWidth = std::max(container.maxWidth, (int)container.boxes[b].rect.getWidth());
+                        container.maxHeight = std::max(container.maxHeight, (unsigned int)container.boxes[b].rect.getHeight());
+                        container.maxWidth = std::max(container.maxWidth, (unsigned int)container.boxes[b].rect.getWidth());
                     }
                     if (container.boxes[b].expand){
                         container.numBoxExpand++;
@@ -1883,29 +1883,29 @@ bool UISystem::eventOnPointerMove(float x, float y){
             if (panel.edgePointerDown != PanelEdge::NONE){
                 panelSizeAcc += Vector2(pointerDiff.x / transform.worldScale.x, pointerDiff.y / transform.worldScale.y);
                 if (panel.edgePointerDown == PanelEdge::RIGHT){
-                    layout.width += (int)panelSizeAcc.x;
+                    layout.width += (unsigned int)panelSizeAcc.x;
                     layout.needUpdateSizes = true;
                     cursor = CursorType::RESIZE_EW;
                 }else if (panel.edgePointerDown == PanelEdge::RIGHT_BOTTOM){
-                    layout.width += (int)panelSizeAcc.x;
-                    layout.height += (int)panelSizeAcc.y;
+                    layout.width += (unsigned int)panelSizeAcc.x;
+                    layout.height += (unsigned int)panelSizeAcc.y;
                     layout.needUpdateSizes = true;
                     cursor = CursorType::RESIZE_NWSE;
                 }else if (panel.edgePointerDown == PanelEdge::BOTTOM){
-                    layout.height += (int)panelSizeAcc.y;
+                    layout.height += (unsigned int)panelSizeAcc.y;
                     layout.needUpdateSizes = true;
                     cursor = CursorType::RESIZE_NS;
                 }else if (panel.edgePointerDown == PanelEdge::LEFT_BOTTOM){
                     transform.position += Vector3(pointerDiff.x / transform.worldScale.x, 0, 0);
                     transform.needUpdate = true;
-                    layout.width -= (int)panelSizeAcc.x;
-                    layout.height += (int)panelSizeAcc.y;
+                    layout.width -= (unsigned int)panelSizeAcc.x;
+                    layout.height += (unsigned int)panelSizeAcc.y;
                     layout.needUpdateSizes = true;
                     cursor = CursorType::RESIZE_NESW;
                 }else if (panel.edgePointerDown == PanelEdge::LEFT){
                     transform.position += Vector3(pointerDiff.x / transform.worldScale.x, 0, 0);
                     transform.needUpdate = true;
-                    layout.width -= (int)panelSizeAcc.x;
+                    layout.width -= (unsigned int)panelSizeAcc.x;
                     layout.needUpdateSizes = true;
                     cursor = CursorType::RESIZE_EW;
                 }

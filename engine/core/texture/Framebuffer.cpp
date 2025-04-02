@@ -67,19 +67,19 @@ unsigned long Framebuffer::getVersion(){
     return this->version;
 }
 
-void Framebuffer::setWidth(int width){
+void Framebuffer::setWidth(unsigned int width){
     this->width = width;
 }
 
-int Framebuffer::getWidth() const{
+unsigned int Framebuffer::getWidth() const{
     return this->width;
 }
 
-void Framebuffer::setHeight(int height){
+void Framebuffer::setHeight(unsigned int height){
     this->height = height;
 }
 
-int Framebuffer::getHeight() const{
+unsigned int Framebuffer::getHeight() const{
     return this->height;
 }
 

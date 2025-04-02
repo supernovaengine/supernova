@@ -12,8 +12,8 @@
 namespace Supernova{
 
     struct SUPERNOVA_API MeshPolygonComponent{
-        int width = 0;
-        int height = 0;
+        unsigned int width = 0;
+        unsigned int height = 0;
 
         bool automaticFlipY = true;
         bool flipY = false;

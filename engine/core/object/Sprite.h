@@ -26,12 +26,12 @@ namespace Supernova{
 
         bool createSprite();
 
-        void setSize(int width, int height);
-        void setWidth(int width);
-        void setHeight(int height);
+        void setSize(unsigned int width, unsigned int height);
+        void setWidth(unsigned int width);
+        void setHeight(unsigned int height);
 
-        int getWidth() const;
-        int getHeight() const;
+        unsigned int getWidth() const;
+        unsigned int getHeight() const;
 
         void setFlipY(bool flipY);
         bool isFlipY() const;

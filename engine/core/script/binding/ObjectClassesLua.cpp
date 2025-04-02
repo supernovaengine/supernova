@@ -444,6 +444,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<int>(&Tilemap::getTile),
             luabridge::overload<const std::string&>(&Tilemap::getTile))
         .addProperty("reserveTiles", &Tilemap::getReserveTiles, &Tilemap::setReserveTiles)
+        .addFunction("getWidth", &Tilemap::getWidth)
+        .addFunction("getHeight", &Tilemap::getHeight)
         .addFunction("clearAll", &Tilemap::clearAll)
         .endClass();
 

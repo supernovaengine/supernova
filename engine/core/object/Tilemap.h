@@ -51,6 +51,9 @@ namespace Supernova{
         void setReserveTiles(unsigned int reserveTiles);
         unsigned int getReserveTiles() const;
 
+        unsigned int getWidth();
+        unsigned int getHeight();
+
         void clearAll();
 
     };

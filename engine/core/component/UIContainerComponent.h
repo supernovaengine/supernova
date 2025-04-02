@@ -29,12 +29,12 @@ namespace Supernova{
 
         ContainerBox boxes[MAX_CONTAINER_BOXES];
 
-        int numBoxes = 0;
-        int fixedWidth = 0;
-        int fixedHeight = 0;
-        int maxWidth = 0;
-        int maxHeight = 0;
-        int numBoxExpand = 0;
+        unsigned int numBoxes = 0;
+        unsigned int fixedWidth = 0;
+        unsigned int fixedHeight = 0;
+        unsigned int maxWidth = 0;
+        unsigned int maxHeight = 0;
+        unsigned int numBoxExpand = 0;
     };
     
 }

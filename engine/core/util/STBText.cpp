@@ -154,7 +154,7 @@ TextureData* STBText::load(const std::string& fontpath, unsigned int fontSize){
 }
 
 void STBText::createText(const std::string& text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
-                         int& width, int& height, bool fixedWidth, bool fixedHeight, bool multiline, bool invert){
+                         unsigned int& width, unsigned int& height, bool fixedWidth, bool fixedHeight, bool multiline, bool invert){
     
     std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
     std::wstring utf16String;
