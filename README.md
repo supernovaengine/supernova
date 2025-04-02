@@ -4,6 +4,8 @@
 ![](https://github.com/supernovaengine/supernova/actions/workflows/build-tool.yml/badge.svg)
 ![](https://github.com/supernovaengine/supernova/actions/workflows/cmake-desktop.yml/badge.svg)
 
+[![Join our Discord](https://img.shields.io/discord/1356958061880934480?label=Discord&logo=discord&style=flat&color=5865F2)](https://discord.gg/yXXDyJf3gT)
+
 **Entity component system (ECS)** and **data-oriented design** engine using object oriented for API.
 
 
@@ -12,6 +14,7 @@ Supernova is a **free** and open-source, cross-platform game engine for creating
 ![Screenshot1](https://supernovaengine.org/img/gh_screen.png)
 
 Live samples: https://samples.supernovaengine.org/
+
 
 ## Supports
 
