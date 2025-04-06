@@ -372,45 +372,57 @@ bool RenderSystem::checkPBRFrabebufferUpdate(Material& material){
 		material.emissiveTexture.isFramebufferOutdated() );
 }
 
-void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool shadows){
+bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool shadows){
 	TextureRender* textureRender = NULL;
 	std::pair<int, int> slotTex(-1, -1);
 
+	bool hasTexture = false;
+
 	textureRender = material.baseColorTexture.getRender();
 	slotTex = shaderData.getTextureIndex(TextureShaderType::BASECOLOR);
-	if (textureRender)
+	if (textureRender){
 		render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-	else
+		hasTexture = true;
+	}else{
 		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+	}
 
 	if (hasLights){
 		textureRender = material.metallicRoughnessTexture.getRender();
 		slotTex = shaderData.getTextureIndex(TextureShaderType::METALLICROUGHNESS);
-		if (textureRender)
+		if (textureRender){
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-		else
+			hasTexture = true;
+		}else{
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+		}
 
 		textureRender = material.normalTexture.getRender();
 		slotTex = shaderData.getTextureIndex(TextureShaderType::NORMAL);
-		if (textureRender)
+		if (textureRender){
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-		else
+			hasTexture = true;
+		}else{
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyNormal);
+		}
 
 		textureRender = material.occlusionTexture.getRender();
 		slotTex = shaderData.getTextureIndex(TextureShaderType::OCCULSION);
-		if (textureRender)
+		if (textureRender){
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-		else
+			hasTexture = true;
+		}else{
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
+		}
 
 		textureRender = material.emissiveTexture.getRender();
 		slotTex = shaderData.getTextureIndex(TextureShaderType::EMISSIVE);
-		if (textureRender)
+		if (textureRender){
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-		else
+			hasTexture = true;
+		}else{
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
+		}
 
 		if (hasShadows && shadows){
 			size_t num2DShadows = 0;
@@ -451,6 +463,8 @@ void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 		}
 
 	}
+
+	return hasTexture;
 }
 
 void RenderSystem::loadDepthTexture(Material& material, ShaderData& shaderData, ObjectRender& render){
@@ -937,13 +951,13 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			terrain->needUpdateNodesBuffer = false;
 		}
 
-		if (terrain && terrain->needUpdateTerrain){
+		if (terrain && terrain->needUpdateTexture){
 			for (int s = 0; s < 2; s++){
 				ShaderData& shaderData = mesh.submeshes[s].shader.get()->shaderData;
 				loadTerrainTextures(*terrain, mesh.submeshes[s].render, shaderData);
 			}
 
-			terrain->needUpdateTerrain = false;
+			terrain->needUpdateTexture = false;
 		}
 
 		for (int i = 0; i < mesh.numSubmeshes; i++){
@@ -957,11 +971,17 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 
 			if (mesh.submeshes[i].needUpdateTexture || needUpdateFramebuffer){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
-				loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
+				bool hasTexture = loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
 
 				mesh.submeshes[i].needUpdateTexture = false; // loadDepthTexture is in drawMeshDepth
-				if (mesh.submeshes[i].shaderProperties.find("Uv1") == std::string::npos && mesh.submeshes[i].shaderProperties.find("Uv2") == std::string::npos){
-					mesh.needReload = true;
+				if (hasTexture){
+					if (mesh.submeshes[i].shaderProperties.find("Uv1") == std::string::npos && mesh.submeshes[i].shaderProperties.find("Uv2") == std::string::npos){
+						mesh.needReload = true;
+					}
+				}else{
+					if (mesh.submeshes[i].shaderProperties.find("Uv1") != std::string::npos || mesh.submeshes[i].shaderProperties.find("Uv2") != std::string::npos){
+						mesh.needReload = true;
+					}
 				}
 			}
 
@@ -1247,8 +1267,14 @@ bool RenderSystem::drawUI(UIComponent& ui, Transform& transform, bool renderToTe
 				ui.render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI), ShaderStageType::FRAGMENT, textureRender);
 
 			ui.needUpdateTexture = false;
-			if (ui.shaderProperties.find("Tex") == std::string::npos) {
-				ui.needReload = true;
+			if (textureRender){
+				if (ui.shaderProperties.find("Tex") == std::string::npos) {
+					ui.needReload = true;
+				}
+			}else{
+				if (ui.shaderProperties.find("Tex") != std::string::npos) {
+					ui.needReload = true;
+				}
 			}
 		}
 
@@ -1452,8 +1478,14 @@ bool RenderSystem::drawPoints(PointsComponent& points, Transform& transform, Tra
 				points.render.addTexture(shaderData.getTextureIndex(TextureShaderType::POINTS), ShaderStageType::FRAGMENT, textureRender);
 
 			points.needUpdateTexture = false;
-			if (points.shaderProperties.find("Tex") == std::string::npos){
-				points.needReload = true;
+			if (textureRender){
+				if (points.shaderProperties.find("Tex") == std::string::npos) {
+					points.needReload = true;
+				}
+			}else{
+				if (points.shaderProperties.find("Tex") != std::string::npos) {
+					points.needReload = true;
+				}
 			}
 		}
 
