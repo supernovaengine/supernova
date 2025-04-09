@@ -265,12 +265,12 @@ const Vector3* OBB::getCorners() const {
 
 void OBB::enclose(const OBB& other) {
     // Handle null OBBs
-    if (mHalfExtents.x <= 0.0f || mHalfExtents.y <= 0.0f || mHalfExtents.z <= 0.0f) {
+    if (mHalfExtents.x <= 0.0f && mHalfExtents.y <= 0.0f && mHalfExtents.z <= 0.0f) {
         *this = other;
         return;
     }
 
-    if (other.mHalfExtents.x <= 0.0f || other.mHalfExtents.y <= 0.0f || other.mHalfExtents.z <= 0.0f) {
+    if (other.mHalfExtents.x <= 0.0f && other.mHalfExtents.y <= 0.0f && other.mHalfExtents.z <= 0.0f) {
         return;
     }
 
