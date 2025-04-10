@@ -358,10 +358,10 @@ void Scene::addEntityChild(Entity parent, Entity child, bool changeTransform){
 				}
 
 				//----------DEBUG
-				//Log::debug("Add child - BEFORE");
+				//printf("Add child - BEFORE\n");
 				//for (int i = 0; i < transforms->size(); i++){
 				//	auto transform = transforms->getComponentFromIndex(i);
-				//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
+				//	printf("Transform %i - Entity: %i - Parent: %i: %s\n", i, transforms->getEntity(i), transform.parent, getEntityName(transforms->getEntity(i)).c_str());
 				//}
 				//----------DEBUG
 
@@ -370,12 +370,12 @@ void Scene::addEntityChild(Entity parent, Entity child, bool changeTransform){
 				moveChildToIndex(child, newIndex, true);
 
 				//----------DEBUG
-				//Log::debug("Add child - AFTER");
+				//printf("Add child - AFTER\n");
 				//for (int i = 0; i < transforms->size(); i++){
 				//	auto transform = transforms->getComponentFromIndex(i);
-				//	Log::debug("Transform %i - Entity: %i - Parent: %i: %s", i, transforms->getEntity(i), transform.parent, transform.name.c_str());
+				//	printf("Transform %i - Entity: %i - Parent: %i: %s\n", i, transforms->getEntity(i), transform.parent, getEntityName(transforms->getEntity(i)).c_str());
 				//}
-				//Log::debug("\n");
+				//printf("\n");
 				//----------DEBUG
 			}
 		}
