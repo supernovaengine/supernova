@@ -204,11 +204,26 @@ Matrix4 Object::getNormalMatrix() const{
 }
 
 void Object::addChild(Object* child){
-    scene->addEntityChild(this->entity, child->entity, false);
+    addChild(child->entity);
 }
 
 void Object::addChild(Entity child){
     scene->addEntityChild(this->entity, child, false);
+}
+
+void Object::removeChild(Object* child){
+    removeChild(child->entity);
+}
+
+void Object::removeChild(Entity child){
+    Transform* childTransform = scene->findComponent<Transform>(child);
+    if (childTransform && childTransform->parent == this->entity){
+        scene->addEntityChild(NULL_ENTITY, child, false);
+    }
+}
+
+void Object::removeParent(){
+    scene->addEntityChild(NULL_ENTITY, this->entity, false);
 }
 
 void Object::moveToTop(){

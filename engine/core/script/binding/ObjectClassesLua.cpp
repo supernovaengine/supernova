@@ -177,6 +177,10 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("addChild", 
             luabridge::overload<Object*>(&Object::addChild),
             luabridge::overload<Entity>(&Object::addChild))
+        .addFunction("removeChild", 
+            luabridge::overload<Object*>(&Object::removeChild),
+            luabridge::overload<Entity>(&Object::removeChild))
+        .addFunction("removeParent", &Object::removeParent)
         .addFunction("moveToTop", &Object::moveToTop)
         .addFunction("moveUp", &Object::moveUp)
         .addFunction("moveDown", &Object::moveDown)

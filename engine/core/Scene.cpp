@@ -320,66 +320,64 @@ size_t Scene::findBranchLastIndex(Entity entity){
 }
 
 void Scene::addEntityChild(Entity parent, Entity child, bool changeTransform){
-	Signature signature;
-	signature.set(componentManager.getComponentId<Transform>(), true);
+	//----------DEBUG
+	//printf("Add child - BEFORE\n");
+	//auto transforms = componentManager.getComponentArray<Transform>();
+	//for (int i = 0; i < transforms->size(); i++){
+	//	auto transform = transforms->getComponentFromIndex(i);
+	//	printf("Transform %i - Entity: %i - Parent: %i: %s\n", i, transforms->getEntity(i), transform.parent, getEntityName(transforms->getEntity(i)).c_str());
+	//}
+	//----------DEBUG
 
 	Signature childSignature = entityManager.getSignature(child);
-	if ((childSignature & signature) == signature){
+	if (childSignature.test(getComponentId<Transform>())){
 		Transform& transformChild = componentManager.getComponent<Transform>(child);
 
 		transformChild.needUpdate = true;
 
 		if (parent == NULL_ENTITY){
 			if (transformChild.parent != NULL_ENTITY){
+				size_t newIndex = findBranchLastIndex(findFirstParent(child)) + 1;
+				moveChildToIndex(child, newIndex, true);
+
+				Transform& transformChild = componentManager.getComponent<Transform>(child);
+
 				transformChild.parent = NULL_ENTITY;
 				if (changeTransform){
 					// set local position to be the same of world position
 					transformChild.modelMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
 				}
-
-				size_t newIndex = findBranchLastIndex(findFirstParent(child)) + 1;
-				moveChildToIndex(child, newIndex, true);
 			}
-			return;
-		}
-
-		Signature parentSignature = entityManager.getSignature(parent);
-		if ((parentSignature & signature) == signature){
-			Transform& transformParent = componentManager.getComponent<Transform>(parent);
-
-			auto transforms = componentManager.getComponentArray<Transform>();
-
-			if (transformChild.parent != parent) {
-				transformChild.parent = parent;
-
-				if (changeTransform){
-					Matrix4 localMatrix = transformParent.modelMatrix.inverse() * transformChild.modelMatrix;
-					localMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
-				}
-
-				//----------DEBUG
-				//printf("Add child - BEFORE\n");
-				//for (int i = 0; i < transforms->size(); i++){
-				//	auto transform = transforms->getComponentFromIndex(i);
-				//	printf("Transform %i - Entity: %i - Parent: %i: %s\n", i, transforms->getEntity(i), transform.parent, getEntityName(transforms->getEntity(i)).c_str());
-				//}
-				//----------DEBUG
-
-				// move the child and its descendants to the new position
+		}else{
+			Signature parentSignature = entityManager.getSignature(parent);
+			if (parentSignature.test(getComponentId<Transform>())){
 				size_t newIndex = findBranchLastIndex(parent) + 1;
 				moveChildToIndex(child, newIndex, true);
 
-				//----------DEBUG
-				//printf("Add child - AFTER\n");
-				//for (int i = 0; i < transforms->size(); i++){
-				//	auto transform = transforms->getComponentFromIndex(i);
-				//	printf("Transform %i - Entity: %i - Parent: %i: %s\n", i, transforms->getEntity(i), transform.parent, getEntityName(transforms->getEntity(i)).c_str());
-				//}
-				//printf("\n");
-				//----------DEBUG
+				Transform& transformParent = componentManager.getComponent<Transform>(parent);
+				Transform& transformChild = componentManager.getComponent<Transform>(child);
+
+				if (transformChild.parent != parent) {
+					transformChild.parent = parent;
+
+					if (changeTransform){
+						Matrix4 localMatrix = transformParent.modelMatrix.inverse() * transformChild.modelMatrix;
+						localMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
+					}
+
+				}
 			}
 		}
 	}
+
+	//----------DEBUG
+	//printf("Add child - AFTER\n");
+	//for (int i = 0; i < transforms->size(); i++){
+	//	auto transform = transforms->getComponentFromIndex(i);
+	//	printf("Transform %i - Entity: %i - Parent: %i: %s\n", i, transforms->getEntity(i), transform.parent, getEntityName(transforms->getEntity(i)).c_str());
+	//}
+	//printf("\n");
+	//----------DEBUG
 }
 
 void Scene::sortComponentsByTransform(Signature entitySignature){

@@ -21,6 +21,11 @@ namespace Supernova{
         void addChild(Object* child);
         void addChild(Entity child);
 
+        void removeChild(Object* child);
+        void removeChild(Entity child);
+
+        void removeParent();
+
         void moveToTop();
         void moveUp();
         void moveDown();
