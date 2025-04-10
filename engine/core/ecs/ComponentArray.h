@@ -130,13 +130,13 @@ namespace Supernova {
 			size_t oldIndex = entityToIndexMap[entity];
 
 			if (oldIndex > newIndex){
-				for (size_t i = oldIndex; i >= newIndex+1; i--){
+				for (size_t i = oldIndex; i > newIndex; i--){
 					Entity moved = indexToEntityMap[i-1];
 					entityToIndexMap[moved] = i;
 					indexToEntityMap[i] = moved;
 				}
 			}else{
-				for (size_t i = oldIndex; i <= newIndex-1; i++){
+				for (size_t i = oldIndex; i < newIndex; i++){
 					Entity moved = indexToEntityMap[i+1];
 					entityToIndexMap[moved] = i;
 					indexToEntityMap[i] = moved;
