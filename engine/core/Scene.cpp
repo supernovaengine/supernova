@@ -248,6 +248,10 @@ void Scene::setLastEntityInternal(Entity lastEntity){
 	entityManager.setLastEntityInternal(lastEntity);
 }
 
+Entity Scene::getLastEntityInternal() const{
+	return entityManager.getLastEntityInternal();
+}
+
 Entity Scene::createEntity(){
     return entityManager.createEntity();
 }

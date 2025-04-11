@@ -35,6 +35,10 @@ namespace Supernova{
             this->lastEntity = lastEntity;
         }
 
+        Entity getLastEntityInternal() const{ // for internal editor use only
+            return this->lastEntity;
+        }
+
         Entity createEntity() {
             lastEntity++;
             metadata[lastEntity];
