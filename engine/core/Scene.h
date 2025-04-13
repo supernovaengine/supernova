@@ -125,7 +125,8 @@ namespace Supernova{
 		bool isEnableUIEvents() const;
 		void setEnableUIEvents(bool enableUIEvents);
 
-		Entity findFirstParent(Entity entity);
+		Entity findOldestParent(Entity entity);
+		bool isParentOf(Entity parent, Entity child);
 		size_t findBranchLastIndex(Entity entity);
 
 		//Entity methods

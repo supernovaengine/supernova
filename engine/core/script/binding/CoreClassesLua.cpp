@@ -429,6 +429,8 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addProperty("sceneAmbientLightEnabled", &Scene::isSceneAmbientLightEnabled, &Scene::setSceneAmbientLightEnabled)
         .addFunction("canReceiveUIEvents", &Scene::canReceiveUIEvents)
         .addProperty("enableUIEvents", &Scene::isEnableUIEvents, &Scene::setEnableUIEvents)
+        .addFunction("findOldestParent", &Scene::findOldestParent)
+        .addFunction("isParentOf", &Scene::isParentOf)
         .addFunction("findBranchLastIndex", &Scene::findBranchLastIndex)
         .addFunction("createEntity", &Scene::createEntity)
         .addFunction("destroyEntity", &Scene::destroyEntity)

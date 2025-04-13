@@ -271,25 +271,56 @@ void Scene::destroyEntity(Entity entity){
 	entityManager.destroy(entity);
 }
 
-Entity Scene::findFirstParent(Entity entity){
+Entity Scene::findOldestParent(Entity entity){
 	auto transforms = componentManager.getComponentArray<Transform>();
 
 	size_t index = transforms->getIndex(entity);
-	Entity firstParent = transforms->getComponentFromIndex(index).parent;
+	Entity lastParent = transforms->getComponentFromIndex(index).parent;
 
 	for (int i = index - 1; i >= 0; i--){
 		entity = transforms->getEntity(i);
 		Transform& transform = transforms->getComponentFromIndex(i);
-		if (entity == firstParent){
-			firstParent = transform.parent;
+		if (entity == lastParent){
+			lastParent = transform.parent;
 
-			if (firstParent == NULL_ENTITY){
+			if (lastParent == NULL_ENTITY){
 				return entity;
 			}
 		}
 	}
 
 	return entity;
+}
+
+bool Scene::isParentOf(Entity parent, Entity child){
+	auto transforms = componentManager.getComponentArray<Transform>();
+
+	size_t index = transforms->getIndex(child);
+	Entity lastParent = transforms->getComponentFromIndex(index).parent;
+
+	if (lastParent == parent){
+		return true;
+	}
+	if (lastParent == NULL_ENTITY){
+		return false;
+	}
+
+	for (int i = index - 1; i >= 0; i--){
+		Entity entity = transforms->getEntity(i);
+		Transform& transform = transforms->getComponentFromIndex(i);
+		if (entity == lastParent){
+			lastParent = transform.parent;
+
+			if (lastParent == parent){
+				return true;
+			}
+			if (lastParent == NULL_ENTITY){
+				return false;
+			}
+		}
+	}
+
+	return false;
 }
 
 size_t Scene::findBranchLastIndex(Entity entity){
@@ -341,7 +372,7 @@ void Scene::addEntityChild(Entity parent, Entity child, bool changeTransform){
 
 		if (parent == NULL_ENTITY){
 			if (transformChild.parent != NULL_ENTITY){
-				size_t newIndex = findBranchLastIndex(findFirstParent(child)) + 1;
+				size_t newIndex = findBranchLastIndex(findOldestParent(child)) + 1;
 				moveChildToIndex(child, newIndex, true);
 
 				Transform& transformChild = componentManager.getComponent<Transform>(child);
