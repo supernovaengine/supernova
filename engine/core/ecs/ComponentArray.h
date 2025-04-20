@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <functional>
 #include <stdexcept>
+#include <numeric>
 #include <memory>
 #include "Entity.h"
 #include "Log.h"
@@ -150,23 +151,55 @@ namespace Supernova {
 		}
 
 		template<typename C>
-		void sortByComponent(std::shared_ptr<ComponentArray<C>> otherComponent){
-			if (size() > 1){
-				for (int i = 1; i < size(); i++){
-					Entity entity1 = indexToEntityMap[i];
-					size_t indexC1 = otherComponent->getIndex(entity1);
+		void sortByComponent(std::shared_ptr<ComponentArray<C>> otherComponent) {
+			// Create a vector of indices [0, 1, ..., N-1]
+			std::vector<size_t> indices(componentArray.size());
+			std::iota(indices.begin(), indices.end(), 0);
 
-					for (int j = 0; j < i; j++){
-						Entity entity2 = indexToEntityMap[j];
-						size_t indexC2 = otherComponent->getIndex(entity2);
+			// Sort indices based on the key in otherComponent
+			std::sort(indices.begin(), indices.end(), [&](size_t a, size_t b) {
+				Entity ea = indexToEntityMap[a];
+				Entity eb = indexToEntityMap[b];
 
-						if (indexC1 < indexC2){
-							moveEntityToIndex(entity1, j);
-							break;
-						}
-					}
-				}
+				bool hasA = otherComponent->hasEntity(ea);
+				bool hasB = otherComponent->hasEntity(eb);
+
+				if (!hasA && !hasB) return false;
+				if (!hasA) return false;
+				if (!hasB) return true;
+
+				size_t indexA = otherComponent->getIndex(ea);
+				size_t indexB = otherComponent->getIndex(eb);
+				return indexA < indexB;
+			});
+
+			// Create new arrays/maps
+			std::vector<T> newComponentArray(componentArray.size());
+			std::unordered_map<Entity, size_t> newEntityToIndexMap;
+			std::unordered_map<size_t, Entity> newIndexToEntityMap;
+
+			for (size_t newIndex = 0; newIndex < indices.size(); ++newIndex) {
+				size_t oldIndex = indices[newIndex];
+				Entity entity = indexToEntityMap[oldIndex];
+				newComponentArray[newIndex] = componentArray[oldIndex];
+				newEntityToIndexMap[entity] = newIndex;
+				newIndexToEntityMap[newIndex] = entity;
 			}
+
+			// Assign new arrays/maps back
+			componentArray = std::move(newComponentArray);
+			entityToIndexMap = std::move(newEntityToIndexMap);
+			indexToEntityMap = std::move(newIndexToEntityMap);
+		}
+
+		bool hasEntity(Entity entity) {
+			auto it = entityToIndexMap.find(entity);
+
+			if (it == entityToIndexMap.end()) {
+				 return false;
+			}
+
+			return true;
 		}
 
 		T* findComponent(Entity entity) {
