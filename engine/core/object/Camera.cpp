@@ -528,14 +528,7 @@ Ray Camera::screenToRay(float x, float y){
 
     // Calculate normalized screen coordinates [-1, 1]
     float normalized_x = ((2.0f * x) / Engine::getCanvasWidth()) - 1.0f;
-    float normalized_y;
-
-    // Handle Y coordinate inversion properly for different camera types
-    if (camera.type == CameraType::CAMERA_2D) {
-        normalized_y = ((2.0f * y) / Engine::getCanvasHeight()) - 1.0f;
-    } else {
-        normalized_y = -(((2.0f * y) / Engine::getCanvasHeight()) - 1.0f);
-    }
+    float normalized_y = -(((2.0f * y) / Engine::getCanvasHeight()) - 1.0f);
 
     // Points in NDC space
     Vector4 near_point_ndc = {normalized_x, normalized_y, -1.0f, 1.0f};

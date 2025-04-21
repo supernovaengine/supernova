@@ -1851,11 +1851,7 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
     }
 
 	//Update ViewMatrix
-	if (camera.type == CameraType::CAMERA_2D){
-        camera.viewMatrix.identity();
-    }else{
-        camera.viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, camera.worldTarget, camera.worldUp);
-    }
+    camera.viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, camera.worldTarget, camera.worldUp);
 
 	camera.worldDirection = Vector3(camera.viewMatrix[0][2], camera.viewMatrix[1][2], camera.viewMatrix[2][2]);
 	camera.worldRight = Vector3(camera.viewMatrix[0][0], camera.viewMatrix[1][0], camera.viewMatrix[2][0]);
