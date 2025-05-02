@@ -16,18 +16,18 @@ namespace Supernova{
         bool createImage();
         bool load();
 
-        void setPatchMargin(int margin);
-        void setPatchMargin(int marginLeft, int marginRight, int marginTop, int marginBottom);
+        void setPatchMargin(unsigned int margin);
+        void setPatchMargin(unsigned int marginLeft, unsigned int marginRight, unsigned int marginTop, unsigned int marginBottom);
 
-        void setPatchMarginBottom(int marginBottom);
-        void setPatchMarginLeft(int marginLeft);
-        void setPatchMarginRight(int marginRight);
-        void setPatchMarginTop(int marginTop);
+        void setPatchMarginBottom(unsigned int marginBottom);
+        void setPatchMarginLeft(unsigned int marginLeft);
+        void setPatchMarginRight(unsigned int marginRight);
+        void setPatchMarginTop(unsigned int marginTop);
 
-        int getPatchMarginBottom() const;
-        int getPatchMarginLeft() const;
-        int getPatchMarginRight() const;
-        int getPatchMarginTop() const;
+        unsigned int getPatchMarginBottom() const;
+        unsigned int getPatchMarginLeft() const;
+        unsigned int getPatchMarginRight() const;
+        unsigned int getPatchMarginTop() const;
 
         void setTexture(const std::string& path);
         void setTexture(Framebuffer* framebuffer);

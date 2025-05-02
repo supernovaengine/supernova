@@ -32,7 +32,7 @@ bool Image::load(){
     return scene->getSystem<RenderSystem>()->loadUI(entity, ui, PIP_DEFAULT | PIP_RTT, false);
 }
 
-void Image::setPatchMargin(int margin){
+void Image::setPatchMargin(unsigned int margin){
     ImageComponent& img = getComponent<ImageComponent>();
     
     img.patchMarginLeft = margin;
@@ -43,7 +43,7 @@ void Image::setPatchMargin(int margin){
     img.needUpdatePatches = true;
 }
 
-void Image::setPatchMargin(int marginLeft, int marginRight, int marginTop, int marginBottom){
+void Image::setPatchMargin(unsigned int marginLeft, unsigned int marginRight, unsigned int marginTop, unsigned int marginBottom){
     ImageComponent& img = getComponent<ImageComponent>();
 
     img.patchMarginLeft = marginLeft;
@@ -54,7 +54,7 @@ void Image::setPatchMargin(int marginLeft, int marginRight, int marginTop, int m
     img.needUpdatePatches = true;
 }
 
-void Image::setPatchMarginBottom(int marginBottom){
+void Image::setPatchMarginBottom(unsigned int marginBottom){
     ImageComponent& img = getComponent<ImageComponent>();
     
     img.patchMarginBottom = marginBottom;
@@ -62,7 +62,7 @@ void Image::setPatchMarginBottom(int marginBottom){
     img.needUpdatePatches = true;
 }
 
-void Image::setPatchMarginLeft(int marginLeft){
+void Image::setPatchMarginLeft(unsigned int marginLeft){
     ImageComponent& img = getComponent<ImageComponent>();
     
     img.patchMarginLeft = marginLeft;
@@ -70,7 +70,7 @@ void Image::setPatchMarginLeft(int marginLeft){
     img.needUpdatePatches = true;
 }
 
-void Image::setPatchMarginRight(int marginRight){
+void Image::setPatchMarginRight(unsigned int marginRight){
     ImageComponent& img = getComponent<ImageComponent>();
     
     img.patchMarginRight = marginRight;
@@ -78,7 +78,7 @@ void Image::setPatchMarginRight(int marginRight){
     img.needUpdatePatches = true;
 }
 
-void Image::setPatchMarginTop(int marginTop){
+void Image::setPatchMarginTop(unsigned int marginTop){
     ImageComponent& img = getComponent<ImageComponent>();
 
     img.patchMarginTop = marginTop;
@@ -86,25 +86,25 @@ void Image::setPatchMarginTop(int marginTop){
     img.needUpdatePatches = true;
 }
 
-int Image::getPatchMarginBottom() const{
+unsigned int Image::getPatchMarginBottom() const{
     ImageComponent& img = getComponent<ImageComponent>();
     
     return img.patchMarginBottom;
 }
 
-int Image::getPatchMarginLeft() const{
+unsigned int Image::getPatchMarginLeft() const{
     ImageComponent& img = getComponent<ImageComponent>();
     
     return img.patchMarginLeft;
 }
 
-int Image::getPatchMarginRight() const{
+unsigned int Image::getPatchMarginRight() const{
     ImageComponent& img = getComponent<ImageComponent>();
     
     return img.patchMarginRight;
 }
 
-int Image::getPatchMarginTop() const{
+unsigned int Image::getPatchMarginTop() const{
     ImageComponent& img = getComponent<ImageComponent>();
     
     return img.patchMarginTop;

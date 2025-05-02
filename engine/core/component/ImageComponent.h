@@ -9,10 +9,10 @@ namespace Supernova{
 
     struct SUPERNOVA_API ImageComponent{
         //Nine patch rect
-        int patchMarginLeft = 0;
-        int patchMarginRight = 0;
-        int patchMarginTop = 0;
-        int patchMarginBottom = 0;
+        unsigned int patchMarginLeft = 0;
+        unsigned int patchMarginRight = 0;
+        unsigned int patchMarginTop = 0;
+        unsigned int patchMarginBottom = 0;
 
         float textureCutFactor = 0.0;
 

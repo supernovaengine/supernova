@@ -665,8 +665,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<Image, UILayout>("Image")
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setPatchMargin", 
-            luabridge::overload<int>(&Image::setPatchMargin),
-            luabridge::overload<int, int, int, int>(&Image::setPatchMargin))
+            luabridge::overload<unsigned int>(&Image::setPatchMargin),
+            luabridge::overload<unsigned int, unsigned int, unsigned int, unsigned int>(&Image::setPatchMargin))
         .addProperty("patchMarginBottom", &Image::getPatchMarginBottom, &Image::setPatchMarginBottom)
         .addProperty("patchMarginLeft", &Image::getPatchMarginLeft, &Image::setPatchMarginLeft)
         .addProperty("patchMarginRight", &Image::getPatchMarginRight, &Image::setPatchMarginRight)
