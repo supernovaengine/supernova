@@ -93,8 +93,8 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
     float texCutRatioW = 0;
     float texCutRatioH = 0;
     if (texWidth != 0 && texHeight != 0){
-        texCutRatioW = 1.0 / texWidth * sprite.textureCutFactor;
-        texCutRatioH = 1.0 / texHeight * sprite.textureCutFactor;
+        texCutRatioW = 1.0 / texWidth * sprite.textureScaleFactor;
+        texCutRatioH = 1.0 / texHeight * sprite.textureScaleFactor;
     }
 
     if (!sprite.flipY){ 
@@ -267,8 +267,8 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
         float texCutRatioW = 0;
         float texCutRatioH = 0;
         if (texWidth != 0 && texHeight != 0){
-            texCutRatioW = 1.0 / texWidth * tilemap.textureCutFactor;
-            texCutRatioH = 1.0 / texHeight * tilemap.textureCutFactor;
+            texCutRatioW = 1.0 / texWidth * tilemap.textureScaleFactor;
+            texCutRatioH = 1.0 / texHeight * tilemap.textureScaleFactor;
         }
 
         Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);

@@ -91,8 +91,8 @@ void UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
     float texCutRatioW = 0;
     float texCutRatioH = 0;
     if (texWidth != 0 && texHeight != 0){
-        texCutRatioW = 1.0 / texWidth * img.textureCutFactor;
-        texCutRatioH = 1.0 / texHeight * img.textureCutFactor;
+        texCutRatioW = 1.0 / texWidth * img.textureScaleFactor;
+        texCutRatioH = 1.0 / texHeight * img.textureScaleFactor;
     }
 
     float x0 = texCutRatioW;

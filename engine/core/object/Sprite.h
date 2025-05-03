@@ -36,8 +36,8 @@ namespace Supernova{
         void setFlipY(bool flipY);
         bool isFlipY() const;
 
-        void setTextureCutFactor(float textureCutFactor);
-        float getTextureCutFactor() const;
+        void setTextureScaleFactor(float textureScaleFactor);
+        float getTextureScaleFactor() const;
 
         void setTextureRect(float x, float y, float width, float height);
         void setTextureRect(Rect textureRect);

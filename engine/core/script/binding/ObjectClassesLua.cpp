@@ -419,7 +419,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("findRectByString", &Tilemap::findRectByString)
         .addFunction("findTileByString", &Tilemap::findTileByString)
-        .addProperty("textureCutFactor", &Tilemap::getTextureCutFactor, &Tilemap::setTextureCutFactor)
+        .addProperty("textureScaleFactor", &Tilemap::getTextureScaleFactor, &Tilemap::setTextureScaleFactor)
         .addFunction("addRect", 
             luabridge::overload<int, const std::string&, const std::string&, TextureFilter, Rect>(&Tilemap::addRect),
             luabridge::overload<int, const std::string&, const std::string&, Rect>(&Tilemap::addRect),
@@ -554,7 +554,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("width", &Sprite::getWidth, &Sprite::setWidth)
         .addProperty("height", &Sprite::getHeight, &Sprite::setHeight)
         .addProperty("flipY", &Sprite::isFlipY, &Sprite::setFlipY)
-        .addProperty("textureCutFactor", &Sprite::getTextureCutFactor, &Sprite::setTextureCutFactor)
+        .addProperty("textureScaleFactor", &Sprite::getTextureScaleFactor, &Sprite::setTextureScaleFactor)
         .addProperty("textureRect", &Sprite::getTextureRect, (void(Sprite::*)(Rect))&Sprite::setTextureRect)
         .addFunction("setTextureRect",(void(Sprite::*)(float, float, float, float)) &Sprite::setTextureRect)
         .addProperty("pivotPreset", &Sprite::getPivotPreset, &Sprite::setPivotPreset)
@@ -674,7 +674,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTexture", 
             luabridge::overload<const std::string&>(&Image::setTexture),
             luabridge::overload<Framebuffer*>(&Image::setTexture))
-        .addProperty("textureCutFactor", &Image::getTextureCutFactor, &Image::setTextureCutFactor)
+        .addProperty("textureScaleFactor", &Image::getTextureScaleFactor, &Image::setTextureScaleFactor)
         .addProperty("color", &Image::getColor, (void(Image::*)(Vector4))&Image::setColor)
         .addFunction("setColor", 
             luabridge::overload<const float, const float, const float>(&Image::setColor),

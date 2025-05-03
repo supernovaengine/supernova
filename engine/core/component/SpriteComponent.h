@@ -29,7 +29,7 @@ namespace Supernova{
         bool automaticFlipY = true;
         bool flipY = false;
 
-        float textureCutFactor = 0.0;
+        float textureScaleFactor = 0.0;
 
         SpriteFrameData framesRect[MAX_SPRITE_FRAMES];
 

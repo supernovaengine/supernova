@@ -126,19 +126,19 @@ void Image::setTexture(Framebuffer* framebuffer){
     ui.needUpdateTexture = true;
 }
 
-void Image::setTextureCutFactor(float textureCutFactor){
+void Image::setTextureScaleFactor(float textureScaleFactor){
     ImageComponent& img = getComponent<ImageComponent>();
     
-    if (img.textureCutFactor != textureCutFactor){
-        img.textureCutFactor = textureCutFactor;
+    if (img.textureScaleFactor != textureScaleFactor){
+        img.textureScaleFactor = textureScaleFactor;
         img.needUpdatePatches = true;
     }
 }
 
-float Image::getTextureCutFactor() const{
+float Image::getTextureScaleFactor() const{
     ImageComponent& img = getComponent<ImageComponent>();
     
-    return img.textureCutFactor;
+    return img.textureScaleFactor;
 }
 
 void Image::setColor(Vector4 color){
