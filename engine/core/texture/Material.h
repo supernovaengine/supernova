@@ -30,6 +30,25 @@ namespace Supernova{
 
         // material name or file
         std::string name = "";
+
+        bool operator == (const Material& other) const {
+            return baseColorFactor == other.baseColorFactor &&
+                   metallicFactor == other.metallicFactor &&
+                   roughnessFactor == other.roughnessFactor &&
+                   emissiveFactor == other.emissiveFactor &&
+                   ambientLight == other.ambientLight &&
+                   ambientIntensity == other.ambientIntensity &&
+                   baseColorTexture == other.baseColorTexture &&
+                   emissiveTexture == other.emissiveTexture &&
+                   metallicRoughnessTexture == other.metallicRoughnessTexture &&
+                   occlusionTexture == other.occlusionTexture &&
+                   normalTexture == other.normalTexture &&
+                   name == other.name;
+        }
+
+        bool operator != (const Material& other) const {
+            return !(*this == other);
+        }
     };
 
 }

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Mesh.h"
@@ -70,6 +70,29 @@ Vector4 Mesh::getColor() const{
 
 float Mesh::getAlpha() const{
     return getColor().w;
+}
+
+void Mesh::setMaterial(const Material& material){
+    setMaterial(0, material);
+}
+
+Material Mesh::getMaterial() const{
+    return getMaterial(0);
+}
+
+void Mesh::setMaterial(unsigned int submesh, const Material& material){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    if (mesh.submeshes[submesh].material != material){
+        mesh.submeshes[submesh].material = material;
+        mesh.submeshes[submesh].needUpdateTexture = true;
+    }
+}
+
+Material Mesh::getMaterial(unsigned int submesh) const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.submeshes[submesh].material;
 }
 
 void Mesh::setPrimitiveType(PrimitiveType primitiveType){
@@ -198,12 +221,6 @@ unsigned int Mesh::getNumSubmeshes() const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     return mesh.numSubmeshes;
-}
-
-Material& Mesh::getMaterial(unsigned int submesh){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.submeshes[submesh].material;
 }
 
 void Mesh::setCastShadows(bool castShadows){

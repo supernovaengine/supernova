@@ -28,6 +28,12 @@ namespace Supernova{
         Vector4 getColor() const;
         float getAlpha() const;
 
+        void setMaterial(const Material& material);
+        Material getMaterial() const;
+
+        void setMaterial(unsigned int submesh, const Material& material);
+        Material getMaterial(unsigned int submesh) const;
+
         void setPrimitiveType(PrimitiveType primitiveType);
         PrimitiveType getPrimitiveType() const;
 
@@ -57,8 +63,6 @@ namespace Supernova{
         AABB getWorldAABB() const;
 
         unsigned int getNumSubmeshes() const;
-
-        Material& getMaterial(unsigned int submesh = 0);
 
         void setCastShadows(bool castShadows);
         bool isCastShadows() const;

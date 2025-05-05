@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "LuaBinding.h"
@@ -304,6 +304,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const float, const float, const float>(&Mesh::setColor),
             luabridge::overload<const float, const float, const float, const float>(&Mesh::setColor))
         .addProperty("alpha", &Mesh::getAlpha, &Mesh::setAlpha)
+        .addProperty("material", (Material(Mesh::*)()const)&Mesh::getMaterial, (void(Mesh::*)(const Material&))&Mesh::setMaterial)
+        .addFunction("setMaterial", 
+            luabridge::overload<const Material&>(&Mesh::setMaterial),
+            luabridge::overload<unsigned int, const Material&>(&Mesh::setMaterial))
+        .addFunction("getMaterial", 
+            luabridge::overload<>(&Mesh::getMaterial),
+            luabridge::overload<unsigned int>(&Mesh::getMaterial))
         .addProperty("primitiveType", (PrimitiveType(Mesh::*)()const)&Mesh::getPrimitiveType, (void(Mesh::*)(PrimitiveType))&Mesh::setPrimitiveType)
         .addFunction("setPrimitiveType", 
             luabridge::overload<PrimitiveType>(&Mesh::setPrimitiveType),
@@ -331,7 +338,6 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getVerticesAABB", &Mesh::getVerticesAABB)
         .addFunction("getWorldAABB", &Mesh::getWorldAABB)
         .addFunction("getNumSubmeshes", &Mesh::getNumSubmeshes)
-        .addFunction("getMaterial", &Mesh::getMaterial)
         .addProperty("castShadows", &Mesh::isCastShadows, &Mesh::setCastShadows)
         .addProperty("receiveShadows", &Mesh::isReceiveShadows, &Mesh::setReceiveShadows)
         .addProperty("shadowsBillboard", &Mesh::isShadowsBillboard, &Mesh::setShadowsBillboard)
