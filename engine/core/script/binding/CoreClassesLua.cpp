@@ -335,7 +335,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Texture>("Texture")
-        .addConstructor <void (*) (void), void (*) (std::string), void (*) (std::string, TextureData)> ()
+        .addConstructor <void (*) (void), void (*) (const std::string&), void (*) (const std::string&, TextureData), void (*) (Framebuffer*)> ()
         .addFunction("setPath", &Texture::setPath)
         .addFunction("setData", &Texture::setData)
         .addFunction("setId", &Texture::setId)

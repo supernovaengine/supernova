@@ -43,6 +43,7 @@ namespace Supernova{
             Texture();
             Texture(const std::string& path);
             Texture(const std::string& id, TextureData data);
+            Texture(Framebuffer* framebuffer);
 
             void setPath(const std::string& path);
             void setData(const std::string& id, TextureData data);

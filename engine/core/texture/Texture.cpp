@@ -67,6 +67,26 @@ Texture::Texture(const std::string& id, TextureData data){
     this->wrapV = TextureWrap::REPEAT;
 }
 
+Texture::Texture(Framebuffer* framebuffer){
+    this->render = NULL;
+    this->framebuffer = framebuffer;
+
+    this->render = NULL;
+    this->framebuffer = framebuffer;
+
+    this->id = "";
+    this->type = TextureType::TEXTURE_2D;
+    this->numFaces = 1;
+    this->loadFromPath = false;
+    this->releaseDataAfterLoad = true;
+    this->needLoad = false;
+
+    this->minFilter = TextureFilter::LINEAR;
+    this->magFilter = TextureFilter::LINEAR;
+    this->wrapU = TextureWrap::REPEAT;
+    this->wrapV = TextureWrap::REPEAT;
+}
+
 Texture::Texture(const Texture& rhs){
     render = rhs.render;
     framebuffer = rhs.framebuffer;
@@ -258,7 +278,7 @@ void Texture::setFramebuffer(Framebuffer* framebuffer){
 
     this->framebuffer = framebuffer;
     this->id.clear();
-    this->numFaces = 6;
+    this->numFaces = 1;
     this->loadFromPath = false;
     this->releaseDataAfterLoad = false;
     this->needLoad = false;
