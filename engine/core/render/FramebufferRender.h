@@ -27,6 +27,10 @@ namespace Supernova{
 
         TextureRender& getColorTexture();
         TextureRender& getDepthTexture();
+
+        uint32_t getGLHandler() const;
+        const void* getD3D11HandlerColorRTV() const;
+        const void* getD3D11HandlerDSV() const;
     };
 }
 

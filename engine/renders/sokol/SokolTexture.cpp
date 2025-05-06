@@ -338,7 +338,7 @@ const void* SokolTexture::getMetalHandler() const{
         return info.tex[info.active_slot];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 const void* SokolTexture::getD3D11Handler() const{
@@ -348,7 +348,7 @@ const void* SokolTexture::getD3D11Handler() const{
         return info.res;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 sg_image SokolTexture::get(){

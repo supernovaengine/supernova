@@ -42,3 +42,15 @@ TextureRender& FramebufferRender::getColorTexture(){
 TextureRender& FramebufferRender::getDepthTexture(){
     return backend.getDepthTexture();
 }
+
+uint32_t FramebufferRender::getGLHandler() const{
+    return backend.getGLHandler();
+}
+
+const void* FramebufferRender::getD3D11HandlerColorRTV() const{
+    return backend.getD3D11HandlerColorRTV();
+}
+
+const void* FramebufferRender::getD3D11HandlerDSV() const{
+    return backend.getD3D11HandlerDSV();
+}

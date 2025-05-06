@@ -88,6 +88,36 @@ TextureRender& SokolFramebuffer::getDepthTexture(){
     return depthTexture;
 }
 
+uint32_t SokolFramebuffer::getGLHandler() const{
+    if (attachments[0].id != SG_INVALID_ID && sg_isvalid()){
+        sg_gl_attachments_info info = sg_gl_query_attachments_info(attachments[0]);
+
+        return info.framebuffer;
+    }
+
+    return 0;
+}
+
+const void* SokolFramebuffer::getD3D11HandlerColorRTV() const{
+    if (attachments[0].id != SG_INVALID_ID && sg_isvalid()){
+        sg_d3d11_attachments_info info = sg_d3d11_query_attachments_info(attachments[0]);
+
+        return info.color_rtv[0];
+    }
+
+    return nullptr;
+}
+
+const void* SokolFramebuffer::getD3D11HandlerDSV() const{
+    if (attachments[0].id != SG_INVALID_ID && sg_isvalid()){
+        sg_d3d11_attachments_info info = sg_d3d11_query_attachments_info(attachments[0]);
+
+        return info.dsv;
+    }
+
+    return nullptr;
+}
+
 sg_attachments SokolFramebuffer::get(size_t face){
     return attachments[face];
 }
