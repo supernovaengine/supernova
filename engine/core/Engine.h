@@ -60,6 +60,7 @@
 #include "util/ThreadUtils.h"
 #include "texture/Framebuffer.h"
 #include <atomic>
+#include <unordered_set>
 
 void init();
 
@@ -113,6 +114,7 @@ namespace Supernova {
     private:
         //-----Supernova config-----
         static std::vector<Scene*> scenes;
+        static std::unordered_set<Scene*> oneTimeScenes;
 
         static Scene* mainScene;
         
@@ -170,6 +172,7 @@ namespace Supernova {
         static void setScene(Scene* scene);
         static Scene* getScene();
         static void addSceneLayer(Scene* scene);
+        static void executeSceneOnce(Scene* scene);
         static void removeScene(Scene* scene);
         static void removeAllSceneLayers();
         static void removeAllScenes();

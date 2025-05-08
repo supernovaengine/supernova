@@ -23,6 +23,7 @@ using namespace Supernova;
 
 //-----Supernova user config-----
 std::vector<Scene*> Engine::scenes;
+std::unordered_set<Scene*> Engine::oneTimeScenes;
 
 Scene* Engine::mainScene = NULL;
 
@@ -121,10 +122,27 @@ void Engine::addSceneLayer(Scene* scene){
     if (asyncThread)
         drawSemaphore.acquire();
 
-    if (scene){
+    auto it = std::find(scenes.begin(), scenes.end(), scene);
+    if (scene && (it == scenes.end())) {
         scenes.push_back(scene);
         includeScene(scenes.size()-1, scene);
     }
+
+    if (asyncThread)
+        drawSemaphore.release();
+}
+
+void Engine::executeSceneOnce(Scene* scene) {
+    if (asyncThread)
+        drawSemaphore.acquire();
+
+    auto it = std::find(scenes.begin(), scenes.end(), scene);
+    if (scene && (it == scenes.end())) {
+        scenes.push_back(scene);
+        includeScene(scenes.size()-1, scene);
+    }
+
+    oneTimeScenes.insert(scene);
 
     if (asyncThread)
         drawSemaphore.release();
@@ -615,6 +633,20 @@ void Engine::systemDraw(){
 
     SystemRender::commit();
 
+    if (!oneTimeScenes.empty()) {
+        for (Scene* scene : oneTimeScenes) {
+            if (scene == mainScene) {
+                continue;
+            }
+            auto sceneIt = std::find(scenes.begin(), scenes.end(), scene);
+            if (sceneIt != scenes.end()) {
+                scenes.erase(sceneIt);
+            }
+        }
+
+        oneTimeScenes.clear();
+    }
+
     drawSemaphore.release();
 
     AudioSystem::checkActive();
@@ -630,6 +662,8 @@ void Engine::systemViewDestroyed(){
     for (int i = 0; i < scenes.size(); i++){
         scenes[i]->destroy();
     }
+
+    oneTimeScenes.clear();
 
     SystemRender::shutdown();
 
