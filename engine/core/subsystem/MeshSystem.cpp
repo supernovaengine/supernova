@@ -1097,31 +1097,37 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
 
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
 
+    // Front face (Z+)
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, halfHeight,  halfDepth));
 
+    // Back face (Z-)
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight, -halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight, -halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight, -halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight, -halfDepth));
 
+    // Left face (X-)
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight, -halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight, -halfDepth));
 
+    // Right face (X+)
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight, -halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight, -halfDepth));
 
+    // Top face (Y+)
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth,  halfHeight, -halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth,  halfHeight, -halfDepth));
 
+    // Bottom face (Y-)
     mesh.buffer.addVector3(attVertex, Vector3(-halfWidth, -halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight,  halfDepth));
     mesh.buffer.addVector3(attVertex, Vector3(halfWidth, -halfHeight, -halfDepth));
@@ -1129,12 +1135,41 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
 
     Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
 
-    for (int i = 0; i < 6; i++){
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 0.0f));
-        mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 1.0f * tiles));
-        mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f * tiles));
-    }
+    // Front face (Z+)
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
+
+    // Back face (Z-)
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
+
+    // Left face (X-)
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 1.0f * tiles));
+
+    // Right face (X+)
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 1.0f * tiles));
+
+    // Top face (Y+)
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
+
+    // Bottom face (Y-)
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 0.0f));
+    mesh.buffer.addVector2(attTexcoord, Vector2(1.0f * tiles, 1.0f * tiles));
+    mesh.buffer.addVector2(attTexcoord, Vector2(0.0f, 1.0f * tiles));
 
     Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
 
@@ -1256,9 +1291,12 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
             nz = z * lengthInv;
             mesh.buffer.addVector3(attNormal, Vector3(nx, ny, nz));
 
-            // vertex tex coord (s, t) range between [0, 1]
-            s = (float)j / slices;
-            t = (float)i / stacks;
+            // Z+ orientation means the texture faces the positive Z direction
+            s = 0.5f + atan2f(x, z) / (2.0f * M_PI);
+
+            // Flip Y coordinate (1-t instead of t)
+            t = 1.0f - (float)i / stacks;
+
             mesh.buffer.addVector2(attTexcoord, Vector2(s, t));
 
             // vertex color (white)
