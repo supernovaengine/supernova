@@ -301,6 +301,7 @@ void RenderSystem::processLights(Transform& cameraTransform){
 		fs_lighting.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
 		fs_lighting.inCon_ouCon_shadows_cascades[i] = Vector4(light.innerConeCos, light.outerConeCos, light.shadowMapIndex, light.numShadowCascades);
 		fs_lighting.eyePos = Vector4(cameraTransform.worldPosition.x, cameraTransform.worldPosition.y, cameraTransform.worldPosition.z, 0.0);
+		fs_lighting.globalIllum = Vector4(scene->getGlobalIlluminationColorLinear(), scene->getGlobalIlluminationIntensity());
 	}
 
 	// Setting intensity of other lights to zero
@@ -985,11 +986,6 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 				}
 			}
 
-			if (scene->isSceneAmbientLightEnabled()){
-				mesh.submeshes[i].material.ambientIntensity = scene->getAmbientLightIntensity();
-				mesh.submeshes[i].material.ambientLight = scene->getAmbientLightColorLinear();
-			}
-
 			if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
 				mesh.needReload = true;
 				return false;
@@ -1000,7 +996,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			}
 
 			if (hasLights){
-				render.applyUniformBlock(mesh.submeshes[i].slotFSLighting, sizeof(float) * (16 * MAX_LIGHTS + 4), &fs_lighting);
+				render.applyUniformBlock(mesh.submeshes[i].slotFSLighting, sizeof(float) * (16 * MAX_LIGHTS + 8), &fs_lighting);
 				if (hasShadows && mesh.receiveShadows){
 					render.applyUniformBlock(mesh.submeshes[i].slotVSShadows, sizeof(float) * (16 * MAX_SHADOWSMAP), &vs_shadows);
 					render.applyUniformBlock(mesh.submeshes[i].slotFSShadows, sizeof(float) * (4 * (MAX_SHADOWSMAP + MAX_SHADOWSCUBEMAP)), &fs_shadows);
@@ -1024,7 +1020,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			}
 
 			if (hasLights){
-				render.applyUniformBlock(mesh.submeshes[i].slotFSParams, sizeof(float) * 16, &mesh.submeshes[i].material);
+				render.applyUniformBlock(mesh.submeshes[i].slotFSParams, sizeof(float) * 12, &mesh.submeshes[i].material);
 			}else{
 				render.applyUniformBlock(mesh.submeshes[i].slotFSParams, sizeof(float) * 4, &mesh.submeshes[i].material);
 			}

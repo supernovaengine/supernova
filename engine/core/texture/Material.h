@@ -18,8 +18,6 @@ namespace Supernova{
         uint8_t _pad_24[8];
         Vector3 emissiveFactor = Vector3(0.0f, 0.0f, 0.0f);  // linear color
         uint8_t _pad_44[4];
-        Vector3 ambientLight = Vector3(1.0f, 1.0f, 1.0f);  // linear color
-        float ambientIntensity = 0.1f;
         // --- end shader part
 
         Texture baseColorTexture;
@@ -36,8 +34,6 @@ namespace Supernova{
                    metallicFactor == other.metallicFactor &&
                    roughnessFactor == other.roughnessFactor &&
                    emissiveFactor == other.emissiveFactor &&
-                   ambientLight == other.ambientLight &&
-                   ambientIntensity == other.ambientIntensity &&
                    baseColorTexture == other.baseColorTexture &&
                    emissiveTexture == other.emissiveTexture &&
                    metallicRoughnessTexture == other.metallicRoughnessTexture &&

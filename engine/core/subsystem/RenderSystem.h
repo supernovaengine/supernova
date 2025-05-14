@@ -36,6 +36,7 @@ namespace Supernova{
 	    Vector4 position_type[MAX_LIGHTS];
 	    Vector4 inCon_ouCon_shadows_cascades[MAX_LIGHTS];
 		Vector4 eyePos;
+		Vector4 globalIllum; //global illumination
 	} fs_lighting_t;
 
 	typedef struct fs_fog_t {

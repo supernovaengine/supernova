@@ -71,9 +71,8 @@ namespace Supernova{
 		Vector4 backgroundColor;
 		bool shadowsPCF;
 
-		bool hasSceneAmbientLight;
-		Vector3 ambientLight;
-		float ambientIntensity;
+		Vector3 globalIllumColor;
+		float globalIllumIntensity;
 
 		bool enableUIEvents;
 
@@ -109,16 +108,13 @@ namespace Supernova{
 		void setShadowsPCF(bool shadowsPCF);
 		bool isShadowsPCF() const;
 
-		void setAmbientLight(float ambientIntensity, Vector3 ambientLight);
-		void setAmbientLight(float ambientIntensity);
-		void setAmbientLight(Vector3 ambientLight);
+		void setGlobalIllumination(float intensity, Vector3 color);
+		void setGlobalIllumination(float intensity);
+		void setGlobalIllumination(Vector3 color);
 
-		float getAmbientLightIntensity() const;
-		Vector3 getAmbientLightColor() const;
-		Vector3 getAmbientLightColorLinear() const;
-
-		bool isSceneAmbientLightEnabled() const;
-		void setSceneAmbientLightEnabled(bool hasSceneAmbientLight);
+		float getGlobalIlluminationIntensity() const;
+		Vector3 getGlobalIlluminationColor() const;
+		Vector3 getGlobalIlluminationColorLinear() const;
 
 		bool canReceiveUIEvents();
 

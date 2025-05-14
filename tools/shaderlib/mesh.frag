@@ -49,8 +49,6 @@ uniform u_fs_pbrParams {
         float metallicFactor;
         float roughnessFactor;
         vec3 emissiveFactor;
-        vec3 ambientLight;
-        float ambientIntensity;
     #endif
 } pbrParams;
 
@@ -61,6 +59,7 @@ uniform u_fs_pbrParams {
         vec4 position_type[MAX_LIGHTS]; //position.xyz and type.w
         vec4 inCone_ouCone_shadows_cascades[MAX_LIGHTS]; //innerConeCos.x, outerConeCos.y, shadowMapIndex.z (-1.0 if no shadow), numCascades.w
         vec4 eyePos; //eyePos.xyz
+        vec4 globalIllum; //globalColor.xyz and globalIntensity.w
     } lighting;
 #endif
 
@@ -230,8 +229,8 @@ void main() {
         #ifdef USE_IBL
             //TODO
         #else
-            // simple ambient light
-            f_diffuse += pbrParams.ambientLight * pbrParams.ambientIntensity * baseColor.rgb;
+            // simple global illumination
+            f_diffuse += lighting.globalIllum.xyz * lighting.globalIllum.w * baseColor.rgb;
         #endif
 
         #ifdef HAS_UV_SET1

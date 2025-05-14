@@ -79,9 +79,8 @@ Scene::Scene(){
 	backgroundColor = Vector4(0.0, 0.0, 0.0, 1.0); //sRGB
 	shadowsPCF = true;
 
-	hasSceneAmbientLight = false;
-	ambientLight = Vector3(1.0, 1.0, 1.0);
-	ambientIntensity = 0.1;
+	globalIllumColor = Vector3(1.0, 1.0, 1.0);
+	globalIllumIntensity = 0.1;
 
 	enableUIEvents = true;
 }
@@ -157,40 +156,29 @@ bool Scene::isShadowsPCF() const{
 	return this->shadowsPCF;
 }
 
-void Scene::setAmbientLight(float ambientIntensity, Vector3 ambientLight){
-	this->ambientIntensity = ambientIntensity;
-	this->ambientLight = Color::sRGBToLinear(ambientLight);
-	this->hasSceneAmbientLight = true;
+void Scene::setGlobalIllumination(float intensity, Vector3 color){
+	this->globalIllumIntensity = intensity;
+	this->globalIllumColor = Color::sRGBToLinear(color);
 }
 
-void Scene::setAmbientLight(float ambientIntensity){
-	this->ambientIntensity = ambientIntensity;
-	this->hasSceneAmbientLight = true;
+void Scene::setGlobalIllumination(float intensity){
+	this->globalIllumIntensity = intensity;
 }
 
-void Scene::setAmbientLight(Vector3 ambientLight){
-	this->ambientLight = Color::sRGBToLinear(ambientLight);
-	this->hasSceneAmbientLight = true;
+void Scene::setGlobalIllumination(Vector3 color){
+	this->globalIllumColor = Color::sRGBToLinear(color);
 }
 
-float Scene::getAmbientLightIntensity() const{
-	return this->ambientIntensity;
+float Scene::getGlobalIlluminationIntensity() const{
+	return this->globalIllumIntensity;
 }
 
-Vector3 Scene::getAmbientLightColor() const{
-	return Color::linearTosRGB(this->ambientLight);
+Vector3 Scene::getGlobalIlluminationColor() const{
+	return Color::linearTosRGB(this->globalIllumColor);
 }
 
-Vector3 Scene::getAmbientLightColorLinear() const{
-	return this->ambientLight;
-}
-
-bool Scene::isSceneAmbientLightEnabled() const{
-	return this->hasSceneAmbientLight;
-}
-
-void Scene::setSceneAmbientLightEnabled(bool hasSceneAmbientLight){
-	this->hasSceneAmbientLight = hasSceneAmbientLight;
+Vector3 Scene::getGlobalIlluminationColorLinear() const{
+	return this->globalIllumColor;
 }
 
 bool Scene::canReceiveUIEvents(){
