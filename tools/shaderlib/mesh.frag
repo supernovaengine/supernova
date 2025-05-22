@@ -229,8 +229,10 @@ void main() {
         #ifdef USE_IBL
             //TODO
         #else
-            // simple global illumination
-            f_diffuse += lighting.globalIllum.xyz * lighting.globalIllum.w * baseColor.rgb;
+            #ifdef USE_PUNCTUAL
+                // simple global illumination
+                f_diffuse += lighting.globalIllum.xyz * lighting.globalIllum.w * baseColor.rgb;
+            #endif
         #endif
 
         #ifdef HAS_UV_SET1
