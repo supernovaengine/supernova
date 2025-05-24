@@ -8,6 +8,7 @@
 #include "Engine.h"
 #include "shader/SBSReader.h"
 #include "util/Base64.h"
+#include <cstdint>
 
 #ifdef SOKOL_GLCORE
 #include "glsl410.h"
@@ -76,34 +77,81 @@ std::string ShaderPool::getShaderName(const std::string& shaderStr){
 	return name;
 }
 
-std::string ShaderPool::getShaderStr(ShaderType shaderType, const std::string& properties){
+std::string ShaderPool::getShaderStr(ShaderType shaderType, uint32_t properties){
 
 	std::string str;
+	std::string propOut;
 
 	if (shaderType == ShaderType::MESH){
 		str = "mesh";
-	}else if (shaderType == ShaderType::SKYBOX){
-		str = "sky";
-	}else if (shaderType == ShaderType::UI){
-		str = "ui";
+
+		if (properties & (1 << 0))  propOut += "Ult";
+		if (properties & (1 << 1))  propOut += "Uv1";
+		if (properties & (1 << 2))  propOut += "Uv2";
+		if (properties & (1 << 3))  propOut += "Puc";
+		if (properties & (1 << 4))  propOut += "Shw";
+		if (properties & (1 << 5))  propOut += "Pcf";
+		if (properties & (1 << 6))  propOut += "Nor";
+		if (properties & (1 << 7))  propOut += "Nmp";
+		if (properties & (1 << 8))  propOut += "Tan";
+		if (properties & (1 << 9))  propOut += "Vc3";
+		if (properties & (1 << 10)) propOut += "Vc4";
+		if (properties & (1 << 11)) propOut += "Txr";
+		if (properties & (1 << 12)) propOut += "Fog";
+		if (properties & (1 << 13)) propOut += "Ski";
+		if (properties & (1 << 14)) propOut += "Mta";
+		if (properties & (1 << 15)) propOut += "Mnr";
+		if (properties & (1 << 16)) propOut += "Mtg";
+		if (properties & (1 << 17)) propOut += "Ter";
+		if (properties & (1 << 18)) propOut += "Ist";
+
 	}else if (shaderType == ShaderType::DEPTH){
 		str = "depth";
+
+		if (properties & (1 << 0))  propOut += "Tex";
+		if (properties & (1 << 1))  propOut += "Ski";
+		if (properties & (1 << 2))  propOut += "Mta";
+		if (properties & (1 << 3))  propOut += "Mnr";
+		if (properties & (1 << 4))  propOut += "Mtg";
+		if (properties & (1 << 5))  propOut += "Ter";
+		if (properties & (1 << 6))  propOut += "Ist";
+
+	}else if (shaderType == ShaderType::SKYBOX){
+		str = "sky";
+
+	}else if (shaderType == ShaderType::UI){
+		str = "ui";
+
+		if (properties & (1 << 0))  propOut += "Tex";
+		if (properties & (1 << 1))  propOut += "Ftx";
+		if (properties & (1 << 2))  propOut += "Vc3";
+		if (properties & (1 << 3))  propOut += "Vc4";
+
 	}else if (shaderType == ShaderType::POINTS){
 		str = "points";
+
+		if (properties & (1 << 0))  propOut += "Tex";
+		if (properties & (1 << 1))  propOut += "Vc3";
+		if (properties & (1 << 2))  propOut += "Vc4";
+		if (properties & (1 << 3))  propOut += "Txr";
+
 	}else if (shaderType == ShaderType::LINES){
 		str = "lines";
+
+		if (properties & (1 << 0))  propOut += "Vc3";
+		if (properties & (1 << 1))  propOut += "Vc4";
 	}
 
 	if (str.empty())
 		Log::error("Erro mapping shader type to string");
 
-	if (!properties.empty())
-		str += "_" + properties;
+	if (!propOut.empty())
+		str += "_" + propOut;
 
 	return str;
 }
 
-std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, const std::string& properties){
+std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t properties){
 	std::string shaderStr = getShaderStr(shaderType, properties);
 	auto& shared = getMap()[shaderStr];
 
@@ -130,7 +178,7 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, const std::
 	return resource;
 }
 
-void ShaderPool::remove(ShaderType shaderType, const std::string& properties){
+void ShaderPool::remove(ShaderType shaderType, uint32_t properties){
 	std::string shaderStr = getShaderStr(shaderType, properties);
 	if (getMap().count(shaderStr)){
 		auto& shared = getMap()[shaderStr];
@@ -146,115 +194,80 @@ void ShaderPool::remove(ShaderType shaderType, const std::string& properties){
 	}
 }
 
-std::string ShaderPool::getMeshProperties(bool unlit, bool uv1, bool uv2, 
-						bool punctual, bool shadows, bool shadowsPCF, bool normals, bool normalMap, 
-						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect, 
-						bool fog, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent,
-						bool terrain, bool instanced){
-	std::string prop;
+uint32_t ShaderPool::getMeshProperties(
+    bool unlit, bool uv1, bool uv2, 
+    bool punctual, bool shadows, bool shadowsPCF, bool normals, bool normalMap, 
+    bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect, 
+    bool fog, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent,
+    bool terrain, bool instanced){
+    uint32_t prop = 0;
 
-	if (unlit)
-		prop += "Ult";
-	if (uv1)
-		prop += "Uv1";
-	if (uv2)
-		prop += "Uv2";
-	if (punctual)
-		prop += "Puc";
-	if (shadows)
-		prop += "Shw";
-	if (shadowsPCF)
-		prop += "Pcf";
-	if (normals)
-		prop += "Nor";
-	if (normalMap)
-		prop += "Nmp";
-	if (tangents)
-		prop += "Tan";
-	if (vertexColorVec3)
-		prop += "Vc3";
-	if (vertexColorVec4)
-		prop += "Vc4";
-	if (textureRect)
-		prop += "Txr";
-	if (fog)
-		prop += "Fog";
-	if (skinning)
-		prop += "Ski";
-	if (morphTarget)
-		prop += "Mta";
-	if (morphNormal)
-		prop += "Mnr";
-	if (morphTangent)
-		prop += "Mtg";
-	if (terrain)
-		prop += "Ter";
-	if (instanced)
-		prop += "Ist";
+    prop |= unlit            ? (1 <<  0) : 0;
+    prop |= uv1              ? (1 <<  1) : 0;
+    prop |= uv2              ? (1 <<  2) : 0;
+    prop |= punctual         ? (1 <<  3) : 0;
+    prop |= shadows          ? (1 <<  4) : 0;
+    prop |= shadowsPCF       ? (1 <<  5) : 0;
+    prop |= normals          ? (1 <<  6) : 0;
+    prop |= normalMap        ? (1 <<  7) : 0;
+    prop |= tangents         ? (1 <<  8) : 0;
+    prop |= vertexColorVec3  ? (1 <<  9) : 0;
+    prop |= vertexColorVec4  ? (1 << 10) : 0;
+    prop |= textureRect      ? (1 << 11) : 0;
+    prop |= fog              ? (1 << 12) : 0;
+    prop |= skinning         ? (1 << 13) : 0;
+    prop |= morphTarget      ? (1 << 14) : 0;
+    prop |= morphNormal      ? (1 << 15) : 0;
+    prop |= morphTangent     ? (1 << 16) : 0;
+    prop |= terrain          ? (1 << 17) : 0;
+    prop |= instanced        ? (1 << 18) : 0;
 
-	return prop;
+    return prop;
 }
 
-std::string ShaderPool::getDepthMeshProperties(bool texture, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent, bool terrain, bool instanced){
-	std::string prop;
+uint32_t ShaderPool::getDepthMeshProperties(bool texture, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent, bool terrain, bool instanced){
+    uint32_t prop = 0;
 
-	if (texture)
-		prop += "Tex";
-	if (skinning)
-		prop += "Ski";
-	if (morphTarget)
-		prop += "Mta";
-	if (morphNormal)
-		prop += "Mnr";
-	if (morphTangent)
-		prop += "Mtg";
-	if (terrain)
-		prop += "Ter";
-	if (instanced)
-		prop += "Ist";
+    prop |= texture          ? (1 <<  0) : 0;
+    prop |= skinning         ? (1 <<  1) : 0;
+    prop |= morphTarget      ? (1 <<  2) : 0;
+    prop |= morphNormal      ? (1 <<  3) : 0;
+    prop |= morphTangent     ? (1 <<  4) : 0;
+    prop |= terrain          ? (1 <<  5) : 0;
+    prop |= instanced        ? (1 <<  6) : 0;
 
-	return prop;
+    return prop;
 }
 
-std::string ShaderPool::getUIProperties(bool texture, bool fontAtlasTexture, bool vertexColorVec3, bool vertexColorVec4){
-	std::string prop;
+uint32_t ShaderPool::getUIProperties(bool texture, bool fontAtlasTexture, bool vertexColorVec3, bool vertexColorVec4){
+    uint32_t prop = 0;
 
-	if (texture)
-		prop += "Tex";
-	if (fontAtlasTexture)
-		prop += "Ftx";
-	if (vertexColorVec3)
-		prop += "Vc3";
-	if (vertexColorVec4)
-		prop += "Vc4";
+    prop |= texture          ? (1 <<  0) : 0;
+    prop |= fontAtlasTexture ? (1 <<  1) : 0;
+    prop |= vertexColorVec3  ? (1 <<  2) : 0;
+    prop |= vertexColorVec4  ? (1 <<  3) : 0;
 
-	return prop;
+    return prop;
 }
 
-std::string ShaderPool::getPointsProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4, bool textureRect){
-	std::string prop;
+uint32_t ShaderPool::getPointsProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4, bool textureRect){
+    uint32_t prop = 0;
 
-	if (texture)
-		prop += "Tex";
-	if (vertexColorVec3)
-		prop += "Vc3";
-	if (vertexColorVec4)
-		prop += "Vc4";
-	if (textureRect)
-		prop += "Txr";
+    prop |= texture          ? (1 <<  0) : 0;
+    prop |= vertexColorVec3	 ? (1 <<  1) : 0;
+    prop |= vertexColorVec4  ? (1 <<  2) : 0;
+    prop |= textureRect      ? (1 <<  3) : 0;
 
-	return prop;
+    return prop;
 }
 
-std::string ShaderPool::getLinesProperties(bool vertexColorVec3, bool vertexColorVec4){
-	std::string prop;
+uint32_t ShaderPool::getLinesProperties(bool vertexColorVec3, bool vertexColorVec4){
+    uint32_t prop = 0;
 
-	if (vertexColorVec3)
-		prop += "Vc3";
-	if (vertexColorVec4)
-		prop += "Vc4";
+    prop |= vertexColorVec3	 ? (1 <<  0) : 0;
+    prop |= vertexColorVec4  ? (1 <<  1) : 0;
 
-	return prop;
+    return prop;
 }
 
 void ShaderPool::clear(){

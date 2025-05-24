@@ -27,7 +27,7 @@ namespace Supernova{
 
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
-        std::string shaderProperties;
+        uint32_t shaderProperties;
         int slotVSParams = -1;
         int slotFSParams = -1;
 

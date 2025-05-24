@@ -33,8 +33,8 @@ namespace Supernova{
         std::shared_ptr<ShaderRender> shader;
         std::shared_ptr<ShaderRender> depthShader;
 
-        std::string shaderProperties;
-        std::string depthShaderProperties;
+        uint32_t shaderProperties;
+        uint32_t depthShaderProperties;
 
         int slotVSParams = -1;
         int slotFSParams = -1;

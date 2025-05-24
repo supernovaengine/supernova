@@ -976,11 +976,11 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 
 				mesh.submeshes[i].needUpdateTexture = false; // loadDepthTexture is in drawMeshDepth
 				if (hasTexture){
-					if (mesh.submeshes[i].shaderProperties.find("Uv1") == std::string::npos && mesh.submeshes[i].shaderProperties.find("Uv2") == std::string::npos){
+					if (!(mesh.submeshes[i].shaderProperties & (1 << 1)) && !(mesh.submeshes[i].shaderProperties & (1 << 2))){ // not 'Uv1' and not 'Uv2'
 						mesh.needReload = true;
 					}
 				}else{
-					if (mesh.submeshes[i].shaderProperties.find("Uv1") != std::string::npos || mesh.submeshes[i].shaderProperties.find("Uv2") != std::string::npos){
+					if ((mesh.submeshes[i].shaderProperties & (1 << 1)) || (mesh.submeshes[i].shaderProperties & (1 << 2))){ // 'Uv1' or 'Uv2'
 						mesh.needReload = true;
 					}
 				}
@@ -1264,11 +1264,11 @@ bool RenderSystem::drawUI(UIComponent& ui, Transform& transform, bool renderToTe
 
 			ui.needUpdateTexture = false;
 			if (textureRender){
-				if (ui.shaderProperties.find("Tex") == std::string::npos) {
+				if (!(ui.shaderProperties & (1 << 0))){ // not 'Tex'
 					ui.needReload = true;
 				}
 			}else{
-				if (ui.shaderProperties.find("Tex") != std::string::npos) {
+				if (ui.shaderProperties & (1 << 0)){ // 'Tex'
 					ui.needReload = true;
 				}
 			}
@@ -1475,11 +1475,11 @@ bool RenderSystem::drawPoints(PointsComponent& points, Transform& transform, Tra
 
 			points.needUpdateTexture = false;
 			if (textureRender){
-				if (points.shaderProperties.find("Tex") == std::string::npos) {
+				if (!(points.shaderProperties & (1 << 0))){ // not 'Tex'
 					points.needReload = true;
 				}
 			}else{
-				if (points.shaderProperties.find("Tex") != std::string::npos) {
+				if (points.shaderProperties & (1 << 0)){ // 'Tex'
 					points.needReload = true;
 				}
 			}
@@ -1623,7 +1623,7 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky, uint8_t pipelines){
 
 	render->beginLoad(PrimitiveType::TRIANGLES);
 
-	sky.shader = ShaderPool::get(ShaderType::SKYBOX, "");
+	sky.shader = ShaderPool::get(ShaderType::SKYBOX, 0);
 	if (!sky.shader->isCreated())
 		return false;
 	render->addShader(sky.shader.get());
@@ -1691,7 +1691,7 @@ void RenderSystem::destroySky(Entity entity, SkyComponent& sky){
 
 	//Destroy shader
 	sky.shader.reset();
-	ShaderPool::remove(ShaderType::SKYBOX, "");
+	ShaderPool::remove(ShaderType::SKYBOX, 0);
 
 	//Destroy texture
 	sky.texture.destroy();

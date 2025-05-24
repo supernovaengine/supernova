@@ -19,24 +19,24 @@ namespace Supernova{
 
         static std::string getShaderFile(const std::string& shaderStr);
         static std::string getShaderName(const std::string& shaderStr);
-        static std::string getShaderStr(ShaderType shaderType, const std::string& properties);
+        static std::string getShaderStr(ShaderType shaderType, uint32_t properties);
 
     public:
-        static std::shared_ptr<ShaderRender> get(ShaderType shaderType, const std::string& properties);
-        static void remove(ShaderType shaderType, const std::string& properties);
+        static std::shared_ptr<ShaderRender> get(ShaderType shaderType, uint32_t properties);
+        static void remove(ShaderType shaderType, uint32_t properties);
 
         static std::string getShaderLangStr();
         static std::vector<std::string>& getMissingShaders();
 
-        static std::string getMeshProperties(bool unlit, bool uv1, bool uv2, 
+        static uint32_t getMeshProperties(bool unlit, bool uv1, bool uv2, 
 						bool punctual, bool shadows, bool shadowsPCF, bool normals, bool normalMap, 
 						bool tangents, bool vertexColorVec3, bool vertexColorVec4, bool textureRect, 
                         bool fog, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent,
                         bool terrain, bool instanced);
-        static std::string getDepthMeshProperties(bool texture, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent, bool terrain, bool instanced);
-        static std::string getUIProperties(bool texture, bool fontAtlasTexture, bool vertexColorVec3, bool vertexColorVec4);
-        static std::string getPointsProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4, bool textureRect);
-        static std::string getLinesProperties(bool vertexColorVec3, bool vertexColorVec4);
+        static uint32_t getDepthMeshProperties(bool texture, bool skinning, bool morphTarget, bool morphNormal, bool morphTangent, bool terrain, bool instanced);
+        static uint32_t getUIProperties(bool texture, bool fontAtlasTexture, bool vertexColorVec3, bool vertexColorVec4);
+        static uint32_t getPointsProperties(bool texture, bool vertexColorVec3, bool vertexColorVec4, bool textureRect);
+        static uint32_t getLinesProperties(bool vertexColorVec3, bool vertexColorVec4);
 
 		// necessary for engine shutdown
 		static void clear();
