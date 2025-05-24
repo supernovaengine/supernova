@@ -13,7 +13,7 @@ namespace Supernova{
 
     typedef std::map<std::string, std::shared_ptr<ShaderRender>> shaders_t;
 
-    class ShaderPool{  
+    class SUPERNOVA_API ShaderPool{
     private:
         static shaders_t& getMap();
 

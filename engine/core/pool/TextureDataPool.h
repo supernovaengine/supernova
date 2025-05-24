@@ -15,7 +15,7 @@ namespace Supernova{
 
     typedef std::map< std::string, std::shared_ptr<std::array<TextureData,6>> > texturesdata_t;
 
-    class TextureDataPool{
+    class SUPERNOVA_API TextureDataPool{
     private:
         static texturesdata_t& getMap();
 

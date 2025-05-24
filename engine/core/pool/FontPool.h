@@ -13,7 +13,7 @@ namespace Supernova{
 
     typedef std::map< std::string, std::shared_ptr<STBText> > fonts_t;
 
-    class FontPool{
+    class SUPERNOVA_API FontPool{
     private:
         static fonts_t& getMap();
 

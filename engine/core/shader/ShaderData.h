@@ -95,7 +95,7 @@ namespace Supernova {
         std::vector<ShaderTextureSamplerPair> textureSamplerPairs;
     };
 
-    class ShaderData {
+    class SUPERNOVA_API ShaderData {
     public:
         ShaderLang lang;
         unsigned int version;

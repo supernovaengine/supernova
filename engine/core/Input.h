@@ -164,7 +164,7 @@ namespace Supernova {
         Vector2 position;
     } Touch;
     
-    class Input {
+    class SUPERNOVA_API Input {
         
         friend class Engine;
         

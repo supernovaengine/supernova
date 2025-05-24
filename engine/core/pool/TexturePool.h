@@ -15,7 +15,7 @@ namespace Supernova{
 
     typedef std::map< std::string, std::shared_ptr<TextureRender> > textures_t;
 
-    class TexturePool{
+    class SUPERNOVA_API TexturePool{
     private:
         static textures_t& getMap();
 
