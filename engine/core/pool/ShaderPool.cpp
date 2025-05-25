@@ -151,9 +151,21 @@ std::string ShaderPool::getShaderStr(ShaderType shaderType, uint32_t properties)
 	return str;
 }
 
+ShaderKey ShaderPool::createShaderKey(ShaderType shaderType, uint32_t properties) {
+    return ((uint64_t)shaderType << 32) | (properties & 0xFFFFFFFF);
+}
+
+ShaderType ShaderPool::getShaderTypeFromKey(ShaderKey key) {
+    return (ShaderType)(key >> 32);
+}
+
+uint32_t ShaderPool::getPropertiesFromKey(ShaderKey key) {
+    return (uint32_t)(key & 0xFFFFFFFF);
+}
+
 std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t properties){
-	std::string shaderStr = getShaderStr(shaderType, properties);
-	auto& shared = getMap()[shaderStr];
+	ShaderKey shaderKey = createShaderKey(shaderType, properties);
+	auto& shared = getMap()[shaderKey];
 
 	if (shared.use_count() > 0){
 		return shared;
@@ -162,6 +174,7 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t pr
 	SBSReader sbs;
 	const auto resource =  std::make_shared<ShaderRender>();
 
+	std::string shaderStr = getShaderStr(shaderType, properties);
 	std::string base64Shd = getBase64Shader(getShaderName(shaderStr));
 	if (!base64Shd.empty() && sbs.read(Base64::decode(base64Shd))){ // from c header
 		resource->createShader(sbs.getShaderData());
@@ -179,13 +192,13 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t pr
 }
 
 void ShaderPool::remove(ShaderType shaderType, uint32_t properties){
-	std::string shaderStr = getShaderStr(shaderType, properties);
-	if (getMap().count(shaderStr)){
-		auto& shared = getMap()[shaderStr];
+	ShaderKey shaderKey = createShaderKey(shaderType, properties);
+	if (getMap().count(shaderKey)){
+		auto& shared = getMap()[shaderKey];
 		if (shared.use_count() <= 1){
 			shared->destroyShader();
 			//Log::debug("Remove shader %s", shaderStr.c_str());
-			getMap().erase(shaderStr);
+			getMap().erase(shaderKey);
 		}
 	}else{
 		if (Engine::isViewLoaded()){

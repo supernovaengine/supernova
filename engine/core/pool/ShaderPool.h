@@ -11,7 +11,9 @@
 
 namespace Supernova{
 
-    typedef std::map<std::string, std::shared_ptr<ShaderRender>> shaders_t;
+    typedef uint64_t ShaderKey;
+
+    typedef std::map<ShaderKey, std::shared_ptr<ShaderRender>> shaders_t;
 
     class SUPERNOVA_API ShaderPool{
     private:
@@ -20,6 +22,10 @@ namespace Supernova{
         static std::string getShaderFile(const std::string& shaderStr);
         static std::string getShaderName(const std::string& shaderStr);
         static std::string getShaderStr(ShaderType shaderType, uint32_t properties);
+
+        static ShaderKey createShaderKey(ShaderType shaderType, uint32_t properties);
+        static ShaderType getShaderTypeFromKey(ShaderKey key);
+        static uint32_t getPropertiesFromKey(ShaderKey key);
 
     public:
         static std::shared_ptr<ShaderRender> get(ShaderType shaderType, uint32_t properties);
