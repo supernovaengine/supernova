@@ -33,13 +33,15 @@ uniform texture2D u_baseColorTexture;
 uniform sampler u_baseColor_smp;
 #ifndef MATERIAL_UNLIT
     uniform texture2D u_metallicRoughnessTexture;
-    uniform texture2D u_normalTexture;
     uniform texture2D u_occlusionTexture;
     uniform texture2D u_emissiveTexture;
     uniform sampler u_metallicRoughness_smp;
-    uniform sampler u_normal_smp;
     uniform sampler u_occlusion_smp;
     uniform sampler u_emissive_smp;
+    #ifdef HAS_NORMAL_MAP
+        uniform texture2D u_normalTexture;
+        uniform sampler u_normal_smp;
+    #endif
 #endif
 
 uniform u_fs_pbrParams {

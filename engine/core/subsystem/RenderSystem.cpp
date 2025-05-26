@@ -665,10 +665,10 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		bool p_receiveShadows = false;
 		bool p_shadowsPCF = false;
 
-		if (mesh.submeshes[i].hasTexCoord1 || mesh.submeshes[i].material.baseColorTexture.getRender()){
+		if (mesh.submeshes[i].hasTexCoord1 || !mesh.submeshes[i].material.baseColorTexture.empty()){
 			p_hasTexture1 = true;
 		}
-		if (terrain && terrain->blendMap.getRender()){
+		if (terrain && !terrain->blendMap.empty()){
 			p_hasTexture1 = true;
 		}
 		if (hasLights){
@@ -981,6 +981,15 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 					}
 				}else{
 					if ((mesh.submeshes[i].shaderProperties & (1 << 1)) || (mesh.submeshes[i].shaderProperties & (1 << 2))){ // 'Uv1' or 'Uv2'
+						mesh.needReload = true;
+					}
+				}
+				if (!mesh.submeshes[i].material.normalTexture.empty()){
+					if (!(mesh.submeshes[i].shaderProperties & (1 << 7))){ // not 'Nmp'
+						mesh.needReload = true;
+					}
+				}else{
+					if (mesh.submeshes[i].shaderProperties & (1 << 7)){ // 'Nmp'
 						mesh.needReload = true;
 					}
 				}

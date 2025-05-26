@@ -145,16 +145,18 @@ bool SokolShader::createShader(ShaderData& shaderData){
             shader_function->source = stage->source.c_str();
         }
 
-        if (SG_MAX_VERTEX_ATTRIBUTES < stage->attributes.size()){
-            Log::error("Number of attributes of shader is bigger than SG_MAX_VERTEX_ATTRIBUTES");
-        }else{
-            // attributes
-            for (int a = 0; a < stage->attributes.size(); a++) {
-                int location = stage->attributes[a].location;
-                if (location >= 0){
-                    shader_desc.attrs[location].glsl_name = stage->attributes[a].name.c_str();
-                    shader_desc.attrs[location].hlsl_sem_name = stage->attributes[a].semanticName.c_str();
-                    shader_desc.attrs[location].hlsl_sem_index = stage->attributes[a].semanticIndex;
+        if (stage->type == ShaderStageType::VERTEX){
+            if (SG_MAX_VERTEX_ATTRIBUTES < stage->attributes.size()){
+                Log::error("Number of attributes of shader is bigger than SG_MAX_VERTEX_ATTRIBUTES");
+            }else{
+                // attributes
+                for (int a = 0; a < stage->attributes.size(); a++) {
+                    int location = stage->attributes[a].location;
+                    if (location >= 0){
+                        shader_desc.attrs[location].glsl_name = stage->attributes[a].name.c_str();
+                        shader_desc.attrs[location].hlsl_sem_name = stage->attributes[a].semanticName.c_str();
+                        shader_desc.attrs[location].hlsl_sem_index = stage->attributes[a].semanticIndex;
+                    }
                 }
             }
         }
@@ -196,28 +198,45 @@ bool SokolShader::createShader(ShaderData& shaderData){
             sbdesc->glsl_binding_n = stage->storagebuffers[sb].binding;
         }
 
+        std::unordered_set<std::string> usedTextures;
+        std::unordered_set<std::string> usedSamplers;
+
+        // Collect texture and sampler names used in pairs
+        for (int ts = 0; ts < stage->textureSamplerPairs.size(); ts++) {
+            usedTextures.insert(stage->textureSamplerPairs[ts].textureName);
+            usedSamplers.insert(stage->textureSamplerPairs[ts].samplerName);
+        }
+
         // textures
         for (int t = 0; t < stage->textures.size(); t++) {
-            sg_shader_image* img = &shader_desc.images[stage->textures[t].slot];
+            if (usedTextures.find(stage->textures[t].name) != usedTextures.end()) {
+                sg_shader_image* img = &shader_desc.images[stage->textures[t].slot];
 
-            img->stage = shader_stage;
-            img->image_type = textureToSokolType(stage->textures[t].type);
-            img->sample_type = textureSamplerToSokolType(stage->textures[t].samplerType);
-            img->multisampled = false; // TODO
-            img->hlsl_register_t_n = stage->textures[t].binding;
-            img->msl_texture_n = stage->textures[t].binding;
-            img->wgsl_group1_binding_n = stage->textures[t].binding;
+                img->stage = shader_stage;
+                img->image_type = textureToSokolType(stage->textures[t].type);
+                img->sample_type = textureSamplerToSokolType(stage->textures[t].samplerType);
+                img->multisampled = false; // TODO
+                img->hlsl_register_t_n = stage->textures[t].binding;
+                img->msl_texture_n = stage->textures[t].binding;
+                img->wgsl_group1_binding_n = stage->textures[t].binding;
+            }else{
+                Log::warn("Texture '%s' is not used", stage->textures[t].name.c_str());
+            }
         }
 
         // samplers
         for (int s = 0; s < stage->samplers.size(); s++) {
-            sg_shader_sampler* sampler = &shader_desc.samplers[stage->samplers[s].slot];
+            if (usedSamplers.find(stage->samplers[s].name) != usedSamplers.end()) {
+                sg_shader_sampler* sampler = &shader_desc.samplers[stage->samplers[s].slot];
 
-            sampler->stage = shader_stage;
-            sampler->sampler_type = samplerToSokolType(stage->samplers[s].type);
-            sampler->hlsl_register_s_n = stage->samplers[s].binding;
-            sampler->msl_sampler_n = stage->samplers[s].binding;
-            sampler->wgsl_group1_binding_n = stage->samplers[s].binding;
+                sampler->stage = shader_stage;
+                sampler->sampler_type = samplerToSokolType(stage->samplers[s].type);
+                sampler->hlsl_register_s_n = stage->samplers[s].binding;
+                sampler->msl_sampler_n = stage->samplers[s].binding;
+                sampler->wgsl_group1_binding_n = stage->samplers[s].binding;
+            }else{
+                Log::warn("Sampler '%s' is not used", stage->samplers[s].name.c_str());
+            }
         }
 
         // texture sampler pair

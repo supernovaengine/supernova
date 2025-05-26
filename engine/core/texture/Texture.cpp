@@ -438,7 +438,7 @@ void Texture::releaseData(){
 }
 
 bool Texture::empty() const{
-    if (!needLoad && !render)
+    if (!needLoad && !data && !render)
         return true;
 
     return false;
