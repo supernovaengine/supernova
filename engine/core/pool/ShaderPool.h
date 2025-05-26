@@ -8,6 +8,7 @@
 #include "render/ShaderRender.h"
 #include <map>
 #include <memory>
+#include <functional>
 
 namespace Supernova{
 
@@ -15,9 +16,13 @@ namespace Supernova{
 
     typedef std::map<ShaderKey, std::shared_ptr<ShaderRender>> shaders_t;
 
+    using ShaderBuilderFn = std::function<ShaderData(ShaderType, uint32_t)>;
+
     class SUPERNOVA_API ShaderPool{
     private:
         static shaders_t& getMap();
+
+        static ShaderBuilderFn shaderBuilderFn;
 
         static std::string getShaderFile(const std::string& shaderStr);
         static std::string getShaderName(const std::string& shaderStr);
@@ -33,6 +38,8 @@ namespace Supernova{
 
         static std::string getShaderLangStr();
         static std::vector<std::string>& getMissingShaders();
+
+        static void setShaderBuilder(ShaderBuilderFn fn);
 
         static uint32_t getMeshProperties(bool unlit, bool uv1, bool uv2, 
 						bool punctual, bool shadows, bool shadowsPCF, bool normals, bool normalMap, 

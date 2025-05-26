@@ -30,6 +30,8 @@
 
 using namespace Supernova;
 
+ShaderBuilderFn ShaderPool::shaderBuilderFn = nullptr;
+
 shaders_t& ShaderPool::getMap(){
     //To prevent similar problem of static init fiasco but on deinitialization
     //https://isocpp.org/wiki/faq/ctors#static-init-order-on-first-use
@@ -41,6 +43,10 @@ std::vector<std::string>& ShaderPool::getMissingShaders(){
     static std::vector<std::string>* missingshaders = new std::vector<std::string>();
     return *missingshaders;
 };
+
+void ShaderPool::setShaderBuilder(ShaderBuilderFn fn) {
+    shaderBuilderFn = fn;
+}
 
 std::string ShaderPool::getShaderLangStr(){
 	if (Engine::getGraphicBackend() == GraphicBackend::GLCORE){
@@ -164,31 +170,35 @@ uint32_t ShaderPool::getPropertiesFromKey(ShaderKey key) {
 }
 
 std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t properties){
-	ShaderKey shaderKey = createShaderKey(shaderType, properties);
-	auto& shared = getMap()[shaderKey];
+    ShaderKey shaderKey = createShaderKey(shaderType, properties);
+    auto& shared = getMap()[shaderKey];
 
-	if (shared.use_count() > 0){
-		return shared;
-	}
+    if (shared.use_count() > 0){
+        return shared;
+    }
 
-	SBSReader sbs;
-	const auto resource =  std::make_shared<ShaderRender>();
+    const auto resource = std::make_shared<ShaderRender>();
 
-	std::string shaderStr = getShaderStr(shaderType, properties);
-	std::string base64Shd = getBase64Shader(getShaderName(shaderStr));
-	if (!base64Shd.empty() && sbs.read(Base64::decode(base64Shd))){ // from c header
-		resource->createShader(sbs.getShaderData());
-		//Log::debug("Create shader %s", shaderStr.c_str());
-	}else if (sbs.read("shader://"+getShaderFile(shaderStr))){ // from file in assets/shaders dir
-		resource->createShader(sbs.getShaderData());
-		//Log::debug("Create shader %s", shaderStr.c_str());
-	}else{
-		getMissingShaders().push_back(shaderStr);
-	}
+    if (shaderBuilderFn) {
+        ShaderData data = shaderBuilderFn(shaderType, properties);
+        resource->createShader(data);
+    } else {
+        SBSReader sbs;
+        std::string shaderStr = getShaderStr(shaderType, properties);
+        std::string base64Shd = getBase64Shader(getShaderName(shaderStr));
+        if (!base64Shd.empty() && sbs.read(Base64::decode(base64Shd))){
+            resource->createShader(sbs.getShaderData());
+            //Log::debug("Create shader %s", shaderStr.c_str());
+        }else if (sbs.read("shader://"+getShaderFile(shaderStr))){
+            resource->createShader(sbs.getShaderData());
+            //Log::debug("Create shader %s", shaderStr.c_str());
+        }else{
+            getMissingShaders().push_back(shaderStr);
+        }
+    }
 
-	shared = resource;
-
-	return resource;
+    shared = resource;
+    return resource;
 }
 
 void ShaderPool::remove(ShaderType shaderType, uint32_t properties){
