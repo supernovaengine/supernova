@@ -124,7 +124,11 @@ void SokolObject::beginLoad(PrimitiveType primitiveType){
     bufferToBindSlot.clear();
 }
 
-void SokolObject::addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){
+void SokolObject::setShader(ShaderRender* shader){
+    pipeline_desc.shader = shader->backend.get();
+}
+
+void SokolObject::setIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){
     sg_buffer ibuf = buffer->backend.get();
     bind.index_buffer = ibuf;
     bind.index_buffer_offset = offset;
@@ -188,10 +192,6 @@ void SokolObject::addStorageBuffer(int slot, ShaderStageType stage, BufferRender
             bind.storage_buffers[slot] = sbuf;
         }
     }
-}
-
-void SokolObject::addShader(ShaderRender* shader){
-    pipeline_desc.shader = shader->backend.get();
 }
 
 void SokolObject::addTexture(std::pair<int, int> slot, ShaderStageType stage, TextureRender* texture){

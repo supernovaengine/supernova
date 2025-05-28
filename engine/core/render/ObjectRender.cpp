@@ -23,8 +23,12 @@ void ObjectRender::beginLoad(PrimitiveType primitiveType){
     backend.beginLoad(primitiveType);
 }
 
-void ObjectRender::addIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){
-    backend.addIndex(buffer, dataType, offset);
+void ObjectRender::setShader(ShaderRender* shader){
+    backend.setShader(shader);
+}
+
+void ObjectRender::setIndex(BufferRender* buffer, AttributeDataType dataType, size_t offset){
+    backend.setIndex(buffer, dataType, offset);
 }
 
 void ObjectRender::addAttribute(int slot, BufferRender* buffer, unsigned int elements, AttributeDataType dataType, unsigned int stride, size_t offset, bool normalized, bool perInstance){
@@ -33,10 +37,6 @@ void ObjectRender::addAttribute(int slot, BufferRender* buffer, unsigned int ele
 
 void ObjectRender::addStorageBuffer(int slot, ShaderStageType stage, BufferRender* buffer){
     backend.addStorageBuffer(slot, stage, buffer);
-}
-
-void ObjectRender::addShader(ShaderRender* shader){
-    backend.addShader(shader);
 }
 
 void ObjectRender::addTexture(std::pair<int, int> slot, ShaderStageType stage, TextureRender* texture){

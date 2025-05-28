@@ -373,7 +373,12 @@ bool RenderSystem::checkPBRFrabebufferUpdate(Material& material){
 		material.emissiveTexture.isFramebufferOutdated() );
 }
 
-bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool shadows){
+bool RenderSystem::checkPBRTextures(Material& material){
+	bool isPBRTexturesEmpty = material.baseColorTexture.empty() || (hasLights && (material.metallicRoughnessTexture.empty() || material.normalTexture.empty() || material.occlusionTexture.empty() || material.emissiveTexture.empty()));
+	return !isPBRTexturesEmpty;
+}
+
+bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render){
 	TextureRender* textureRender = NULL;
 	std::pair<int, int> slotTex(-1, -1);
 
@@ -424,48 +429,51 @@ bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 		}else{
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
 		}
-
-		if (hasShadows && shadows){
-			size_t num2DShadows = 0;
-			size_t numCubeShadows = 0;
-			auto lights = scene->getComponentArray<LightComponent>();
-			for (int l = 0; l < lights->size(); l++){
-				LightComponent& light = lights->getComponentFromIndex(l);
-				if (light.shadowMapIndex >= 0){
-					if (light.type == LightType::POINT){
-						slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(light.shadowMapIndex));
-						render.addTexture(slotTex, ShaderStageType::FRAGMENT, &light.framebuffer[0].getColorTexture());
-						numCubeShadows++;
-					}else if (light.type == LightType::SPOT){
-						slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex));
-						render.addTexture(slotTex, ShaderStageType::FRAGMENT, &light.framebuffer[0].getColorTexture());
-						num2DShadows++;
-					}else if (light.type == LightType::DIRECTIONAL){
-						for (int c = 0; c < light.numShadowCascades; c++){
-							slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex+c));
-							render.addTexture(slotTex, ShaderStageType::FRAGMENT, &light.framebuffer[c].getColorTexture());
-							num2DShadows++;
-						}
-					}
-				}
-			}
-			if (MAX_SHADOWSMAP > num2DShadows){
-				for (int s = num2DShadows; s < MAX_SHADOWSMAP; s++){
-					slotTex = shaderData.getTextureIndex(getShadowMapByIndex(s));
-					render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
-				}
-			}
-			if (MAX_SHADOWSCUBEMAP > numCubeShadows){
-				for (int s = numCubeShadows; s < MAX_SHADOWSCUBEMAP; s++){
-					slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(s+MAX_SHADOWSMAP));
-					render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyCubeBlack);
-				}
-			}
-		}
-
 	}
 
 	return hasTexture;
+}
+
+void RenderSystem::loadShadowTextures(ShaderData& shaderData, ObjectRender& render, bool receiveShadows){
+	std::pair<int, int> slotTex(-1, -1);
+
+	if (hasLights && hasShadows && receiveShadows){
+		size_t num2DShadows = 0;
+		size_t numCubeShadows = 0;
+		auto lights = scene->getComponentArray<LightComponent>();
+		for (int l = 0; l < lights->size(); l++){
+			LightComponent& light = lights->getComponentFromIndex(l);
+			if (light.shadowMapIndex >= 0){
+				if (light.type == LightType::POINT){
+					slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(light.shadowMapIndex));
+					render.addTexture(slotTex, ShaderStageType::FRAGMENT, &light.framebuffer[0].getColorTexture());
+					numCubeShadows++;
+				}else if (light.type == LightType::SPOT){
+					slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex));
+					render.addTexture(slotTex, ShaderStageType::FRAGMENT, &light.framebuffer[0].getColorTexture());
+					num2DShadows++;
+				}else if (light.type == LightType::DIRECTIONAL){
+					for (int c = 0; c < light.numShadowCascades; c++){
+						slotTex = shaderData.getTextureIndex(getShadowMapByIndex(light.shadowMapIndex+c));
+						render.addTexture(slotTex, ShaderStageType::FRAGMENT, &light.framebuffer[c].getColorTexture());
+						num2DShadows++;
+					}
+				}
+			}
+		}
+		if (MAX_SHADOWSMAP > num2DShadows){
+			for (int s = num2DShadows; s < MAX_SHADOWSMAP; s++){
+				slotTex = shaderData.getTextureIndex(getShadowMapByIndex(s));
+				render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
+			}
+		}
+		if (MAX_SHADOWSCUBEMAP > numCubeShadows){
+			for (int s = numCubeShadows; s < MAX_SHADOWSCUBEMAP; s++){
+				slotTex = shaderData.getTextureIndex(getShadowMapCubeByIndex(s+MAX_SHADOWSMAP));
+				render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyCubeBlack);
+			}
+		}
+	}
 }
 
 void RenderSystem::loadDepthTexture(Material& material, ShaderData& shaderData, ObjectRender& render){
@@ -601,10 +609,12 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 
 		render.beginLoad(mesh.submeshes[i].primitiveType);
 
+		bool hasPBRTextures = checkPBRTextures(mesh.submeshes[i].material);
+
 		for (auto const& buf : buffers){
         	if (buf.second->isRenderAttributes()) {
             	for (auto const &attr : buf.second->getAttributes()) {
-					if (attr.first == AttributeType::TEXCOORD1){
+					if (attr.first == AttributeType::TEXCOORD1 && hasPBRTextures){
 						mesh.submeshes[i].hasTexCoord1 = true;
 					}
 					if (attr.first == AttributeType::TANGENT){
@@ -629,7 +639,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         	}
     	}
 		for (auto const& attr : mesh.submeshes[i].attributes){
-			if (attr.first == AttributeType::TEXCOORD1){
+			if (attr.first == AttributeType::TEXCOORD1 && hasPBRTextures){
 				mesh.submeshes[i].hasTexCoord1 = true;
 			}
 			if (attr.first == AttributeType::TANGENT){
@@ -708,7 +718,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		}
 		if (!mesh.submeshes[i].shader->isCreated())
 			return false;
-		render.addShader(mesh.submeshes[i].shader.get());
+		render.setShader(mesh.submeshes[i].shader.get());
 		ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
 
 		mesh.submeshes[i].slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_PARAMS);
@@ -733,7 +743,8 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			mesh.submeshes[i].slotVSMorphTarget = shaderData.getUniformBlockIndex(UniformBlockType::VS_MORPHTARGET);
 		}
 
-		loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
+		loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render);
+		loadShadowTextures(shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
 
 		if (terrain){
 			mesh.submeshes[i].slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS);
@@ -762,7 +773,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 				if (buf.second->getType() == BufferType::INDEX_BUFFER){
 					indexCount = buf.second->getCount();
 					Attribute indexattr = buf.second->getAttributes()[AttributeType::INDEX];
-					render.addIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
+					render.setIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
 				}else{
 					for (auto const &attr : buf.second->getAttributes()) {
 						render.addAttribute(shaderData.getAttrIndex(attr.first), buf.second->getRender(), attr.second.getElements(), attr.second.getDataType(), buf.second->getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
@@ -775,7 +786,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			if (bufferNameToRender.count(attr.second.getBufferName())){
 				if (attr.first == AttributeType::INDEX){
 					indexCount = attr.second.getCount();
-					render.addIndex(bufferNameToRender[attr.second.getBufferName()], attr.second.getDataType(), attr.second.getOffset());
+					render.setIndex(bufferNameToRender[attr.second.getBufferName()], attr.second.getDataType(), attr.second.getOffset());
 				}else{
 					render.addAttribute(shaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBufferName()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBufferName()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 				}
@@ -806,7 +817,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 
 			depthRender.beginLoad(mesh.submeshes[i].primitiveType);
 
-			depthRender.addShader(mesh.submeshes[i].depthShader.get());
+			depthRender.setShader(mesh.submeshes[i].depthShader.get());
 			ShaderData& depthShaderData = mesh.submeshes[i].depthShader.get()->shaderData;
 
 			mesh.submeshes[i].slotVSDepthParams = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_PARAMS);
@@ -836,7 +847,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 					if (buf.second->getType() == BufferType::INDEX_BUFFER){
 						indexCount = buf.second->getCount();
 						Attribute indexattr = buf.second->getAttributes()[AttributeType::INDEX];
-						depthRender.addIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
+						depthRender.setIndex(buf.second->getRender(), indexattr.getDataType(), indexattr.getOffset());
 					}else{
 						for (auto const &attr : buf.second->getAttributes()){
 							if (attr.first == AttributeType::POSITION || attr.first == AttributeType::TEXCOORD1){
@@ -866,7 +877,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			for (auto const& attr : mesh.submeshes[i].attributes){
 				if (bufferNameToRender.count(attr.second.getBufferName())){
 					if (attr.first == AttributeType::INDEX){
-						depthRender.addIndex(bufferNameToRender[attr.second.getBufferName()], attr.second.getDataType(), attr.second.getOffset());
+						depthRender.setIndex(bufferNameToRender[attr.second.getBufferName()], attr.second.getDataType(), attr.second.getOffset());
 					}else if (attr.first == AttributeType::POSITION){
 						depthRender.addAttribute(depthShaderData.getAttrIndex(attr.first), bufferNameToRender[attr.second.getBufferName()], attr.second.getElements(), attr.second.getDataType(), bufferStride[attr.second.getBufferName()], attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
 					}
@@ -972,7 +983,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 
 			if (mesh.submeshes[i].needUpdateTexture || needUpdateFramebuffer){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
-				bool hasTexture = loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
+				bool hasTexture = loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render);
 
 				mesh.submeshes[i].needUpdateTexture = false; // loadDepthTexture is in drawMeshDepth
 				if (hasTexture){
@@ -1184,12 +1195,12 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& ui, uint8_t pipelines, boo
 
 	render.beginLoad(ui.primitiveType);
 
-	TextureRender* textureRender = ui.texture.getRender();
+	bool hasUITexture = ui.texture.empty();
 
 	bool p_hasTexture = false;
 	bool p_vertexColorVec4 = true;
 	bool p_hasFontAtlasTexture = false;
-	if (textureRender){
+	if (hasUITexture){
 		if (isText){
 			p_vertexColorVec4 = false;
 			p_hasFontAtlasTexture = true;
@@ -1202,7 +1213,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& ui, uint8_t pipelines, boo
 	ui.shader = ShaderPool::get(ShaderType::UI, ui.shaderProperties);
 	if (!ui.shader->isCreated())
 		return false;
-	render.addShader(ui.shader.get());
+	render.setShader(ui.shader.get());
 	ShaderData& shaderData = ui.shader.get()->shaderData;
 
 	ui.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_VS_PARAMS);
@@ -1238,7 +1249,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& ui, uint8_t pipelines, boo
 		ui.indices.getRender()->createBuffer(bufferSize, ui.indices.getData(), ui.indices.getType(), ui.indices.getUsage());
 		ui.vertexCount = ui.indices.getCount();
 		Attribute indexattr = ui.indices.getAttributes()[AttributeType::INDEX];
-		render.addIndex(ui.indices.getRender(), indexattr.getDataType(), indexattr.getOffset());
+		render.setIndex(ui.indices.getRender(), indexattr.getDataType(), indexattr.getOffset());
 		if (ui.indices.getUsage() != BufferUsage::IMMUTABLE){
 			ui.needUpdateBuffer = true;
 		}
@@ -1246,7 +1257,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& ui, uint8_t pipelines, boo
 		ui.vertexCount = ui.buffer.getCount();
 	}
 
-	if (textureRender)
+	if (TextureRender* textureRender = ui.texture.getRender())
 		render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI), ShaderStageType::FRAGMENT, textureRender);
 	
 	ui.needUpdateTexture = false;
@@ -1352,17 +1363,17 @@ bool RenderSystem::loadPoints(Entity entity, PointsComponent& points, uint8_t pi
 
 	render.beginLoad(PrimitiveType::POINTS);
 
-	TextureRender* textureRender = points.texture.getRender();
-
 	if (Engine::isAutomaticTransparency() && !points.transparent){
 		if (points.texture.isTransparent()){ // Particle color is not tested here
 			points.transparent = true;
 		}
 	}
 
+	bool hasPointsTexture = points.texture.empty();
+
 	bool p_hasTexture = false;
 	bool p_hasTextureRect = false;
-	if (textureRender){
+	if (hasPointsTexture){
 		p_hasTexture = true;
 		if (points.hasTextureRect){
 			p_hasTextureRect = true;
@@ -1373,7 +1384,7 @@ bool RenderSystem::loadPoints(Entity entity, PointsComponent& points, uint8_t pi
 	points.shader = ShaderPool::get(ShaderType::POINTS, points.shaderProperties);
 	if (!points.shader->isCreated())
 		return false;
-	render.addShader(points.shader.get());
+	render.setShader(points.shader.get());
 	ShaderData& shaderData = points.shader.get()->shaderData;
 
 	points.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::POINTS_VS_PARAMS);
@@ -1400,7 +1411,7 @@ bool RenderSystem::loadPoints(Entity entity, PointsComponent& points, uint8_t pi
 
 	points.needUpdateBuffer = true;
 
-	if (textureRender)
+	if (TextureRender* textureRender = points.texture.getRender())
 		render.addTexture(shaderData.getTextureIndex(TextureShaderType::POINTS), ShaderStageType::FRAGMENT, textureRender);
 
 	points.needUpdateTexture = false;
@@ -1432,7 +1443,7 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 	lines.shader = ShaderPool::get(ShaderType::LINES, lines.shaderProperties);
 	if (!lines.shader->isCreated())
 		return false;
-	render.addShader(lines.shader.get());
+	render.setShader(lines.shader.get());
 	ShaderData& shaderData = lines.shader.get()->shaderData;
 
 	lines.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::LINES_VS_PARAMS);
@@ -1635,14 +1646,13 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky, uint8_t pipelines){
 	sky.shader = ShaderPool::get(ShaderType::SKYBOX, 0);
 	if (!sky.shader->isCreated())
 		return false;
-	render->addShader(sky.shader.get());
+	render->setShader(sky.shader.get());
 	ShaderData& shaderData = sky.shader.get()->shaderData;
 
 	sky.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::SKY_VS_PARAMS);
 	sky.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::SKY_FS_PARAMS);
 
-	TextureRender* textureRender = sky.texture.getRender();
-	if (textureRender){
+	if (TextureRender* textureRender = sky.texture.getRender()){
 		render->addTexture(shaderData.getTextureIndex(TextureShaderType::SKYCUBE), ShaderStageType::FRAGMENT, textureRender);
 	} else {
 		return false;

@@ -16,7 +16,7 @@ namespace Supernova{
 
     typedef std::map<ShaderKey, std::shared_ptr<ShaderRender>> shaders_t;
 
-    using ShaderBuilderFn = std::function<ShaderData(ShaderType, uint32_t)>;
+    using ShaderBuilderFn = std::function<ShaderData(ShaderKey)>;
 
     class SUPERNOVA_API ShaderPool{
     private:
@@ -29,12 +29,13 @@ namespace Supernova{
         static std::string getShaderStr(ShaderType shaderType, uint32_t properties);
 
         static ShaderKey createShaderKey(ShaderType shaderType, uint32_t properties);
-        static ShaderType getShaderTypeFromKey(ShaderKey key);
-        static uint32_t getPropertiesFromKey(ShaderKey key);
 
     public:
         static std::shared_ptr<ShaderRender> get(ShaderType shaderType, uint32_t properties);
         static void remove(ShaderType shaderType, uint32_t properties);
+
+        static ShaderType getShaderTypeFromKey(ShaderKey key);
+        static uint32_t getPropertiesFromKey(ShaderKey key);
 
         static std::string getShaderLangStr();
         static std::vector<std::string>& getMissingShaders();

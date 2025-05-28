@@ -161,14 +161,6 @@ ShaderKey ShaderPool::createShaderKey(ShaderType shaderType, uint32_t properties
     return ((uint64_t)shaderType << 32) | (properties & 0xFFFFFFFF);
 }
 
-ShaderType ShaderPool::getShaderTypeFromKey(ShaderKey key) {
-    return (ShaderType)(key >> 32);
-}
-
-uint32_t ShaderPool::getPropertiesFromKey(ShaderKey key) {
-    return (uint32_t)(key & 0xFFFFFFFF);
-}
-
 std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t properties){
     ShaderKey shaderKey = createShaderKey(shaderType, properties);
     auto& shared = getMap()[shaderKey];
@@ -180,7 +172,7 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t pr
     const auto resource = std::make_shared<ShaderRender>();
 
     if (shaderBuilderFn) {
-        ShaderData data = shaderBuilderFn(shaderType, properties);
+        ShaderData data = shaderBuilderFn(shaderKey);
         resource->createShader(data);
     } else {
         SBSReader sbs;
@@ -215,6 +207,14 @@ void ShaderPool::remove(ShaderType shaderType, uint32_t properties){
 			Log::debug("Trying to destroy a non existent shader");
 		}
 	}
+}
+
+ShaderType ShaderPool::getShaderTypeFromKey(ShaderKey key) {
+    return (ShaderType)(key >> 32);
+}
+
+uint32_t ShaderPool::getPropertiesFromKey(ShaderKey key) {
+    return (uint32_t)(key & 0xFFFFFFFF);
 }
 
 uint32_t ShaderPool::getMeshProperties(
