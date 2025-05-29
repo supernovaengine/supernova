@@ -374,21 +374,27 @@ bool RenderSystem::checkPBRFrabebufferUpdate(Material& material){
 }
 
 bool RenderSystem::checkPBRTextures(Material& material){
-	bool isPBRTexturesEmpty = material.baseColorTexture.empty() || (hasLights && (material.metallicRoughnessTexture.empty() || material.normalTexture.empty() || material.occlusionTexture.empty() || material.emissiveTexture.empty()));
-	return !isPBRTexturesEmpty;
+    bool hasBaseColor = !material.baseColorTexture.empty();
+
+    bool hasOtherPBRTextures = false;
+    if (hasLights) {
+        hasOtherPBRTextures = !material.metallicRoughnessTexture.empty() || 
+                              !material.normalTexture.empty() || 
+                              !material.occlusionTexture.empty() || 
+                              !material.emissiveTexture.empty();
+    }
+
+    return hasBaseColor || hasOtherPBRTextures;
 }
 
-bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render){
+void RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render){
 	TextureRender* textureRender = NULL;
 	std::pair<int, int> slotTex(-1, -1);
-
-	bool hasTexture = false;
 
 	textureRender = material.baseColorTexture.getRender();
 	slotTex = shaderData.getTextureIndex(TextureShaderType::BASECOLOR);
 	if (textureRender){
 		render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-		hasTexture = true;
 	}else{
 		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 	}
@@ -398,7 +404,6 @@ bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 		slotTex = shaderData.getTextureIndex(TextureShaderType::METALLICROUGHNESS);
 		if (textureRender){
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-			hasTexture = true;
 		}else{
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 		}
@@ -407,7 +412,6 @@ bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 		slotTex = shaderData.getTextureIndex(TextureShaderType::NORMAL);
 		if (textureRender){
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-			hasTexture = true;
 		}else{
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyNormal);
 		}
@@ -416,7 +420,6 @@ bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 		slotTex = shaderData.getTextureIndex(TextureShaderType::OCCULSION);
 		if (textureRender){
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-			hasTexture = true;
 		}else{
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 		}
@@ -425,13 +428,10 @@ bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 		slotTex = shaderData.getTextureIndex(TextureShaderType::EMISSIVE);
 		if (textureRender){
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-			hasTexture = true;
 		}else{
 			render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
 		}
 	}
-
-	return hasTexture;
 }
 
 void RenderSystem::loadShadowTextures(ShaderData& shaderData, ObjectRender& render, bool receiveShadows){
@@ -614,7 +614,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		for (auto const& buf : buffers){
         	if (buf.second->isRenderAttributes()) {
             	for (auto const &attr : buf.second->getAttributes()) {
-					if (attr.first == AttributeType::TEXCOORD1 && hasPBRTextures){
+					if (attr.first == AttributeType::TEXCOORD1){
 						mesh.submeshes[i].hasTexCoord1 = true;
 					}
 					if (attr.first == AttributeType::TANGENT){
@@ -639,7 +639,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         	}
     	}
 		for (auto const& attr : mesh.submeshes[i].attributes){
-			if (attr.first == AttributeType::TEXCOORD1 && hasPBRTextures){
+			if (attr.first == AttributeType::TEXCOORD1){
 				mesh.submeshes[i].hasTexCoord1 = true;
 			}
 			if (attr.first == AttributeType::TANGENT){
@@ -675,7 +675,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		bool p_receiveShadows = false;
 		bool p_shadowsPCF = false;
 
-		if (mesh.submeshes[i].hasTexCoord1 || !mesh.submeshes[i].material.baseColorTexture.empty()){
+		if (mesh.submeshes[i].hasTexCoord1 && hasPBRTextures){
 			p_hasTexture1 = true;
 		}
 		if (terrain && !terrain->blendMap.empty()){
@@ -983,27 +983,9 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 
 			if (mesh.submeshes[i].needUpdateTexture || needUpdateFramebuffer){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
-				bool hasTexture = loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render);
+				loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render);
 
 				mesh.submeshes[i].needUpdateTexture = false; // loadDepthTexture is in drawMeshDepth
-				if (hasTexture){
-					if (!(mesh.submeshes[i].shaderProperties & (1 << 1)) && !(mesh.submeshes[i].shaderProperties & (1 << 2))){ // not 'Uv1' and not 'Uv2'
-						mesh.needReload = true;
-					}
-				}else{
-					if ((mesh.submeshes[i].shaderProperties & (1 << 1)) || (mesh.submeshes[i].shaderProperties & (1 << 2))){ // 'Uv1' or 'Uv2'
-						mesh.needReload = true;
-					}
-				}
-				if (!mesh.submeshes[i].material.normalTexture.empty()){
-					if (!(mesh.submeshes[i].shaderProperties & (1 << 7))){ // not 'Nmp'
-						mesh.needReload = true;
-					}
-				}else{
-					if (mesh.submeshes[i].shaderProperties & (1 << 7)){ // 'Nmp'
-						mesh.needReload = true;
-					}
-				}
 			}
 
 			if (!render.beginDraw((renderToTexture)?PIP_RTT:PIP_DEFAULT)){
@@ -1195,7 +1177,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& ui, uint8_t pipelines, boo
 
 	render.beginLoad(ui.primitiveType);
 
-	bool hasUITexture = ui.texture.empty();
+	bool hasUITexture = !ui.texture.empty();
 
 	bool p_hasTexture = false;
 	bool p_vertexColorVec4 = true;
@@ -1278,20 +1260,10 @@ bool RenderSystem::drawUI(UIComponent& ui, Transform& transform, bool renderToTe
 
 		if (ui.needUpdateTexture || ui.texture.isFramebufferOutdated()){
 			ShaderData& shaderData = ui.shader.get()->shaderData;
-			TextureRender* textureRender = ui.texture.getRender();
-			if (textureRender)
+			if (TextureRender* textureRender = ui.texture.getRender())
 				ui.render.addTexture(shaderData.getTextureIndex(TextureShaderType::UI), ShaderStageType::FRAGMENT, textureRender);
 
 			ui.needUpdateTexture = false;
-			if (textureRender){
-				if (!(ui.shaderProperties & (1 << 0))){ // not 'Tex'
-					ui.needReload = true;
-				}
-			}else{
-				if (ui.shaderProperties & (1 << 0)){ // 'Tex'
-					ui.needReload = true;
-				}
-			}
 		}
 
 		if (ui.needUpdateBuffer){
@@ -1369,7 +1341,7 @@ bool RenderSystem::loadPoints(Entity entity, PointsComponent& points, uint8_t pi
 		}
 	}
 
-	bool hasPointsTexture = points.texture.empty();
+	bool hasPointsTexture = !points.texture.empty();
 
 	bool p_hasTexture = false;
 	bool p_hasTextureRect = false;
@@ -1489,20 +1461,10 @@ bool RenderSystem::drawPoints(PointsComponent& points, Transform& transform, Tra
 
 		if (points.needUpdateTexture || points.texture.isFramebufferOutdated()){
 			ShaderData& shaderData = points.shader.get()->shaderData;
-			TextureRender* textureRender = points.texture.getRender();
-			if (textureRender)
+			if (TextureRender* textureRender = points.texture.getRender())
 				points.render.addTexture(shaderData.getTextureIndex(TextureShaderType::POINTS), ShaderStageType::FRAGMENT, textureRender);
 
 			points.needUpdateTexture = false;
-			if (textureRender){
-				if (!(points.shaderProperties & (1 << 0))){ // not 'Tex'
-					points.needReload = true;
-				}
-			}else{
-				if (points.shaderProperties & (1 << 0)){ // 'Tex'
-					points.needReload = true;
-				}
-			}
 		}
 
 		if (points.needUpdateBuffer){
@@ -1683,8 +1645,7 @@ bool RenderSystem::drawSky(SkyComponent& sky, bool renderToTexture){
 
 		if (sky.needUpdateTexture || sky.texture.isFramebufferOutdated()){
 			ShaderData& shaderData = sky.shader.get()->shaderData;
-			TextureRender* textureRender = sky.texture.getRender();
-			if (textureRender)
+			if (TextureRender* textureRender = sky.texture.getRender())
 				sky.render.addTexture(shaderData.getTextureIndex(TextureShaderType::SKYCUBE), ShaderStageType::FRAGMENT, textureRender);
 
 			sky.needUpdateTexture = false;
@@ -2701,6 +2662,30 @@ void RenderSystem::update(double dt){
 
 				instmesh->needUpdateInstances = false;
 			}
+
+			for (int s = 0; s < mesh.numSubmeshes; s++){
+				if (mesh.submeshes[s].needUpdateTexture){
+					if (checkPBRTextures(mesh.submeshes[s].material)){
+						if (!(mesh.submeshes[s].shaderProperties & (1 << 1)) && !(mesh.submeshes[s].shaderProperties & (1 << 2))){ // not 'Uv1' and not 'Uv2'
+							mesh.needReload = true;
+						}
+					}else{
+						if ((mesh.submeshes[s].shaderProperties & (1 << 1)) || (mesh.submeshes[s].shaderProperties & (1 << 2))){ // 'Uv1' or 'Uv2'
+							mesh.needReload = true;
+						}
+					}
+					if (!mesh.submeshes[s].material.normalTexture.empty()){
+						if (!(mesh.submeshes[s].shaderProperties & (1 << 7))){ // not 'Nmp'
+							mesh.needReload = true;
+						}
+					}else{
+						if (mesh.submeshes[s].shaderProperties & (1 << 7)){ // 'Nmp'
+							mesh.needReload = true;
+						}
+					}
+				}
+			}
+
 			if (mesh.loaded && mesh.needReload){
 				destroyMesh(entity, mesh);
 			}
@@ -2713,6 +2698,19 @@ void RenderSystem::update(double dt){
 			}
 		}else if (signature.test(scene->getComponentId<UIComponent>())){
 			UIComponent& ui = scene->getComponent<UIComponent>(entity);
+
+			if (ui.needUpdateTexture){
+				if (!ui.texture.empty()){
+					if (!(ui.shaderProperties & (1 << 0))){ // not 'Tex'
+						ui.needReload = true;
+					}
+				}else{
+					if (ui.shaderProperties & (1 << 0)){ // 'Tex'
+						ui.needReload = true;
+					}
+				}
+			}
+
 			if (ui.loaded && ui.needReload){
 				destroyUI(entity, ui);
 			}
@@ -2729,6 +2727,19 @@ void RenderSystem::update(double dt){
 			}
 		}else if (signature.test(scene->getComponentId<PointsComponent>())){
 			PointsComponent& points = scene->getComponent<PointsComponent>(entity);
+
+			if (points.needUpdateTexture){
+				if (!points.texture.empty()){
+					if (!(points.shaderProperties & (1 << 0))){ // not 'Tex'
+						points.needReload = true;
+					}
+				}else{
+					if (points.shaderProperties & (1 << 0)){ // 'Tex'
+						points.needReload = true;
+					}
+				}
+			}
+
 			if (points.loaded && points.needReload){
 				destroyPoints(entity, points);
 			}

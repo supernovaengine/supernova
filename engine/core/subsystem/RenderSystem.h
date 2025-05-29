@@ -118,7 +118,7 @@ namespace Supernova{
 		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv);
 		bool checkPBRFrabebufferUpdate(Material& material);
 		bool checkPBRTextures(Material& material);
-		bool loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render);
+		void loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render);
 		void loadShadowTextures(ShaderData& shaderData, ObjectRender& render, bool receiveShadow);
 		void loadDepthTexture(Material& material, ShaderData& shaderData, ObjectRender& render);
 		void loadTerrainTextures(TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData);
