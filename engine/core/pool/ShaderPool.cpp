@@ -165,32 +165,39 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t pr
     ShaderKey shaderKey = createShaderKey(shaderType, properties);
     auto& shared = getMap()[shaderKey];
 
-    if (shared.use_count() > 0){
+    if (shared && shared->isCreated()){
         return shared;
     }
 
-    const auto resource = std::make_shared<ShaderRender>();
+    if (!shared) {
+        shared = std::make_shared<ShaderRender>();
+    }
 
-    if (shaderBuilderFn) {
-        ShaderData data = shaderBuilderFn(shaderKey);
-        resource->createShader(data);
-    } else {
-        SBSReader sbs;
-        std::string shaderStr = getShaderStr(shaderType, properties);
-        std::string base64Shd = getBase64Shader(getShaderName(shaderStr));
-        if (!base64Shd.empty() && sbs.read(Base64::decode(base64Shd))){
-            resource->createShader(sbs.getShaderData());
-            //Log::debug("Create shader %s", shaderStr.c_str());
-        }else if (sbs.read("shader://"+getShaderFile(shaderStr))){
-            resource->createShader(sbs.getShaderData());
-            //Log::debug("Create shader %s", shaderStr.c_str());
-        }else{
-            getMissingShaders().push_back(shaderStr);
+    if (!shared->isCreated()) {
+        if (shaderBuilderFn) {
+            ShaderBuildResult result = shaderBuilderFn(shaderKey);
+            if (result.state == ShaderBuildState::Finished) {
+                shared->createShader(result.data);
+            } else if (result.state == ShaderBuildState::Running) {
+                // Shader is still building, do nothing
+            } else if (result.state == ShaderBuildState::Failed) {
+                Log::error("Shader build failed");
+            }
+        } else {
+            SBSReader sbs;
+            std::string shaderStr = getShaderStr(shaderType, properties);
+            std::string base64Shd = getBase64Shader(getShaderName(shaderStr));
+            if (!base64Shd.empty() && sbs.read(Base64::decode(base64Shd))){
+                shared->createShader(sbs.getShaderData());
+            } else if (sbs.read("shader://"+getShaderFile(shaderStr))){
+                shared->createShader(sbs.getShaderData());
+            } else {
+                getMissingShaders().push_back(shaderStr);
+            }
         }
     }
 
-    shared = resource;
-    return resource;
+    return shared;
 }
 
 void ShaderPool::remove(ShaderType shaderType, uint32_t properties){

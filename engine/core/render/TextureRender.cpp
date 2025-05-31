@@ -25,7 +25,7 @@ bool TextureRender::createTexture(
                 const std::string& label, int width, int height,
                 ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6], 
                 TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
-    if (Engine::isViewLoaded())
+    if (Engine::isViewLoaded() && !isCreated())
         return backend.createTexture(label, width, height, colorFormat, type, numFaces, data, size, minFilter, magFilter, wrapU, wrapV);
     else
         return false;
@@ -34,7 +34,7 @@ bool TextureRender::createTexture(
 bool TextureRender::createFramebufferTexture(
                 TextureType type, bool depth, bool shadowMap, int width, int height, 
                 TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
-    if (Engine::isViewLoaded())
+    if (Engine::isViewLoaded() && !isCreated())
         return backend.createFramebufferTexture(type, depth, shadowMap, width, height, minFilter, magFilter, wrapU, wrapV);
     else
         return false;
@@ -54,4 +54,8 @@ const void* TextureRender::getMetalHandler() const{
 
 const void* TextureRender::getD3D11Handler() const{
     return backend.getD3D11Handler();
+}
+
+bool TextureRender::isCreated(){
+    return backend.isCreated();
 }

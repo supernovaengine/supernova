@@ -21,7 +21,7 @@ FramebufferRender::~FramebufferRender(){
 }
 
 bool FramebufferRender::createFramebuffer(TextureType textureType, int width, int height, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV, bool shadowMap){
-    if (Engine::isViewLoaded())
+    if (Engine::isViewLoaded() && !isCreated())
         return backend.createFramebuffer(textureType, width, height, minFilter, magFilter, wrapU, wrapV, shadowMap);
     else
         return false;

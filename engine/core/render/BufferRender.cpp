@@ -21,7 +21,7 @@ BufferRender::~BufferRender(){
 }
 
 bool BufferRender::createBuffer(unsigned int size, void* data, BufferType type, BufferUsage usage){
-    if (Engine::isViewLoaded())
+    if (Engine::isViewLoaded() && !isCreated())
         return backend.createBuffer(size, data, type, usage);
     else
         return false;
@@ -33,4 +33,8 @@ void BufferRender::updateBuffer(unsigned int size, void* data){
 
 void BufferRender::destroyBuffer(){
     backend.destroyBuffer();
+}
+
+bool BufferRender::isCreated(){
+    return backend.isCreated();
 }

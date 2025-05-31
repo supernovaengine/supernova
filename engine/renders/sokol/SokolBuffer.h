@@ -22,6 +22,7 @@ namespace Supernova{
         bool createBuffer(unsigned int size, void* data, BufferType type, BufferUsage usage);
         void updateBuffer(unsigned int size, void* data);
         void destroyBuffer();
+        bool isCreated();
 
         sg_buffer get();
     };

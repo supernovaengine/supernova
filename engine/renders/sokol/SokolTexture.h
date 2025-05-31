@@ -45,6 +45,8 @@ namespace Supernova{
         const void* getMetalHandler() const;
         const void* getD3D11Handler() const;
 
+        bool isCreated();
+
         sg_image get();
         sg_sampler getSampler();
     };

@@ -16,7 +16,23 @@ namespace Supernova{
 
     typedef std::map<ShaderKey, std::shared_ptr<ShaderRender>> shaders_t;
 
-    using ShaderBuilderFn = std::function<ShaderData(ShaderKey)>;
+    enum class ShaderBuildState {
+        Finished,
+        Running,
+        Failed,
+        NotStarted
+    };
+
+    struct ShaderBuildResult {
+        ShaderData data;
+        ShaderBuildState state;
+
+        ShaderBuildResult() : state(ShaderBuildState::NotStarted) {}
+        ShaderBuildResult(const ShaderData& shaderData, ShaderBuildState buildState) 
+            : data(shaderData), state(buildState) {}
+    };
+
+    using ShaderBuilderFn = std::function<ShaderBuildResult(ShaderKey)>;
 
     class SUPERNOVA_API ShaderPool{
     private:

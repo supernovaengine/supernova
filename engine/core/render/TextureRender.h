@@ -37,6 +37,8 @@ namespace Supernova {
         uint32_t getGLHandler() const;
         const void* getMetalHandler() const;
         const void* getD3D11Handler() const;
+
+        bool isCreated();
     };
 }
 

@@ -24,7 +24,7 @@ ShaderRender::~ShaderRender(){
 }
 
 bool ShaderRender::createShader(ShaderData& shaderData){
-    if (Engine::isViewLoaded()) {
+    if (Engine::isViewLoaded() && !isCreated()) {
         this->shaderData = shaderData;
 
         bool ret = backend.createShader(this->shaderData);

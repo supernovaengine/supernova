@@ -86,6 +86,13 @@ void SokolBuffer::destroyBuffer(){
     buffer.id = SG_INVALID_ID;
 }
 
+bool SokolBuffer::isCreated(){
+    if (buffer.id != SG_INVALID_ID)
+        return true;
+
+    return false;
+}
+
 sg_buffer SokolBuffer::get(){
     return buffer;
 }
