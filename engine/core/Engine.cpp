@@ -634,17 +634,24 @@ void Engine::systemDraw(){
     SystemRender::commit();
 
     if (!oneTimeScenes.empty()) {
+        std::unordered_set<Scene*> loadedScenes;
+
         for (Scene* scene : oneTimeScenes) {
             if (scene == mainScene) {
                 continue;
             }
+            bool loaded = scene->getSystem<RenderSystem>()->isAllLoaded();
             auto sceneIt = std::find(scenes.begin(), scenes.end(), scene);
-            if (sceneIt != scenes.end()) {
+            if (loaded && sceneIt != scenes.end()) {
                 scenes.erase(sceneIt);
+                loadedScenes.insert(scene);
             }
         }
 
-        oneTimeScenes.clear();
+        // Only remove scenes that have been fully loaded
+        for (Scene* scene : loadedScenes) {
+            oneTimeScenes.erase(scene);
+        }
     }
 
     drawSemaphore.release();

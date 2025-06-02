@@ -2089,6 +2089,50 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& center
     return true;
 }
 
+bool RenderSystem::isAllLoaded() const{
+    // Check MeshComponents
+    auto meshes = scene->getComponentArray<MeshComponent>();
+    for (int i = 0; i < meshes->size(); i++) {
+        const MeshComponent& mesh = meshes->getComponentFromIndex(i);
+        if (!mesh.loaded)
+            return false;
+    }
+
+    // Check UIComponents
+    auto uis = scene->getComponentArray<UIComponent>();
+    for (int i = 0; i < uis->size(); i++) {
+        const UIComponent& ui = uis->getComponentFromIndex(i);
+        if (!ui.loaded)
+            return false;
+    }
+
+    // Check PointsComponents
+    auto pointsArray = scene->getComponentArray<PointsComponent>();
+    for (int i = 0; i < pointsArray->size(); i++) {
+        const PointsComponent& points = pointsArray->getComponentFromIndex(i);
+        if (!points.loaded)
+            return false;
+    }
+
+    // Check LinesComponents
+    auto linesArray = scene->getComponentArray<LinesComponent>();
+    for (int i = 0; i < linesArray->size(); i++) {
+        const LinesComponent& lines = linesArray->getComponentFromIndex(i);
+        if (!lines.loaded)
+            return false;
+    }
+
+    // Check SkyComponents
+    auto skyArray = scene->getComponentArray<SkyComponent>();
+    for (int i = 0; i < skyArray->size(); i++) {
+        const SkyComponent& sky = skyArray->getComponentFromIndex(i);
+        if (!sky.loaded)
+            return false;
+    }
+
+    return true;
+}
+
 void RenderSystem::updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix, Plane* frustumPlanes){
 
     frustumPlanes[FRUSTUM_PLANE_LEFT].normal.x = viewProjectionMatrix[0][3] + viewProjectionMatrix[0][0];

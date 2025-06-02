@@ -183,6 +183,8 @@ namespace Supernova{
 		bool isInsideCamera(CameraComponent& camera, const AABB& box);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& point);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius);
+
+		bool isAllLoaded() const;
 	
 		virtual void load();
 		virtual void destroy();
