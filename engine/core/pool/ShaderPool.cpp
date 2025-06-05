@@ -9,6 +9,7 @@
 #include "shader/SBSReader.h"
 #include "util/Base64.h"
 #include <cstdint>
+#include <algorithm>
 
 #ifdef SOKOL_GLCORE
 #include "glsl410.h"
@@ -161,6 +162,13 @@ ShaderKey ShaderPool::createShaderKey(ShaderType shaderType, uint32_t properties
     return ((uint64_t)shaderType << 32) | (properties & 0xFFFFFFFF);
 }
 
+void ShaderPool::addMissingShader(const std::string& shaderStr) {
+    auto& missingShaders = getMissingShaders();
+    if (std::find(missingShaders.begin(), missingShaders.end(), shaderStr) == missingShaders.end()) {
+        missingShaders.push_back(shaderStr);
+    }
+}
+
 std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t properties){
     ShaderKey shaderKey = createShaderKey(shaderType, properties);
     auto& shared = getMap()[shaderKey];
@@ -192,7 +200,7 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t pr
             } else if (sbs.read("shader://"+getShaderFile(shaderStr))){
                 shared->createShader(sbs.getShaderData());
             } else {
-                getMissingShaders().push_back(shaderStr);
+                addMissingShader(shaderStr);
             }
         }
     }
