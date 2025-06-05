@@ -301,33 +301,20 @@ bool Texture::load(){
     if (!needLoad)
         return false;
 
-    numFaces = 1;
-	if (type == TextureType::TEXTURE_CUBE){
-		numFaces = 6;
-	}
-
     if (loadFromPath){
-        this->data = std::make_shared<std::array<TextureData,6>>();
+        std::array<std::string, 6> aPaths = {paths[0], paths[1], paths[2], paths[3], paths[4], paths[5]};
 
-        for (int f = 0; f < numFaces; f++){
-            if (paths[f].empty() && type == TextureType::TEXTURE_CUBE){
-                Log::error("Cube texture is missing textures");
-                return false;
-            }
-            data->at(f).loadTextureFromFile(paths[f].c_str());
+        data = TextureDataPool::loadFromFile(id, aPaths, numFaces);
 
-            if (Engine::getTextureStrategy() == TextureStrategy::FIT){
-                data->at(f).fitPowerOfTwo();
-            }else if (Engine::getTextureStrategy() == TextureStrategy::RESIZE){
-                data->at(f).resizePowerOfTwo();
+        if (!data) {
+            if (!TextureDataPool::isAsyncLoading()){
+                Log::error("Failed to load texture data for id: %s", id.c_str());
             }
+            return false;
         }
     }
 
-    data = TextureDataPool::get(id, *data.get());
-
     needLoad = false;
-
     return true;
 }
 
@@ -368,7 +355,7 @@ TextureRender* Texture::getRender(){
     load();
 
     if (!id.empty()){
-        render = TexturePool::get(id, type, *data.get(), minFilter, magFilter, wrapU, wrapV);
+        render = TexturePool::get(id, type, data, minFilter, magFilter, wrapU, wrapV);
     }
 
     if (data && releaseDataAfterLoad){

@@ -660,6 +660,8 @@ void Engine::systemDraw(){
 }
 
 void Engine::systemViewDestroyed(){
+    TextureDataPool::requestShutdown();
+
     drawSemaphore.acquire();
     
     viewLoaded = false;

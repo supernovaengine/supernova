@@ -27,7 +27,7 @@ namespace Supernova{
             std::string paths[6];
             std::shared_ptr<std::array<TextureData,6>> data = NULL;
 
-            int numFaces;
+            size_t numFaces;
 
             bool loadFromPath;
             bool releaseDataAfterLoad;

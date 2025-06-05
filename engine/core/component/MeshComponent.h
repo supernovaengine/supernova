@@ -71,6 +71,7 @@ namespace Supernova{
         bool hasDepthTexture = false;
 
         bool needUpdateTexture = false;
+        bool needUpdateDepthTexture = false;
     };
 
     struct MeshComponent{

@@ -19,40 +19,43 @@ textures_t& TexturePool::getMap(){
 std::shared_ptr<TextureRender> TexturePool::get(const std::string& id){
 	auto& shared = getMap()[id];
 
-	if (shared.use_count() > 0){
-		return shared;
-	}
+    if (shared && shared->isCreated()){
+        return shared;
+    }
 
 	return NULL;
 }
 
-std::shared_ptr<TextureRender> TexturePool::get(const std::string& id, TextureType type, std::array<TextureData,6> data, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
+std::shared_ptr<TextureRender> TexturePool::get(const std::string& id, TextureType type, const std::shared_ptr<std::array<TextureData,6>> &data, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
 	auto& shared = getMap()[id];
 
-	if (shared.use_count() > 0){
-		return shared;
-	}
+    if (shared && shared->isCreated()){
+        return shared;
+    }
+
+    if (!shared) {
+        shared = std::make_shared<TextureRender>();
+    }
 
 	int numFaces = 1;
 	if (type == TextureType::TEXTURE_CUBE){
 		numFaces = 6;
 	}
 
-	const auto resource =  std::make_shared<TextureRender>();
+	if (data){
+		void* data_array[6];
+		size_t size_array[6];
 
-	void* data_array[6];
-	size_t size_array[6];
+		for (int f = 0; f < numFaces; f++){
+			data_array[f] = data->at(f).getData();
+			size_array[f] = (size_t)data->at(f).getSize();
+		}
 
-	for (int f = 0; f < numFaces; f++){
-		data_array[f] = data[f].getData();
-		size_array[f] = (size_t)data[f].getSize();
+		shared->createTexture(id, data->at(0).getWidth(), data->at(0).getHeight(), data->at(0).getColorFormat(), type, numFaces, data_array, size_array, minFilter, magFilter, wrapU, wrapV);
+		//Log::debug("Create texture %s", id.c_str());
 	}
 
-	resource->createTexture(id, data[0].getWidth(), data[0].getHeight(), data[0].getColorFormat(), type, numFaces, data_array, size_array, minFilter, magFilter, wrapU, wrapV);
-	//Log::debug("Create texture %s", id.c_str());
-	shared = resource;
-
-	return resource;
+	return shared;
 }
 
 void TexturePool::remove(const std::string& id){
