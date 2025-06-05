@@ -115,22 +115,18 @@ std::shared_ptr<std::array<TextureData,6>> TextureDataPool::loadFromFile(const s
 }
 
 std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string& id, const std::array<std::string, 6>& paths, size_t numFaces) {
-    if (shutdownRequested.load()) {
-        throw std::runtime_error("Shutdown requested");
-    }
-
     uint64_t buildId = std::hash<std::string>{}(id);
+
     if (asyncLoading) {
+        if (shutdownRequested.load()) {
+            throw std::runtime_error("Shutdown requested");
+        }
         ResourceProgress::updateProgress(buildId, 0.1f);  // Starting
     }
 
     std::array<TextureData,6> data;
 
     for (size_t f = 0; f < numFaces; f++) {
-        if (shutdownRequested.load()) {
-            throw std::runtime_error("Shutdown requested");
-        }
-
         if (paths[f].empty()) {
             throw std::runtime_error("Texture is missing texture for face " + std::to_string(f));
         }
@@ -148,15 +144,17 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
         }
 
         if (asyncLoading) {
+            if (shutdownRequested.load()) {
+                throw std::runtime_error("Shutdown requested");
+            }
             ResourceProgress::updateProgress(buildId, 0.1f + (0.8f * (f + 1) / static_cast<float>(numFaces)));
         }
     }
 
-    if (shutdownRequested.load()) {
-        throw std::runtime_error("Shutdown requested");
-    }
-
     if (asyncLoading) {
+        if (shutdownRequested.load()) {
+            throw std::runtime_error("Shutdown requested");
+        }
         ResourceProgress::updateProgress(buildId, 1.0f);  // Completing
     }
 

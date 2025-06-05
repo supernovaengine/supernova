@@ -811,7 +811,7 @@ int PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& ter
             TextureData& textureData = terrain.heightMap.getData();
 
             if (samplesSize == 0){
-                samplesSize = textureData.getNearestPowerOfTwo();
+                samplesSize = textureData.getMinNearestPowerOfTwo();
                 if (samplesSize > std::min(textureData.getOriginalWidth(), textureData.getOriginalHeight())){
                     samplesSize = samplesSize / 2;
                 }

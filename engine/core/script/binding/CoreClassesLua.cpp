@@ -364,6 +364,37 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endClass();
 
     luabridge::getGlobalNamespace(L)
+        .beginClass<TextureData>("TextureData")
+        .addConstructor<
+            void(), 
+            void(int, int, unsigned int, ColorFormat, int, void*), 
+            //void(unsigned char*, unsigned int), // TODO: missing constructor
+            void(const char*)>()
+        .addFunction("loadTextureFromFile", &TextureData::loadTextureFromFile)
+        //.addFunction("loadTextureFromMemory", &TextureData::loadTextureFromMemory)
+        .addFunction("releaseImageData", &TextureData::releaseImageData)
+        .addFunction("hasAlpha", &TextureData::hasAlpha)
+        .addFunction("resizePowerOfTwo", &TextureData::resizePowerOfTwo)
+        .addFunction("fitPowerOfTwo", &TextureData::fitPowerOfTwo)
+        .addFunction("resize", &TextureData::resize)
+        .addFunction("crop", &TextureData::crop)
+        .addFunction("fitSize", &TextureData::fitSize)
+        .addFunction("flipVertical", &TextureData::flipVertical)
+        .addFunction("getColorComponent", &TextureData::getColorComponent)
+        .addProperty("dataOwned", &TextureData::getDataOwned, &TextureData::setDataOwned)
+        .addFunction("getWidth", &TextureData::getWidth)
+        .addFunction("getHeight", &TextureData::getHeight)
+        .addFunction("getOriginalWidth", &TextureData::getOriginalWidth)
+        .addFunction("getOriginalHeight", &TextureData::getOriginalHeight)
+        .addFunction("getSize", &TextureData::getSize)
+        .addFunction("getColorFormat", &TextureData::getColorFormat)
+        .addFunction("getChannels", &TextureData::getChannels)
+        .addFunction("getData", &TextureData::getData)
+        .addFunction("isTransparent", &TextureData::isTransparent)
+        .addFunction("getMinNearestPowerOfTwo", &TextureData::getMinNearestPowerOfTwo)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<Material>("Material")
         .addProperty("baseColorFactor", &Material::baseColorFactor)
         .addProperty("metallicFactor", &Material::metallicFactor)

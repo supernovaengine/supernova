@@ -51,6 +51,14 @@ TextureData::TextureData(int width, int height, unsigned int size, ColorFormat c
     this->dataOwned = false;
 }
 
+TextureData::TextureData(const char* filename) : TextureData(){
+    loadTextureFromFile(filename);
+}
+
+TextureData::TextureData(unsigned char* data, unsigned int dataLength) : TextureData(){
+    loadTextureFromMemory(data, dataLength);
+}
+
 TextureData::TextureData(const TextureData& v){
     this->copy(v);
 }
@@ -370,6 +378,10 @@ void TextureData::setDataOwned(bool dataOwned){
     this->dataOwned = dataOwned;
 }
 
+bool TextureData::getDataOwned() const{
+    return this->dataOwned;
+}
+
 int TextureData::getWidth(){
     return width;
 }
@@ -406,7 +418,7 @@ bool TextureData::isTransparent(){
     return transparent;
 }
 
-int TextureData::getNearestPowerOfTwo(){
+int TextureData::getMinNearestPowerOfTwo(){
     return getNearestPowerOfTwo(std::min(width, height));
 }
 

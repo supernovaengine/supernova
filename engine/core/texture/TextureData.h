@@ -34,6 +34,8 @@ namespace Supernova {
 
         TextureData();
         TextureData(int width, int height, unsigned int size, ColorFormat color_format, int channels, void* data);
+        TextureData(const char* filename);
+        TextureData(unsigned char* data, unsigned int dataLength);
         TextureData(const TextureData& v);
         TextureData& operator = ( const TextureData& v );
         bool operator == ( const TextureData& v ) const;
@@ -61,6 +63,7 @@ namespace Supernova {
         unsigned char getColorComponent(int x, int y, int color);
         
         void setDataOwned(bool dataOwned);
+        bool getDataOwned() const;
 
         int getWidth();
         int getHeight();
@@ -73,7 +76,7 @@ namespace Supernova {
 
         bool isTransparent();
 
-        int getNearestPowerOfTwo();
+        int getMinNearestPowerOfTwo();
 
         // render callback clean function
         static void cleanupTexture(void* data);
