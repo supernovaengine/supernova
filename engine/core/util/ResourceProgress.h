@@ -5,6 +5,7 @@
 #ifndef RESOURCEPROGRESS_H
 #define RESOURCEPROGRESS_H
 
+#include "Export.h"
 #include <string>
 #include <mutex>
 #include <unordered_map>
@@ -38,7 +39,7 @@ namespace Supernova {
         bool hasActiveBuilds = false;
     };
 
-    class ResourceProgress {
+    class SUPERNOVA_API ResourceProgress {
     private:
         static std::mutex progressMutex;
         static std::unordered_map<uint64_t, ResourceBuildInfo> activeBuilds;
