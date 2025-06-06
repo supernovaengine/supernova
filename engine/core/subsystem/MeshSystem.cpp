@@ -28,7 +28,7 @@ MeshSystem::~MeshSystem(){
 void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
-    mesh.submeshes[0].hasDepthTexture = true;
+    mesh.submeshes[0].textureShadow = true;
     mesh.submeshes[0].faceCulling = false;
     mesh.numSubmeshes = 1;
 

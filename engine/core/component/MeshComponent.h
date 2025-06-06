@@ -58,6 +58,7 @@ namespace Supernova{
         unsigned int vertexCount = 0;
 
         bool faceCulling = true;
+        bool textureShadow = false;
         
         bool hasTexCoord1 = false;
         bool hasNormalMap = false;
@@ -68,7 +69,6 @@ namespace Supernova{
         bool hasMorphTarget = false;
         bool hasMorphNormal = false;
         bool hasMorphTangent = false;
-        bool hasDepthTexture = false;
 
         bool needUpdateTexture = false;
         bool needUpdateDepthTexture = false;

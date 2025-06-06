@@ -755,7 +755,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		mesh.submeshes[i].shader = ShaderPool::get(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
 		if (hasShadows && mesh.castShadows){
 			mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(
-				mesh.submeshes[i].hasDepthTexture, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, 
+				mesh.submeshes[i].textureShadow, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, 
 				mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent, false, (instmesh)?true:false);
 			mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
 			if (!mesh.submeshes[i].depthShader->isCreated())
@@ -879,7 +879,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 				mesh.submeshes[i].slotVSDepthMorphTarget = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_MORPHTARGET);
 			}
 
-			if (mesh.submeshes[i].hasDepthTexture){
+			if (mesh.submeshes[i].textureShadow){
 				if (!loadDepthTexture(mesh.submeshes[i].material, depthShaderData, depthRender)){
 					return false;
 				}
@@ -961,7 +961,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			}
 
 			CullingMode depthCullingMode = (mesh.cullingMode==CullingMode::BACK)? CullingMode::FRONT : CullingMode::BACK;
-			bool depthFaceCulling = (mesh.submeshes[i].hasDepthTexture)? false : mesh.submeshes[i].faceCulling;
+			bool depthFaceCulling = (mesh.submeshes[i].textureShadow)? false : mesh.submeshes[i].faceCulling;
 
 			if (!depthRender.endLoad(PIP_DEPTH, depthFaceCulling, depthCullingMode, mesh.windingOrder)){
 				return false;
@@ -2784,7 +2784,7 @@ void RenderSystem::update(double dt){
 
 			for (int s = 0; s < mesh.numSubmeshes; s++){
 				if (mesh.submeshes[s].needUpdateTexture){
-					if (mesh.submeshes[i].hasDepthTexture){
+					if (mesh.submeshes[i].textureShadow){
 						mesh.submeshes[i].needUpdateDepthTexture = true;
 					}
 					if (checkPBRTextures(mesh.submeshes[s].material)){

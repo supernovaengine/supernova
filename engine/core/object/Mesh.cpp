@@ -155,7 +155,7 @@ bool Mesh::isCastShadowsWithTexture() const{
 void Mesh::setCastShadowsWithTexture(unsigned int submesh, bool castShadowsWithTexture){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
-    mesh.submeshes[submesh].hasDepthTexture = castShadowsWithTexture;
+    mesh.submeshes[submesh].textureShadow = castShadowsWithTexture;
 
     mesh.needReload = true;
 }
@@ -163,7 +163,7 @@ void Mesh::setCastShadowsWithTexture(unsigned int submesh, bool castShadowsWithT
 bool Mesh::isCastShadowsWithTexture(unsigned int submesh) const{
     MeshComponent& mesh = getComponent<MeshComponent>();
 
-    return mesh.submeshes[submesh].hasDepthTexture;
+    return mesh.submeshes[submesh].textureShadow;
 }
 
 void Mesh::setCullingMode(CullingMode cullingMode){
