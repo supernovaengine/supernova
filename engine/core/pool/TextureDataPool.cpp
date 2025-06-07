@@ -46,11 +46,16 @@ std::shared_ptr<std::array<TextureData,6>> TextureDataPool::get(const std::strin
 	return shared;
 }
 
-std::shared_ptr<std::array<TextureData,6>> TextureDataPool::loadFromFile(const std::string& id, const std::array<std::string, 6>& paths, size_t numFaces){
+TextureLoadResult TextureDataPool::loadFromFile(const std::string& id, const std::array<std::string, 6>& paths, size_t numFaces) {
     auto& shared = getMap()[id];
 
+    TextureLoadResult result;
+    result.id = id;
+
     if (shared && shared.use_count() > 0) {
-        return shared;
+        result.state = ResourceLoadState::Ready;
+        result.data = shared;
+        return result;
     }
 
     if (asyncLoading) {
@@ -71,19 +76,28 @@ std::shared_ptr<std::array<TextureData,6>> TextureDataPool::loadFromFile(const s
                     shared = std::make_shared<std::array<TextureData,6>>(data);
                     pendingBuilds.erase(it);
                     ResourceProgress::completeBuild(std::hash<std::string>{}(id));
-                    return shared;
+
+                    result.state = ResourceLoadState::Ready;
+                    result.data = shared;
+                    return result;
                 } catch (const std::exception& e) {
                     pendingBuilds.erase(it);
                     ResourceProgress::failBuild(std::hash<std::string>{}(id));
-                    //Log::error("Failed to load texture: %s", e.what());
-                    return nullptr;
+
+                    result.state = ResourceLoadState::Failed;
+                    result.errorMessage = e.what();
+                    return result;
                 }
             } else if (future.valid()) {
                 // Still building
-                return nullptr;
+                result.state = ResourceLoadState::Loading;
+                return result;
             } else {
                 // Invalid future, remove it
                 pendingBuilds.erase(it);
+                result.state = ResourceLoadState::Failed;
+                result.errorMessage = "Invalid future";
+                return result;
             }
         }
 
@@ -102,19 +116,22 @@ std::shared_ptr<std::array<TextureData,6>> TextureDataPool::loadFromFile(const s
         });
 
     } else {
-
         try {
             std::array<TextureData,6> data = loadTextureInternal(id, paths, numFaces);
             shared = std::make_shared<std::array<TextureData,6>>(data);
-            return shared;
-        } catch (const std::exception& e) {
-            //Log::error("Failed to load texture: %s", e.what());
-            return nullptr;
-        }
 
+            result.state = ResourceLoadState::Ready;
+            result.data = shared;
+            return result;
+        } catch (const std::exception& e) {
+            result.state = ResourceLoadState::Failed;
+            result.errorMessage = e.what();
+            return result;
+        }
     }
 
-    return nullptr; // Will be ready on next call
+    result.state = ResourceLoadState::Loading;
+    return result;
 }
 
 std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string& id, const std::array<std::string, 6>& paths, size_t numFaces) {

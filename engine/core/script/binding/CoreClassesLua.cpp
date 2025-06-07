@@ -145,6 +145,14 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("ResourceLoadState")
+        .addVariable("NotStarted", ResourceLoadState::NotStarted)
+        .addVariable("Loading", ResourceLoadState::Loading)
+        .addVariable("Ready", ResourceLoadState::Ready)
+        .addVariable("Failed", ResourceLoadState::Failed)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginClass<Engine>("Engine")
 
         .addStaticProperty("scene", &Engine::getScene, &Engine::setScene)
@@ -393,6 +401,18 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("isTransparent", &TextureData::isTransparent)
         .addFunction("getMinNearestPowerOfTwo", &TextureData::getMinNearestPowerOfTwo)
         .endClass();
+
+        luabridge::getGlobalNamespace(L)
+            .beginClass<TextureLoadResult>("TextureLoadResult")
+            .addConstructor<void()>()
+            .addProperty("id", &TextureLoadResult::id)
+            .addProperty("state", &TextureLoadResult::state)
+            .addProperty("errorMessage", &TextureLoadResult::errorMessage)
+            .addProperty("data", &TextureLoadResult::data)
+            .addFunction("__tostring", [] (const TextureLoadResult& result) {
+                return "TextureLoadResult(id: " + result.id + ", state: " + std::to_string(static_cast<int>(result.state)) + ")";
+            })
+            .endClass();
 
     luabridge::getGlobalNamespace(L)
         .beginClass<Material>("Material")

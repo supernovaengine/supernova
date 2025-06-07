@@ -44,7 +44,7 @@ void ResourceProgress::completeBuild(uint64_t id) {
 }
 
 void ResourceProgress::failBuild(uint64_t id) {
-    Log::debug("Loading completed: %s", activeBuilds[id].name.c_str());
+    Log::debug("Loading failed: %s", activeBuilds[id].name.c_str());
     std::lock_guard<std::mutex> lock(progressMutex);
     activeBuilds.erase(id);
 }

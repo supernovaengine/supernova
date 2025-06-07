@@ -8,6 +8,7 @@
 #include "Scene.h"
 #include "Input.h"
 #include "FileData.h"
+#include "util/ResourceProgress.h"
 
 using namespace Supernova;
 
@@ -51,6 +52,9 @@ namespace luabridge
     template<> struct Stack<TextureWrap> : EnumWrapper<TextureWrap>{};
     template<> struct Stack<AdMobRating> : EnumWrapper<AdMobRating>{};
     template<> struct Stack<CursorType> : EnumWrapper<CursorType>{};
+    template<> struct Stack<ResourceLoadState> : EnumWrapper<ResourceLoadState>{};
+
+    template<> struct Stack<ResourceType> : EnumWrapper<ResourceType>{};
 
     template<> struct Stack<RotationOrder> : EnumWrapper<RotationOrder>{};
 

@@ -109,6 +109,13 @@ namespace Supernova {
         DYNAMIC
     };
 
+    enum class ResourceLoadState {
+        NotStarted,
+        Loading,
+        Ready,
+        Failed
+    };
+
     class SUPERNOVA_API Engine {
         
     private:

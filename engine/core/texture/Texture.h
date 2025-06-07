@@ -65,7 +65,7 @@ namespace Supernova{
 
             virtual ~Texture();
 
-            bool load();
+            TextureLoadResult load();
             void destroy();
 
             TextureRender* getRender();

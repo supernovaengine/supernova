@@ -284,35 +284,46 @@ void Texture::setFramebuffer(Framebuffer* framebuffer){
     this->needLoad = false;
 }
 
-bool Texture::load(){
+TextureLoadResult Texture::load() {
+    TextureLoadResult result;
+    result.id = id;
 
-    if (framebuffer)
-        return true;
+    if (framebuffer) {
+        result.state = ResourceLoadState::Ready;
+        result.data = nullptr; // Or however you want to signal framebuffer
+        return result;
+    }
 
-    if (data){
-        return true;
-    }else{
+    if (data) {
+        result.state = ResourceLoadState::Ready;
+        result.data = data;
+        return result;
+    } else {
         data = TextureDataPool::get(id);
-        if (data){
-            return true;
+        if (data) {
+            result.state = ResourceLoadState::Ready;
+            result.data = data;
+            return result;
         }
     }
 
-    if (!needLoad)
-        return false;
+    if (!needLoad) {
+        result.state = ResourceLoadState::NotStarted;
+        return result;
+    }
 
-    if (loadFromPath){
+    if (loadFromPath) {
         std::array<std::string, 6> aPaths = {paths[0], paths[1], paths[2], paths[3], paths[4], paths[5]};
-
-        data = TextureDataPool::loadFromFile(id, aPaths, numFaces);
-
-        if (!data) {
-            return false;
+        result = TextureDataPool::loadFromFile(id, aPaths, numFaces);
+        if (result && result.data) {
+            data = result.data;
+            needLoad = false;
         }
+        return result;
     }
 
-    needLoad = false;
-    return true;
+    result.state = ResourceLoadState::NotStarted;
+    return result;
 }
 
 void Texture::destroy(){
