@@ -808,6 +808,7 @@
 		71ABBD4927A87A2E001CE3AF /* MeshSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD4727A87A2E001CE3AF /* MeshSystem.cpp */; };
 		71ABBD4A27A87A2E001CE3AF /* MeshSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD4727A87A2E001CE3AF /* MeshSystem.cpp */; };
 		71ABBD4B27A87A2E001CE3AF /* MeshSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD4827A87A2E001CE3AF /* MeshSystem.h */; };
+		71B366662DF5054B00B19238 /* TextureLoadResult.h in Headers */ = {isa = PBXBuildFile; fileRef = 71B366652DF5054B00B19238 /* TextureLoadResult.h */; };
 		71BE60E425B1D019006D6E02 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE60E325B1D019006D6E02 /* assets */; };
 		71BE60E525B1D019006D6E02 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE60E325B1D019006D6E02 /* assets */; };
 		71BE61C525B1DA3E006D6E02 /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61BA25B1DA3E006D6E02 /* stb_truetype.c */; };
@@ -2102,6 +2103,7 @@
 		71ABBD4327A879D4001CE3AF /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Button.h; sourceTree = "<group>"; };
 		71ABBD4727A87A2E001CE3AF /* MeshSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MeshSystem.cpp; sourceTree = "<group>"; };
 		71ABBD4827A87A2E001CE3AF /* MeshSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshSystem.h; sourceTree = "<group>"; };
+		71B366652DF5054B00B19238 /* TextureLoadResult.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = TextureLoadResult.h; sourceTree = "<group>"; };
 		71BE602825B1C49C006D6E02 /* liblua-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "liblua-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BE60E325B1D019006D6E02 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		71BE612625B1D088006D6E02 /* libstb-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libstb-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3448,13 +3450,14 @@
 		7162FC6A25962A0E0075B97D /* texture */ = {
 			isa = PBXGroup;
 			children = (
-				717AD991292FC30A007D7DB5 /* Framebuffer.cpp */,
 				717AD990292FC30A007D7DB5 /* Framebuffer.h */,
+				717AD991292FC30A007D7DB5 /* Framebuffer.cpp */,
 				715CB11A288CD5790049344B /* Material.h */,
-				7162FC6C25962A0E0075B97D /* Texture.cpp */,
 				7162FC6D25962A0E0075B97D /* Texture.h */,
-				71BE621E25B1DB83006D6E02 /* TextureData.cpp */,
+				7162FC6C25962A0E0075B97D /* Texture.cpp */,
 				71BE621F25B1DB83006D6E02 /* TextureData.h */,
+				71BE621E25B1DB83006D6E02 /* TextureData.cpp */,
+				71B366652DF5054B00B19238 /* TextureLoadResult.h */,
 			);
 			path = texture;
 			sourceTree = "<group>";
@@ -4280,6 +4283,7 @@
 				717AD964290B65E6007D7DB5 /* AudioComponent.h in Headers */,
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
 				71BE622225B1DB83006D6E02 /* TextureData.h in Headers */,
+				71B366662DF5054B00B19238 /* TextureLoadResult.h in Headers */,
 				717AD98A292118EF007D7DB5 /* UIContainerComponent.h in Headers */,
 				7105A55A28B305910092EA05 /* Color.h in Headers */,
 				71ABBD342783C8BB001CE3AF /* Image.h in Headers */,
