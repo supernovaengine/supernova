@@ -307,9 +307,6 @@ bool Texture::load(){
         data = TextureDataPool::loadFromFile(id, aPaths, numFaces);
 
         if (!data) {
-            if (!TextureDataPool::isAsyncLoading()){
-                Log::error("Failed to load texture data for id: %s", id.c_str());
-            }
             return false;
         }
     }

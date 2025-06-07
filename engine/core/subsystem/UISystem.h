@@ -38,7 +38,7 @@ namespace Supernova{
 		void calculateUIAABB(UIComponent& ui);
 
 		//Image
-		void createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
+		bool createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout);
 
 		// Text
 		bool loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutComponent& layout);

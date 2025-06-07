@@ -30,11 +30,18 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
 UISystem::~UISystem(){
 }
 
-void UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
+bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
+    unsigned int texWidth = 0;
+    unsigned int texHeight = 0;
 
-    ui.texture.load();
-    unsigned int texWidth = ui.texture.getWidth();
-    unsigned int texHeight = ui.texture.getHeight();
+    if (!ui.texture.empty()){
+        if (!ui.texture.load()){
+            return false;
+        }
+
+        texWidth = ui.texture.getWidth();
+        texHeight = ui.texture.getHeight();
+    }
 
     if (texWidth == 0 || texHeight == 0){
         texWidth = layout.width;
@@ -48,7 +55,7 @@ void UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
 
     if ((layout.width == 0 || layout.height == 0)){
         //Log::warn("Cannot create UI image without size");
-        return;
+        return false;
     }
 
     ui.primitiveType = PrimitiveType::TRIANGLES;
@@ -173,6 +180,8 @@ void UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
 
     if (ui.loaded)
         ui.needUpdateBuffer = true;
+
+    return true;
 }
 
 bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
@@ -698,9 +707,11 @@ bool UISystem::createOrUpdateImage(ImageComponent& img, UIComponent& ui, UILayou
             changeFlipY(ui, camera);
         }
 
-        createImagePatches(img, ui, layout);
-
-        img.needUpdatePatches = false;
+        if (createImagePatches(img, ui, layout)){
+            img.needUpdatePatches = false;
+        }else{
+            return false;
+        }
     }
 
     return true;

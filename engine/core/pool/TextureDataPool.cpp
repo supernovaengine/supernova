@@ -75,7 +75,7 @@ std::shared_ptr<std::array<TextureData,6>> TextureDataPool::loadFromFile(const s
                 } catch (const std::exception& e) {
                     pendingBuilds.erase(it);
                     ResourceProgress::failBuild(std::hash<std::string>{}(id));
-                    Log::error("Failed to load texture: %s", e.what());
+                    //Log::error("Failed to load texture: %s", e.what());
                     return nullptr;
                 }
             } else if (future.valid()) {
@@ -103,11 +103,14 @@ std::shared_ptr<std::array<TextureData,6>> TextureDataPool::loadFromFile(const s
 
     } else {
 
-        std::array<TextureData,6> data = loadTextureInternal(id, paths, numFaces);
-
-        shared = std::make_shared<std::array<TextureData,6>>(data);
-
-        return shared;
+        try {
+            std::array<TextureData,6> data = loadTextureInternal(id, paths, numFaces);
+            shared = std::make_shared<std::array<TextureData,6>>(data);
+            return shared;
+        } catch (const std::exception& e) {
+            //Log::error("Failed to load texture: %s", e.what());
+            return nullptr;
+        }
 
     }
 
@@ -133,7 +136,11 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
 
         bool success = data[f].loadTextureFromFile(paths[f].c_str());
         if (!success) {
-            throw std::runtime_error("Failed to load texture face " + std::to_string(f) + " from file: " + paths[f]);
+            if (numFaces == 1){
+                throw std::runtime_error("Failed to load texture from file: " + paths[f]);
+            }else{
+                throw std::runtime_error("Failed to load texture face " + std::to_string(f) + " from file: " + paths[f]);
+            }
         }
 
         // Apply texture strategy
