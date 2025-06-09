@@ -503,6 +503,14 @@
 		71651FF72AA804B4008D9BF5 /* Manifold2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FEC2AA804B4008D9BF5 /* Manifold2D.cpp */; };
 		71651FF82AA804B4008D9BF5 /* Contact2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FED2AA804B4008D9BF5 /* Contact2D.cpp */; };
 		71651FF92AA804B4008D9BF5 /* Contact2D.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71651FED2AA804B4008D9BF5 /* Contact2D.cpp */; };
+		716803C82DF75E6F00ED71BE /* ThreadClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716803C72DF75E6F00ED71BE /* ThreadClassesLua.cpp */; };
+		716803C92DF75E6F00ED71BE /* ThreadClassesLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716803C72DF75E6F00ED71BE /* ThreadClassesLua.cpp */; };
+		716803CF2DF75EA200ED71BE /* ThreadPoolManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716803CD2DF75EA200ED71BE /* ThreadPoolManager.cpp */; };
+		716803D02DF75EA200ED71BE /* ResourceProgress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716803CB2DF75EA200ED71BE /* ResourceProgress.cpp */; };
+		716803D12DF75EA200ED71BE /* ThreadPoolManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716803CD2DF75EA200ED71BE /* ThreadPoolManager.cpp */; };
+		716803D22DF75EA200ED71BE /* ResourceProgress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716803CB2DF75EA200ED71BE /* ResourceProgress.cpp */; };
+		716803D32DF75EA200ED71BE /* ResourceProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = 716803CA2DF75EA200ED71BE /* ResourceProgress.h */; };
+		716803D42DF75EA200ED71BE /* ThreadPoolManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 716803CC2DF75EA200ED71BE /* ThreadPoolManager.h */; };
 		716A72E62B5DF9CC00DDE179 /* SpringSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72E42B5DF9CC00DDE179 /* SpringSettings.cpp */; };
 		716A72E72B5DF9CC00DDE179 /* SpringSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72E42B5DF9CC00DDE179 /* SpringSettings.cpp */; };
 		716A72F42B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 716A72EA2B5DFA0E00DDE179 /* SoftBodySharedSettings.cpp */; };
@@ -871,9 +879,6 @@
 		71D9B63729B563B500F00B88 /* stb_image_resize2.h in Headers */ = {isa = PBXBuildFile; fileRef = 71D9B63429B563B500F00B88 /* stb_image_resize2.h */; };
 		71D9B63829B563B500F00B88 /* stb_image_resize2.c in Sources */ = {isa = PBXBuildFile; fileRef = 71D9B63529B563B500F00B88 /* stb_image_resize2.c */; };
 		71D9B63929B563B500F00B88 /* stb_image_resize2.c in Sources */ = {isa = PBXBuildFile; fileRef = 71D9B63529B563B500F00B88 /* stb_image_resize2.c */; };
-		71DBC7432DF127CE00B1F472 /* ResourceProgress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71DBC7422DF127CE00B1F472 /* ResourceProgress.cpp */; };
-		71DBC7442DF127CE00B1F472 /* ResourceProgress.h in Headers */ = {isa = PBXBuildFile; fileRef = 71DBC7412DF127CE00B1F472 /* ResourceProgress.h */; };
-		71DBC7452DF127CE00B1F472 /* ResourceProgress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71DBC7422DF127CE00B1F472 /* ResourceProgress.cpp */; };
 		71DFC2632C7EB24D00AC0222 /* JobSystemSingleThreaded.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71DFC25E2C7EB24D00AC0222 /* JobSystemSingleThreaded.cpp */; };
 		71DFC2642C7EB24D00AC0222 /* JobSystemSingleThreaded.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71DFC25E2C7EB24D00AC0222 /* JobSystemSingleThreaded.cpp */; };
 		71DFC2672C7EB26F00AC0222 /* DebugRendererSimple.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71DFC2652C7EB26F00AC0222 /* DebugRendererSimple.cpp */; };
@@ -1899,6 +1904,11 @@
 		71651FE92AA804B4008D9BF5 /* Manifold2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Manifold2D.h; sourceTree = "<group>"; };
 		71651FEC2AA804B4008D9BF5 /* Manifold2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Manifold2D.cpp; sourceTree = "<group>"; };
 		71651FED2AA804B4008D9BF5 /* Contact2D.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Contact2D.cpp; sourceTree = "<group>"; };
+		716803C72DF75E6F00ED71BE /* ThreadClassesLua.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreadClassesLua.cpp; sourceTree = "<group>"; };
+		716803CA2DF75EA200ED71BE /* ResourceProgress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResourceProgress.h; sourceTree = "<group>"; };
+		716803CB2DF75EA200ED71BE /* ResourceProgress.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceProgress.cpp; sourceTree = "<group>"; };
+		716803CC2DF75EA200ED71BE /* ThreadPoolManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ThreadPoolManager.h; sourceTree = "<group>"; };
+		716803CD2DF75EA200ED71BE /* ThreadPoolManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ThreadPoolManager.cpp; sourceTree = "<group>"; };
 		716A72E22B5DF9A500DDE179 /* AllowedDOFs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AllowedDOFs.h; sourceTree = "<group>"; };
 		716A72E32B5DF9B700DDE179 /* BodyType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BodyType.h; sourceTree = "<group>"; };
 		716A72E42B5DF9CC00DDE179 /* SpringSettings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpringSettings.cpp; sourceTree = "<group>"; };
@@ -2148,8 +2158,6 @@
 		71D74952296731F200348AB8 /* Tilemap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tilemap.h; sourceTree = "<group>"; };
 		71D9B63429B563B500F00B88 /* stb_image_resize2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stb_image_resize2.h; sourceTree = "<group>"; };
 		71D9B63529B563B500F00B88 /* stb_image_resize2.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = stb_image_resize2.c; sourceTree = "<group>"; };
-		71DBC7412DF127CE00B1F472 /* ResourceProgress.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ResourceProgress.h; sourceTree = "<group>"; };
-		71DBC7422DF127CE00B1F472 /* ResourceProgress.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ResourceProgress.cpp; sourceTree = "<group>"; };
 		71DFC25E2C7EB24D00AC0222 /* JobSystemSingleThreaded.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = JobSystemSingleThreaded.cpp; sourceTree = "<group>"; };
 		71DFC25F2C7EB24D00AC0222 /* JobSystemSingleThreaded.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = JobSystemSingleThreaded.h; sourceTree = "<group>"; };
 		71DFC2602C7EB24D00AC0222 /* ScopeExit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScopeExit.h; sourceTree = "<group>"; };
@@ -2479,6 +2487,7 @@
 				7105A56128B305B20092EA05 /* IOClassesLua.cpp */,
 				7105A55E28B305B20092EA05 /* MathClassesLua.cpp */,
 				7105A55C28B305B20092EA05 /* ObjectClassesLua.cpp */,
+				716803C72DF75E6F00ED71BE /* ThreadClassesLua.cpp */,
 				7105A56028B305B20092EA05 /* UtilClassesLua.cpp */,
 			);
 			path = binding;
@@ -3232,26 +3241,27 @@
 				7162FC7B25962A0E0075B97D /* buffer */,
 				7162FC4425962A0E0075B97D /* component */,
 				71E36B8125D5996400EFEED4 /* ecs */,
-				7162FC7225962A0E0075B97D /* Engine.cpp */,
 				7162FC2B25962A0E0075B97D /* Engine.h */,
-				7128D08525BB033D00965B51 /* Input.cpp */,
+				7162FC7225962A0E0075B97D /* Engine.cpp */,
 				7128D05D25BB02F800965B51 /* Input.h */,
+				7128D08525BB033D00965B51 /* Input.cpp */,
 				7162FC2F25962A0E0075B97D /* io */,
-				7162FC2C25962A0E0075B97D /* Log.cpp */,
 				7162FC6925962A0E0075B97D /* Log.h */,
+				7162FC2C25962A0E0075B97D /* Log.cpp */,
 				7162FC4825962A0E0075B97D /* math */,
 				7162FC6225962A0E0075B97D /* object */,
 				71BE623325B1DB9E006D6E02 /* pool */,
 				7162FC3825962A0E0075B97D /* render */,
-				7162FC2D25962A0E0075B97D /* Scene.cpp */,
 				7162FC8625962A0E0075B97D /* Scene.h */,
+				7162FC2D25962A0E0075B97D /* Scene.cpp */,
 				71BE622C25B1DB9D006D6E02 /* script */,
 				71CC839D26B8C54A00EEBB93 /* shader */,
 				7162FC6F25962A0E0075B97D /* subsystem */,
 				7162FC7A25962A0E0075B97D /* Supernova.h */,
-				71BE61FF25B1DB22006D6E02 /* System.cpp */,
 				71BE61FE25B1DB22006D6E02 /* System.h */,
+				71BE61FF25B1DB22006D6E02 /* System.cpp */,
 				7162FC6A25962A0E0075B97D /* texture */,
+				716803CE2DF75EA200ED71BE /* thread */,
 				7162FC2E25962A0E0075B97D /* util */,
 			);
 			path = core;
@@ -3270,8 +3280,6 @@
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
 				7105CAA62AD61BD5007C91BA /* JoltPhysicsAux.h */,
-				71DBC7412DF127CE00B1F472 /* ResourceProgress.h */,
-				71DBC7422DF127CE00B1F472 /* ResourceProgress.cpp */,
 				71451BF2270CA3EA00712643 /* SpriteFrameData.h */,
 				71ABBD27277A3210001CE3AF /* STBText.h */,
 				71ABBD26277A3210001CE3AF /* STBText.cpp */,
@@ -3606,6 +3614,17 @@
 			);
 			name = project;
 			path = ../../project;
+			sourceTree = "<group>";
+		};
+		716803CE2DF75EA200ED71BE /* thread */ = {
+			isa = PBXGroup;
+			children = (
+				716803CA2DF75EA200ED71BE /* ResourceProgress.h */,
+				716803CB2DF75EA200ED71BE /* ResourceProgress.cpp */,
+				716803CC2DF75EA200ED71BE /* ThreadPoolManager.h */,
+				716803CD2DF75EA200ED71BE /* ThreadPoolManager.cpp */,
+			);
+			path = thread;
 			sourceTree = "<group>";
 		};
 		716A72E92B5DFA0E00DDE179 /* SoftBody */ = {
@@ -4253,6 +4272,8 @@
 				71CC839726B8C4D800EEBB93 /* Light.h in Headers */,
 				717D9B4127337850002C0803 /* ParticlesComponent.h in Headers */,
 				715CB119288CD40E0049344B /* Terrain.h in Headers */,
+				716803D32DF75EA200ED71BE /* ResourceProgress.h in Headers */,
+				716803D42DF75EA200ED71BE /* ThreadPoolManager.h in Headers */,
 				71CC839A26B8C4FD00EEBB93 /* FramebufferRender.h in Headers */,
 				71F225452C58736B006ED3CA /* InstancedMeshComponent.h in Headers */,
 				7105CAA92AD61BD5007C91BA /* Box2DAux.h in Headers */,
@@ -4304,7 +4325,6 @@
 				71D7494D296731A800348AB8 /* TilemapComponent.h in Headers */,
 				71165BC1282981BE00CF79C1 /* Base64.h in Headers */,
 				718FDDF82837CA9A00AF314C /* msl21macos.h in Headers */,
-				71DBC7442DF127CE00B1F472 /* ResourceProgress.h in Headers */,
 				71D74958296731F200348AB8 /* Tilemap.h in Headers */,
 				71BE623F25B1DB9E006D6E02 /* LuaBinding.h in Headers */,
 				71FCE4C128E0FA01003C5217 /* LuaFunctionBase.h in Headers */,
@@ -5395,6 +5415,8 @@
 				7105A56928B305B20092EA05 /* ECSClassesLua.cpp in Sources */,
 				71451BDD270CA17F00712643 /* RotationAction.cpp in Sources */,
 				71ABBD0F277A313C001CE3AF /* AlphaAction.cpp in Sources */,
+				716803CF2DF75EA200ED71BE /* ThreadPoolManager.cpp in Sources */,
+				716803D02DF75EA200ED71BE /* ResourceProgress.cpp in Sources */,
 				71BE624225B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				713D8293259D307F00567F9F /* Scene.cpp in Sources */,
 				7105A56D28B305B20092EA05 /* IOClassesLua.cpp in Sources */,
@@ -5491,7 +5513,7 @@
 				7170A3D62818A8A30003E965 /* Bone.cpp in Sources */,
 				713D82B2259D307F00567F9F /* IndexBuffer.cpp in Sources */,
 				7105A55928B305910092EA05 /* Color.cpp in Sources */,
-				71DBC7452DF127CE00B1F472 /* ResourceProgress.cpp in Sources */,
+				716803C82DF75E6F00ED71BE /* ThreadClassesLua.cpp in Sources */,
 				710506AF297F4483002DD23C /* Shape.cpp in Sources */,
 				7105CAB62AD61CB6007C91BA /* Body3D.cpp in Sources */,
 				7105CAB32AD61CB6007C91BA /* Joint3D.cpp in Sources */,
@@ -5561,6 +5583,8 @@
 				7105A56828B305B20092EA05 /* ECSClassesLua.cpp in Sources */,
 				71451BDC270CA17F00712643 /* RotationAction.cpp in Sources */,
 				71ABBD0E277A313C001CE3AF /* AlphaAction.cpp in Sources */,
+				716803D12DF75EA200ED71BE /* ThreadPoolManager.cpp in Sources */,
+				716803D22DF75EA200ED71BE /* ResourceProgress.cpp in Sources */,
 				71BE624125B1DB9E006D6E02 /* TexturePool.cpp in Sources */,
 				7162FE0E2596A5BE0075B97D /* SokolShader.cpp in Sources */,
 				7105A56C28B305B20092EA05 /* IOClassesLua.cpp in Sources */,
@@ -5657,7 +5681,7 @@
 				7170A3D52818A8A30003E965 /* Bone.cpp in Sources */,
 				7162FD4F25963AE00075B97D /* Engine.cpp in Sources */,
 				7105A55828B305910092EA05 /* Color.cpp in Sources */,
-				71DBC7432DF127CE00B1F472 /* ResourceProgress.cpp in Sources */,
+				716803C92DF75E6F00ED71BE /* ThreadClassesLua.cpp in Sources */,
 				710506AE297F4483002DD23C /* Shape.cpp in Sources */,
 				7105CAB52AD61CB6007C91BA /* Body3D.cpp in Sources */,
 				7105CAB22AD61CB6007C91BA /* Joint3D.cpp in Sources */,
