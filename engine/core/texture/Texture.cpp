@@ -289,19 +289,19 @@ TextureLoadResult Texture::load() {
     result.id = id;
 
     if (framebuffer) {
-        result.state = ResourceLoadState::Ready;
+        result.state = ResourceLoadState::Finished;
         result.data = nullptr; // Or however you want to signal framebuffer
         return result;
     }
 
     if (data) {
-        result.state = ResourceLoadState::Ready;
+        result.state = ResourceLoadState::Finished;
         result.data = data;
         return result;
     } else {
         data = TextureDataPool::get(id);
         if (data) {
-            result.state = ResourceLoadState::Ready;
+            result.state = ResourceLoadState::Finished;
             result.data = data;
             return result;
         }

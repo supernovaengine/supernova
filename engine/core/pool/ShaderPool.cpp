@@ -184,11 +184,11 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t pr
     if (!shared->isCreated()) {
         if (shaderBuilderFn) {
             ShaderBuildResult result = shaderBuilderFn(shaderKey);
-            if (result.state == ShaderBuildState::Finished) {
+            if (result.state == ResourceLoadState::Finished) {
                 shared->createShader(result.data);
-            } else if (result.state == ShaderBuildState::Running) {
+            } else if (result.state == ResourceLoadState::Loading) {
                 // Shader is still building, do nothing
-            } else if (result.state == ShaderBuildState::Failed) {
+            } else if (result.state == ResourceLoadState::Failed) {
                 Log::error("Shader build failed");
             }
         } else {

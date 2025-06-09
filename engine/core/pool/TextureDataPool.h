@@ -5,9 +5,9 @@
 #ifndef TEXTUREDATAPOOL_H
 #define TEXTUREDATAPOOL_H
 
+#include "Engine.h"
 #include "render/TextureRender.h"
 #include "texture/TextureData.h"
-#include "texture/TextureLoadResult.h"
 
 #include <map>
 #include <memory>
@@ -21,6 +21,19 @@
 namespace Supernova{
 
     typedef std::map< std::string, std::shared_ptr<std::array<TextureData,6>> > texturesdata_t;
+
+    struct TextureLoadResult {
+        std::string id;
+        ResourceLoadState state = ResourceLoadState::NotStarted;
+        std::string errorMessage;
+        std::shared_ptr<std::array<TextureData, 6>> data = nullptr;
+
+        TextureLoadResult() = default;
+
+        explicit operator bool() const {
+            return state == ResourceLoadState::Finished;
+        }
+    };
 
     class SUPERNOVA_API TextureDataPool{
     private:

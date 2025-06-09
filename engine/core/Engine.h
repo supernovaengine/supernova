@@ -112,7 +112,7 @@ namespace Supernova {
     enum class ResourceLoadState {
         NotStarted,
         Loading,
-        Ready,
+        Finished,
         Failed
     };
 

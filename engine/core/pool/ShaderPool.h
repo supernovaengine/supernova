@@ -5,6 +5,7 @@
 #ifndef SHADERPOOL_H
 #define SHADERPOOL_H
 
+#include "Engine.h"
 #include "render/ShaderRender.h"
 #include <map>
 #include <memory>
@@ -25,11 +26,15 @@ namespace Supernova{
 
     struct ShaderBuildResult {
         ShaderData data;
-        ShaderBuildState state;
+        ResourceLoadState state;
 
-        ShaderBuildResult() : state(ShaderBuildState::NotStarted) {}
-        ShaderBuildResult(const ShaderData& shaderData, ShaderBuildState buildState) 
+        ShaderBuildResult() : state(ResourceLoadState::NotStarted) {}
+        ShaderBuildResult(const ShaderData& shaderData, ResourceLoadState buildState) 
             : data(shaderData), state(buildState) {}
+
+        explicit operator bool() const {
+            return state == ResourceLoadState::Finished;
+        }
     };
 
     using ShaderBuilderFn = std::function<ShaderBuildResult(ShaderKey)>;

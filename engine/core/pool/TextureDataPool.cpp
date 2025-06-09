@@ -53,7 +53,7 @@ TextureLoadResult TextureDataPool::loadFromFile(const std::string& id, const std
     result.id = id;
 
     if (shared && shared.use_count() > 0) {
-        result.state = ResourceLoadState::Ready;
+        result.state = ResourceLoadState::Finished;
         result.data = shared;
         return result;
     }
@@ -77,7 +77,7 @@ TextureLoadResult TextureDataPool::loadFromFile(const std::string& id, const std
                     pendingBuilds.erase(it);
                     ResourceProgress::completeBuild(std::hash<std::string>{}(id));
 
-                    result.state = ResourceLoadState::Ready;
+                    result.state = ResourceLoadState::Finished;
                     result.data = shared;
                     return result;
                 } catch (const std::exception& e) {
@@ -120,7 +120,7 @@ TextureLoadResult TextureDataPool::loadFromFile(const std::string& id, const std
             std::array<TextureData,6> data = loadTextureInternal(id, paths, numFaces);
             shared = std::make_shared<std::array<TextureData,6>>(data);
 
-            result.state = ResourceLoadState::Ready;
+            result.state = ResourceLoadState::Finished;
             result.data = shared;
             return result;
         } catch (const std::exception& e) {

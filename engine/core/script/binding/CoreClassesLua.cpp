@@ -148,7 +148,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .beginNamespace("ResourceLoadState")
         .addVariable("NotStarted", ResourceLoadState::NotStarted)
         .addVariable("Loading", ResourceLoadState::Loading)
-        .addVariable("Ready", ResourceLoadState::Ready)
+        .addVariable("Finished", ResourceLoadState::Finished)
         .addVariable("Failed", ResourceLoadState::Failed)
         .endNamespace();
 
