@@ -8,7 +8,7 @@
 #include "Scene.h"
 #include "Input.h"
 #include "FileData.h"
-#include "util/ResourceProgress.h"
+#include "thread/ResourceProgress.h"
 
 using namespace Supernova;
 

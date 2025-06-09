@@ -6,7 +6,8 @@
 
 #include "Engine.h"
 #include "Log.h"
-#include "util/ResourceProgress.h"
+#include "thread/ResourceProgress.h"
+#include "thread/ThreadPoolManager.h"
 
 #include <filesystem>
 
@@ -111,11 +112,15 @@ TextureLoadResult TextureDataPool::loadFromFile(const std::string& id, const std
 
         ResourceProgress::startBuild(buildId, ResourceType::Texture, textureName);
 
-        pendingBuilds[id] = std::async(std::launch::async, [id, paths, numFaces, buildId]() {
-            return loadTextureInternal(id, paths, numFaces);
-        });
+        // Use thread pool instead of std::async
+        pendingBuilds[id] = ThreadPoolManager::getInstance().enqueue(
+            [id, paths, numFaces, buildId]() {
+                return loadTextureInternal(id, paths, numFaces);
+            }
+        );
 
     } else {
+        // Synchronous loading remains the same
         try {
             std::array<TextureData,6> data = loadTextureInternal(id, paths, numFaces);
             shared = std::make_shared<std::array<TextureData,6>>(data);

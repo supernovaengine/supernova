@@ -14,6 +14,7 @@
 #include "pool/TextureDataPool.h"
 #include "pool/ShaderPool.h"
 #include "pool/FontPool.h"
+#include "thread/ThreadPoolManager.h"
 
 #include "sokol_time.h"
 
@@ -430,6 +431,15 @@ bool Engine::isViewLoaded(){
     return viewLoaded;
 }
 
+void Engine::setMaxResourceLoadingThreads(size_t maxThreads) {
+    ThreadPoolManager::shutdown();
+    ThreadPoolManager::initialize(maxThreads);
+}
+
+size_t Engine::getQueuedResourceCount() {
+    return ThreadPoolManager::getInstance().getQueueSize();
+}
+
 void Engine::setFramebuffer(Framebuffer* framebuffer){
     Engine::framebuffer = framebuffer;
 }
@@ -463,6 +473,9 @@ void Engine::calculateCanvas(){
 }
 
 void Engine::systemInit(int argc, char* argv[]){
+
+    size_t maxThreads = std::max(1u, std::thread::hardware_concurrency() - 1);
+    ThreadPoolManager::initialize(maxThreads);
 
     Engine::setCanvasSize(1000,480);
 
@@ -682,6 +695,8 @@ void Engine::systemViewDestroyed(){
     FontPool::clear();
 
     drawSemaphore.release();
+
+    ThreadPoolManager::shutdown();
 }
 
 void Engine::systemShutdown(){

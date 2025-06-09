@@ -186,4 +186,7 @@
 #include "util/UniqueToken.h"
 //#include "util/XMLUtils.h"
 
+#include "thread/ResourceProgress.h"
+#include "thread/ThreadPoolManager.h"
+
 #endif /* supernova_h */

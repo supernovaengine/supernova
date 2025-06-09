@@ -35,6 +35,7 @@ namespace Supernova {
         static void registerMathClasses(lua_State *L);
         static void registerObjectClasses(lua_State *L);
         static void registerUtilClasses(lua_State *L);
+        static void registerThreadClasses(lua_State *L);
 
         static void init();
 

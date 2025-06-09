@@ -249,6 +249,9 @@ namespace Supernova {
         static bool isAsyncThread();
         static bool isViewLoaded();
 
+        static void setMaxResourceLoadingThreads(size_t maxThreads);
+        static size_t getQueuedResourceCount();
+
         static void setFramebuffer(Framebuffer* framebuffer);
         static Framebuffer* getFramebuffer();
 

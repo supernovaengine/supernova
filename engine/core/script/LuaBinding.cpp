@@ -226,6 +226,7 @@ void LuaBinding::registerClasses(lua_State *L){
     registerIOClasses(L);
     registerMathClasses(L); 
     registerUtilClasses(L);
+    registerThreadClasses(L);
 
 #endif //DISABLE_LUA_BINDINGS
 }
