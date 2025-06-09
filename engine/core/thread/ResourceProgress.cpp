@@ -14,7 +14,7 @@ std::unordered_map<uint64_t, ResourceBuildInfo> ResourceProgress::activeBuilds;
 uint64_t ResourceProgress::mostRecentBuildId = 0;
 
 void ResourceProgress::startBuild(uint64_t id, ResourceType type, const std::string& name) {
-    Log::debug("Loading started: %s", name.c_str());
+    Log::debug("Loading started [%s]: %s", getResourceTypeName(type).c_str(), name.c_str());
     std::lock_guard<std::mutex> lock(progressMutex);
 
     ResourceBuildInfo info;
@@ -38,13 +38,13 @@ void ResourceProgress::updateProgress(uint64_t id, float progress) {
 }
 
 void ResourceProgress::completeBuild(uint64_t id) {
-    Log::debug("Loading completed: %s", activeBuilds[id].name.c_str());
+    Log::debug("Loading completed [%s]: %s", getResourceTypeName(activeBuilds[id].type).c_str(), activeBuilds[id].name.c_str());
     std::lock_guard<std::mutex> lock(progressMutex);
     activeBuilds.erase(id);
 }
 
 void ResourceProgress::failBuild(uint64_t id) {
-    Log::debug("Loading failed: %s", activeBuilds[id].name.c_str());
+    Log::debug("Loading failed [%s]: %s", getResourceTypeName(activeBuilds[id].type).c_str(), activeBuilds[id].name.c_str());
     std::lock_guard<std::mutex> lock(progressMutex);
     activeBuilds.erase(id);
 }

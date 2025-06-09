@@ -1,6 +1,7 @@
 #ifndef threadpoolmanager_h
 #define threadpoolmanager_h
 
+#include "Export.h"
 #include <queue>
 #include <thread>
 #include <mutex>
@@ -11,7 +12,7 @@
 
 namespace Supernova {
 
-    class ThreadPoolManager {
+    class SUPERNOVA_API ThreadPoolManager {
     private:
         static std::unique_ptr<ThreadPoolManager> instance;
         static std::mutex instanceMutex;
