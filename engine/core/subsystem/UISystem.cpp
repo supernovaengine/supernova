@@ -35,12 +35,13 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
     unsigned int texHeight = 0;
 
     if (!ui.texture.empty()){
-        if (!ui.texture.load()){
+        TextureLoadResult texResult = ui.texture.load();
+        if (texResult.state == ResourceLoadState::Finished){
+            texWidth = ui.texture.getWidth();
+            texHeight = ui.texture.getHeight();
+        }else if (texResult.state == ResourceLoadState::Loading){
             return false;
         }
-
-        texWidth = ui.texture.getWidth();
-        texHeight = ui.texture.getHeight();
     }
 
     if (texWidth == 0 || texHeight == 0){
@@ -51,11 +52,6 @@ bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayout
     if (layout.width == 0 && layout.height == 0){
         layout.width = texWidth;
         layout.height = texHeight;
-    }
-
-    if ((layout.width == 0 || layout.height == 0)){
-        //Log::warn("Cannot create UI image without size");
-        return false;
     }
 
     ui.primitiveType = PrimitiveType::TRIANGLES;

@@ -347,7 +347,7 @@ void Texture::destroy(){
     }
 }
 
-TextureRender* Texture::getRender(){
+TextureRender* Texture::getRender(TextureRender* fallBackTexture){
     if (framebuffer){
         lastFramebufferVersion = framebuffer->getVersion();
         return &framebuffer->getRender().getColorTexture();
@@ -360,7 +360,10 @@ TextureRender* Texture::getRender(){
         return render.get();
     }
 
-    load();
+    TextureLoadResult texResult = load();
+    if (texResult.state == ResourceLoadState::Failed){
+        return fallBackTexture;
+    }
 
     if (!id.empty()){
         render = TexturePool::get(id, type, data, minFilter, magFilter, wrapU, wrapV);

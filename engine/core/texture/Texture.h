@@ -68,7 +68,7 @@ namespace Supernova{
             TextureLoadResult load();
             void destroy();
 
-            TextureRender* getRender();
+            TextureRender* getRender(TextureRender* fallBackTexture = NULL);
             std::string getPath(size_t index = 0) const;
             TextureData& getData(size_t index = 0) const;
             std::string getId() const;
