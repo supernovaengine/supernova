@@ -572,9 +572,9 @@ void UISystem::updateTextEdit(Entity entity, TextEditComponent& textedit, ImageC
         textXOffset = textlayout.width - widthArea;
     }
 
-    float textX = img.patchMarginLeft - textXOffset;
+    float textX = static_cast<float>(img.patchMarginLeft) - textXOffset;
     // descend is negative
-    float textY = img.patchMarginTop + (heightArea / 2) - (textlayout.height / 2);
+    float textY = static_cast<float>(img.patchMarginTop) + (heightArea / 2) - (textlayout.height / 2);
 
     Vector3 textPosition = Vector3(textX, textY, 0);
 
