@@ -9,7 +9,9 @@
 #include "buffer/InterleavedBuffer.h"
 #include "io/FileData.h"
 #include "io/Data.h"
+#include "thread/ResourceProgress.h"
 
+#include <filesystem>
 #include <sstream>
 #include "tiny_obj_loader.h"
 #include "tiny_gltf.h"
@@ -1629,12 +1631,21 @@ void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsi
         mesh.needReload = true;
 }
 
-bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
+bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool asyncLoad){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
     ModelComponent& model = scene->getComponent<ModelComponent>(entity);
     Transform& transform = scene->getComponent<Transform>(entity);
 
     destroyModel(model);
+
+    std::string modelName;
+    uint64_t buildId = 0;
+    if (asyncLoad) {
+        std::filesystem::path filePath(filename);
+        modelName = filePath.filename().string();
+        buildId = std::hash<std::string>{}(filename);
+        ResourceProgress::startBuild(buildId, ResourceType::Model, modelName);
+    }
 
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
@@ -1657,6 +1668,10 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
 
     bool res = false;
 
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.1f); // File reading started
+    }
+
     if (ext.compare("glb") == 0) {
         res = loader.LoadBinaryFromFile(model.gltfModel, &err, &warn, filename); // for binary glTF(.glb)
     }else{
@@ -1669,12 +1684,22 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
 
     if (!err.empty()) {
         Log::error("Can't load GLTF model (%s): %s", filename.c_str(), err.c_str());
+        if (asyncLoad) {
+            ResourceProgress::failBuild(buildId);
+        }
         return false;
     }
 
     if (!res) {
         Log::verbose("Failed to load glTF: %s", filename.c_str());
+        if (asyncLoad) {
+            ResourceProgress::failBuild(buildId);
+        }
         return false;
+    }
+
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.3f); // File loaded, starting processing
     }
 
     int meshNode = -1;
@@ -1708,6 +1733,10 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
         mesh.windingOrder = WindingOrder::CCW;
     }
 
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.4f); // Transform processing done
+    }
+
     tinygltf::Mesh gltfmesh = model.gltfModel->meshes[meshIndex];
 
     if (gltfmesh.primitives.size() > 0){
@@ -1721,6 +1750,11 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
     }
 
     for (size_t i = 0; i < mesh.numSubmeshes; i++) {
+        // Update progress based on submesh processing
+        if (asyncLoad) {
+            float submeshProgress = 0.4f + (0.4f * (float(i) / float(mesh.numSubmeshes)));
+            ResourceProgress::updateProgress(buildId, submeshProgress);
+        }
 
         mesh.submeshes[i].attributes.clear();
 
@@ -2070,6 +2104,10 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
 
     }
 
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.8f); // Submeshes processed
+    }
+
     int skinIndex = model.gltfModel->nodes[meshNode].skin;
     int skeletonRoot = -1;
 
@@ -2096,6 +2134,9 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
         if (model.skeleton != NULL_ENTITY) {
             if (skin.joints.size() > MAX_BONES){
                 Log::error("Cannot create skinning bigger than %i", MAX_BONES);
+                if (asyncLoad) {
+                    ResourceProgress::failBuild(buildId);
+                }
                 return false;
             }
             scene->addEntityChild(entity, model.skeleton, false);
@@ -2227,6 +2268,10 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
 
     }
 
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.95f); // Animations processed
+    }
+
 /*
     //BEGIN DEBUG
     for (auto &gltfmesh : gltfModel->meshes) {
@@ -2265,15 +2310,29 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename){
     if (mesh.loaded)
         mesh.needReload = true;
 
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 1.0f); // Complete
+        ResourceProgress::completeBuild(buildId);
+    }
+
     return true;
 }
 
-bool MeshSystem::loadOBJ(Entity entity, const std::string& filename){
+bool MeshSystem::loadOBJ(Entity entity, const std::string& filename, bool asyncLoad){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
     ModelComponent& model = scene->getComponent<ModelComponent>(entity);
     Transform& transform = scene->getComponent<Transform>(entity);
 
     destroyModel(model);
+
+    std::string modelName;
+    uint64_t buildId = 0;
+    if (asyncLoad) {
+        std::filesystem::path filePath(filename);
+        modelName = filePath.filename().string();
+        buildId = std::hash<std::string>{}(filename);
+        ResourceProgress::startBuild(buildId, ResourceType::Model, modelName);
+    }
 
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
@@ -2289,6 +2348,10 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string& filename){
 
     std::string baseDir = FileData::getBaseDir(filename);
 
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.1f); // Loading started
+    }
+
     bool ret = tinyobj::LoadObj(&attrib, &shapes, &materials, &warn, &err, filename.c_str(), baseDir.c_str());
 
     if (!warn.empty()) {
@@ -2297,152 +2360,190 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string& filename){
 
     if (!err.empty()) {
         Log::error("Can't load OBJ model (%s): %s", filename.c_str(), err.c_str());
+        if (asyncLoad) {
+            ResourceProgress::failBuild(buildId);
+        }
         return false;
     }
 
-    if (ret) {
+    if (!ret) {
+        if (asyncLoad) {
+            ResourceProgress::failBuild(buildId);
+        }
+        return false;
+    }
 
-        mesh.buffer.clear();
-        mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-        mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-        mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
-        mesh.buffer.addAttribute(AttributeType::COLOR, 4);
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.3f); // File loaded
+    }
 
-        mesh.indices.clear();
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
-        if (materials.size() > 0){
-            mesh.numSubmeshes = materials.size();
+    mesh.indices.clear();
 
+    if (materials.size() > 0){
+        mesh.numSubmeshes = materials.size();
+
+    }
+
+    if (mesh.numSubmeshes > MAX_SUBMESHES){
+        Log::error("Model %s has more submeshes then MAX_SUBMESHES. Please increase MAX_SUBMESHES", filename.c_str());
+        mesh.numSubmeshes = MAX_SUBMESHES;
+    }
+
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.4f); // Materials setup
+    }
+
+    for (size_t i = 0; i < mesh.numSubmeshes; i++) {
+        // Update progress for material processing
+        if (asyncLoad) {
+            float materialProgress = 0.4f + (0.2f * (float(i) / float(mesh.numSubmeshes)));
+            ResourceProgress::updateProgress(buildId, materialProgress);
         }
 
-        if (mesh.numSubmeshes > MAX_SUBMESHES){
-            Log::error("Model %s has more submeshes then MAX_SUBMESHES. Please increase MAX_SUBMESHES", filename.c_str());
-            mesh.numSubmeshes = MAX_SUBMESHES;
+        mesh.submeshes[i].attributes.clear();
+
+        // Convert the blinn-phong model to the pbr metallic-roughness model
+        // Based on https://github.com/CesiumGS/obj2gltf
+        const float specularIntensity = materials[i].specular[0] * 0.2125 + materials[i].specular[1] * 0.7154 + materials[i].specular[2] * 0.0721; //luminance
+
+        float roughnessFactor = materials[i].shininess;
+        roughnessFactor = roughnessFactor / 1000.0;
+        roughnessFactor = 1.0 - roughnessFactor;
+        roughnessFactor = std::min(std::max(roughnessFactor, 0.0f), 1.0f); //clamp
+
+        if (specularIntensity < 0.1) {
+            roughnessFactor *= (1.0 - specularIntensity);
         }
 
-        for (size_t i = 0; i < mesh.numSubmeshes; i++) {
+        const float metallicFactor = 0.0;
 
-            mesh.submeshes[i].attributes.clear();
+        materials[i].specular[0] = metallicFactor;
+        materials[i].specular[1] = metallicFactor;
+        materials[i].specular[2] = metallicFactor;
 
-            // Convert the blinn-phong model to the pbr metallic-roughness model
-            // Based on https://github.com/CesiumGS/obj2gltf
-            const float specularIntensity = materials[i].specular[0] * 0.2125 + materials[i].specular[1] * 0.7154 + materials[i].specular[2] * 0.0721; //luminance
+        materials[i].shininess = roughnessFactor;
+        // ------ End convertion
 
-            float roughnessFactor = materials[i].shininess;
-            roughnessFactor = roughnessFactor / 1000.0;
-            roughnessFactor = 1.0 - roughnessFactor;
-            roughnessFactor = std::min(std::max(roughnessFactor, 0.0f), 1.0f); //clamp
+        mesh.submeshes[i].material.baseColorFactor = Vector4(materials[i].diffuse[0], materials[i].diffuse[1], materials[i].diffuse[2], 1.0);
+        mesh.submeshes[i].material.emissiveFactor = Vector3(materials[i].emission[0], materials[i].emission[1], materials[i].emission[2]);
+        mesh.submeshes[i].material.metallicFactor = materials[i].specular[0];
+        mesh.submeshes[i].material.roughnessFactor = materials[i].shininess;
 
-            if (specularIntensity < 0.1) {
-                roughnessFactor *= (1.0 - specularIntensity);
-            }
+        if (!materials[i].diffuse_texname.empty())
+            mesh.submeshes[i].material.baseColorTexture.setPath(baseDir+materials[i].diffuse_texname);
+        if (!materials[i].normal_texname.empty())
+            mesh.submeshes[i].material.normalTexture.setPath(baseDir+materials[i].normal_texname);
+        if (!materials[i].emissive_texname.empty())
+            mesh.submeshes[i].material.emissiveTexture.setPath(baseDir+materials[i].emissive_texname);
+        if (!materials[i].ambient_texname.empty())
+            mesh.submeshes[i].material.occlusionTexture.setPath(baseDir+materials[i].ambient_texname);
 
-            const float metallicFactor = 0.0;
+        //TODO: occlusionFactor (Ka)
+        //TODO: metallicroughnessTexture (map_Ks + map_Ns)
 
-            materials[i].specular[0] = metallicFactor;
-            materials[i].specular[1] = metallicFactor;
-            materials[i].specular[2] = metallicFactor;
+        if (materials[i].dissolve < 1){
+            mesh.transparent = true;
+        }
+    }
 
-            materials[i].shininess = roughnessFactor;
-            // ------ End convertion
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.6f); // Materials processed, starting geometry
+    }
 
-            mesh.submeshes[i].material.baseColorFactor = Vector4(materials[i].diffuse[0], materials[i].diffuse[1], materials[i].diffuse[2], 1.0);
-            mesh.submeshes[i].material.emissiveFactor = Vector3(materials[i].emission[0], materials[i].emission[1], materials[i].emission[2]);
-            mesh.submeshes[i].material.metallicFactor = materials[i].specular[0];
-            mesh.submeshes[i].material.roughnessFactor = materials[i].shininess;
+    Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
+    Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
+    Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
+    Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
 
-            if (!materials[i].diffuse_texname.empty())
-                mesh.submeshes[i].material.baseColorTexture.setPath(baseDir+materials[i].diffuse_texname);
-            if (!materials[i].normal_texname.empty())
-                mesh.submeshes[i].material.normalTexture.setPath(baseDir+materials[i].normal_texname);
-            if (!materials[i].emissive_texname.empty())
-                mesh.submeshes[i].material.emissiveTexture.setPath(baseDir+materials[i].emissive_texname);
-            if (!materials[i].ambient_texname.empty())
-                mesh.submeshes[i].material.occlusionTexture.setPath(baseDir+materials[i].ambient_texname);
+    std::vector<std::vector<uint16_t>> indexMap;
+    if (materials.size() > 0) {
+        indexMap.resize(materials.size());
+    }else{
+        indexMap.resize(1);
+    }
 
-            //TODO: occlusionFactor (Ka)
-            //TODO: metallicroughnessTexture (map_Ks + map_Ns)
-
-            if (materials[i].dissolve < 1){
-                mesh.transparent = true;
-            }
+    for (size_t i = 0; i < shapes.size(); i++) {
+        // Update progress for shape processing
+        if (asyncLoad) {
+            float shapeProgress = 0.6f + (0.3f * (float(i) / float(shapes.size())));
+            ResourceProgress::updateProgress(buildId, shapeProgress);
         }
 
-        Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
-        Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
-        Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
-        Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
+        size_t index_offset = 0;
+        for (size_t f = 0; f < shapes[i].mesh.num_face_vertices.size(); f++) {
+            size_t fnum = shapes[i].mesh.num_face_vertices[f];
 
-        std::vector<std::vector<uint16_t>> indexMap;
-        if (materials.size() > 0) {
-            indexMap.resize(materials.size());
-        }else{
-            indexMap.resize(1);
-        }
+            int material_id = shapes[i].mesh.material_ids[f];
+            if (material_id < 0)
+                material_id = 0;
 
-        for (size_t i = 0; i < shapes.size(); i++) {
+            // For each vertex in the face
+            for (size_t v = 0; v < fnum; v++) {
+                tinyobj::index_t idx = shapes[i].mesh.indices[index_offset + v];
 
-            size_t index_offset = 0;
-            for (size_t f = 0; f < shapes[i].mesh.num_face_vertices.size(); f++) {
-                size_t fnum = shapes[i].mesh.num_face_vertices[f];
+                indexMap[material_id].push_back(mesh.buffer.getCount());
 
-                int material_id = shapes[i].mesh.material_ids[f];
-                if (material_id < 0)
-                    material_id = 0;
+                    mesh.buffer.addVector3(attVertex,
+                                        Vector3(attrib.vertices[3*idx.vertex_index+0],
+                                                attrib.vertices[3*idx.vertex_index+1],
+                                                attrib.vertices[3*idx.vertex_index+2]));
 
-                // For each vertex in the face
-                for (size_t v = 0; v < fnum; v++) {
-                    tinyobj::index_t idx = shapes[i].mesh.indices[index_offset + v];
-
-                    indexMap[material_id].push_back(mesh.buffer.getCount());
-
-                     mesh.buffer.addVector3(attVertex,
-                                          Vector3(attrib.vertices[3*idx.vertex_index+0],
-                                                  attrib.vertices[3*idx.vertex_index+1],
-                                                  attrib.vertices[3*idx.vertex_index+2]));
-
-                    if (attrib.texcoords.size() > 0) {
-                         mesh.buffer.addVector2(attTexcoord,
-                                              Vector2(attrib.texcoords[2 * idx.texcoord_index + 0],
-                                                      1.0f - attrib.texcoords[2 * idx.texcoord_index + 1]));
-                    }
-                    if (attrib.normals.size() > 0) {
-                         mesh.buffer.addVector3(attNormal,
-                                              Vector3(attrib.normals[3 * idx.normal_index + 0],
-                                                      attrib.normals[3 * idx.normal_index + 1],
-                                                      attrib.normals[3 * idx.normal_index + 2]));
-                    }
-
-                    if (attrib.colors.size() > 0){
-                         mesh.buffer.addVector4(attColor,
-                                              Vector4(attrib.colors[3 * idx.vertex_index + 0],
-                                                      attrib.colors[3 * idx.vertex_index + 1],
-                                                      attrib.colors[3 * idx.vertex_index + 2],
-                                                      1.0));
-                    }else{
-                         mesh.buffer.addVector4(attColor, Vector4(1.0, 1.0, 1.0, 1.0));
-                    }
-
+                if (attrib.texcoords.size() > 0) {
+                        mesh.buffer.addVector2(attTexcoord,
+                                            Vector2(attrib.texcoords[2 * idx.texcoord_index + 0],
+                                                    1.0f - attrib.texcoords[2 * idx.texcoord_index + 1]));
+                }
+                if (attrib.normals.size() > 0) {
+                        mesh.buffer.addVector3(attNormal,
+                                            Vector3(attrib.normals[3 * idx.normal_index + 0],
+                                                    attrib.normals[3 * idx.normal_index + 1],
+                                                    attrib.normals[3 * idx.normal_index + 2]));
                 }
 
-                index_offset += fnum;
+                if (attrib.colors.size() > 0){
+                        mesh.buffer.addVector4(attColor,
+                                            Vector4(attrib.colors[3 * idx.vertex_index + 0],
+                                                    attrib.colors[3 * idx.vertex_index + 1],
+                                                    attrib.colors[3 * idx.vertex_index + 2],
+                                                    1.0));
+                }else{
+                        mesh.buffer.addVector4(attColor, Vector4(1.0, 1.0, 1.0, 1.0));
+                }
+
             }
+
+            index_offset += fnum;
         }
-
-        for (size_t i = 0; i < mesh.numSubmeshes; i++) {
-            addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);
-
-            mesh.indices.setValues(mesh.indices.getCount(),  mesh.indices.getAttribute(AttributeType::INDEX), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
-            mesh.indices.setRenderAttributes(false);
-        }
-
-        std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
     }
+
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 0.9f); // Geometry processed
+    }
+
+    for (size_t i = 0; i < mesh.numSubmeshes; i++) {
+        addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);
+
+        mesh.indices.setValues(mesh.indices.getCount(),  mesh.indices.getAttribute(AttributeType::INDEX), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
+        mesh.indices.setRenderAttributes(false);
+    }
+
+    std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
 
     calculateMeshAABB(mesh);
 
     if (mesh.loaded)
         mesh.needReload = true;
+
+    if (asyncLoad) {
+        ResourceProgress::updateProgress(buildId, 1.0f); // Complete
+        ResourceProgress::completeBuild(buildId);
+    }
 
     return true;
 }
