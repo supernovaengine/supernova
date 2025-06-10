@@ -76,14 +76,12 @@ TextureLoadResult TextureDataPool::loadFromFile(const std::string& id, const std
                     std::array<TextureData,6> data = future.get();
                     shared = std::make_shared<std::array<TextureData,6>>(data);
                     pendingBuilds.erase(it);
-                    ResourceProgress::completeBuild(std::hash<std::string>{}(id));
 
                     result.state = ResourceLoadState::Finished;
                     result.data = shared;
                     return result;
                 } catch (const std::exception& e) {
                     pendingBuilds.erase(it);
-                    ResourceProgress::failBuild(std::hash<std::string>{}(id));
 
                     result.state = ResourceLoadState::Failed;
                     result.errorMessage = e.what();
@@ -153,11 +151,13 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
 
     for (size_t f = 0; f < numFaces; f++) {
         if (paths[f].empty()) {
+            ResourceProgress::failBuild(std::hash<std::string>{}(id));
             throw std::runtime_error("Texture is missing texture for face " + std::to_string(f));
         }
 
         bool success = data[f].loadTextureFromFile(paths[f].c_str());
         if (!success) {
+            ResourceProgress::failBuild(std::hash<std::string>{}(id));
             if (numFaces == 1){
                 throw std::runtime_error("Failed to load texture from file: " + paths[f]);
             }else{
@@ -185,6 +185,7 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
             throw std::runtime_error("Shutdown requested");
         }
         ResourceProgress::updateProgress(buildId, 1.0f);  // Completing
+        ResourceProgress::completeBuild(std::hash<std::string>{}(id));
     }
 
     return data;
