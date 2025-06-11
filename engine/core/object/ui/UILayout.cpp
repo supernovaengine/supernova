@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "UILayout.h"
@@ -13,6 +13,9 @@ UILayout::UILayout(Scene* scene): Object(scene){
 }
 
 UILayout::UILayout(Scene* scene, Entity entity): Object(scene, entity){
+}
+
+UILayout::~UILayout(){
 }
 
 void UILayout::setSize(unsigned int width, unsigned int height){

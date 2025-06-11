@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef MODEL_H
@@ -15,6 +15,7 @@ namespace Supernova{
     class SUPERNOVA_API Model: public Mesh{
     public:
         Model(Scene* scene);
+        Model(Scene* scene, Entity entity);
         virtual ~Model();
 
         bool loadModel(const std::string& filename);

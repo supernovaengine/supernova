@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Image.h"
@@ -16,6 +16,9 @@ Image::Image(Scene* scene): UILayout(scene){
 }
 
 Image::Image(Scene* scene, Entity entity): UILayout(scene, entity){
+}
+
+Image::~Image(){
 }
 
 bool Image::createImage(){

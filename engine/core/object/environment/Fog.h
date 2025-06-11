@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef FOG_H
@@ -14,6 +14,8 @@ namespace Supernova{
 
     public:
         Fog(Scene* scene);
+        Fog(Scene* scene, Entity entity);
+        virtual ~Fog();
 
         FogType getType() const;
         Vector3 getColor() const;

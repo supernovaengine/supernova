@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Terrain.h"
@@ -14,8 +14,10 @@ Terrain::Terrain(Scene* scene): Mesh(scene){
     addComponent<TerrainComponent>({});
 }
 
-Terrain::~Terrain(){
+Terrain::Terrain(Scene* scene, Entity entity): Mesh(scene, entity){
+}
 
+Terrain::~Terrain(){
 }
 
 bool Terrain::createTerrain(){

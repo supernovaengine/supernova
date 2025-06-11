@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef TEXTEDIT_H
@@ -14,6 +14,8 @@ namespace Supernova{
 
     public:
         TextEdit(Scene* scene);
+        TextEdit(Scene* scene, Entity entity);
+        virtual ~TextEdit();
 
         Text getTextObject() const;
         Polygon getCursorObject() const;

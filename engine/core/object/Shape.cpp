@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Shape.h"
@@ -9,6 +9,9 @@
 using namespace Supernova;
 
 Shape::Shape(Scene* scene): Mesh(scene){
+}
+
+Shape::Shape(Scene* scene, Entity entity): Mesh(scene, entity){
 }
 
 Shape::~Shape(){

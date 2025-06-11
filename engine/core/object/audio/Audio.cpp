@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Audio.h"
@@ -11,6 +11,10 @@ using namespace Supernova;
 Audio::Audio(Scene* scene): Object(scene){
     addComponent<AudioComponent>({});
 }
+
+Audio::Audio(Scene* scene, Entity entity): Object(scene, entity){
+}
+
 
 Audio::~Audio(){
 

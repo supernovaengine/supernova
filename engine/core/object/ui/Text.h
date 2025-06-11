@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef TEXT_H
@@ -15,6 +15,7 @@ namespace Supernova{
     public:
         Text(Scene* scene);
         Text(Scene* scene, Entity entity);
+        virtual ~Text();
 
         bool createText();
         bool load();

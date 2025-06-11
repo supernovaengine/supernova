@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Fog.h"
@@ -9,6 +9,12 @@ using namespace Supernova;
 
 Fog::Fog(Scene* scene): EntityHandle(scene){
     addComponent<FogComponent>({});
+}
+
+Fog::Fog(Scene* scene, Entity entity): EntityHandle(scene, entity){
+}
+
+Fog::~Fog(){
 }
 
 FogType Fog::getType() const{

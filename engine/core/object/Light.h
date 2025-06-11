@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef LIGHT_H
@@ -12,6 +12,7 @@ namespace Supernova{
     class SUPERNOVA_API Light: public Object{
     public:
         Light(Scene* scene);
+        Light(Scene* scene, Entity entity);
         virtual ~Light();
 
         void setType(LightType type);

@@ -11,6 +11,12 @@ SkyBox::SkyBox(Scene* scene): EntityHandle(scene){
     addComponent<SkyComponent>({});
 }
 
+SkyBox::SkyBox(Scene* scene, Entity entity): EntityHandle(scene, entity){
+}
+
+SkyBox::~SkyBox(){
+}
+
 bool SkyBox::load(){
     SkyComponent& sky = getComponent<SkyComponent>();
 

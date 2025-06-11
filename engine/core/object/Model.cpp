@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Model.h"
@@ -21,11 +21,12 @@ using namespace Supernova;
 
 Model::Model(Scene* scene): Mesh(scene){
     addComponent<ModelComponent>({});
+}
 
+Model::Model(Scene* scene, Entity entity): Mesh(scene, entity){
 }
 
 Model::~Model(){
-
 }
 
 bool Model::loadModel(const std::string& filename){

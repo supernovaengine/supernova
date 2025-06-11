@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Points.h"
@@ -12,8 +12,10 @@ Points::Points(Scene* scene): Object(scene){
     addComponent<PointsComponent>({});
 }
 
-Points::~Points(){
+Points::Points(Scene* scene, Entity entity): Object(scene, entity){
+}
 
+Points::~Points(){
 }
 
 bool Points::load(){

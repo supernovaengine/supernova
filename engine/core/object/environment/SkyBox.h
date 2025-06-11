@@ -12,6 +12,8 @@ namespace Supernova{
 
     public:
         SkyBox(Scene* scene);
+        SkyBox(Scene* scene, Entity entity);
+        virtual ~SkyBox();
 
         bool load();
 

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 
@@ -17,6 +17,9 @@ Polygon::Polygon(Scene* scene): UILayout(scene){
 }
 
 Polygon::Polygon(Scene* scene, Entity entity): UILayout(scene, entity){
+}
+
+Polygon::~Polygon(){
 }
 
 bool Polygon::createPolygon(){

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Light.h"
@@ -12,11 +12,12 @@ using namespace Supernova;
 
 Light::Light(Scene* scene): Object(scene){
     addComponent<LightComponent>({});
+}
 
+Light::Light(Scene* scene, Entity entity): Object(scene, entity){
 }
 
 Light::~Light(){
-    
 }
 
 void Light::setType(LightType type){

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 
@@ -16,6 +16,12 @@ MeshPolygon::MeshPolygon(Scene* scene): Mesh(scene){
 
     MeshComponent& mesh = getComponent<MeshComponent>();
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
+}
+
+MeshPolygon::MeshPolygon(Scene* scene, Entity entity): Mesh(scene, entity){
+}
+
+MeshPolygon::~MeshPolygon(){
 }
 
 bool MeshPolygon::createPolygon(){

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef MESHPOLYGON_H
@@ -12,6 +12,8 @@ namespace Supernova{
 
     public:
         MeshPolygon(Scene* scene);
+        MeshPolygon(Scene* scene, Entity entity);
+        virtual ~MeshPolygon();
 
         bool createPolygon();
 

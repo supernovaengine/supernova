@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef SPRITE_H
@@ -19,6 +19,7 @@ namespace Supernova{
 
     public:
         Sprite(Scene* scene);
+        Sprite(Scene* scene, Entity entity);
         virtual ~Sprite();
 
         Sprite(const Sprite& rhs);

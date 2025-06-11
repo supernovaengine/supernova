@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Button.h"
@@ -14,6 +14,12 @@ Button::Button(Scene* scene): Image(scene){
 
     ButtonComponent& btcomp = getComponent<ButtonComponent>();
     scene->getSystem<UISystem>()->createButtonObjects(entity, btcomp);
+}
+
+Button::Button(Scene* scene, Entity entity): Image(scene, entity){
+}
+
+Button::~Button(){
 }
 
 Text Button::getLabelObject() const{

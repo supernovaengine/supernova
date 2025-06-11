@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef CONTAINER_H
@@ -13,6 +13,7 @@ namespace Supernova{
     public:
         Container(Scene* scene);
         Container(Scene* scene, Entity entity);
+        virtual ~Container();
         
         void setType(ContainerType type);
         ContainerType getType() const;

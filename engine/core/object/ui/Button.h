@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef BUTTON_H
@@ -13,6 +13,8 @@ namespace Supernova{
 
     public:
         Button(Scene* scene);
+        Button(Scene* scene, Entity entity);
+        virtual ~Button();
 
         Text getLabelObject() const;
 

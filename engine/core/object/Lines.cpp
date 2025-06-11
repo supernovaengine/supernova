@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Lines.h"
@@ -9,6 +9,9 @@ using namespace Supernova;
 
 Lines::Lines(Scene* scene): Object(scene){
     addComponent<LinesComponent>({});
+}
+
+Lines::Lines(Scene* scene, Entity entity): Object(scene, entity){
 }
 
 Lines::~Lines(){

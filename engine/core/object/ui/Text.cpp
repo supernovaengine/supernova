@@ -1,3 +1,7 @@
+//
+// (c) 2025 Eduardo Doria.
+//
+
 #include "Text.h"
 
 #include "util/Color.h"
@@ -13,6 +17,9 @@ Text::Text(Scene* scene): UILayout(scene){
 }
 
 Text::Text(Scene* scene, Entity entity): UILayout(scene, entity){
+}
+
+Text::~Text(){
 }
 
 bool Text::createText(){

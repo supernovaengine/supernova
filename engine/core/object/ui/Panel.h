@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef PANEL_H
@@ -14,6 +14,8 @@ namespace Supernova{
 
     public:
         Panel(Scene* scene);
+        Panel(Scene* scene, Entity entity);
+        virtual ~Panel();
 
         Image getHeaderImageObject() const;
         Container getHeaderContainerObject() const;

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef SCROLLBAR_H
@@ -14,6 +14,8 @@ namespace Supernova{
 
     public:
         Scrollbar(Scene* scene);
+        Scrollbar(Scene* scene, Entity entity);
+        virtual ~Scrollbar();
 
         Image getBarObject() const;
 

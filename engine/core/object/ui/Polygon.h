@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef POLYGON_H
@@ -13,6 +13,7 @@ namespace Supernova{
     public:
         Polygon(Scene* scene);
         Polygon(Scene* scene, Entity entity);
+        virtual ~Polygon();
 
         bool createPolygon();
         bool load();

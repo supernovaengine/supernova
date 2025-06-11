@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef UILAYOUT_H
@@ -13,6 +13,7 @@ namespace Supernova{
     public:
         UILayout(Scene* scene);
         UILayout(Scene* scene, Entity entity);
+        virtual ~UILayout();
 
         void setSize(unsigned int width, unsigned int height);
         void setWidth(unsigned int width);

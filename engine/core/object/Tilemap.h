@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef TILEMAP_H
@@ -13,6 +13,7 @@ namespace Supernova{
 
     public:
         Tilemap(Scene* scene);
+        Tilemap(Scene* scene, Entity entity);
         virtual ~Tilemap();
 
         bool createTilemap();

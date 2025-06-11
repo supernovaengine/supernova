@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef CAMERA_H
@@ -20,6 +20,7 @@ namespace Supernova{
     public:
         Camera(Scene* scene);
         Camera(Scene* scene, Entity entity);
+        virtual ~Camera();
 
         void activate();
 

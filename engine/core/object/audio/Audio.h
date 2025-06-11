@@ -1,4 +1,6 @@
-
+//
+// (c) 2025 Eduardo Doria.
+//
 
 #ifndef Audio_h
 #define Audio_h
@@ -11,6 +13,7 @@ namespace Supernova {
     class SUPERNOVA_API Audio: public Object{
     public:
         Audio(Scene* scene);
+        Audio(Scene* scene, Entity entity);
         virtual ~Audio();
 
         int loadAudio(const std::string& filename);

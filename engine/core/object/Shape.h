@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef SHAPE_H
@@ -12,6 +12,7 @@ namespace Supernova{
     class SUPERNOVA_API Shape: public Mesh{
     public:
         Shape(Scene* scene);
+        Shape(Scene* scene, Entity entity);
         virtual ~Shape();
 
         void createPlane(float width, float depth);

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef LINES_H
@@ -12,6 +12,7 @@ namespace Supernova{
     class SUPERNOVA_API Lines: public Object{
     public:
         Lines(Scene* scene);
+        Lines(Scene* scene, Entity entity);
         virtual ~Lines();
 
         bool load();

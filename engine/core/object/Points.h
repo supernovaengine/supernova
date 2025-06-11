@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef POINTS_H
@@ -13,6 +13,7 @@ namespace Supernova{
     class SUPERNOVA_API Points: public Object{
     public:
         Points(Scene* scene);
+        Points(Scene* scene, Entity entity);
         virtual ~Points();
 
         bool load();

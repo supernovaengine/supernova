@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Camera.h"
@@ -23,6 +23,9 @@ Camera::Camera(Scene* scene): Object(scene){
 }
 
 Camera::Camera(Scene* scene, Entity entity): Object(scene, entity){
+}
+
+Camera::~Camera(){
 }
 
 void Camera::applyOrthoDefaults(CameraComponent& cameraComponent){

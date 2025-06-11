@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Container.h"
@@ -11,6 +11,9 @@ Container::Container(Scene* scene): UILayout(scene){
 }
 
 Container::Container(Scene* scene, Entity entity): UILayout(scene, entity){
+}
+
+Container::~Container(){
 }
 
 void Container::setType(ContainerType type){

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Tilemap.h"
@@ -9,6 +9,9 @@ using namespace Supernova;
 
 Tilemap::Tilemap(Scene* scene): Mesh(scene){
     addComponent<TilemapComponent>({});
+}
+
+Tilemap::Tilemap(Scene* scene, Entity entity): Mesh(scene, entity){
 }
 
 Tilemap::~Tilemap(){

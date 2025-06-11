@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef MESH_H
@@ -14,6 +14,7 @@ namespace Supernova{
     class SUPERNOVA_API Mesh: public Object{
     public:
         Mesh(Scene* scene);
+        Mesh(Scene* scene, Entity entity);
         virtual ~Mesh();
 
         bool load();

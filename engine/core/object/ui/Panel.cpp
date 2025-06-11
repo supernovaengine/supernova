@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Panel.h"
@@ -14,6 +14,12 @@ Panel::Panel(Scene* scene): Image(scene){
 
     PanelComponent& panelcomp = getComponent<PanelComponent>();
     scene->getSystem<UISystem>()->createPanelObjects(entity, panelcomp);
+}
+
+Panel::Panel(Scene* scene, Entity entity): Image(scene, entity){
+}
+
+Panel::~Panel(){
 }
 
 Image Panel::getHeaderImageObject() const{

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Sprite.h"
@@ -12,6 +12,10 @@ using namespace Supernova;
 
 Sprite::Sprite(Scene* scene): Mesh(scene){
     addComponent<SpriteComponent>({});
+    animation = NULL;
+}
+
+Sprite::Sprite(Scene* scene, Entity entity): Mesh(scene, entity){
     animation = NULL;
 }
 

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Scrollbar.h"
@@ -13,6 +13,12 @@ Scrollbar::Scrollbar(Scene* scene): Image(scene){
 
     ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
     scene->getSystem<UISystem>()->createScrollbarObjects(entity, scrollcomp);
+}
+
+Scrollbar::Scrollbar(Scene* scene, Entity entity): Image(scene, entity){
+}
+
+Scrollbar::~Scrollbar(){
 }
 
 Image Scrollbar::getBarObject() const{

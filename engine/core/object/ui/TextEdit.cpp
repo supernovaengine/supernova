@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "TextEdit.h"
@@ -14,6 +14,12 @@ TextEdit::TextEdit(Scene* scene): Image(scene){
 
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
     scene->getSystem<UISystem>()->createTextEditObjects(entity, tecomp);
+}
+
+TextEdit::TextEdit(Scene* scene, Entity entity): Image(scene, entity){
+}
+
+TextEdit::~TextEdit(){
 }
 
 Text TextEdit::getTextObject() const{

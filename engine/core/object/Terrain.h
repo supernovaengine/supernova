@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef TERRAIN_H
@@ -13,6 +13,7 @@ namespace Supernova{
 
     public:
         Terrain(Scene* scene);
+        Terrain(Scene* scene, Entity entity);
         virtual ~Terrain();
 
         bool createTerrain();

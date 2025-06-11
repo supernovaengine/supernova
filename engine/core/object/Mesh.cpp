@@ -14,6 +14,9 @@ Mesh::Mesh(Scene* scene): Object(scene){
     addComponent<MeshComponent>({});
 }
 
+Mesh::Mesh(Scene* scene, Entity entity): Object(scene, entity){
+}
+
 Mesh::~Mesh(){
 }
 

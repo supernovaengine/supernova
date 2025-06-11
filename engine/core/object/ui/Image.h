@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef IMAGE_H
@@ -12,6 +12,7 @@ namespace Supernova{
     public:
         Image(Scene* scene);
         Image(Scene* scene, Entity entity);
+        virtual ~Image();
 
         bool createImage();
         bool load();
