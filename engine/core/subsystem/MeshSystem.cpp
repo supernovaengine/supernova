@@ -373,9 +373,9 @@ std::vector<float> MeshSystem::getCylinderSideNormals(float baseRadius, float to
     for(int i = 0; i <= slices; ++i)
     {
         sectorAngle = i * sectorStep;
-        normals.push_back(cos(sectorAngle)*x0 - sin(sectorAngle)*z0);   // nx
-        normals.push_back(y0);   // ny
-        normals.push_back(sin(sectorAngle)*x0 + cos(sectorAngle)*z0);  // nz
+        normals.push_back(sin(sectorAngle)*x0);    // nx
+        normals.push_back(y0);                     // ny
+        normals.push_back(-cos(sectorAngle)*x0);   // nz
     }
 
     return normals;
@@ -390,9 +390,9 @@ std::vector<float> MeshSystem::buildUnitCircleVertices(float slices){
 
     for(int i = 0; i <= slices; ++i){
         sectorAngle = i * sectorStep;
-        unitCircleVertices.push_back(cos(sectorAngle)); // x
-        unitCircleVertices.push_back(0);                // y
-        unitCircleVertices.push_back(sin(sectorAngle)); // z
+        unitCircleVertices.push_back(sin(sectorAngle));  // x
+        unitCircleVertices.push_back(0);                 // y
+        unitCircleVertices.push_back(-cos(sectorAngle)); // z
     }
 
     return unitCircleVertices;
@@ -1283,8 +1283,8 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
             sectorAngle = j * sectorStep;           // starting from 0 to 2pi
 
             // vertex position (x, y, z)
-            x = xz * cosf(sectorAngle);             // r * cos(u) * cos(v)
-            z = xz * sinf(sectorAngle);             // r * cos(u) * sin(v)
+            x = xz * sinf(sectorAngle);             // r * cos(u) * sin(v)
+            z = -xz * cosf(sectorAngle);            // -r * cos(u) * cos(v)
             mesh.buffer.addVector3(attVertex, Vector3(x, y, z));
 
             // normalized vertex normal (nx, ny, nz)
@@ -1296,8 +1296,8 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
             // Z+ orientation means the texture faces the positive Z direction
             s = 0.5f + atan2f(x, z) / (2.0f * M_PI);
 
-            // Flip Y coordinate (1-t instead of t)
-            t = 1.0f - (float)i / stacks;
+            // Remove Y flip since circle now starts at Z-
+            t = (float)i / stacks;
 
             mesh.buffer.addVector2(attTexcoord, Vector2(s, t));
 
@@ -1375,7 +1375,7 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
             z = unitCircleVertices[k+2];
             mesh.buffer.addVector3(attVertex, Vector3(x * radius, y, z * radius));
             mesh.buffer.addVector3(attNormal, Vector3(sideNormals[k], sideNormals[k+1], sideNormals[k+2]));
-            mesh.buffer.addVector2(attTexcoord, Vector2((float)j / slices, t));
+            mesh.buffer.addVector2(attTexcoord, Vector2(1.0f - (float)j / slices, t));
             mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
         }
     }
@@ -1394,7 +1394,7 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
         z = unitCircleVertices[j+2];
         mesh.buffer.addVector3(attVertex, Vector3(x * baseRadius, y, z * baseRadius));
         mesh.buffer.addVector3(attNormal, Vector3(0, -1, 0));
-        mesh.buffer.addVector2(attTexcoord, Vector2(-x * 0.5f + 0.5f, -z * 0.5f + 0.5f)); // flip horizontal
+        mesh.buffer.addVector2(attTexcoord, Vector2(x * 0.5f + 0.5f, -z * 0.5f + 0.5f));
         mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
@@ -1412,7 +1412,7 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
         z = unitCircleVertices[j+2];
         mesh.buffer.addVector3(attVertex, Vector3(x * topRadius, y, z * topRadius));
         mesh.buffer.addVector3(attNormal, Vector3(0, 1, 0));
-        mesh.buffer.addVector2(attTexcoord, Vector2(x * 0.5f + 0.5f, -z * 0.5f + 0.5f));
+        mesh.buffer.addVector2(attTexcoord, Vector2(-x * 0.5f + 0.5f, -z * 0.5f + 0.5f));
         mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
     }
 
