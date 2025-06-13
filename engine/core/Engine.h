@@ -184,6 +184,7 @@ namespace Supernova {
         static void removeAllSceneLayers();
         static void removeAllScenes();
 
+        static bool isSceneRunning(Scene* scene);
         static Scene* getMainScene();
         static Scene* getLastScene();
         

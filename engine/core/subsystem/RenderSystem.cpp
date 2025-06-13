@@ -57,7 +57,7 @@ void RenderSystem::load(){
 		CameraComponent& camera = cameras->getComponentFromIndex(i);
 		if (camera.renderToTexture){
 			if (!camera.framebuffer->isCreated()){
-				createFramebuffer(camera);
+				camera.framebuffer->create();
 			}
 		}
 	}
@@ -117,14 +117,10 @@ void RenderSystem::destroy(){
 	}
 }
 
-void RenderSystem::createFramebuffer(CameraComponent& camera){
-	camera.framebuffer->create();
-}
-
 void RenderSystem::updateFramebuffer(CameraComponent& camera){
 	if (camera.framebuffer->isCreated()){
 		camera.framebuffer->destroy();
-		createFramebuffer(camera);
+		camera.framebuffer->create();
 	}
 }
 
@@ -3067,8 +3063,7 @@ void RenderSystem::draw(){
 			camera.render.applyViewport(Engine::getViewRect());
 		}else{
 			if (!camera.framebuffer->isCreated()){
-				// In case of async framebuffer load, wait for creation
-				return;
+				camera.framebuffer->create();
 			}
 			camera.render.startRenderPass(&camera.framebuffer->getRender());
 		}

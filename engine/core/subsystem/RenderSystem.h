@@ -106,7 +106,6 @@ namespace Supernova{
 
 		void updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 
-		void createFramebuffer(CameraComponent& camera);
 		void createEmptyTextures();
 		int checkLightsAndShadow();
 		bool loadLights(int numLights);

@@ -194,6 +194,15 @@ void Engine::removeAllScenes(){
         drawSemaphore.release();
 }
 
+bool Engine::isSceneRunning(Scene* scene){
+    if (!scene) {
+        return false;
+    }
+
+    auto it = std::find(scenes.begin(), scenes.end(), scene);
+    return it != scenes.end();
+}
+
 Scene* Engine::getMainScene(){
     return mainScene;
 }
