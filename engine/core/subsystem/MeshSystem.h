@@ -61,12 +61,12 @@ namespace Supernova{
 		MeshSystem(Scene* scene);
 		virtual ~MeshSystem();
 
-		void createPlane(Entity entity, float width=1, float depth=1, unsigned int tiles=1);
-		void createBox(Entity entity, float width=1, float height=1, float depth=1, unsigned int tiles=1);
-		void createSphere(Entity entity, float radius=1, unsigned int slices=36, unsigned int stacks=18);
-		void createCylinder(Entity entity, float baseRadius=1, float topRadius=1, float height=2, unsigned int slices=36, unsigned int stacks=18);
-		void createCapsule(Entity entity, float baseRadius=1, float topRadius=1, float height=2, unsigned int slices=36, unsigned int stacks=18);
-		void createTorus(Entity entity, float radius=1, float ringRadius=0.5, unsigned int sides=36, unsigned int rings=16);
+		void createPlane(MeshComponent& mesh, float width=1, float depth=1, unsigned int tiles=1);
+		void createBox(MeshComponent& mesh, float width=1, float height=1, float depth=1, unsigned int tiles=1);
+		void createSphere(MeshComponent& mesh, float radius=1, unsigned int slices=36, unsigned int stacks=18);
+		void createCylinder(MeshComponent& mesh, float baseRadius=1, float topRadius=1, float height=2, unsigned int slices=36, unsigned int stacks=18);
+		void createCapsule(MeshComponent& mesh, float baseRadius=1, float topRadius=1, float height=2, unsigned int slices=36, unsigned int stacks=18);
+		void createTorus(MeshComponent& mesh, float radius=1, float ringRadius=0.5, unsigned int sides=36, unsigned int rings=16);
 		bool loadGLTF(Entity entity, const std::string& filename, bool asyncLoad=false);
 		bool loadOBJ(Entity entity, const std::string& filename, bool asyncLoad=false);
 

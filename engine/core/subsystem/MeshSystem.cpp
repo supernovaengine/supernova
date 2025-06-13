@@ -1023,9 +1023,7 @@ void MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
 
 }
 
-void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned int tiles){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
+void MeshSystem::createPlane(MeshComponent& mesh, float width, float depth, unsigned int tiles){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
@@ -1079,9 +1077,7 @@ void MeshSystem::createPlane(Entity entity, float width, float depth, unsigned i
         mesh.needReload = true;
 }
 
-void MeshSystem::createBox(Entity entity, float width, float height, float depth, unsigned int tiles){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
+void MeshSystem::createBox(MeshComponent& mesh, float width, float height, float depth, unsigned int tiles){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
@@ -1245,9 +1241,7 @@ void MeshSystem::createBox(Entity entity, float width, float height, float depth
         mesh.needReload = true;
 }
 
-void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, unsigned int stacks){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
+void MeshSystem::createSphere(MeshComponent& mesh, float radius, unsigned int slices, unsigned int stacks){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
@@ -1341,9 +1335,7 @@ void MeshSystem::createSphere(Entity entity, float radius, unsigned int slices, 
         mesh.needReload = true;
 }
 
-void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
+void MeshSystem::createCylinder(MeshComponent& mesh, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
@@ -1472,9 +1464,7 @@ void MeshSystem::createCylinder(Entity entity, float baseRadius, float topRadius
         mesh.needReload = true;
 }
 
-void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
+void MeshSystem::createCapsule(MeshComponent& mesh, float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 
@@ -1557,9 +1547,7 @@ void MeshSystem::createCapsule(Entity entity, float baseRadius, float topRadius,
         mesh.needReload = true;
 }
 
-void MeshSystem::createTorus(Entity entity, float radius, float ringRadius, unsigned int sides, unsigned int rings){
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
+void MeshSystem::createTorus(MeshComponent& mesh, float radius, float ringRadius, unsigned int sides, unsigned int rings){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.numSubmeshes = 1;
 

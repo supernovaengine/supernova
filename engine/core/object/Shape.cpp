@@ -18,65 +18,65 @@ Shape::~Shape(){
 }
 
 void Shape::createPlane(float width, float depth){
-    scene->getSystem<MeshSystem>()->createPlane(entity, width, depth);
+    scene->getSystem<MeshSystem>()->createPlane(getComponent<MeshComponent>(), width, depth);
 }
 
 void Shape::createPlane(float width, float depth, unsigned int tiles){
-    scene->getSystem<MeshSystem>()->createPlane(entity, width, depth, tiles);
+    scene->getSystem<MeshSystem>()->createPlane(getComponent<MeshComponent>(), width, depth, tiles);
 }
 
 void Shape::createBox(float width, float height, float depth){
-    scene->getSystem<MeshSystem>()->createBox(entity, width, height, depth);
+    scene->getSystem<MeshSystem>()->createBox(getComponent<MeshComponent>(), width, height, depth);
 }
 
 void Shape::createBox(float width, float height, float depth, unsigned int tiles){
-    scene->getSystem<MeshSystem>()->createBox(entity, width, height, depth, tiles);
+    scene->getSystem<MeshSystem>()->createBox(getComponent<MeshComponent>(), width, height, depth, tiles);
 }
 
 void Shape::createSphere(float radius){
-    scene->getSystem<MeshSystem>()->createSphere(entity, radius);
+    scene->getSystem<MeshSystem>()->createSphere(getComponent<MeshComponent>(), radius);
 }
 
 void Shape::createSphere(float radius, unsigned int slices, unsigned int stacks){
-    scene->getSystem<MeshSystem>()->createSphere(entity, radius, slices, stacks);
+    scene->getSystem<MeshSystem>()->createSphere(getComponent<MeshComponent>(), radius, slices, stacks);
 }
 
 void Shape::createCylinder(float radius, float height){
-    scene->getSystem<MeshSystem>()->createCylinder(entity, radius, radius, height);
+    scene->getSystem<MeshSystem>()->createCylinder(getComponent<MeshComponent>(), radius, radius, height);
 }
 
 void Shape::createCylinder(float baseRadius, float topRadius, float height){
-    scene->getSystem<MeshSystem>()->createCylinder(entity, baseRadius, topRadius, height);
+    scene->getSystem<MeshSystem>()->createCylinder(getComponent<MeshComponent>(), baseRadius, topRadius, height);
 }
 
 void Shape::createCylinder(float radius, float height, unsigned int slices, unsigned int stacks){
-    scene->getSystem<MeshSystem>()->createCylinder(entity, radius, radius, height, slices, stacks);
+    scene->getSystem<MeshSystem>()->createCylinder(getComponent<MeshComponent>(), radius, radius, height, slices, stacks);
 }
 
 void Shape::createCylinder(float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
-    scene->getSystem<MeshSystem>()->createCylinder(entity, baseRadius, topRadius, height, slices, stacks);
+    scene->getSystem<MeshSystem>()->createCylinder(getComponent<MeshComponent>(), baseRadius, topRadius, height, slices, stacks);
 }
 
 void Shape::createCapsule(float radius, float height){
-    scene->getSystem<MeshSystem>()->createCapsule(entity, radius, radius, height);
+    scene->getSystem<MeshSystem>()->createCapsule(getComponent<MeshComponent>(), radius, radius, height);
 }
 
 void Shape::createCapsule(float baseRadius, float topRadius, float height){
-    scene->getSystem<MeshSystem>()->createCapsule(entity, baseRadius, topRadius, height);
+    scene->getSystem<MeshSystem>()->createCapsule(getComponent<MeshComponent>(), baseRadius, topRadius, height);
 }
 
 void Shape::createCapsule(float radius, float height, unsigned int slices, unsigned int stacks){
-    scene->getSystem<MeshSystem>()->createCapsule(entity, radius, radius, height, slices, stacks);
+    scene->getSystem<MeshSystem>()->createCapsule(getComponent<MeshComponent>(), radius, radius, height, slices, stacks);
 }
 
 void Shape::createCapsule(float baseRadius, float topRadius, float height, unsigned int slices, unsigned int stacks){
-    scene->getSystem<MeshSystem>()->createCapsule(entity, baseRadius, topRadius, height, slices, stacks);
+    scene->getSystem<MeshSystem>()->createCapsule(getComponent<MeshComponent>(), baseRadius, topRadius, height, slices, stacks);
 }
 
 void Shape::createTorus(float radius, float ringRadius){
-    scene->getSystem<MeshSystem>()->createTorus(entity, radius, ringRadius);
+    scene->getSystem<MeshSystem>()->createTorus(getComponent<MeshComponent>(), radius, ringRadius);
 }
 
 void Shape::createTorus(float radius, float ringRadius, unsigned int sides, unsigned int rings){
-    scene->getSystem<MeshSystem>()->createTorus(entity, radius, ringRadius, sides, rings);
+    scene->getSystem<MeshSystem>()->createTorus(getComponent<MeshComponent>(), radius, ringRadius, sides, rings);
 }
