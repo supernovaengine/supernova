@@ -3067,7 +3067,8 @@ void RenderSystem::draw(){
 			camera.render.applyViewport(Engine::getViewRect());
 		}else{
 			if (!camera.framebuffer->isCreated()){
-				createFramebuffer(camera);
+				// In case of async framebuffer load, wait for creation
+				return;
 			}
 			camera.render.startRenderPass(&camera.framebuffer->getRender());
 		}

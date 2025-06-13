@@ -352,8 +352,9 @@ const void* SokolTexture::getD3D11Handler() const{
 }
 
 bool SokolTexture::isCreated(){
-    if (image.id != SG_INVALID_ID)
-        return true;
+    if (image.id != SG_INVALID_ID && sg_isvalid()) {
+        return sg_query_image_state(image) == SG_RESOURCESTATE_VALID;
+    }
 
     return false;
 }

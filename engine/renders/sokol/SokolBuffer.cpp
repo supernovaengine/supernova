@@ -87,8 +87,9 @@ void SokolBuffer::destroyBuffer(){
 }
 
 bool SokolBuffer::isCreated(){
-    if (buffer.id != SG_INVALID_ID)
-        return true;
+    if (buffer.id != SG_INVALID_ID && sg_isvalid()) {
+        return sg_query_buffer_state(buffer) == SG_RESOURCESTATE_VALID;
+    }
 
     return false;
 }

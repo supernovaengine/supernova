@@ -286,8 +286,9 @@ void SokolShader::destroyShader(){
 }
 
 bool SokolShader::isCreated(){
-    if (shader.id != SG_INVALID_ID)
-        return true;
+    if (shader.id != SG_INVALID_ID && sg_isvalid()) {
+        return sg_query_shader_state(shader) == SG_RESOURCESTATE_VALID;
+    }
 
     return false;
 }

@@ -74,8 +74,9 @@ void SokolFramebuffer::destroyFramebuffer(){
 }
 
 bool SokolFramebuffer::isCreated(){
-    if (attachments[0].id != SG_INVALID_ID)
-        return true;
+    if (attachments[0].id != SG_INVALID_ID && sg_isvalid()) {
+        return sg_query_attachments_state(attachments[0]) == SG_RESOURCESTATE_VALID;
+    }
 
     return false;
 }
