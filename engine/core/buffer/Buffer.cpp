@@ -71,17 +71,20 @@ bool Buffer::increase(size_t newSize){
 }
 
 void Buffer::clearAll(){
-    size = 0;
     stride = 0;
     attributes.clear();
+    data = nullptr; // Reset data pointer
+
     clear();
 }
 
 void Buffer::clear(){
+    size = 0;
     for (auto &x : attributes) {
         x.second.setCount(0);
     }
     count = 0;
+    // Note: data pointer and attributes are preserved for reuse
 }
 
 void Buffer::importData(void* data, size_t size){
@@ -366,6 +369,10 @@ Vector4 Buffer::getVector4(Attribute* attribute, unsigned int index){
 
 unsigned char* Buffer::getData() const{
     return data ? &data[0] : nullptr;
+}
+
+void Buffer::setSize(size_t size){
+    this->size = size;
 }
 
 size_t Buffer::getSize() const{

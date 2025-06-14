@@ -43,11 +43,10 @@ namespace Supernova {
         Buffer& operator=(const Buffer& rhs);
 
         virtual bool increase(size_t newSize);
+        virtual void clearAll();
         virtual void clear();
 
         void importData(void* data, size_t size);
-
-        void clearAll();
 
         void addAttribute(AttributeType attribute, AttributeDataType dataType, unsigned int elements, size_t offset);
         void addAttribute(AttributeType attribute, unsigned int elements, size_t offset, bool perInstance);
@@ -97,6 +96,8 @@ namespace Supernova {
         Vector4 getVector4(Attribute* attribute, unsigned int index);
 
         unsigned char* getData() const;
+
+        void setSize(size_t size);
         size_t getSize() const;
 
         void setStride(unsigned int stride);

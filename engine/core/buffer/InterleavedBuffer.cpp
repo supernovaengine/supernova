@@ -12,8 +12,7 @@ InterleavedBuffer::InterleavedBuffer(): Buffer(){
     vectorBuffer.clear();
     vertexSize = 0;
 
-    if (vectorBuffer.size() > 0)
-        data = &vectorBuffer[0];
+    data = nullptr;
 }
 
 InterleavedBuffer::~InterleavedBuffer(){
@@ -24,8 +23,7 @@ InterleavedBuffer::InterleavedBuffer(const InterleavedBuffer& rhs): Buffer(rhs){
     vectorBuffer = rhs.vectorBuffer;
     vertexSize = rhs.vertexSize;
 
-    if (vectorBuffer.size() > 0)
-        data = &vectorBuffer[0];
+    data = vectorBuffer.empty() ? nullptr : &vectorBuffer[0];
 }
 
 InterleavedBuffer& InterleavedBuffer::operator=(const InterleavedBuffer& rhs){
@@ -34,8 +32,7 @@ InterleavedBuffer& InterleavedBuffer::operator=(const InterleavedBuffer& rhs){
     vectorBuffer = rhs.vectorBuffer;
     vertexSize = rhs.vertexSize;
 
-    if (vectorBuffer.size() > 0)
-        data = &vectorBuffer[0];
+    data = vectorBuffer.empty() ? nullptr : &vectorBuffer[0];
 
     return *this;
 }
@@ -59,11 +56,16 @@ void InterleavedBuffer::clearAll(){
     Buffer::clearAll();
 
     vertexSize = 0;
-    vectorBuffer.clear(); // clear only here to not lost ref in async commands
+    vectorBuffer.clear(); // clear only here to not lose ref in async commands
+    data = nullptr; // Explicitly set to nullptr since buffer is cleared
 }
 
 void InterleavedBuffer::clear(){
     Buffer::clear(); 
+
+    vertexSize = 0;
+    vectorBuffer.resize(0); // Resize to 0 but keep capacity to avoid reallocation
+    data = vectorBuffer.empty() ? nullptr : &vectorBuffer[0];
 }
 
 void InterleavedBuffer::addAttribute(AttributeType attribute, int elements){
@@ -85,5 +87,13 @@ void InterleavedBuffer::addAttribute(AttributeType attribute, int elements, bool
 
         setStride(vertexSize);
     }
+}
+
+unsigned int InterleavedBuffer::getVertexSize() const { 
+    return vertexSize; 
+}
+
+void InterleavedBuffer::setVertexSize(unsigned int size) { 
+    vertexSize = size;
 }
 

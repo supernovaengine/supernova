@@ -36,6 +36,9 @@ namespace Supernova{
         void addAttribute(AttributeType attribute, int elements);
         void addAttribute(AttributeType attribute, int elements, bool perInstance);
 
+        unsigned int getVertexSize() const;
+        void setVertexSize(unsigned int size);
+
     };
 
 }
