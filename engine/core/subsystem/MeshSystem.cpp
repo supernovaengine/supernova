@@ -42,8 +42,6 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 
     mesh.buffer.setUsage(BufferUsage::DYNAMIC);
 
-    mesh.indices.clear();
-
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
 
     Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
@@ -131,6 +129,8 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         0,  2,  3,
     };
 
+    mesh.indices.clear();
+
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
@@ -209,8 +209,6 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     mesh.buffer.setUsage(BufferUsage::DYNAMIC);
-
-    mesh.indices.clear();
 
     tilemap.width = 0;
     tilemap.height = 0;
@@ -306,6 +304,8 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
         indexMap[rectData.submeshId].push_back(3 + (i*4));
 
     }
+
+    mesh.indices.clear();
 
     for (int i = 0; i < mesh.numSubmeshes; i++){
         addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);
@@ -1033,8 +1033,6 @@ void MeshSystem::createPlane(MeshComponent& mesh, float width, float depth, unsi
     mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
-    mesh.indices.clear();
-
     float halfWidth = width / 2.0;
     float halfDepth = depth / 2.0;
 
@@ -1067,6 +1065,8 @@ void MeshSystem::createPlane(MeshComponent& mesh, float width, float depth, unsi
         0,  2,  3,
     };
 
+    mesh.indices.clear();
+
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         6, (char*)&indices_array[0], sizeof(uint16_t));
@@ -1086,8 +1086,6 @@ void MeshSystem::createBox(MeshComponent& mesh, float width, float height, float
     mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
     mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
-
-    mesh.indices.clear();
 
     float halfWidth = width / 2.0;
     float halfHeight = height / 2.0;
@@ -1231,6 +1229,8 @@ void MeshSystem::createBox(MeshComponent& mesh, float width, float height, float
             20, 23, 22,
     };
 
+    mesh.indices.clear();
+
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         36, (char*)&indices_array[0], sizeof(uint16_t));
@@ -1255,8 +1255,6 @@ void MeshSystem::createSphere(MeshComponent& mesh, float radius, unsigned int sl
     Attribute* attTexcoord = mesh.buffer.getAttribute(AttributeType::TEXCOORD1);
     Attribute* attNormal = mesh.buffer.getAttribute(AttributeType::NORMAL);
     Attribute* attColor = mesh.buffer.getAttribute(AttributeType::COLOR);
-
-    mesh.indices.clear();
 
     float x, y, z, xz;                              // vertex position
     float nx, ny, nz, lengthInv = 1.0f / radius;    // vertex normal
@@ -1324,6 +1322,8 @@ void MeshSystem::createSphere(MeshComponent& mesh, float radius, unsigned int sl
             }
         }
     }
+
+    mesh.indices.clear();
 
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
@@ -1454,6 +1454,8 @@ void MeshSystem::createCylinder(MeshComponent& mesh, float baseRadius, float top
         }
     }
 
+    mesh.indices.clear();
+
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
@@ -1537,6 +1539,8 @@ void MeshSystem::createCapsule(MeshComponent& mesh, float baseRadius, float topR
         }
     }
 
+    mesh.indices.clear();
+
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
         indices.size(), (char*)&indices[0], sizeof(uint16_t));
@@ -1608,6 +1612,8 @@ void MeshSystem::createTorus(MeshComponent& mesh, float radius, float ringRadius
             indices.push_back(row_b + ring + 1);
         }
     }
+
+    mesh.indices.clear();
 
     mesh.indices.setValues(
         0, mesh.indices.getAttribute(AttributeType::INDEX),
@@ -2371,8 +2377,6 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string& filename, bool asyncL
     mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
-    mesh.indices.clear();
-
     if (materials.size() > 0){
         mesh.numSubmeshes = materials.size();
 
@@ -2513,6 +2517,8 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string& filename, bool asyncL
     if (asyncLoad) {
         ResourceProgress::updateProgress(buildId, 0.9f); // Geometry processed
     }
+
+    mesh.indices.clear();
 
     for (size_t i = 0; i < mesh.numSubmeshes; i++) {
         addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);

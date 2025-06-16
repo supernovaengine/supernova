@@ -13,8 +13,7 @@ IndexBuffer::IndexBuffer(): Buffer(){
 
     type = BufferType::INDEX_BUFFER;
 
-    if (vectorBuffer.size() > 0)
-        data = &vectorBuffer[0];
+    data = nullptr;
 }
 
 IndexBuffer::~IndexBuffer(){
@@ -24,8 +23,7 @@ IndexBuffer::~IndexBuffer(){
 IndexBuffer::IndexBuffer(const IndexBuffer& rhs): Buffer(rhs){
     vectorBuffer = rhs.vectorBuffer;
 
-    if (vectorBuffer.size() > 0)
-        data = &vectorBuffer[0];
+    data = vectorBuffer.empty() ? nullptr : &vectorBuffer[0];
 }
 
 IndexBuffer& IndexBuffer::operator=(const IndexBuffer& rhs){
@@ -33,8 +31,7 @@ IndexBuffer& IndexBuffer::operator=(const IndexBuffer& rhs){
 
     vectorBuffer = rhs.vectorBuffer;
 
-    if (vectorBuffer.size() > 0)
-        data = &vectorBuffer[0];
+    data = vectorBuffer.empty() ? nullptr : &vectorBuffer[0];
 
     return *this;
 }
@@ -62,9 +59,14 @@ bool IndexBuffer::increase(size_t newSize) {
 void IndexBuffer::clearAll(){
     Buffer::clearAll();
 
+    createIndexAttribute();
     vectorBuffer.clear();
+    data = nullptr; // Explicitly set to nullptr since buffer is cleared
 }
 
 void IndexBuffer::clear(){
     Buffer::clear();
+
+    vectorBuffer.resize(0); // Resize to 0 but keep capacity to avoid reallocation
+    data = vectorBuffer.empty() ? nullptr : &vectorBuffer[0];
 }
