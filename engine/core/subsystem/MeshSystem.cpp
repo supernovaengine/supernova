@@ -1491,8 +1491,8 @@ void MeshSystem::createCapsule(MeshComponent& mesh, float baseRadius, float topR
         float r = topRadius * sin(theta);
         for (int j = 0; j <= slices; ++j) {
             float phi = j * stackAngle;
-            float x = r * cos(phi);
-            float z = r * sin(phi);
+            float x = r * sin(phi);
+            float z = -r * cos(phi);
             float s = (float)j / slices;
             float t = (float)i / (stacks / 2);
 
@@ -1510,8 +1510,8 @@ void MeshSystem::createCapsule(MeshComponent& mesh, float baseRadius, float topR
         float r = baseRadius * sin(theta);
         for (int j = 0; j <= slices; ++j) {
             float phi = j * stackAngle;
-            float x = r * cos(phi);
-            float z = r * sin(phi);
+            float x = r * sin(phi);
+            float z = -r * cos(phi);
             float s = (float)j / slices;
             float t = (float)(i - stacks / 2) / (stacks / 2);
 
@@ -1583,16 +1583,16 @@ void MeshSystem::createTorus(MeshComponent& mesh, float radius, float ringRadius
             // torus surface position
             const float spx = sin_theta * (radius - (ringRadius * cos_phi));
             const float spy = sin_phi * ringRadius;
-            const float spz = cos_theta * (radius - (ringRadius * cos_phi));
+            const float spz = -cos_theta * (radius - (ringRadius * cos_phi));
 
             // torus position with ring-radius zero (for normal computation)
             const float ipx = sin_theta * radius;
             const float ipy = 0.0f;
-            const float ipz = cos_theta * radius;
+            const float ipz = -cos_theta * radius;
 
             mesh.buffer.addVector3(attVertex, Vector3(spx, spy, spz));
             mesh.buffer.addVector3(attNormal, Vector3(spx - ipx, spy - ipy, spz - ipz));
-            mesh.buffer.addVector2(attTexcoord, Vector2(ring * du, 1.0f - side * dv));
+            mesh.buffer.addVector2(attTexcoord, Vector2(ring * du, side * dv));
             mesh.buffer.addVector4(attColor, Vector4(1.0f, 1.0f, 1.0f, 1.0f));
         }
     }
@@ -1604,12 +1604,12 @@ void MeshSystem::createTorus(MeshComponent& mesh, float radius, float ringRadius
         const uint16_t row_b = row_a + rings + 1;
         for (uint16_t ring = 0; ring < rings; ring++) {
             indices.push_back(row_a + ring);
-            indices.push_back(row_b + ring + 1);
             indices.push_back(row_a + ring + 1);
+            indices.push_back(row_b + ring + 1);
 
             indices.push_back(row_a + ring);
-            indices.push_back(row_b + ring);
             indices.push_back(row_b + ring + 1);
+            indices.push_back(row_b + ring);
         }
     }
 
