@@ -144,7 +144,11 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
         if (shutdownRequested.load()) {
             throw std::runtime_error("Shutdown requested");
         }
-        ResourceProgress::updateProgress(buildId, 0.1f);  // Starting
+
+        // Calculate starting progress based on number of faces
+        // Single face: start at 0.5, Multiple faces: start proportionally
+        float startProgress = numFaces == 1 ? 0.5f : (1.0f / (numFaces * 2.0f));
+        ResourceProgress::updateProgress(buildId, startProgress);
     }
 
     std::array<TextureData,6> data;
@@ -176,7 +180,20 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
             if (shutdownRequested.load()) {
                 throw std::runtime_error("Shutdown requested");
             }
-            ResourceProgress::updateProgress(buildId, 0.1f + (0.8f * (f + 1) / static_cast<float>(numFaces)));
+
+            // Calculate progress with better distribution
+            float faceProgress;
+            if (numFaces == 1) {
+                // For single face: go from 0.5 to 0.95
+                faceProgress = 0.5f + (0.45f * (f + 1) / static_cast<float>(numFaces));
+            } else {
+                // For multiple faces: use more granular progress
+                float startProgress = 1.0f / (numFaces * 2.0f);
+                float workingRange = 0.9f - startProgress;
+                faceProgress = startProgress + (workingRange * (f + 1) / static_cast<float>(numFaces));
+            }
+
+            ResourceProgress::updateProgress(buildId, faceProgress);
         }
     }
 

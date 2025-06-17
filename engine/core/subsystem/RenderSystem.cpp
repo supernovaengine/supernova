@@ -967,6 +967,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 	}
 
 	mesh.needReload = false;
+	mesh.needUpdateAABB = true;
 	mesh.loadCalled = true;
 	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 
@@ -1308,6 +1309,7 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& ui, uint8_t pipelines, boo
 	}
 
 	ui.needReload = false;
+	ui.needUpdateAABB = true;
 	ui.loadCalled = true;
 	SystemRender::addQueueCommand(&changeLoaded, new check_load_t{scene, entity});
 

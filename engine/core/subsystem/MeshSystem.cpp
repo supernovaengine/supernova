@@ -1494,7 +1494,7 @@ void MeshSystem::createCapsule(MeshComponent& mesh, float baseRadius, float topR
             float x = r * sin(phi);
             float z = -r * cos(phi);
             float s = (float)j / slices;
-            float t = (float)i / (stacks / 2);
+            float t = (float)(stacks / 2 - i) / (stacks / 2);
 
             mesh.buffer.addVector3(attVertex, Vector3(x, y + height / 2, z));
             mesh.buffer.addVector3(attNormal, Vector3(x / topRadius, y / topRadius, z / topRadius));
@@ -1513,7 +1513,7 @@ void MeshSystem::createCapsule(MeshComponent& mesh, float baseRadius, float topR
             float x = r * sin(phi);
             float z = -r * cos(phi);
             float s = (float)j / slices;
-            float t = (float)(i - stacks / 2) / (stacks / 2);
+            float t = (float)(stacks - i) / (stacks / 2);
 
             mesh.buffer.addVector3(attVertex, Vector3(x, y - height / 2, z));
             mesh.buffer.addVector3(attNormal, Vector3(x / baseRadius, y / baseRadius, z / baseRadius));
