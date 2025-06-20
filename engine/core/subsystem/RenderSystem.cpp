@@ -254,12 +254,8 @@ bool RenderSystem::loadLights(int numLights){
 	return true;
 }
 
-void RenderSystem::processLights(Transform& cameraTransform){
+void RenderSystem::processLights(int numLights, Transform& cameraTransform){
 	auto lights = scene->getComponentArray<LightComponent>();
-
-	int numLights = lights->size();
-	if (numLights > MAX_LIGHTS)
-		numLights = MAX_LIGHTS;
 
 	for (int i = 0; i < numLights; i++){
 		LightComponent& light = lights->getComponentFromIndex(i);
@@ -2957,7 +2953,7 @@ void RenderSystem::update(double dt){
 		}
 	}
 
-	processLights(mainCameraTransform);
+	processLights(numLights, mainCameraTransform);
 }
 
 void RenderSystem::draw(){

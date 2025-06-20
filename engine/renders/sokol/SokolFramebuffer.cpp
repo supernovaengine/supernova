@@ -19,12 +19,17 @@ SokolFramebuffer::SokolFramebuffer(const SokolFramebuffer& rhs){
     for (int i = 0; i < 6; i++){
         attachments[i] = rhs.attachments[i];
     }
+    colorTexture = rhs.colorTexture;
+    depthTexture = rhs.depthTexture;
 }
 
 SokolFramebuffer& SokolFramebuffer::operator=(const SokolFramebuffer& rhs){
     for (int i = 0; i < 6; i++){
         attachments[i] = rhs.attachments[i];
     }
+    colorTexture = rhs.colorTexture;
+    depthTexture = rhs.depthTexture;
+
     return *this;
 }
 

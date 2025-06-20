@@ -109,7 +109,7 @@ namespace Supernova{
 		void createEmptyTextures();
 		int checkLightsAndShadow();
 		bool loadLights(int numLights);
-		void processLights(Transform& cameraTransform);
+		void processLights(int numLights, Transform& cameraTransform);
 		bool loadAndProcessFog();
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
