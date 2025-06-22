@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef ACTIONSYSTEM_H
@@ -110,7 +110,8 @@ namespace Supernova{
 		virtual void update(double dt);
 		virtual void draw();
 
-		virtual void entityDestroyed(Entity entity);
+		virtual void onComponentAdded(Entity entity, ComponentId componentId) override;
+		virtual void onComponentRemoved(Entity entity, ComponentId componentId) override;
 	};
 
 }

@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef SUBSYSTEM_H
@@ -8,6 +8,7 @@
 #include "Export.h"
 #include "Entity.h"
 #include "Signature.h"
+#include "ComponentManager.h"
 #include <set>
 
 namespace Supernova{
@@ -34,7 +35,8 @@ namespace Supernova{
 	
 		virtual void update(double dt) = 0;
 
-		virtual void entityDestroyed(Entity entity) = 0;
+		virtual void onComponentAdded(Entity entity, ComponentId componentId) {}
+		virtual void onComponentRemoved(Entity entity, ComponentId componentId) {}
 	
 	};
 

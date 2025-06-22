@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "MeshSystem.h"
@@ -2747,10 +2747,13 @@ void MeshSystem::draw(){
 
 }
 
-void MeshSystem::entityDestroyed(Entity entity){
-	Signature signature = scene->getSignature(entity);
+void MeshSystem::onComponentAdded(Entity entity, ComponentId componentId) {
 
-	if (signature.test(scene->getComponentId<ModelComponent>())){
-        destroyModel(scene->getComponent<ModelComponent>(entity));
+}
+
+void MeshSystem::onComponentRemoved(Entity entity, ComponentId componentId) {
+	if (componentId == scene->getComponentId<ModelComponent>()) {
+		ModelComponent& model = scene->getComponent<ModelComponent>(entity);
+		destroyModel(model);
 	}
 }

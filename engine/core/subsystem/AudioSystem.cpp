@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "AudioSystem.h"
@@ -273,12 +273,13 @@ void AudioSystem::draw(){
 
 }
 
-void AudioSystem::entityDestroyed(Entity entity){
-    Signature signature = scene->getSignature(entity);
+void AudioSystem::onComponentAdded(Entity entity, ComponentId componentId) {
 
-    if (signature.test(scene->getComponentId<AudioComponent>())){
-        AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
+}
 
-        destroyAudio(audio);
-    }
+void AudioSystem::onComponentRemoved(Entity entity, ComponentId componentId) {
+	if (componentId == scene->getComponentId<AudioComponent>()) {
+		AudioComponent& audio = scene->getComponent<AudioComponent>(entity);
+		destroyAudio(audio);
+	}
 }

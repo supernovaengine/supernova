@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "PhysicsSystem.h"
@@ -1923,19 +1923,22 @@ void PhysicsSystem::draw(){
 
 }
 
-void PhysicsSystem::entityDestroyed(Entity entity){
-    Signature signature = scene->getSignature(entity);
+void PhysicsSystem::onComponentAdded(Entity entity, ComponentId componentId) {
 
-    if (signature.test(scene->getComponentId<Body2DComponent>())){
-        destroyBody2D(scene->getComponent<Body2DComponent>(entity));
-    }
-    if (signature.test(scene->getComponentId<Body3DComponent>())){
-        destroyBody3D(scene->getComponent<Body3DComponent>(entity));
-    }
-    if (signature.test(scene->getComponentId<Joint2DComponent>())){
-        destroyJoint2D(scene->getComponent<Joint2DComponent>(entity));
-    }
-    if (signature.test(scene->getComponentId<Joint3DComponent>())){
-        destroyJoint3D(scene->getComponent<Joint3DComponent>(entity));
-    }
+}
+
+void PhysicsSystem::onComponentRemoved(Entity entity, ComponentId componentId) {
+	if (componentId == scene->getComponentId<Body2DComponent>()) {
+		Body2DComponent& body2d = scene->getComponent<Body2DComponent>(entity);
+		destroyBody2D(body2d);
+	} else if (componentId == scene->getComponentId<Body3DComponent>()) {
+		Body3DComponent& body3d = scene->getComponent<Body3DComponent>(entity);
+		destroyBody3D(body3d);
+	} else if (componentId == scene->getComponentId<Joint2DComponent>()) {
+		Joint2DComponent& joint2d = scene->getComponent<Joint2DComponent>(entity);
+		destroyJoint2D(joint2d);
+	} else if (componentId == scene->getComponentId<Joint3DComponent>()) {
+		Joint3DComponent& joint3d = scene->getComponent<Joint3DComponent>(entity);
+		destroyJoint3D(joint3d);
+	}
 }

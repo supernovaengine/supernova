@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "ActionSystem.h"
@@ -1117,14 +1117,16 @@ void ActionSystem::update(double dt){
 	}
 }
 
-void ActionSystem::entityDestroyed(Entity entity){
-    Signature signature = scene->getSignature(entity);
+void ActionSystem::onComponentAdded(Entity entity, ComponentId componentId) {
 
-    if (signature.test(scene->getComponentId<ActionComponent>())){
-        actionDestroy(scene->getComponent<ActionComponent>(entity));
-    }
+}
 
-    if (signature.test(scene->getComponentId<AnimationComponent>())){
-        animationDestroy(scene->getComponent<AnimationComponent>(entity));
-    }
+void ActionSystem::onComponentRemoved(Entity entity, ComponentId componentId) {
+	if (componentId == scene->getComponentId<ActionComponent>()) {
+		ActionComponent& action = scene->getComponent<ActionComponent>(entity);
+		actionDestroy(action);
+	} else if (componentId == scene->getComponentId<AnimationComponent>()) {
+		AnimationComponent& animation = scene->getComponent<AnimationComponent>(entity);
+		animationDestroy(animation);
+	}
 }

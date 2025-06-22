@@ -31,7 +31,7 @@ namespace Supernova{
 
         std::shared_ptr<STBText> stbtext = NULL;
 
-        bool needReload = false;
+        bool needReloadAtlas = false;
         bool needUpdateText = true;
     };
 

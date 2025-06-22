@@ -11,9 +11,6 @@ using namespace Supernova;
 
 Panel::Panel(Scene* scene): Image(scene){
     addComponent<PanelComponent>({});
-
-    PanelComponent& panelcomp = getComponent<PanelComponent>();
-    scene->getSystem<UISystem>()->createPanelObjects(entity, panelcomp);
 }
 
 Panel::Panel(Scene* scene, Entity entity): Image(scene, entity){

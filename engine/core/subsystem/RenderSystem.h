@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef RENDERSYSTEM_H
@@ -183,6 +183,12 @@ namespace Supernova{
 		bool isInsideCamera(CameraComponent& camera, const Vector3& point);
 		bool isInsideCamera(CameraComponent& camera, const Vector3& center, const float& radius);
 
+		void needReloadPoints();
+		void needReloadLines();
+		void needReloadMeshes();
+		void needReloadUIs();
+		void needReloadSky();
+
 		bool isAllLoaded() const;
 	
 		virtual void load();
@@ -190,7 +196,8 @@ namespace Supernova{
 		virtual void draw();
 		virtual void update(double dt);
 
-		virtual void entityDestroyed(Entity entity);
+		virtual void onComponentAdded(Entity entity, ComponentId componentId) override;
+		virtual void onComponentRemoved(Entity entity, ComponentId componentId) override;
 	};
 
 }

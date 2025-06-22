@@ -11,9 +11,6 @@ using namespace Supernova;
 
 TextEdit::TextEdit(Scene* scene): Image(scene){
     addComponent<TextEditComponent>({});
-
-    TextEditComponent& tecomp = getComponent<TextEditComponent>();
-    scene->getSystem<UISystem>()->createTextEditObjects(entity, tecomp);
 }
 
 TextEdit::TextEdit(Scene* scene, Entity entity): Image(scene, entity){

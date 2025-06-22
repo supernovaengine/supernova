@@ -74,7 +74,7 @@ void Text::setMaxTextSize(unsigned int maxTextSize){
     if (textcomp.maxTextSize != maxTextSize){
         textcomp.maxTextSize = maxTextSize;
 
-        textcomp.needReload = true;
+        textcomp.needReloadAtlas = true;
         textcomp.needUpdateText = true;
         ui.needReload = true;
     }
@@ -107,7 +107,7 @@ void Text::setFont(const std::string &font){
     if (textcomp.font != font){
         textcomp.font = font;
 
-        textcomp.needReload = true;
+        textcomp.needReloadAtlas = true;
         textcomp.needUpdateText = true;
     }
 }
@@ -123,7 +123,7 @@ void Text::setFontSize(unsigned int fontSize){
 
     textcomp.fontSize = fontSize;
 
-    textcomp.needReload = true;
+    textcomp.needReloadAtlas = true;
     textcomp.needUpdateText = true;
 }
 

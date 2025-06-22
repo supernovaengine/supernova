@@ -10,9 +10,6 @@ using namespace Supernova;
 
 Scrollbar::Scrollbar(Scene* scene): Image(scene){
     addComponent<ScrollbarComponent>({});
-
-    ScrollbarComponent& scrollcomp = getComponent<ScrollbarComponent>();
-    scene->getSystem<UISystem>()->createScrollbarObjects(entity, scrollcomp);
 }
 
 Scrollbar::Scrollbar(Scene* scene, Entity entity): Image(scene, entity){

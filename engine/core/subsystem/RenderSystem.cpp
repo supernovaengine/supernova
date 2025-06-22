@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "RenderSystem.h"
@@ -51,16 +51,6 @@ void RenderSystem::load(){
 	createEmptyTextures();
 		
 	update(0); // first update
-
-	auto cameras = scene->getComponentArray<CameraComponent>();
-	for (int i = 0; i < cameras->size(); i++){
-		CameraComponent& camera = cameras->getComponentFromIndex(i);
-		if (camera.renderToTexture){
-			if (!camera.framebuffer->isCreated()){
-				camera.framebuffer->create();
-			}
-		}
-	}
 }
 
 void RenderSystem::destroy(){
@@ -2158,6 +2148,46 @@ bool RenderSystem::isInsideCamera(CameraComponent& camera, const Vector3& center
     return true;
 }
 
+void RenderSystem::needReloadPoints() {
+	auto pointsArray = scene->getComponentArray<PointsComponent>();
+	for (int i = 0; i < pointsArray->size(); i++) {
+		PointsComponent& points = pointsArray->getComponentFromIndex(i);
+		points.needReload = true;
+	}
+}
+
+void RenderSystem::needReloadLines() {
+	auto linesArray = scene->getComponentArray<LinesComponent>();
+	for (int i = 0; i < linesArray->size(); i++) {
+		LinesComponent& lines = linesArray->getComponentFromIndex(i);
+		lines.needReload = true;
+	}
+}
+
+void RenderSystem::needReloadMeshes() {
+	auto meshes = scene->getComponentArray<MeshComponent>();
+	for (int i = 0; i < meshes->size(); i++) {
+		MeshComponent& mesh = meshes->getComponentFromIndex(i);
+		mesh.needReload = true;
+	}
+}
+
+void RenderSystem::needReloadUIs() {
+	auto uis = scene->getComponentArray<UIComponent>();
+	for (int i = 0; i < uis->size(); i++) {
+		UIComponent& ui = uis->getComponentFromIndex(i);
+		ui.needReload = true;
+	}
+}
+
+void RenderSystem::needReloadSky() {
+	auto skyArray = scene->getComponentArray<SkyComponent>();
+	for (int i = 0; i < skyArray->size(); i++) {
+		SkyComponent& sky = skyArray->getComponentFromIndex(i);
+		sky.needReload = true;
+	}
+}
+
 bool RenderSystem::isAllLoaded() const{
     // Check MeshComponents
     auto meshes = scene->getComponentArray<MeshComponent>();
@@ -2700,6 +2730,13 @@ void RenderSystem::update(double dt){
 		CameraComponent& camera = cameras->getComponentFromIndex(i);
 		Entity cameraEntity = cameras->getEntity(i);
 		Transform& cameraTransform = scene->getComponent<Transform>(cameraEntity);
+
+		if (camera.renderToTexture){
+			if (!camera.framebuffer->isCreated()){
+				camera.framebuffer->create();
+			}
+		}
+
 		if (camera.renderToTexture && cameraEntity != mainCameraEntity){
 			hasMultipleCameras = true;
 		}
@@ -3232,34 +3269,34 @@ void RenderSystem::draw(){
 	}
 }
 
-void RenderSystem::entityDestroyed(Entity entity){
-	Signature signature = scene->getSignature(entity);
-
-	if (signature.test(scene->getComponentId<LightComponent>())){
-		destroyLight(scene->getComponent<LightComponent>(entity));
+void RenderSystem::onComponentAdded(Entity entity, ComponentId componentId) {
+	if (componentId == scene->getComponentId<LightComponent>()) {
+		needReloadMeshes();
 	}
+}
 
-	if (signature.test(scene->getComponentId<CameraComponent>())){
-		destroyCamera(scene->getComponent<CameraComponent>(entity), true);
-	}
-
-	if (signature.test(scene->getComponentId<MeshComponent>())){
-		destroyMesh(entity, scene->getComponent<MeshComponent>(entity));
-	}
-
-	if (signature.test(scene->getComponentId<UIComponent>())){
-		destroyUI(entity, scene->getComponent<UIComponent>(entity));
-	}
-
-	if (signature.test(scene->getComponentId<PointsComponent>())){
-		destroyPoints(entity, scene->getComponent<PointsComponent>(entity));
-	}
-
-	if (signature.test(scene->getComponentId<LinesComponent>())){
-		destroyLines(entity, scene->getComponent<LinesComponent>(entity));
-	}
-
-	if (signature.test(scene->getComponentId<SkyComponent>())){
-		destroySky(entity, scene->getComponent<SkyComponent>(entity));
+void RenderSystem::onComponentRemoved(Entity entity, ComponentId componentId) {
+	if (componentId == scene->getComponentId<LightComponent>()) {
+		LightComponent& light = scene->getComponent<LightComponent>(entity);
+		destroyLight(light);
+		needReloadMeshes();
+	} else if (componentId == scene->getComponentId<MeshComponent>()) {
+		MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+		destroyMesh(entity, mesh);
+	} else if (componentId == scene->getComponentId<UIComponent>()) {
+		UIComponent& ui = scene->getComponent<UIComponent>(entity);
+		destroyUI(entity, ui);
+	} else if (componentId == scene->getComponentId<PointsComponent>()) {
+		PointsComponent& points = scene->getComponent<PointsComponent>(entity);
+		destroyPoints(entity, points);
+	} else if (componentId == scene->getComponentId<LinesComponent>()) {
+		LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
+		destroyLines(entity, lines);
+	} else if (componentId == scene->getComponentId<SkyComponent>()) {
+		SkyComponent& sky = scene->getComponent<SkyComponent>(entity);
+		destroySky(entity, sky);
+	} else if (componentId == scene->getComponentId<CameraComponent>()) {
+		CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
+		destroyCamera(camera, true);
 	}
 }

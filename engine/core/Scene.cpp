@@ -252,9 +252,13 @@ bool Scene::isEntityCreated(Entity entity){
 }
 
 void Scene::destroyEntity(Entity entity){
-
+	Signature signature = entityManager.getSignature(entity);
 	for (auto const& pair : systems){
-		pair.second->entityDestroyed(entity);
+		for (ComponentId componentId = 0; componentId < signature.size(); ++componentId) {
+			if (signature.test(componentId)) {
+				pair.second->onComponentRemoved(entity, componentId);
+			}
+		}
 	}
 
 	componentManager.entityDestroyed(entity);

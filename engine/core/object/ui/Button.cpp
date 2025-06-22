@@ -11,9 +11,6 @@ using namespace Supernova;
 
 Button::Button(Scene* scene): Image(scene){
     addComponent<ButtonComponent>({});
-
-    ButtonComponent& btcomp = getComponent<ButtonComponent>();
-    scene->getSystem<UISystem>()->createButtonObjects(entity, btcomp);
 }
 
 Button::Button(Scene* scene, Entity entity): Image(scene, entity){

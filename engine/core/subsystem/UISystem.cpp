@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "UISystem.h"
@@ -200,7 +200,7 @@ bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutCompo
 
     ui.needUpdateTexture = true;
 
-    text.needReload = false;
+    text.needReloadAtlas = false;
     text.loaded = true;
 
     return true;
@@ -720,7 +720,7 @@ bool UISystem::createOrUpdateText(TextComponent& text, UIComponent& ui, UILayout
             changeFlipY(ui, camera);
         }
 
-        if (text.loaded && text.needReload){
+        if (text.loaded && text.needReloadAtlas){
             destroyText(text);
         }
         if (!text.loaded){
@@ -895,7 +895,7 @@ void UISystem::changeFlipY(UIComponent& ui, CameraComponent& camera){
 
 void UISystem::destroyText(TextComponent& text){
     text.loaded = false;
-    text.needReload = false;
+    text.needReloadAtlas = false;
 
     text.needUpdateText = true;
 
@@ -1468,36 +1468,6 @@ void UISystem::update(double dt){
 
 }
 
-void UISystem::entityDestroyed(Entity entity){
-    Signature signature = scene->getSignature(entity);
-
-    if (signature.test(scene->getComponentId<TextComponent>())){
-        TextComponent& text = scene->getComponent<TextComponent>(entity);
-
-        destroyText(text);
-    }
-    if (signature.test(scene->getComponentId<ButtonComponent>())){
-        ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
-
-        destroyButton(button);
-    }
-    if (signature.test(scene->getComponentId<PanelComponent>())){
-        PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
-
-        destroyPanel(panel);
-    }
-    if (signature.test(scene->getComponentId<ScrollbarComponent>())){
-        ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
-
-        destroyScrollbar(scrollbar);
-    }
-    if (signature.test(scene->getComponentId<TextEditComponent>())){
-        TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
-
-        destroyTextEdit(textedit);
-    }
-}
-
 bool UISystem::isTextEditFocused(){
     auto textedits = scene->getComponentArray<TextEditComponent>();
     for (int i = 0; i < textedits->size(); i++){
@@ -1961,4 +1931,40 @@ bool UISystem::isCoordInside(float x, float y, Transform& transform, UILayoutCom
         return true;
     }
     return false;
+}
+
+
+void UISystem::onComponentAdded(Entity entity, ComponentId componentId) {
+	if (componentId == scene->getComponentId<ButtonComponent>()) {
+		ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+		createButtonObjects(entity, button);
+	} else if (componentId == scene->getComponentId<PanelComponent>()) {
+		PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+		createPanelObjects(entity, panel);
+	} else if (componentId == scene->getComponentId<ScrollbarComponent>()) {
+		ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+		createScrollbarObjects(entity, scrollbar);
+	} else if (componentId == scene->getComponentId<TextEditComponent>()) {
+		TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
+		createTextEditObjects(entity, textedit);
+	}
+}
+
+void UISystem::onComponentRemoved(Entity entity, ComponentId componentId) {
+	if (componentId == scene->getComponentId<ButtonComponent>()) {
+		ButtonComponent& button = scene->getComponent<ButtonComponent>(entity);
+		destroyButton(button);
+	} else if (componentId == scene->getComponentId<PanelComponent>()) {
+		PanelComponent& panel = scene->getComponent<PanelComponent>(entity);
+		destroyPanel(panel);
+	} else if (componentId == scene->getComponentId<ScrollbarComponent>()) {
+		ScrollbarComponent& scrollbar = scene->getComponent<ScrollbarComponent>(entity);
+		destroyScrollbar(scrollbar);
+	} else if (componentId == scene->getComponentId<TextEditComponent>()) {
+		TextEditComponent& textedit = scene->getComponent<TextEditComponent>(entity);
+		destroyTextEdit(textedit);
+	} else if (componentId == scene->getComponentId<TextComponent>()) {
+		TextComponent& text = scene->getComponent<TextComponent>(entity);
+		destroyText(text);
+	}
 }
