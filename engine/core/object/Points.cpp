@@ -232,6 +232,14 @@ void Points::setTexture(const std::string& path){
     pointscomp.needUpdateTexture = true;
 }
 
+void Points::setTexture(const std::string& id, TextureData data){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+
+    pointscomp.texture.setData(id, data);
+
+    pointscomp.needUpdateTexture = true;
+}
+
 void Points::setTexture(Framebuffer* framebuffer){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
 

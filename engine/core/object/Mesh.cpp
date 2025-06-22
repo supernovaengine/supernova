@@ -38,6 +38,14 @@ void Mesh::setTexture(const std::string& path){
     mesh.submeshes[0].needUpdateTexture = true;
 }
 
+void Mesh::setTexture(const std::string& id, TextureData data){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.submeshes[0].material.baseColorTexture.setData(id, data);
+
+    mesh.submeshes[0].needUpdateTexture = true;
+}
+
 void Mesh::setTexture(Framebuffer* framebuffer){
     MeshComponent& mesh = getComponent<MeshComponent>();
 

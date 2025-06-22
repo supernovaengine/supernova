@@ -24,6 +24,7 @@ namespace Supernova{
         void clearVertices();
 
         void setTexture(const std::string& path);
+        void setTexture(const std::string& id, TextureData data);
         void setTexture(Framebuffer* framebuffer);
 
         void setColor(Vector4 color);

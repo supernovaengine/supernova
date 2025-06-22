@@ -298,6 +298,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (*) (Scene*)> ()
         .addFunction("setTexture", 
             luabridge::overload<const std::string&>(&Mesh::setTexture),
+            luabridge::overload<const std::string&,TextureData>(&Mesh::setTexture),
             luabridge::overload<Framebuffer*>(&Mesh::setTexture))
         .addProperty("color", &Mesh::getColor, (void(Mesh::*)(Vector4))&Mesh::setColor)
         .addFunction("setColor", 
@@ -526,6 +527,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const std::string&>(&Points::removeSpriteFrame))
         .addFunction("setTexture", 
             luabridge::overload<const std::string&>(&Points::setTexture),
+            luabridge::overload<const std::string&,TextureData>(&Points::setTexture),
             luabridge::overload<Framebuffer*>(&Points::setTexture))
         .endClass();
 
@@ -632,6 +634,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("alpha", &Polygon::getAlpha, &Polygon::setAlpha)
         .addFunction("setTexture", 
             luabridge::overload<const std::string&>(&Polygon::setTexture),
+            luabridge::overload<const std::string&,TextureData>(&Polygon::setTexture),
             luabridge::overload<Framebuffer*>(&Polygon::setTexture))
         .addProperty("flipY", &Polygon::isFlipY, &Polygon::setFlipY)
         .addFunction("getAABB", &Polygon::getAABB)
@@ -679,6 +682,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("patchMarginTop", &Image::getPatchMarginTop, &Image::setPatchMarginTop)
         .addFunction("setTexture", 
             luabridge::overload<const std::string&>(&Image::setTexture),
+            luabridge::overload<const std::string&,TextureData>(&Image::setTexture),
             luabridge::overload<Framebuffer*>(&Image::setTexture))
         .addProperty("textureScaleFactor", &Image::getTextureScaleFactor, &Image::setTextureScaleFactor)
         .addProperty("color", &Image::getColor, (void(Image::*)(Vector4))&Image::setColor)

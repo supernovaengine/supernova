@@ -121,6 +121,14 @@ void Image::setTexture(const std::string& path){
     ui.needUpdateTexture = true;
 }
 
+void Image::setTexture(const std::string& id, TextureData data){
+    UIComponent& ui = getComponent<UIComponent>();
+
+    ui.texture.setData(id, data);
+
+    ui.needUpdateTexture = true;
+}
+
 void Image::setTexture(Framebuffer* framebuffer){
     UIComponent& ui = getComponent<UIComponent>();
 

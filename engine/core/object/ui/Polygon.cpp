@@ -64,6 +64,14 @@ void Polygon::setTexture(const std::string& path){
     ui.needUpdateTexture = true;
 }
 
+void Polygon::setTexture(const std::string& id, TextureData data){
+    UIComponent& ui = getComponent<UIComponent>();
+
+    ui.texture.setData(id, data);
+
+    ui.needUpdateTexture = true;
+}
+
 void Polygon::setTexture(Framebuffer* framebuffer){
     UIComponent& ui = getComponent<UIComponent>();
 

@@ -57,6 +57,7 @@ namespace Supernova{
         void removeSpriteFrame(const std::string& name);
 
         void setTexture(const std::string& path);
+        void setTexture(const std::string& id, TextureData data);
         void setTexture(Framebuffer* framebuffer);
     };
 }

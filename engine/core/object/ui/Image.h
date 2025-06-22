@@ -31,6 +31,7 @@ namespace Supernova{
         unsigned int getPatchMarginTop() const;
 
         void setTexture(const std::string& path);
+        void setTexture(const std::string& id, TextureData data);
         void setTexture(Framebuffer* framebuffer);
 
         void setTextureScaleFactor(float textureScaleFactor);
