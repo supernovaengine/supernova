@@ -1143,27 +1143,30 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 	for (int i = 0; i < mesh.numSubmeshes; i++){
 
 		Submesh& submesh = mesh.submeshes[i];
+		if (!mesh.needReload){
+			//Destroy shader
+			submesh.shader.reset();
+			ShaderPool::remove(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
+			if (hasShadows && mesh.castShadows)
+				ShaderPool::remove(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
 
-		//Destroy shader
-		submesh.shader.reset();
-		ShaderPool::remove(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
-		if (hasShadows && mesh.castShadows)
-			ShaderPool::remove(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
-
-		//Destroy texture
-		submesh.material.baseColorTexture.destroy();
-		submesh.material.metallicRoughnessTexture.destroy();
-		submesh.material.normalTexture.destroy();
-		submesh.material.occlusionTexture.destroy();
-		submesh.material.emissiveTexture.destroy();
+			//Destroy texture
+			submesh.material.baseColorTexture.destroy();
+			submesh.material.metallicRoughnessTexture.destroy();
+			submesh.material.normalTexture.destroy();
+			submesh.material.occlusionTexture.destroy();
+			submesh.material.emissiveTexture.destroy();
+		}
 
 		if (terrain){
 			//Destroy terrain texture
-			terrain->heightMap.destroy();
-			terrain->blendMap.destroy();
-			terrain->textureDetailRed.destroy();
-			terrain->textureDetailGreen.destroy();
-			terrain->textureDetailBlue.destroy();
+			if (!mesh.needReload){
+				terrain->heightMap.destroy();
+				terrain->blendMap.destroy();
+				terrain->textureDetailRed.destroy();
+				terrain->textureDetailGreen.destroy();
+				terrain->textureDetailBlue.destroy();
+			}
 
 			//Destroy terrain buffer
 			for (int s = 0; s < 2; s++){
@@ -1173,6 +1176,9 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 
 		if (instmesh){
 			//Destroy instmesh buffer
+			if (!mesh.needReload){
+				instmesh->buffer.clearAll();
+			}
 			instmesh->buffer.getRender()->destroyBuffer();
 		}
 
@@ -1198,12 +1204,16 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
 	}
 
 	//Destroy buffer
-	//mesh.buffer.clearAll();
+	if (!mesh.needReload){
+		mesh.buffer.clearAll();
+		mesh.indices.clearAll();
+	}
 	mesh.buffer.getRender()->destroyBuffer();
-	//mesh.indices.clearAll();
 	mesh.indices.getRender()->destroyBuffer();
 	for (int i = 0; i < mesh.numExternalBuffers; i++){
-		//mesh.eBuffers[i].clearAll();
+		if (!mesh.needReload){
+			mesh.eBuffers[i].clearAll();
+		}
 		mesh.eBuffers[i].getRender()->destroyBuffer();
 	}
 
@@ -1347,25 +1357,25 @@ void RenderSystem::destroyUI(Entity entity, UIComponent& ui){
 	if (!ui.loaded)
 		return;
 
-	//Destroy shader
-	ui.shader.reset();
-	ShaderPool::remove(ShaderType::UI, ui.shaderProperties);
+	if (!ui.needReload){
+		//Destroy shader
+		ui.shader.reset();
+		ShaderPool::remove(ShaderType::UI, ui.shaderProperties);
 
-	//Destroy texture
-	ui.texture.destroy();
+		//Destroy texture
+		ui.texture.destroy();
+	}
 
 	//Destroy render
 	ui.render.destroy();
 
 	//Destroy buffer
-	if (ui.buffer.getSize() > 0){
-		//ui.buffer.clearAll();
-		ui.buffer.getRender()->destroyBuffer();
+	if (!ui.needReload){
+		ui.buffer.clearAll();
+		ui.indices.clearAll();
 	}
-	if (ui.indices.getSize() > 0){
-		//ui.indices.clearAll();
-		ui.indices.getRender()->destroyBuffer();
-	}
+	ui.buffer.getRender()->destroyBuffer();
+	ui.indices.getRender()->destroyBuffer();
 
 	//Shaders uniforms
 	ui.slotVSParams = -1;
@@ -1543,18 +1553,22 @@ void RenderSystem::destroyPoints(Entity entity, PointsComponent& points){
 	if (!points.loaded)
 		return;
 
-	//Destroy shader
-	points.shader.reset();
-	ShaderPool::remove(ShaderType::POINTS, points.shaderProperties);
+	if (!points.needReload){
+		//Destroy shader
+		points.shader.reset();
+		ShaderPool::remove(ShaderType::POINTS, points.shaderProperties);
 
-	//Destroy texture
-	points.texture.destroy();
+		//Destroy texture
+		points.texture.destroy();
+	}
 
 	//Destroy render
 	points.render.destroy();
 
 	//Destroy buffer
-	//points.buffer.clearAll();
+	if (!points.needReload){
+		points.buffer.clearAll();
+	}
 	points.buffer.getRender()->destroyBuffer();
 
 	//Shaders uniforms
@@ -1588,14 +1602,19 @@ void RenderSystem::destroyLines(Entity entity, LinesComponent& lines){
 	if (!lines.loaded)
 		return;
 
-	//Destroy shader
-	lines.shader.reset();
-	ShaderPool::remove(ShaderType::LINES, lines.shaderProperties);
+	if (!lines.needReload){
+		//Destroy shader
+		lines.shader.reset();
+		ShaderPool::remove(ShaderType::LINES, lines.shaderProperties);
+	}
 
 	//Destroy render
 	lines.render.destroy();
 
 	//Destroy buffer
+	if (!lines.needReload){
+		lines.buffer.clearAll();
+	}
 	lines.buffer.getRender()->destroyBuffer();
 
 	//Shaders uniforms
@@ -1728,18 +1747,22 @@ void RenderSystem::destroySky(Entity entity, SkyComponent& sky){
 	if (!sky.loaded)
 		return;
 
-	//Destroy shader
-	sky.shader.reset();
-	ShaderPool::remove(ShaderType::SKYBOX, 0);
+	if (!sky.needReload){
+		//Destroy shader
+		sky.shader.reset();
+		ShaderPool::remove(ShaderType::SKYBOX, 0);
 
-	//Destroy texture
-	sky.texture.destroy();
+		//Destroy texture
+		sky.texture.destroy();
+	}
 
 	//Destroy render
 	sky.render.destroy();
 
 	//Destroy buffer
-	//sky.buffer.clearAll();
+	if (!sky.needReload){
+		sky.buffer.clearAll();
+	}
 	sky.buffer.getRender()->destroyBuffer();
 
 	//Shaders uniforms
