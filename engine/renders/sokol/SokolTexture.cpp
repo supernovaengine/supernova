@@ -260,7 +260,7 @@ bool SokolTexture::createFramebufferTexture(
             TextureType type, bool depth, bool shadowMap, int width, int height, 
             TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
     sg_image_desc img_desc = {0};
-    img_desc.render_target = true;
+    img_desc.usage.render_attachment = true;
     img_desc.type = getTextureType(type);
     img_desc.width = width;
     img_desc.height = height;

@@ -25,25 +25,27 @@ bool SokolBuffer::createBuffer(unsigned int size, void* data, BufferType type, B
 
     if (usage == BufferUsage::IMMUTABLE){
         vbuf_desc.size = (size_t)size;
-        vbuf_desc.data.ptr = data;
+        vbuf_desc.data = {data, (size_t)size};
     }else{
         vbuf_desc.size = (size_t)size;
     }
 
+    // TODO: Multi-purpose buffer objects
+    // https://floooh.github.io/2025/05/19/sokol-gfx-compute-ms2.html
     if (type == BufferType::VERTEX_BUFFER){
-        vbuf_desc.type = SG_BUFFERTYPE_VERTEXBUFFER;
+        vbuf_desc.usage.vertex_buffer = true;
     } else if (type == BufferType::INDEX_BUFFER){
-        vbuf_desc.type = SG_BUFFERTYPE_INDEXBUFFER;
+        vbuf_desc.usage.index_buffer = true;
     } else if (type == BufferType::STORAGE_BUFFER){
-        vbuf_desc.type = SG_BUFFERTYPE_STORAGEBUFFER;
+        vbuf_desc.usage.storage_buffer = true;
     }
 
     if (usage == BufferUsage::IMMUTABLE){
-        vbuf_desc.usage = SG_USAGE_IMMUTABLE;
+        vbuf_desc.usage.immutable = true;
     }else if (usage == BufferUsage::DYNAMIC){
-        vbuf_desc.usage = SG_USAGE_DYNAMIC;
+        vbuf_desc.usage.dynamic_update = true;
     }else if (usage == BufferUsage::STREAM){
-        vbuf_desc.usage = SG_USAGE_STREAM;
+        vbuf_desc.usage.stream_update = true;
     }
 
     if (Engine::isAsyncThread()){
