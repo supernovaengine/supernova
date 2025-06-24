@@ -21,9 +21,9 @@ namespace Supernova{
 	class SUPERNOVA_API MeshSystem : public SubSystem {
 
     private:
-        void createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera);
-		void createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
-		void createTilemap(TilemapComponent& tilemap, MeshComponent& mesh);
+        bool createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera);
+		bool createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
+		bool createTilemap(TilemapComponent& tilemap, MeshComponent& mesh);
 
 		void changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh);
 		Rect normalizeTileRect(Rect tileRect, unsigned int texWidth, unsigned int texHeight);
@@ -54,7 +54,7 @@ namespace Supernova{
 		float maxTerrainHeightArea(TerrainComponent& terrain, float x, float z, float w, float h);
 		float minTerrainHeightArea(TerrainComponent& terrain, float x, float z, float w, float h);
 		void createPlaneNodeSubmesh(unsigned int submeshIndex, TerrainComponent& terrain, MeshComponent& mesh, int width, int height, int widthSegments, int heightSegments);
-		void createTerrain(TerrainComponent& terrain, MeshComponent& mesh);
+		bool createTerrain(TerrainComponent& terrain, MeshComponent& mesh);
 		void createTerrainNode(TerrainComponent& terrain, float x, float y, float size, int lodDepth);
 
 	public:

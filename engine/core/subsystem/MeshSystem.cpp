@@ -27,7 +27,7 @@ MeshSystem::~MeshSystem(){
 
 }
 
-void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera){
+bool MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
     mesh.submeshes[0].textureShadow = true;
@@ -46,9 +46,23 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 
     Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
 
-    mainTexture.load();
-    unsigned int texWidth = mainTexture.getWidth();
-    unsigned int texHeight = mainTexture.getHeight();
+    unsigned int texWidth = 0;
+    unsigned int texHeight = 0;
+
+    if (!mainTexture.empty()){
+        TextureLoadResult texResult = mainTexture.load();
+        if (texResult.state == ResourceLoadState::Finished){
+            texWidth = mainTexture.getWidth();
+            texHeight = mainTexture.getHeight();
+        }else if (texResult.state == ResourceLoadState::Loading){
+            return false;
+        }
+    }
+
+    if (texWidth == 0 || texHeight == 0){
+        texWidth = sprite.width;
+        texHeight = sprite.height;
+    }
 
     if (sprite.width == 0 && sprite.height == 0){
         sprite.width = texWidth;
@@ -139,9 +153,11 @@ void MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
 
     if (mesh.loaded)
         mesh.needUpdateBuffer = true; // buffer is not immutable
+
+    return true;
 }
 
-void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
+bool MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;
     mesh.submeshes[0].faceCulling = false;
     mesh.numSubmeshes = 1;
@@ -196,9 +212,11 @@ void MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
 
     if (mesh.loaded)
         mesh.needReload = true;
+
+    return true;
 }
 
-void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
+bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
 
@@ -254,14 +272,24 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
 
         unsigned int texWidth = 0;
         unsigned int texHeight = 0;
-        if (texture.load()){
-            tileRect = normalizeTileRect(tileRect, texture.getWidth(), texture.getHeight());
-            texWidth = texture.getWidth();
-            texHeight = texture.getHeight();
-        }else if (mainTexture.load()){
-            tileRect = normalizeTileRect(tileRect, mainTexture.getWidth(), mainTexture.getHeight());
-            texWidth = mainTexture.getWidth();
-            texHeight = mainTexture.getHeight();
+        if (!texture.empty()){
+            TextureLoadResult texResult = texture.load();
+            if (texResult.state == ResourceLoadState::Finished){
+                tileRect = normalizeTileRect(tileRect, texture.getWidth(), texture.getHeight());
+                texWidth = texture.getWidth();
+                texHeight = texture.getHeight();
+            }else if (texResult.state == ResourceLoadState::Loading){
+                return false;
+            }
+        }else if (!mainTexture.empty()){
+            TextureLoadResult texResult = mainTexture.load();
+            if (texResult.state == ResourceLoadState::Finished){
+                tileRect = normalizeTileRect(tileRect, mainTexture.getWidth(), mainTexture.getHeight());
+                texWidth = mainTexture.getWidth();
+                texHeight = mainTexture.getHeight();
+            }else if (texResult.state == ResourceLoadState::Loading){
+                return false;
+            }
         }
 
         float texCutRatioW = 0;
@@ -331,6 +359,8 @@ void MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
         }
     }
     tilemap.numTiles = numTiles;
+
+    return true;
 }
 
 void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh){
@@ -935,7 +965,7 @@ void MeshSystem::createTerrainNode(TerrainComponent& terrain, float x, float y, 
     }
 }
 
-void MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
+bool MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
     for (int s = 0; s < 2; s++){
         terrain.nodesbuffer[s].clear();
         terrain.nodesbuffer[s].addAttribute(AttributeType::TERRAINNODEPOSITION, 2, true);
@@ -951,23 +981,15 @@ void MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
     mesh.buffer.addAttribute(AttributeType::POSITION, 3);
     mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
 
-    if (scene->getCamera() == NULL_ENTITY){
-        Log::error("Cannot create terrain without defined camera in scene");
-        return;
-    }
-
-    if (MAX_TERRAINGRID < (terrain.rootGridSize*terrain.rootGridSize)){
-        Log::error("Cannot create full terrain, increase MAX_TERRAINGRID to %u", (terrain.rootGridSize*terrain.rootGridSize));
-        return;
-    }
-
     mesh.indices.clear();
 
     terrain.heightMap.setReleaseDataAfterLoad(false);
 
-    if (!terrain.heightMap.load()){
-        Log::error("Terrain must have a heightmap");
-        return;
+    if (!terrain.heightMap.empty()){
+        TextureLoadResult texResult = terrain.heightMap.load();
+        if (texResult.state == ResourceLoadState::Loading){
+            return false;
+        }
     }
 
     size_t idealSize = getTerrainGridArraySize(terrain.rootGridSize, terrain.levels);
@@ -1021,6 +1043,7 @@ void MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
 
     terrain.heightMapLoaded = true;
 
+    return true;
 }
 
 void MeshSystem::createPlane(MeshComponent& mesh, float width, float depth, unsigned int tiles){
@@ -2618,9 +2641,11 @@ bool MeshSystem::createOrUpdateSprite(SpriteComponent& sprite, MeshComponent& me
             changeFlipY(sprite.flipY, camera, mesh);
         }
 
-        createSprite(sprite, mesh, camera);
-
-        sprite.needUpdateSprite = false;
+        if (createSprite(sprite, mesh, camera)){
+            sprite.needUpdateSprite = false;
+        }else{
+            return false;
+        }
     }
 
     return true;
@@ -2628,9 +2653,30 @@ bool MeshSystem::createOrUpdateSprite(SpriteComponent& sprite, MeshComponent& me
 
 bool MeshSystem::createOrUpdateTerrain(TerrainComponent& terrain, MeshComponent& mesh){
     if (terrain.needUpdateTerrain){
-        createTerrain(terrain, mesh);
 
-        terrain.needUpdateTerrain = false;
+        if (scene->getCamera() == NULL_ENTITY){
+            Log::error("Cannot create terrain without defined camera in scene");
+            terrain.needUpdateTerrain = false;
+            return false;
+        }
+
+        if (MAX_TERRAINGRID < (terrain.rootGridSize*terrain.rootGridSize)){
+            Log::error("Cannot create full terrain, increase MAX_TERRAINGRID to %u", (terrain.rootGridSize*terrain.rootGridSize));
+            terrain.needUpdateTerrain = false;
+            return false;
+        }
+
+        if (terrain.heightMap.empty()){
+            Log::error("Terrain must have a heightmap");
+            terrain.needUpdateTerrain = false;
+            return false;
+        }
+
+        if (createTerrain(terrain, mesh)){
+            terrain.needUpdateTerrain = false;
+        }else{
+            return false;
+        }
     }
 
     return true;
@@ -2643,9 +2689,11 @@ bool MeshSystem::createOrUpdateMeshPolygon(MeshPolygonComponent& polygon, MeshCo
             changeFlipY(polygon.flipY, camera, mesh);
         }
 
-        createMeshPolygon(polygon, mesh);
-
-        polygon.needUpdatePolygon = false;
+        if (createMeshPolygon(polygon, mesh)){
+            polygon.needUpdatePolygon = false;
+        }else{
+            return false;
+        }
     }
 
     return true;
@@ -2658,9 +2706,11 @@ bool MeshSystem::createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent&
             changeFlipY(tilemap.flipY, camera, mesh);
         }
 
-        createTilemap(tilemap, mesh);
-
-        tilemap.needUpdateTilemap = false;
+        if (createTilemap(tilemap, mesh)){
+            tilemap.needUpdateTilemap = false;
+        }else{
+            return false;
+        }
     }
 
     return true;
