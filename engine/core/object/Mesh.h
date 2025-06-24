@@ -66,6 +66,9 @@ namespace Supernova{
 
         unsigned int getNumSubmeshes() const;
 
+        void setReceiveLights(bool receiveLights);
+        bool isReceiveLights() const;
+
         void setCastShadows(bool castShadows);
         bool isCastShadows() const;
 

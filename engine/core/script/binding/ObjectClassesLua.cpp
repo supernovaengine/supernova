@@ -339,6 +339,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getVerticesAABB", &Mesh::getVerticesAABB)
         .addFunction("getWorldAABB", &Mesh::getWorldAABB)
         .addFunction("getNumSubmeshes", &Mesh::getNumSubmeshes)
+        .addProperty("receiveLights", &Mesh::isReceiveLights, &Mesh::setReceiveLights)
         .addProperty("castShadows", &Mesh::isCastShadows, &Mesh::setCastShadows)
         .addProperty("receiveShadows", &Mesh::isReceiveShadows, &Mesh::setReceiveShadows)
         .addProperty("shadowsBillboard", &Mesh::isShadowsBillboard, &Mesh::setShadowsBillboard)

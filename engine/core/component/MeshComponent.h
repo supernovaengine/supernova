@@ -98,6 +98,7 @@ namespace Supernova{
         AABB verticesAABB = AABB::ZERO; // is not influenced by instances
         AABB worldAABB; // initially NULL
 
+        bool receiveLights = true;
         bool castShadows = true;
         bool receiveShadows = true;
         bool shadowsBillboard = true;

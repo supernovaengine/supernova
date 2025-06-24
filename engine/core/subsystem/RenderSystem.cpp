@@ -355,11 +355,11 @@ bool RenderSystem::checkPBRFrabebufferUpdate(Material& material){
 		material.emissiveTexture.isFramebufferOutdated() );
 }
 
-bool RenderSystem::checkPBRTextures(Material& material){
+bool RenderSystem::checkPBRTextures(Material& material, bool receiveLights){
     bool hasBaseColor = !material.baseColorTexture.empty();
 
     bool hasOtherPBRTextures = false;
-    if (hasLights) {
+    if (hasLights && receiveLights) {
         hasOtherPBRTextures = !material.metallicRoughnessTexture.empty() || 
                               !material.normalTexture.empty() || 
                               !material.occlusionTexture.empty() || 
@@ -369,7 +369,7 @@ bool RenderSystem::checkPBRTextures(Material& material){
     return hasBaseColor || hasOtherPBRTextures;
 }
 
-bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render){
+bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool receiveLights){
 	TextureRender* textureRender = NULL;
 	std::pair<int, int> slotTex(-1, -1);
 
@@ -384,7 +384,7 @@ bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 		render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
 	}
 
-	if (hasLights){
+	if (hasLights && receiveLights){
 		textureRender = material.metallicRoughnessTexture.getRender(&emptyWhite);
 		slotTex = shaderData.getTextureIndex(TextureShaderType::METALLICROUGHNESS);
 		if (textureRender){
@@ -433,10 +433,10 @@ bool RenderSystem::loadPBRTextures(Material& material, ShaderData& shaderData, O
 	return true;
 }
 
-void RenderSystem::loadShadowTextures(ShaderData& shaderData, ObjectRender& render, bool receiveShadows){
+void RenderSystem::loadShadowTextures(ShaderData& shaderData, ObjectRender& render, bool receiveLights, bool receiveShadows){
 	std::pair<int, int> slotTex(-1, -1);
 
-	if (hasLights && hasShadows && receiveShadows){
+	if (hasLights && receiveLights && hasShadows && receiveShadows){
 		size_t num2DShadows = 0;
 		size_t numCubeShadows = 0;
 		auto lights = scene->getComponentArray<LightComponent>();
@@ -636,7 +636,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 
 		render.beginLoad(mesh.submeshes[i].primitiveType);
 
-		bool hasPBRTextures = checkPBRTextures(mesh.submeshes[i].material);
+		bool hasPBRTextures = checkPBRTextures(mesh.submeshes[i].material, mesh.receiveLights);
 
 		for (auto const& buf : buffers){
         	if (buf.second->isRenderAttributes()) {
@@ -708,7 +708,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		if (terrain && !terrain->blendMap.empty()){
 			p_hasTexture1 = true;
 		}
-		if (hasLights){
+		if (hasLights && mesh.receiveLights){
 			p_punctual = true;
 
 			p_hasNormal = true;
@@ -753,7 +753,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		if (hasFog){
 			mesh.submeshes[i].slotFSFog = shaderData.getUniformBlockIndex(UniformBlockType::FS_FOG);
 		}
-		if (hasLights){
+		if (hasLights && mesh.receiveLights){
 			mesh.submeshes[i].slotFSLighting = shaderData.getUniformBlockIndex(UniformBlockType::FS_LIGHTING);
 			if (hasShadows && mesh.receiveShadows){
 				mesh.submeshes[i].slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS);
@@ -770,10 +770,10 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 			mesh.submeshes[i].slotVSMorphTarget = shaderData.getUniformBlockIndex(UniformBlockType::VS_MORPHTARGET);
 		}
 
-		if (!loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render)){
+		if (!loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveLights)){
 			return false;
 		}
-		loadShadowTextures(shaderData, mesh.submeshes[i].render, mesh.receiveShadows);
+		loadShadowTextures(shaderData, mesh.submeshes[i].render, mesh.receiveLights, mesh.receiveShadows);
 
 		if (terrain){
 			mesh.submeshes[i].slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS);
@@ -1023,7 +1023,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 
 			if (mesh.submeshes[i].needUpdateTexture || needUpdateFramebuffer){
 				ShaderData& shaderData = mesh.submeshes[i].shader.get()->shaderData;
-				if (loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render)){
+				if (loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveLights)){
 					mesh.submeshes[i].needUpdateTexture = false;
 				}
 			}
@@ -1037,7 +1037,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 				render.applyUniformBlock(mesh.submeshes[i].slotFSFog, sizeof(float) * 8, &fs_fog);
 			}
 
-			if (hasLights){
+			if (hasLights && mesh.receiveLights){
 				render.applyUniformBlock(mesh.submeshes[i].slotFSLighting, sizeof(float) * (16 * MAX_LIGHTS + 8), &fs_lighting);
 				if (hasShadows && mesh.receiveShadows){
 					render.applyUniformBlock(mesh.submeshes[i].slotVSShadows, sizeof(float) * (16 * MAX_SHADOWSMAP), &vs_shadows);
@@ -1061,7 +1061,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 				}
 			}
 
-			if (hasLights){
+			if (hasLights && mesh.receiveLights){
 				render.applyUniformBlock(mesh.submeshes[i].slotFSParams, sizeof(float) * 12, &mesh.submeshes[i].material);
 			}else{
 				render.applyUniformBlock(mesh.submeshes[i].slotFSParams, sizeof(float) * 4, &mesh.submeshes[i].material);
@@ -2841,7 +2841,7 @@ void RenderSystem::update(double dt){
 					if (mesh.submeshes[i].textureShadow){
 						mesh.submeshes[i].needUpdateDepthTexture = true;
 					}
-					if (checkPBRTextures(mesh.submeshes[s].material)){
+					if (checkPBRTextures(mesh.submeshes[s].material, mesh.receiveLights)){
 						if (!(mesh.submeshes[s].shaderProperties & (1 << 1)) && !(mesh.submeshes[s].shaderProperties & (1 << 2))){ // not 'Uv1' and not 'Uv2'
 							mesh.needReload = true;
 						}

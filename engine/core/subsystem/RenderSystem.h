@@ -116,9 +116,9 @@ namespace Supernova{
 		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);
 		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv);
 		bool checkPBRFrabebufferUpdate(Material& material);
-		bool checkPBRTextures(Material& material);
-		bool loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render);
-		void loadShadowTextures(ShaderData& shaderData, ObjectRender& render, bool receiveShadow);
+		bool checkPBRTextures(Material& material, bool receiveLights);
+		bool loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool receiveLights);
+		void loadShadowTextures(ShaderData& shaderData, ObjectRender& render, bool receiveLights, bool receiveShadow);
 		bool loadDepthTexture(Material& material, ShaderData& shaderData, ObjectRender& render);
 		bool loadTerrainTextures(TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData);
 		Rect getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, CameraComponent& camera);

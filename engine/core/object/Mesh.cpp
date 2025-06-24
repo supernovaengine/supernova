@@ -234,6 +234,22 @@ unsigned int Mesh::getNumSubmeshes() const{
     return mesh.numSubmeshes;
 }
 
+void Mesh::setReceiveLights(bool receiveLights){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    if (mesh.receiveLights != receiveLights){
+        mesh.receiveLights = receiveLights;
+
+        mesh.needReload = true;
+    }
+}
+
+bool Mesh::isReceiveLights() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.receiveLights;
+}
+
 void Mesh::setCastShadows(bool castShadows){
     MeshComponent& mesh = getComponent<MeshComponent>();
 
