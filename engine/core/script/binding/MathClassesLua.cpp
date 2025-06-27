@@ -29,6 +29,8 @@ namespace luabridge
     template<> struct Stack<Plane::Side> : EnumWrapper<Plane::Side>{};
     template<> struct Stack<AABB::BoxType> : EnumWrapper<AABB::BoxType>{};
     template<> struct Stack<AABB::CornerEnum> : EnumWrapper<AABB::CornerEnum>{};
+    template<> struct Stack<OBB::BoxType> : EnumWrapper<OBB::BoxType>{};
+    template<> struct Stack<OBB::CornerEnum> : EnumWrapper<OBB::CornerEnum>{};
     
     template<> struct Stack<RayFilter> : EnumWrapper<RayFilter>{};
 }
@@ -407,11 +409,12 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<const AABB&>(&AABB::merge),
             luabridge::overload<const Vector3&>(&AABB::merge))
         .addFunction("transform", &AABB::transform)
-        .addFunction("isNull", &AABB::isNull)
         .addFunction("setNull", &AABB::setNull)
-        .addFunction("isFinite", &AABB::isFinite)
+        .addFunction("isNull", &AABB::isNull)
+        .addFunction("setInfinite", &AABB::setInfinite)
         .addFunction("isInfinite", &AABB::isInfinite)
-        .addFunction("setInfinite", &AABB::isNull)
+        .addFunction("setFinite", &AABB::setFinite)
+        .addFunction("isFinite", &AABB::isFinite)
         .addFunction("intersects", 
             luabridge::overload<const AABB&>(&AABB::intersects),
             luabridge::overload<const OBB&>(&AABB::intersects),
@@ -460,9 +463,16 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .beginClass<OBB>("OBB")
         .addConstructor<
             void(), 
+            void(OBB::BoxType), 
             void(const Vector3&, const Vector3&),
             void(const Vector3&, const Vector3&, const Vector3&, const Vector3&, const Vector3&)>()
         .addFunction("toString", &OBB::toString)
+        .addFunction("setNull", &OBB::setNull)
+        .addFunction("isNull", &OBB::isNull)
+        .addFunction("setInfinite", &OBB::setInfinite)
+        .addFunction("isInfinite", &OBB::isInfinite)
+        .addFunction("setFinite", &OBB::setFinite)
+        .addFunction("isFinite", &OBB::isFinite)
         .addProperty("center", &OBB::getCenter, &OBB::setCenter)
         .addProperty("halfExtents", &OBB::getHalfExtents, &OBB::setHalfExtents)
         .addFunction("getAxisX", &OBB::getAxisX)
@@ -494,6 +504,16 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("distance", &OBB::distance)
         .addFunction("volume", &OBB::volume)
         .addFunction("closestPoint", &OBB::closestPoint)
+        .addStaticProperty("BoxType", [](lua_State* L) {
+            auto table = luabridge::newTable(L);
+            table.push(L);
+            luabridge::getNamespaceFromStack(L)
+                .addVariable("BOXTYPE_NULL", OBB::BoxType::BOXTYPE_NULL)
+                .addVariable("BOXTYPE_FINITE", OBB::BoxType::BOXTYPE_FINITE)
+                .addVariable("BOXTYPE_INFINITE", OBB::BoxType::BOXTYPE_INFINITE);
+            table.pop();
+            return table;
+            })
         .addStaticProperty("CornerEnum", [](lua_State* L) {
             auto table = luabridge::newTable(L);
             table.push(L);

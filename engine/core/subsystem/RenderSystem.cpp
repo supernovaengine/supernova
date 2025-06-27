@@ -984,6 +984,8 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 			instanceCount = instmesh->numVisible;
 
 			if (instmesh->needUpdateBuffer){
+				// setData here because component can change order and lose reference
+				instmesh->buffer.setData((unsigned char*)(&instmesh->renderInstances.at(0)), sizeof(InstanceRenderData)*instmesh->numVisible);
 				instmesh->buffer.getRender()->updateBuffer(instmesh->buffer.getSize(), instmesh->buffer.getData());
 
 				instmesh->needUpdateBuffer = false;
@@ -1489,8 +1491,6 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 	lines.buffer.setRenderAttributes(true);
 	lines.buffer.setUsage(BufferUsage::DYNAMIC);
 
-	lines.buffer.setData((unsigned char*)(&lines.lines.at(0)), sizeof(LineData)*lines.lines.size());
-
 	// two points per line
 	size_t bufferSize = lines.maxLines * (lines.buffer.getStride() * 2);
 
@@ -1503,9 +1503,8 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 			render.addAttribute(shaderData.getAttrIndex(attr.first), lines.buffer.getRender(), attr.second.getElements(), attr.second.getDataType(), lines.buffer.getStride(), attr.second.getOffset(), attr.second.getNormalized(), attr.second.getPerInstance());
         }
     }
-	if (lines.buffer.getUsage() != BufferUsage::IMMUTABLE){
-		lines.needUpdateBuffer = true;
-	}
+	// buffer is dynamic
+	lines.needUpdateBuffer = true;
 
 	if (!render.endLoad(pipelines, false, CullingMode::BACK, WindingOrder::CCW)){
 		return false;
@@ -1519,7 +1518,7 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint8_t pipel
 }
 
 bool RenderSystem::drawPoints(PointsComponent& points, Transform& transform, Transform& camTransform, bool renderToTexture){
-	if (points.loaded && points.buffer.getSize() > 0){
+	if (points.loaded && points.numVisible > 0){
 
 		if (points.needUpdateTexture || points.texture.isFramebufferOutdated()){
 			ShaderData& shaderData = points.shader.get()->shaderData;
@@ -1532,6 +1531,8 @@ bool RenderSystem::drawPoints(PointsComponent& points, Transform& transform, Tra
 		}
 
 		if (points.needUpdateBuffer){
+			// setData here because component can change order and lose reference
+			points.buffer.setData((unsigned char*)(&points.renderPoints.at(0)), sizeof(PointRenderData)*points.numVisible);
 			points.buffer.getRender()->updateBuffer(points.buffer.getSize(), points.buffer.getData());
 			points.needUpdateBuffer = false;
 		}
@@ -1578,9 +1579,11 @@ void RenderSystem::destroyPoints(Entity entity, PointsComponent& points){
 }
 
 bool RenderSystem::drawLines(LinesComponent& lines, Transform& transform, Transform& camTransform, bool renderToTexture){
-	if (lines.loaded && lines.buffer.getSize() > 0){
+	if (lines.loaded && lines.lines.size() > 0){
 
 		if (lines.needUpdateBuffer){
+			// setData here because component can change order and lose reference
+			lines.buffer.setData((unsigned char*)(&lines.lines.at(0)), sizeof(LineData)*lines.lines.size());
 			lines.buffer.getRender()->updateBuffer(lines.buffer.getSize(), lines.buffer.getData());
 			lines.needUpdateBuffer = false;
 		}
@@ -1961,12 +1964,6 @@ void RenderSystem::updatePoints(PointsComponent& points, Transform& transform, C
 		}
 	}
 
-	if (points.numVisible > 0){
-		points.buffer.setData((unsigned char*)(&points.renderPoints.at(0)), sizeof(PointRenderData)*points.numVisible);
-	}else{
-		points.buffer.setData((unsigned char*)nullptr, 0);
-	}
-
 	if (points.loaded)
 		points.needUpdateBuffer = true;
 }
@@ -2337,12 +2334,6 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
 	}
 
 	mesh.needUpdateAABB = true;
-
-	if (instmesh.numVisible > 0){
-		instmesh.buffer.setData((unsigned char*)(&instmesh.renderInstances.at(0)), sizeof(InstanceRenderData)*instmesh.numVisible);
-	}else{
-		instmesh.buffer.setData((unsigned char*)nullptr, 0);
-	}
 
 	if (mesh.loaded)
 		instmesh.needUpdateBuffer = true;
@@ -2922,6 +2913,20 @@ void RenderSystem::update(double dt){
 			if (!points.loadCalled){
 				loadPoints(entity, points, pipelines);
 			}
+
+			bool sortTransparentPoints = points.transparent && mainCamera.type != CameraType::CAMERA_2D;
+
+			if (points.needUpdate){
+				updatePoints(points, transform, mainCamera, mainCameraTransform);
+			}
+
+			if (points.needUpdate || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentPoints)){
+				if (!hasMultipleCameras || !sortTransparentPoints){
+					sortPoints(points, transform, mainCamera, mainCameraTransform);
+				}
+			}
+
+			points.needUpdate = false;
 		}else if (signature.test(scene->getComponentId<LinesComponent>())){
 			LinesComponent& lines = scene->getComponent<LinesComponent>(entity);
 			if (lines.loaded && lines.needReload){
@@ -2982,24 +2987,6 @@ void RenderSystem::update(double dt){
 				}
 			}
 
-		}
-
-        if (signature.test(scene->getComponentId<PointsComponent>())){
-			PointsComponent& points = scene->getComponent<PointsComponent>(entity);
-
-			bool sortTransparentPoints = points.transparent && mainCamera.type != CameraType::CAMERA_2D;
-
-			if (points.needUpdate){
-				updatePoints(points, transform, mainCamera, mainCameraTransform);
-			}
-
-			if (points.needUpdate || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentPoints)){
-				if (!hasMultipleCameras || !sortTransparentPoints){
-					sortPoints(points, transform, mainCamera, mainCameraTransform);
-				}
-			}
-
-			points.needUpdate = false;
 		}
 
 		transform.needUpdateChildVisibility = false;

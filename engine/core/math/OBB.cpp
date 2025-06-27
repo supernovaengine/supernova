@@ -10,15 +10,28 @@
 
 using namespace Supernova;
 
-const OBB OBB::ZERO(Vector3::ZERO, Vector3(0.0f, 0.0f, 0.0f));
+const OBB OBB::ZERO(OBB::BOXTYPE_FINITE);
 
-OBB::OBB() 
+OBB::OBB()
     : mCenter(Vector3::ZERO),
       mHalfExtents(Vector3(0.0f, 0.0f, 0.0f)),
-      mAxisX(Vector3::UNIT_X),
-      mAxisY(Vector3::UNIT_Y),
-      mAxisZ(Vector3::UNIT_Z),
-      mCorners(0) {
+      mAxisX(Vector3(1.0f, 0.0f, 0.0f)),
+      mAxisY(Vector3(0.0f, 1.0f, 0.0f)),
+      mAxisZ(Vector3(0.0f, 0.0f, 1.0f)),
+      mCorners(0),
+      mBoxType(BOXTYPE_NULL)
+{
+}
+
+OBB::OBB(BoxType boxType)
+    : mCenter(Vector3::ZERO),
+      mHalfExtents(Vector3(0.0f, 0.0f, 0.0f)),
+      mAxisX(Vector3(1.0f, 0.0f, 0.0f)),
+      mAxisY(Vector3(0.0f, 1.0f, 0.0f)),
+      mAxisZ(Vector3(0.0f, 0.0f, 1.0f)),
+      mCorners(0),
+      mBoxType(boxType)
+{
 }
 
 OBB::OBB(const OBB& obb)
@@ -27,35 +40,48 @@ OBB::OBB(const OBB& obb)
       mAxisX(obb.mAxisX),
       mAxisY(obb.mAxisY),
       mAxisZ(obb.mAxisZ),
-      mCorners(0) {
+      mCorners(0),
+      mBoxType(obb.mBoxType)
+{
 }
 
 OBB::OBB(const Vector3& center, const Vector3& halfExtents)
     : mCenter(center),
       mHalfExtents(halfExtents),
-      mAxisX(Vector3::UNIT_X),
-      mAxisY(Vector3::UNIT_Y),
-      mAxisZ(Vector3::UNIT_Z),
-      mCorners(0) {
+      mAxisX(Vector3(1.0f, 0.0f, 0.0f)),
+      mAxisY(Vector3(0.0f, 1.0f, 0.0f)),
+      mAxisZ(Vector3(0.0f, 0.0f, 1.0f)),
+      mCorners(0)
+{
+    mBoxType = BOXTYPE_FINITE;
 }
 
 OBB::OBB(const Vector3& center, const Vector3& halfExtents, 
     const Vector3& axisX, const Vector3& axisY, const Vector3& axisZ)
     : mCenter(center),
-    mHalfExtents(halfExtents),
-    mAxisX(axisX.normalized()),
-    mAxisY(axisY.normalized()),
-    mAxisZ(axisZ.normalized()),
-    mCorners(0) {
+      mHalfExtents(halfExtents),
+      mAxisX(axisX.normalized()),
+      mAxisY(axisY.normalized()),
+      mAxisZ(axisZ.normalized()),
+      mCorners(0)
+{
+    mBoxType = BOXTYPE_FINITE;
 }
 
 OBB::OBB(const AABB& aabb)
     : mCenter(aabb.getCenter()),
       mHalfExtents(aabb.getHalfSize()),
-      mAxisX(Vector3::UNIT_X),
-      mAxisY(Vector3::UNIT_Y),
-      mAxisZ(Vector3::UNIT_Z),
-      mCorners(0) {
+      mAxisX(Vector3(1.0f, 0.0f, 0.0f)),
+      mAxisY(Vector3(0.0f, 1.0f, 0.0f)),
+      mAxisZ(Vector3(0.0f, 0.0f, 1.0f)),
+      mCorners(0)
+{
+    if (aabb.isNull())
+        mBoxType = BOXTYPE_NULL;
+    else if (aabb.isInfinite())
+        mBoxType = BOXTYPE_INFINITE;
+    else
+        mBoxType = BOXTYPE_FINITE;
 }
 
 OBB::OBB(const AABB& aabb, const Matrix4& transform) {
@@ -69,6 +95,13 @@ OBB::OBB(const AABB& aabb, const Matrix4& transform) {
     mCenter = transform * aabb.getCenter();
     mHalfExtents = aabb.getHalfSize() * scale;
     setOrientation(rotation);
+
+    if (aabb.isNull())
+        mBoxType = BOXTYPE_NULL;
+    else if (aabb.isInfinite())
+        mBoxType = BOXTYPE_INFINITE;
+    else
+        mBoxType = BOXTYPE_FINITE;
 }
 
 OBB::~OBB() {
@@ -77,15 +110,15 @@ OBB::~OBB() {
 }
 
 OBB& OBB::operator=(const OBB& rhs) {
-    if (this == &rhs) return *this; // Self-assignment check
+    if (this == &rhs) return *this;
 
     mCenter = rhs.mCenter;
     mHalfExtents = rhs.mHalfExtents;
     mAxisX = rhs.mAxisX;
     mAxisY = rhs.mAxisY;
     mAxisZ = rhs.mAxisZ;
+    mBoxType = rhs.mBoxType;
 
-    // Reset corners (they'll be recalculated when needed)
     if (mCorners) {
         delete[] mCorners;
         mCorners = 0;
@@ -95,6 +128,12 @@ OBB& OBB::operator=(const OBB& rhs) {
 }
 
 bool OBB::operator==(const OBB& rhs) const {
+    if (this->mBoxType != rhs.mBoxType)
+        return false;
+
+    if (!this->isFinite())
+        return true;  // NULL or INFINITE boxes are equal if same type
+
     return mCenter == rhs.mCenter &&
            mHalfExtents == rhs.mHalfExtents &&
            mAxisX == rhs.mAxisX &&
@@ -107,11 +146,42 @@ bool OBB::operator!=(const OBB& rhs) const {
 }
 
 std::string OBB::toString() const {
-    return "OBB(Center: " + mCenter.toString() + 
+    std::string typeStr;
+    switch(mBoxType) {
+        case BOXTYPE_NULL: typeStr = "NULL"; break;
+        case BOXTYPE_FINITE: typeStr = "FINITE"; break;
+        case BOXTYPE_INFINITE: typeStr = "INFINITE"; break;
+    }
+
+    return "OBB(" + typeStr + ", Center: " + mCenter.toString() + 
            ", HalfExtents: " + mHalfExtents.toString() + 
            ", AxisX: " + mAxisX.toString() + 
            ", AxisY: " + mAxisY.toString() + 
            ", AxisZ: " + mAxisZ.toString() + ")";
+}
+
+void OBB::setNull() { 
+    mBoxType = BOXTYPE_NULL; 
+}
+
+bool OBB::isNull() const { 
+    return mBoxType == BOXTYPE_NULL; 
+}
+
+void OBB::setInfinite() { 
+    mBoxType = BOXTYPE_INFINITE; 
+}
+
+bool OBB::isInfinite() const { 
+    return mBoxType == BOXTYPE_INFINITE; 
+}
+
+void OBB::setFinite() { 
+    mBoxType = BOXTYPE_FINITE; 
+}
+
+bool OBB::isFinite() const { 
+    return mBoxType == BOXTYPE_FINITE; 
 }
 
 const Vector3& OBB::getCenter() const {
@@ -128,6 +198,12 @@ const Vector3& OBB::getHalfExtents() const {
 
 void OBB::setHalfExtents(const Vector3& halfExtents) {
     mHalfExtents = halfExtents;
+
+    if (halfExtents.x == 0 && halfExtents.y == 0 && halfExtents.z == 0) {
+        mBoxType = BOXTYPE_NULL;
+    } else if (mBoxType == BOXTYPE_NULL) {
+        mBoxType = BOXTYPE_FINITE;
+    }
 }
 
 const Vector3& OBB::getAxisX() const {
@@ -194,7 +270,9 @@ void OBB::transform(const Vector3& translate, const Quaternion& rotate, const Ve
 }
 
 AABB OBB::toAABB() const {
-    // Start with empty AABB
+    if (isNull()) return AABB(AABB::BOXTYPE_NULL);
+    if (isInfinite()) return AABB(AABB::BOXTYPE_INFINITE);
+
     Vector3 min(std::numeric_limits<float>::max());
     Vector3 max(std::numeric_limits<float>::lowest());
 
@@ -225,6 +303,8 @@ Matrix4 OBB::toMatrix() const {
 }
 
 Vector3 OBB::getCorner(CornerEnum cornerToGet) const {
+    if (isNull() || isInfinite()) return Vector3();
+
     switch(cornerToGet) {
         case FAR_LEFT_BOTTOM:
             return mCenter - mAxisX * mHalfExtents.x - mAxisY * mHalfExtents.y - mAxisZ * mHalfExtents.z;
@@ -264,17 +344,22 @@ const Vector3* OBB::getCorners() const {
 }
 
 void OBB::enclose(const OBB& other) {
-    // Handle null OBBs
-    if (mHalfExtents.x <= 0.0f && mHalfExtents.y <= 0.0f && mHalfExtents.z <= 0.0f) {
+    if (other.isNull()) return;
+
+    if (this->isNull()) {
         *this = other;
         return;
     }
 
-    if (other.mHalfExtents.x <= 0.0f && other.mHalfExtents.y <= 0.0f && other.mHalfExtents.z <= 0.0f) {
+    if (other.isInfinite()) {
+        setInfinite();
         return;
     }
 
-    // Get corners of the other OBB
+    if (this->isInfinite()) {
+        return;
+    }
+
     const Vector3* otherCorners = other.getCorners();
 
     // Expand this OBB to include all corners of the other OBB
@@ -282,7 +367,6 @@ void OBB::enclose(const OBB& other) {
         enclose(otherCorners[i]);
     }
 
-    // Clear corners so they'll be recalculated
     if (mCorners) {
         delete[] mCorners;
         mCorners = nullptr;
@@ -290,6 +374,18 @@ void OBB::enclose(const OBB& other) {
 }
 
 void OBB::enclose(const Vector3& point) {
+    if (isInfinite()) return;
+
+    if (isNull()) {
+        mCenter = point;
+        mHalfExtents = Vector3::ZERO;
+        mAxisX = Vector3(1.0f, 0.0f, 0.0f);
+        mAxisY = Vector3(0.0f, 1.0f, 0.0f);
+        mAxisZ = Vector3(0.0f, 0.0f, 1.0f);
+        setFinite();
+        return;
+    }
+
     // Transform point to OBB's local space
     Vector3 localPoint = point - mCenter;
 
@@ -319,6 +415,9 @@ void OBB::enclose(const Vector3& point) {
 }
 
 bool OBB::intersects(const OBB& other) const {
+    if (isNull() || other.isNull()) return false;
+    if (isInfinite() || other.isInfinite()) return true;
+
     // Implementation using Separating Axis Theorem (SAT)
 
     // Get the axes to test
@@ -475,18 +574,27 @@ bool OBB::intersects(const OBB& other) const {
 }
 
 bool OBB::intersects(const AABB& aabb) const {
+    if (isNull()) return false;
+    if (isInfinite()) return true;
+
     // Convert AABB to OBB and use OBB-OBB intersection test
     OBB obbFromAABB(aabb);
     return intersects(obbFromAABB);
 }
 
 bool OBB::intersects(const Sphere& sphere) const {
+    if (isNull()) return false;
+    if (isInfinite()) return true;
+
     Vector3 closest = closestPoint(sphere.center);
     float distanceSquared = closest.squaredDistance(sphere.center);
     return distanceSquared <= (sphere.radius * sphere.radius);
 }
 
 bool OBB::intersects(const Plane& plane) const {
+    if (isNull()) return false;
+    if (isInfinite()) return true;
+
     // Get the projection interval radius of the OBB onto the plane normal
     float r = mHalfExtents.x * std::abs(plane.normal.dotProduct(mAxisX)) +
               mHalfExtents.y * std::abs(plane.normal.dotProduct(mAxisY)) +
@@ -500,6 +608,9 @@ bool OBB::intersects(const Plane& plane) const {
 }
 
 bool OBB::intersects(const Vector3& point) const {
+    if (isNull()) return false;
+    if (isInfinite()) return true;
+
     // Transform the point into the OBB's local space
     Vector3 localPoint = point - mCenter;
 
@@ -519,6 +630,9 @@ bool OBB::contains(const Vector3& point) const {
 }
 
 bool OBB::contains(const OBB& other) const {
+    if (isNull()) return false;
+    if (isInfinite()) return true;
+
     // Get corners of the other OBB
     const Vector3* corners = other.getCorners();
 
@@ -542,6 +656,9 @@ float OBB::distance(const Vector3& point) const {
 }
 
 float OBB::volume() const {
+    if (isNull()) return 0.0f;
+    if (isInfinite()) return std::numeric_limits<float>::infinity();
+
     return mHalfExtents.x * 2 * mHalfExtents.y * 2 * mHalfExtents.z * 2;
 }
 

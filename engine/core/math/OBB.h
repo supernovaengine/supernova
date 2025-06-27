@@ -13,15 +13,13 @@ namespace Supernova {
     class Ray;
 
     class SUPERNOVA_API OBB {
-    private:
-        Vector3 mCenter;         // Center of the OBB
-        Vector3 mHalfExtents;    // Half-lengths of the OBB along each axis
-        Vector3 mAxisX;          // Local X axis direction (normalized)
-        Vector3 mAxisY;          // Local Y axis direction (normalized)
-        Vector3 mAxisZ;          // Local Z axis direction (normalized)
-        mutable Vector3* mCorners;
-
     public:
+        enum BoxType {
+            BOXTYPE_NULL,
+            BOXTYPE_FINITE,
+            BOXTYPE_INFINITE
+        };
+
         enum CornerEnum {
             FAR_LEFT_BOTTOM = 0,
             FAR_LEFT_TOP = 1,
@@ -33,9 +31,20 @@ namespace Supernova {
             NEAR_RIGHT_TOP = 4
         };
 
-        static const OBB ZERO;
+    private:
+        Vector3 mCenter;
+        Vector3 mHalfExtents;
+        Vector3 mAxisX;
+        Vector3 mAxisY;
+        Vector3 mAxisZ;
+        mutable Vector3* mCorners;
+        BoxType mBoxType;
+
+    public:
+        static const OBB ZERO; // Null OBB
 
         OBB();
+        OBB(BoxType boxType);
         OBB(const OBB& obb);
         OBB(const Vector3& center, const Vector3& halfExtents);
         OBB(const Vector3& center, const Vector3& halfExtents, 
@@ -50,6 +59,13 @@ namespace Supernova {
         bool operator!=(const OBB& rhs) const;
 
         std::string toString() const;
+
+        void setNull();
+        bool isNull() const;
+        void setInfinite();
+        bool isInfinite() const;
+        void setFinite();
+        bool isFinite() const;
 
         // Getters and setters
         const Vector3& getCenter() const;

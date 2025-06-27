@@ -10,21 +10,17 @@ const AABB AABB::ZERO(0, 0, 0, 0, 0, 0);
 
 
 AABB::AABB()
-        : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
-    setMinimum( -0.5, -0.5, -0.5 );
-    setMaximum( 0.5, 0.5, 0.5 );
+        : mMinimum(Vector3(0, 0, 0)), mMaximum(Vector3(0, 0, 0)), mCorners(0) {
     mBoxType = BOXTYPE_NULL;
 }
 
 AABB::AABB(BoxType bt)
-        : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
-    setMinimum( -0.5, -0.5, -0.5 );
-    setMaximum( 0.5, 0.5, 0.5 );
+        : mMinimum(Vector3(0, 0, 0)), mMaximum(Vector3(0, 0, 0)), mCorners(0) {
     mBoxType = bt;
 }
 
 AABB::AABB(const AABB & rkBox)
-        : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
+        : mMinimum(Vector3(0, 0, 0)), mMaximum(Vector3(0, 0, 0)), mCorners(0) {
     if (rkBox.isNull())
         setNull();
     else if (rkBox.isInfinite())
@@ -34,12 +30,12 @@ AABB::AABB(const AABB & rkBox)
 }
 
 AABB::AABB( const Vector3& min, const Vector3& max )
-        : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
+        : mMinimum(Vector3(0, 0, 0)), mMaximum(Vector3(0, 0, 0)), mCorners(0) {
     setExtents( min, max );
 }
 
 AABB::AABB(float mx, float my, float mz, float Mx, float My, float Mz )
-        : mMinimum(Vector3::ZERO), mMaximum(Vector3::UNIT_SCALE), mCorners(0) {
+        : mMinimum(Vector3(0, 0, 0)), mMaximum(Vector3(0, 0, 0)), mCorners(0) {
     setExtents( mx, my, mz, Mx, My, Mz );
 }
 
@@ -317,16 +313,20 @@ bool AABB::isNull(void) const {
     return (mBoxType == BOXTYPE_NULL);
 }
 
-bool AABB::isFinite(void) const {
-    return (mBoxType == BOXTYPE_FINITE);
-}
-
 void AABB::setInfinite() {
     mBoxType = BOXTYPE_INFINITE;
 }
 
 bool AABB::isInfinite(void) const {
     return (mBoxType == BOXTYPE_INFINITE);
+}
+
+void AABB::setFinite() {
+    mBoxType = BOXTYPE_FINITE;
+}
+
+bool AABB::isFinite(void) const {
+    return (mBoxType == BOXTYPE_FINITE);
 }
 
 bool AABB::intersects(const AABB& b2) const {

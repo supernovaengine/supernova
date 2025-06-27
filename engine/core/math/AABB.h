@@ -40,7 +40,7 @@ namespace Supernova{
 
     public:
 
-        static const AABB ZERO;
+        static const AABB ZERO; // not null, but all zeros
 
         AABB();
         AABB(BoxType e);
@@ -88,9 +88,10 @@ namespace Supernova{
 
         void setNull();
         bool isNull(void) const;
-        bool isFinite(void) const;
         void setInfinite();
         bool isInfinite(void) const;
+        void setFinite();
+        bool isFinite(void) const;
 
         bool intersects(const AABB& b2) const;
         bool intersects(const OBB& obb) const;
