@@ -985,7 +985,7 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
 
 			if (instmesh->needUpdateBuffer){
 				// setData here because component can change order and lose reference
-				instmesh->buffer.setData((unsigned char*)(&instmesh->renderInstances.at(0)), sizeof(InstanceRenderData)*instmesh->numVisible);
+				instmesh->buffer.setData((unsigned char*)(&instmesh->renderInstances[0]), sizeof(InstanceRenderData)*instmesh->numVisible);
 				instmesh->buffer.getRender()->updateBuffer(instmesh->buffer.getSize(), instmesh->buffer.getData());
 
 				instmesh->needUpdateBuffer = false;
@@ -1532,7 +1532,7 @@ bool RenderSystem::drawPoints(PointsComponent& points, Transform& transform, Tra
 
 		if (points.needUpdateBuffer){
 			// setData here because component can change order and lose reference
-			points.buffer.setData((unsigned char*)(&points.renderPoints.at(0)), sizeof(PointRenderData)*points.numVisible);
+			points.buffer.setData((unsigned char*)(&points.renderPoints[0]), sizeof(PointRenderData)*points.numVisible);
 			points.buffer.getRender()->updateBuffer(points.buffer.getSize(), points.buffer.getData());
 			points.needUpdateBuffer = false;
 		}
@@ -1583,7 +1583,7 @@ bool RenderSystem::drawLines(LinesComponent& lines, Transform& transform, Transf
 
 		if (lines.needUpdateBuffer){
 			// setData here because component can change order and lose reference
-			lines.buffer.setData((unsigned char*)(&lines.lines.at(0)), sizeof(LineData)*lines.lines.size());
+			lines.buffer.setData((unsigned char*)(&lines.lines[0]), sizeof(LineData)*lines.lines.size());
 			lines.buffer.getRender()->updateBuffer(lines.buffer.getSize(), lines.buffer.getData());
 			lines.needUpdateBuffer = false;
 		}
