@@ -6,7 +6,7 @@ uniform u_vs_pbrParams {
     mat4 mvpMatrix;
 } pbrParams;
 
-#ifdef HAS_TEXTURERECT
+#if defined(HAS_TEXTURERECT) && (defined(HAS_UV_SET1) || defined(HAS_UV_SET2))
     uniform u_vs_spriteParams {
         vec4 textureRect;
     } spriteParams;
