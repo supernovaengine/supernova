@@ -2355,10 +2355,8 @@ void RenderSystem::sortInstancedMesh(InstancedMeshComponent& instmesh, MeshCompo
 }
 
 void RenderSystem::configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera){
-	if (light.shadowCameraNearFar.x == 0.0){
+	if (light.automaticShadowCamera){
 		light.shadowCameraNearFar.x = camera.nearClip;
-	}
-	if (light.shadowCameraNearFar.y == 0.0){
 		if (light.range == 0.0){
 			light.shadowCameraNearFar.y = camera.farClip;
 		}else{
@@ -2935,6 +2933,16 @@ void RenderSystem::update(double dt){
 			if (!lines.loadCalled){
 				loadLines(entity, lines, pipelines);
 			}
+
+		}else if (signature.test(scene->getComponentId<LightComponent>())){
+			LightComponent& light = scene->getComponent<LightComponent>(entity);
+
+			if (mainCamera.needUpdate || transform.needUpdate || light.needUpdateShadowMap){
+				// need to be updated ONLY for main camera
+				updateLightFromScene(light, transform, mainCamera);
+
+				light.needUpdateShadowMap = false;
+			}
 		}
 
 		if (mainCamera.needUpdate || transform.needUpdate){
@@ -2948,13 +2956,6 @@ void RenderSystem::update(double dt){
 
 					updateTerrain(terrain, transform, mainCamera, mainCameraTransform);
 				}
-			}
-
-			// need to be updated ONLY for main camera
-			if (signature.test(scene->getComponentId<LightComponent>())){
-				LightComponent& light = scene->getComponent<LightComponent>(entity);
-				
-				updateLightFromScene(light, transform, mainCamera);
 			}
 			
 			if (signature.test(scene->getComponentId<AudioComponent>())){

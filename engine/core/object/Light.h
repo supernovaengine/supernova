@@ -53,6 +53,9 @@ namespace Supernova{
         void setCameraFar(float far);
         float getCameraFar() const;
 
+        void setAutomaticShadowCamera(bool automatic);
+        bool isAutomaticShadowCamera() const;
+
         void setNumCascades(unsigned int numCascades);
         float getNumCascades() const;
     };

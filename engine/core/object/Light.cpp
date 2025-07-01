@@ -6,6 +6,7 @@
 
 #include "util/Angle.h"
 #include "util/Color.h"
+#include "subsystem/RenderSystem.h"
 #include <math.h>
 
 using namespace Supernova;
@@ -23,7 +24,10 @@ Light::~Light(){
 void Light::setType(LightType type){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.type = type;
+    if (lightcomp.type != type){
+        lightcomp.type = type;
+        scene->getSystem<RenderSystem>()->needReloadMeshes();
+    }
 }
 
 LightType Light::getType() const{
@@ -36,8 +40,10 @@ void Light::setDirection(Vector3 direction){
     LightComponent& lightcomp = getComponent<LightComponent>();
     Transform& transform = getComponent<Transform>();
 
-    lightcomp.direction = direction;
-    transform.needUpdate = true; //Does not affect children
+    if (lightcomp.direction != direction){
+        lightcomp.direction = direction;
+        transform.needUpdate = true;
+    }
 }
 
 void Light::setDirection(const float x, const float y, const float z){
@@ -69,7 +75,10 @@ Vector3 Light::getColor() const{
 void Light::setRange(float range){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.range = range;
+    if (lightcomp.range != range){
+        lightcomp.range = range;
+        lightcomp.needUpdateShadowMap = true;
+    }
 }
 
 float Light::getRange() const{
@@ -82,8 +91,9 @@ void Light::setIntensity(float intensity){
     LightComponent& lightcomp = getComponent<LightComponent>();
     Transform& transform = getComponent<Transform>();
 
-    if (intensity > 0 && lightcomp.intensity == 0)
-        transform.needUpdate = true; //Does not affect children
+    if (intensity > 0 && lightcomp.intensity == 0){
+        lightcomp.needUpdateShadowMap = true;
+    }
 
     lightcomp.intensity = intensity;
 }
@@ -97,14 +107,25 @@ float  Light::getIntensity() const{
 void Light::setConeAngle(float inner, float outer){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.innerConeCos = cos(Angle::defaultToRad(inner / 2));
-    lightcomp.outerConeCos = cos(Angle::defaultToRad(outer / 2));
+    float innerConeCos = cos(Angle::defaultToRad(inner / 2));
+    float outerConeCos = cos(Angle::defaultToRad(outer / 2));
+
+    if (lightcomp.innerConeCos != innerConeCos || lightcomp.outerConeCos != outerConeCos){
+        lightcomp.innerConeCos = innerConeCos;
+        lightcomp.outerConeCos = outerConeCos;
+        lightcomp.needUpdateShadowMap = true;
+    }
 }
 
 void Light::setInnerConeAngle(float inner){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.innerConeCos = cos(Angle::defaultToRad(inner / 2));
+    float innerConeCos = cos(Angle::defaultToRad(inner / 2));
+
+    if (lightcomp.innerConeCos != innerConeCos){
+        lightcomp.innerConeCos = innerConeCos;
+        lightcomp.needUpdateShadowMap = true;
+    }
 }
 
 float Light::getInnerConeAngle() const{
@@ -116,7 +137,12 @@ float Light::getInnerConeAngle() const{
 void Light::setOuterConeAngle(float outer){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.outerConeCos = cos(Angle::defaultToRad(outer / 2));
+    float outerConeCos = cos(Angle::defaultToRad(outer / 2));
+
+    if (lightcomp.outerConeCos != outerConeCos){
+        lightcomp.outerConeCos = outerConeCos;
+        lightcomp.needUpdateShadowMap = true;
+    }
 }
 
 float Light::getOuterConeAngle() const{
@@ -128,7 +154,12 @@ float Light::getOuterConeAngle() const{
 void Light::setShadows(bool shadows){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.shadows = shadows;
+    if (lightcomp.shadows != shadows){
+        lightcomp.shadows = shadows;
+
+        lightcomp.needUpdateShadowMap = true;
+        scene->getSystem<RenderSystem>()->needReloadMeshes();
+    }
 }
 
 bool Light::isShadows() const{
@@ -164,13 +195,21 @@ unsigned int Light::getShadowMapSize() const{
 void Light::setShadowCameraNearFar(float near, float far){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.shadowCameraNearFar = Vector2(near, far);
+    if (lightcomp.shadowCameraNearFar != Vector2(near, far)){
+        lightcomp.shadowCameraNearFar = Vector2(near, far);
+        lightcomp.automaticShadowCamera = false;
+        lightcomp.needUpdateShadowMap = true;
+    }
 }
 
 void Light::setCameraNear(float near){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.shadowCameraNearFar.x = near;
+    if (lightcomp.shadowCameraNearFar.x != near){
+        lightcomp.shadowCameraNearFar.x = near;
+        lightcomp.automaticShadowCamera = false;
+        lightcomp.needUpdateShadowMap = true;
+    }
 }
 
 float Light::getCameraNear() const{
@@ -182,7 +221,11 @@ float Light::getCameraNear() const{
 void Light::setCameraFar(float far){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.shadowCameraNearFar.y = far;
+    if (lightcomp.shadowCameraNearFar.y != far){
+        lightcomp.shadowCameraNearFar.y = far;
+        lightcomp.automaticShadowCamera = false;
+        lightcomp.needUpdateShadowMap = true;
+    }
 }
 
 float Light::getCameraFar() const{
@@ -191,10 +234,28 @@ float Light::getCameraFar() const{
     return lightcomp.shadowCameraNearFar.y;
 }
 
+void Light::setAutomaticShadowCamera(bool automatic){
+    LightComponent& lightcomp = getComponent<LightComponent>();
+
+    if (lightcomp.automaticShadowCamera != automatic){
+        lightcomp.automaticShadowCamera = automatic;
+        lightcomp.needUpdateShadowMap = true;
+    }
+}
+
+bool Light::isAutomaticShadowCamera() const{
+    LightComponent& lightcomp = getComponent<LightComponent>();
+
+    return lightcomp.automaticShadowCamera;
+}
+
 void Light::setNumCascades(unsigned int numCascades){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.numShadowCascades = numCascades;
+    if (lightcomp.numShadowCascades != numCascades){
+        lightcomp.numShadowCascades = numCascades;
+        lightcomp.needUpdateShadowMap = true;
+    }
 }
 
 float Light::getNumCascades() const{

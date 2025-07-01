@@ -289,6 +289,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setCameraNear", &Light::setCameraNear)
         .addProperty("cameraFar", &Light::getCameraFar, &Light::setCameraFar)
         .addFunction("setCameraFar", &Light::setCameraFar)
+        .addProperty("automaticShadowCamera", &Light::isAutomaticShadowCamera, &Light::setAutomaticShadowCamera)
         .addProperty("numCascades", &Light::getNumCascades, &Light::setNumCascades)
         .addFunction("setNumCascades", &Light::setNumCascades)
         .endClass();

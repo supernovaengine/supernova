@@ -44,14 +44,17 @@ namespace Supernova{
         float outerConeCos = 0.642787635f; // cos(Angle::defaultToRad(100 / 2));
 
         bool shadows = false;
+        bool automaticShadowCamera = true;
         float shadowBias = 0.001f;
         unsigned int mapResolution = 1024;
-        Vector2 shadowCameraNearFar = Vector2(0.0f, 0.0f); // when zero it gets value from scene camera or light range
+        Vector2 shadowCameraNearFar = Vector2(0.1f, 10.0f); // when automatic it gets value from scene camera or light range
         unsigned int numShadowCascades = 3;
 
         LightCamera cameras[6];
         FramebufferRender framebuffer[MAX_SHADOWCASCADES];
         int shadowMapIndex;
+
+        bool needUpdateShadowMap = true;
     };
     
 }
