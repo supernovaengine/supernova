@@ -86,7 +86,7 @@ namespace Supernova{
         unsigned int vertexCount = 0;
 
         Submesh submeshes[MAX_SUBMESHES];
-        unsigned int numSubmeshes = 0;
+        unsigned int numSubmeshes = 1;
 
         Matrix4 bonesMatrix[MAX_BONES];
         float normAdjustJoint = 1;
