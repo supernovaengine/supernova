@@ -53,6 +53,7 @@ namespace luabridge
     template<> struct Stack<AdMobRating> : EnumWrapper<AdMobRating>{};
     template<> struct Stack<CursorType> : EnumWrapper<CursorType>{};
     template<> struct Stack<ResourceLoadState> : EnumWrapper<ResourceLoadState>{};
+    template<> struct Stack<LightState> : EnumWrapper<LightState>{};
 
     template<> struct Stack<ResourceType> : EnumWrapper<ResourceType>{};
 

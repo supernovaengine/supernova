@@ -62,6 +62,12 @@ namespace Supernova{
 
 	class Camera;
 
+	enum class LightState {
+		OFF,
+		ON,
+		AUTO
+	};
+
 	class SUPERNOVA_API Scene{
 	private:
 
@@ -71,6 +77,7 @@ namespace Supernova{
 		Vector4 backgroundColor;
 		bool shadowsPCF;
 
+		LightState lightState;
 		Vector3 globalIllumColor;
 		float globalIllumIntensity;
 
@@ -107,6 +114,9 @@ namespace Supernova{
 
 		void setShadowsPCF(bool shadowsPCF);
 		bool isShadowsPCF() const;
+
+		void setLightState(LightState state);
+		LightState getLightState() const;
 
 		void setGlobalIllumination(float intensity, Vector3 color);
 		void setGlobalIllumination(float intensity);

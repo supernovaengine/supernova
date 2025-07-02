@@ -79,6 +79,7 @@ Scene::Scene(){
 	backgroundColor = Vector4(0.0, 0.0, 0.0, 1.0); //sRGB
 	shadowsPCF = true;
 
+	lightState = LightState::AUTO;
 	globalIllumColor = Vector3(1.0, 1.0, 1.0);
 	globalIllumIntensity = 0.1;
 
@@ -149,11 +150,25 @@ Vector4 Scene::getBackgroundColor() const{
 }
 
 void Scene::setShadowsPCF(bool shadowsPCF){
-	this->shadowsPCF = shadowsPCF;
+	if (this->shadowsPCF != shadowsPCF){
+		this->shadowsPCF = shadowsPCF;
+		getSystem<RenderSystem>()->needReloadMeshes();
+	}
 }
 
 bool Scene::isShadowsPCF() const{
 	return this->shadowsPCF;
+}
+
+void Scene::setLightState(LightState state){
+	if (this->lightState != state){
+		this->lightState = state;
+		getSystem<RenderSystem>()->needReloadMeshes();
+	}
+}
+
+LightState Scene::getLightState() const{
+	return this->lightState;
 }
 
 void Scene::setGlobalIllumination(float intensity, Vector3 color){

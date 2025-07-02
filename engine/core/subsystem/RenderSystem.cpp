@@ -175,8 +175,12 @@ int RenderSystem::checkLightsAndShadow(){
 	if (numLights > MAX_LIGHTS)
 		numLights = MAX_LIGHTS;
 
-	if (numLights > 0)
+	if (scene->getLightState() == LightState::AUTO){
+		if (numLights > 0)
+			hasLights = true;
+	}else if (scene->getLightState() == LightState::ON){
 		hasLights = true;
+	}
 	
 	for (int i = 0; i < numLights; i++){
 		LightComponent& light = lights->getComponentFromIndex(i);
@@ -282,9 +286,10 @@ void RenderSystem::processLights(int numLights, Transform& cameraTransform){
 		fs_lighting.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
 		fs_lighting.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
 		fs_lighting.inCon_ouCon_shadows_cascades[i] = Vector4(light.innerConeCos, light.outerConeCos, light.shadowMapIndex, light.numShadowCascades);
-		fs_lighting.eyePos = Vector4(cameraTransform.worldPosition.x, cameraTransform.worldPosition.y, cameraTransform.worldPosition.z, 0.0);
-		fs_lighting.globalIllum = Vector4(scene->getGlobalIlluminationColorLinear(), scene->getGlobalIlluminationIntensity());
 	}
+
+	fs_lighting.eyePos = Vector4(cameraTransform.worldPosition.x, cameraTransform.worldPosition.y, cameraTransform.worldPosition.z, 0.0);
+	fs_lighting.globalIllum = Vector4(scene->getGlobalIlluminationColorLinear(), scene->getGlobalIlluminationIntensity());
 
 	// Setting intensity of other lights to zero
 	for (int i = numLights; i < MAX_LIGHTS; i++){
