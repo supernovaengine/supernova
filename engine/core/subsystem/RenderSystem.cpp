@@ -209,6 +209,14 @@ bool RenderSystem::loadLights(int numLights){
 				Log::warn("Shadow cascades number is bigger than max value");
 			}
 
+			if (light.needUpdateShadowMap){
+				for (int i = 0; i < light.numShadowCascades; i++) {
+					light.framebuffer[i].destroyFramebuffer();
+				}
+
+				light.needUpdateShadowMap = false;
+			}
+
 			if (light.type == LightType::POINT){
 				if (!light.framebuffer[0].isCreated())
 					light.framebuffer[0].createFramebuffer(
@@ -2643,7 +2651,10 @@ void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent
 		if (transform.cylindricalBillboard)
 			camPos.y = transform.worldPosition.y;
 
-		if ((camPos - transform.worldPosition).crossProduct(camera.worldUp).length() != 0){ // check if not parallel
+		Vector3 toCamera = camPos - transform.worldPosition;
+		const float EPSILON = 1e-6f;
+
+		if (toCamera.length() > EPSILON && toCamera.crossProduct(camera.worldUp).length() > EPSILON){ // check if not parallel
 			Matrix4 m1 = Matrix4::lookAtMatrix(camPos, transform.worldPosition, camera.worldUp).inverse();
 
 			Quaternion oldRotation = transform.rotation;
@@ -2942,11 +2953,11 @@ void RenderSystem::update(double dt){
 		}else if (signature.test(scene->getComponentId<LightComponent>())){
 			LightComponent& light = scene->getComponent<LightComponent>(entity);
 
-			if (mainCamera.needUpdate || transform.needUpdate || light.needUpdateShadowMap){
+			if (mainCamera.needUpdate || transform.needUpdate || light.needUpdateShadowCamera){
 				// need to be updated ONLY for main camera
 				updateLightFromScene(light, transform, mainCamera);
 
-				light.needUpdateShadowMap = false;
+				light.needUpdateShadowCamera = false;
 			}
 		}
 

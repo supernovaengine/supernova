@@ -46,7 +46,7 @@ namespace Supernova{
         bool shadows = false;
         bool automaticShadowCamera = true;
         float shadowBias = 0.001f;
-        unsigned int mapResolution = 1024;
+        unsigned int mapResolution = 2048;
         Vector2 shadowCameraNearFar = Vector2(0.1f, 10.0f); // when automatic it gets value from scene camera or light range
         unsigned int numShadowCascades = 3;
 
@@ -54,7 +54,8 @@ namespace Supernova{
         FramebufferRender framebuffer[MAX_SHADOWCASCADES];
         int shadowMapIndex;
 
-        bool needUpdateShadowMap = true;
+        bool needUpdateShadowCamera = false;
+        bool needUpdateShadowMap = false; // framebuffers
     };
     
 }

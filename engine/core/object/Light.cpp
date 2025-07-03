@@ -26,6 +26,7 @@ void Light::setType(LightType type){
 
     if (lightcomp.type != type){
         lightcomp.type = type;
+
         scene->getSystem<RenderSystem>()->needReloadMeshes();
     }
 }
@@ -42,6 +43,7 @@ void Light::setDirection(Vector3 direction){
 
     if (lightcomp.direction != direction){
         lightcomp.direction = direction;
+
         transform.needUpdate = true;
     }
 }
@@ -77,7 +79,8 @@ void Light::setRange(float range){
 
     if (lightcomp.range != range){
         lightcomp.range = range;
-        lightcomp.needUpdateShadowMap = true;
+
+        lightcomp.needUpdateShadowCamera = true;
     }
 }
 
@@ -92,7 +95,7 @@ void Light::setIntensity(float intensity){
     Transform& transform = getComponent<Transform>();
 
     if (intensity > 0 && lightcomp.intensity == 0){
-        lightcomp.needUpdateShadowMap = true;
+        lightcomp.needUpdateShadowCamera = true;
     }
 
     lightcomp.intensity = intensity;
@@ -113,7 +116,8 @@ void Light::setConeAngle(float inner, float outer){
     if (lightcomp.innerConeCos != innerConeCos || lightcomp.outerConeCos != outerConeCos){
         lightcomp.innerConeCos = innerConeCos;
         lightcomp.outerConeCos = outerConeCos;
-        lightcomp.needUpdateShadowMap = true;
+
+        lightcomp.needUpdateShadowCamera = true;
     }
 }
 
@@ -124,7 +128,8 @@ void Light::setInnerConeAngle(float inner){
 
     if (lightcomp.innerConeCos != innerConeCos){
         lightcomp.innerConeCos = innerConeCos;
-        lightcomp.needUpdateShadowMap = true;
+
+        lightcomp.needUpdateShadowCamera = true;
     }
 }
 
@@ -141,7 +146,8 @@ void Light::setOuterConeAngle(float outer){
 
     if (lightcomp.outerConeCos != outerConeCos){
         lightcomp.outerConeCos = outerConeCos;
-        lightcomp.needUpdateShadowMap = true;
+
+        lightcomp.needUpdateShadowCamera = true;
     }
 }
 
@@ -157,7 +163,7 @@ void Light::setShadows(bool shadows){
     if (lightcomp.shadows != shadows){
         lightcomp.shadows = shadows;
 
-        lightcomp.needUpdateShadowMap = true;
+        lightcomp.needUpdateShadowCamera = true;
         scene->getSystem<RenderSystem>()->needReloadMeshes();
     }
 }
@@ -183,7 +189,12 @@ float Light::getBias() const{
 void Light::setShadowMapSize(unsigned int size){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    lightcomp.mapResolution = size;
+    if (lightcomp.mapResolution != size){
+        lightcomp.mapResolution = size;
+
+        lightcomp.needUpdateShadowMap = true;
+        scene->getSystem<RenderSystem>()->needReloadMeshes();
+    }
 }
 
 unsigned int Light::getShadowMapSize() const{
@@ -197,8 +208,9 @@ void Light::setShadowCameraNearFar(float near, float far){
 
     if (lightcomp.shadowCameraNearFar != Vector2(near, far)){
         lightcomp.shadowCameraNearFar = Vector2(near, far);
+
         lightcomp.automaticShadowCamera = false;
-        lightcomp.needUpdateShadowMap = true;
+        lightcomp.needUpdateShadowCamera = true;
     }
 }
 
@@ -207,8 +219,9 @@ void Light::setCameraNear(float near){
 
     if (lightcomp.shadowCameraNearFar.x != near){
         lightcomp.shadowCameraNearFar.x = near;
+
         lightcomp.automaticShadowCamera = false;
-        lightcomp.needUpdateShadowMap = true;
+        lightcomp.needUpdateShadowCamera = true;
     }
 }
 
@@ -223,8 +236,9 @@ void Light::setCameraFar(float far){
 
     if (lightcomp.shadowCameraNearFar.y != far){
         lightcomp.shadowCameraNearFar.y = far;
+
         lightcomp.automaticShadowCamera = false;
-        lightcomp.needUpdateShadowMap = true;
+        lightcomp.needUpdateShadowCamera = true;
     }
 }
 
@@ -239,7 +253,8 @@ void Light::setAutomaticShadowCamera(bool automatic){
 
     if (lightcomp.automaticShadowCamera != automatic){
         lightcomp.automaticShadowCamera = automatic;
-        lightcomp.needUpdateShadowMap = true;
+
+        lightcomp.needUpdateShadowCamera = true;
     }
 }
 
@@ -254,7 +269,8 @@ void Light::setNumCascades(unsigned int numCascades){
 
     if (lightcomp.numShadowCascades != numCascades){
         lightcomp.numShadowCascades = numCascades;
-        lightcomp.needUpdateShadowMap = true;
+
+        lightcomp.needUpdateShadowCamera = true;
     }
 }
 

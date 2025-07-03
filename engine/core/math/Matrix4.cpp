@@ -664,104 +664,110 @@ Matrix4 Matrix4::perspectiveMatrix(float yfov, float aspect, float near, float f
 }
 
 void Matrix4::decomposeStandard(Vector3& position, Vector3& scale, Quaternion& rotation) const {
-    // Extract position
+    // Extract translation (assuming column-major, last column is translation)
     position.x = matrix[3][0];
     position.y = matrix[3][1];
     position.z = matrix[3][2];
 
-    // Extract scale (column lengths)
-    scale.x = Vector3(matrix[0][0], matrix[0][1], matrix[0][2]).length();
-    scale.y = Vector3(matrix[1][0], matrix[1][1], matrix[1][2]).length();
-    scale.z = Vector3(matrix[2][0], matrix[2][1], matrix[2][2]).length();
+    // Extract basis vectors (upper-left 3x3 matrix)
+    Vector3 col0(matrix[0][0], matrix[0][1], matrix[0][2]);
+    Vector3 col1(matrix[1][0], matrix[1][1], matrix[1][2]);
+    Vector3 col2(matrix[2][0], matrix[2][1], matrix[2][2]);
 
-    // Handle negative determinant (reflection)
-    if (determinant() < 0) scale = -scale;
-    // Create rotation matrix - MODIFIED to handle zero scales
-    Matrix4 rotationM;
+    // Extract scale (length of basis vectors)
+    scale.x = col0.length();
+    scale.y = col1.length();
+    scale.z = col2.length();
 
-    // Check for near-zero scales to avoid division by zero
     const float EPSILON = 1e-6f;
 
-    // Initialize rotation matrix with identity
-    rotationM.identity();
-
-    // For each column with non-zero scale, normalize and copy to rotation matrix
-    if (std::abs(scale.x) > EPSILON) {
-        rotationM.set(0, 0, matrix[0][0] / scale.x);
-        rotationM.set(0, 1, matrix[0][1] / scale.x);
-        rotationM.set(0, 2, matrix[0][2] / scale.x);
+    // If all scales are degenerate, just return identity rotation and unit scale
+    if (scale.x < EPSILON && scale.y < EPSILON && scale.z < EPSILON) {
+        scale = Vector3(1.0f, 1.0f, 1.0f);
+        rotation = Quaternion(); // identity
+        return;
     }
 
-    if (std::abs(scale.y) > EPSILON) {
-        rotationM.set(1, 0, matrix[1][0] / scale.y);
-        rotationM.set(1, 1, matrix[1][1] / scale.y);
-        rotationM.set(1, 2, matrix[1][2] / scale.y);
+    // Handle negative determinant (reflection): flip one axis only
+    if (determinant() < 0) {
+        scale.x = -scale.x;
+        col0 = -col0;
     }
 
-    if (std::abs(scale.z) > EPSILON) {
-        rotationM.set(2, 0, matrix[2][0] / scale.z);
-        rotationM.set(2, 1, matrix[2][1] / scale.z);
-        rotationM.set(2, 2, matrix[2][2] / scale.z);
-    }
+    // Clamp scale to avoid division by zero
+    if (std::abs(scale.x) < EPSILON) scale.x = 1.0f;
+    if (std::abs(scale.y) < EPSILON) scale.y = 1.0f;
+    if (std::abs(scale.z) < EPSILON) scale.z = 1.0f;
 
-    // Special case: if we have degenerate scaling, ensure we still return a valid rotation
-    if (std::abs(scale.x) <= EPSILON || std::abs(scale.y) <= EPSILON || std::abs(scale.z) <= EPSILON) {
-        // If any scale is zero, we need to rebuild a valid rotation matrix
-        // This approach constructs an orthonormal basis where possible
-        Vector3 xAxis(rotationM.get(0, 0), rotationM.get(0, 1), rotationM.get(0, 2));
-        Vector3 yAxis(rotationM.get(1, 0), rotationM.get(1, 1), rotationM.get(1, 2));
-        Vector3 zAxis(rotationM.get(2, 0), rotationM.get(2, 1), rotationM.get(2, 2));
+    // Normalize columns to get rotation axes
+    Vector3 xAxis = col0 / scale.x;
+    Vector3 yAxis = col1 / scale.y;
+    Vector3 zAxis = col2 / scale.z;
 
-        // Find the first non-zero axis
+    // Validate orthogonality
+    // If not, reconstruct
+    float dot01 = std::abs(xAxis.dotProduct(yAxis));
+    float dot02 = std::abs(xAxis.dotProduct(zAxis));
+    float dot12 = std::abs(yAxis.dotProduct(zAxis));
+    if (dot01 > 0.01f || dot02 > 0.01f || dot12 > 0.01f) {
+        // Orthonormalize using Gram-Schmidt process
         if (xAxis.length() > EPSILON) {
             xAxis = xAxis.normalize();
-
-            // Find or create a valid y-axis
-            if (yAxis.length() > EPSILON) {
-                yAxis = yAxis.normalize();
-            } else {
-                // Create orthogonal vector
-                yAxis = xAxis.perpendicular().normalize();
-            }
-
-            // Ensure z-axis is orthogonal to both
-            zAxis = xAxis.crossProduct(yAxis).normalize();
-
-            // Ensure y-axis is truly orthogonal (eliminate any drift)
-            yAxis = zAxis.crossProduct(xAxis).normalize();
+        } else {
+            xAxis = Vector3(1, 0, 0);
         }
-        else if (yAxis.length() > EPSILON) {
+
+        // Make yAxis orthogonal to xAxis
+        yAxis = yAxis - xAxis * yAxis.dotProduct(xAxis);
+        if (yAxis.length() > EPSILON) {
             yAxis = yAxis.normalize();
+        } else {
+            // Safe perpendicular vector generation
+            Vector3 perp = xAxis.perpendicular();
+            if (perp.length() > EPSILON) {
+                yAxis = perp.normalize();
+            } else {
+                // Fallback: choose an axis that's not parallel to xAxis
+                if (std::abs(xAxis.x) < 0.9f) {
+                    yAxis = Vector3(1, 0, 0);
+                } else {
+                    yAxis = Vector3(0, 1, 0);
+                }
 
-            // Create orthogonal vector
-            zAxis = yAxis.perpendicular().normalize();
-
-            // Complete the basis
-            xAxis = yAxis.crossProduct(zAxis).normalize();
+                // Make it orthogonal to xAxis
+                yAxis = yAxis - xAxis * yAxis.dotProduct(xAxis);
+                if (yAxis.length() > EPSILON) {
+                    yAxis = yAxis.normalize();
+                } else {
+                    yAxis = Vector3(0, 1, 0); // Ultimate fallback
+                }
+            }
         }
-        else if (zAxis.length() > EPSILON) {
+
+        // Calculate zAxis as cross product
+        zAxis = xAxis.crossProduct(yAxis);
+        if (zAxis.length() > EPSILON) {
             zAxis = zAxis.normalize();
-
-            // Create orthogonal vector
-            xAxis = zAxis.perpendicular().normalize();
-
-            // Complete the basis
-            yAxis = zAxis.crossProduct(xAxis).normalize();
+        } else {
+            zAxis = Vector3(0, 0, 1); // Fallback
         }
-        else {
-            // All axes are degenerate, just use identity rotation
-            rotation = Quaternion();
-            return;
-        }
-
-        // Set the rotation matrix with our orthonormal basis
-        rotationM.set(0, 0, xAxis.x); rotationM.set(0, 1, xAxis.y); rotationM.set(0, 2, xAxis.z);
-        rotationM.set(1, 0, yAxis.x); rotationM.set(1, 1, yAxis.y); rotationM.set(1, 2, yAxis.z);
-        rotationM.set(2, 0, zAxis.x); rotationM.set(2, 1, zAxis.y); rotationM.set(2, 2, zAxis.z);
     }
 
-    // Convert to quaternion and normalize
-    rotation = Quaternion().fromRotationMatrix(rotationM).normalize();
+    // Build rotation matrix (column-major)
+    Matrix4 rotM;
+    rotM.identity();
+    rotM.set(0, 0, xAxis.x); rotM.set(0, 1, xAxis.y); rotM.set(0, 2, xAxis.z);
+    rotM.set(1, 0, yAxis.x); rotM.set(1, 1, yAxis.y); rotM.set(1, 2, yAxis.z);
+    rotM.set(2, 0, zAxis.x); rotM.set(2, 1, zAxis.y); rotM.set(2, 2, zAxis.z);
+
+    // Convert to quaternion
+    rotation = Quaternion().fromRotationMatrix(rotM);
+    float qNorm = rotation.norm();
+    if (qNorm < EPSILON * EPSILON) {
+        rotation = Quaternion(); // identity fallback
+    } else {
+        rotation = rotation.normalize();
+    }
 }
 
 void Matrix4::decomposeQDU(Vector3& position, Vector3& scale, Quaternion& rotation) const{

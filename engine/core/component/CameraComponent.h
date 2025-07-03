@@ -13,7 +13,7 @@
 
 #define DEFAULT_ORTHO_NEAR          -10
 #define DEFAULT_ORTHO_FAR           10
-#define DEFAULT_PERSPECTIVE_NEAR    1
+#define DEFAULT_PERSPECTIVE_NEAR    0.2
 #define DEFAULT_PERSPECTIVE_FAR     200
 
 namespace Supernova{
