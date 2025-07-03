@@ -94,13 +94,13 @@ namespace Supernova{
 		void createScrollbarObjects(Entity entity, ScrollbarComponent& scrollbar);
 		void createTextEditObjects(Entity entity, TextEditComponent& textedit);
 
-		virtual void load();
-		virtual void destroy();
-		virtual void update(double dt);
-		virtual void draw();
+		void load() override;
+		void draw() override;
+		void destroy() override;
+		void update(double dt) override;
 
-		virtual void onComponentAdded(Entity entity, ComponentId componentId) override;
-		virtual void onComponentRemoved(Entity entity, ComponentId componentId) override;
+		void onComponentAdded(Entity entity, ComponentId componentId) override;
+		void onComponentRemoved(Entity entity, ComponentId componentId) override;
 	};
 
 }

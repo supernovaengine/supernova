@@ -160,13 +160,13 @@ namespace Supernova{
 		void addBroadPhaseLayer3D(uint8_t index, uint32_t groupsToInclude);
 		void addBroadPhaseLayer3D(uint8_t index, uint32_t groupsToInclude, uint32_t groupsToExclude);
 
-		virtual void load();
-		virtual void destroy();
-		virtual void update(double dt);
-		virtual void draw();
+		void load() override;
+		void draw() override;
+		void destroy() override;
+		void update(double dt) override;
 
-		virtual void onComponentAdded(Entity entity, ComponentId componentId) override;
-		virtual void onComponentRemoved(Entity entity, ComponentId componentId) override;
+		void onComponentAdded(Entity entity, ComponentId componentId) override;
+		void onComponentRemoved(Entity entity, ComponentId componentId) override;
 	};
 
 }
