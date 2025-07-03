@@ -76,7 +76,7 @@ namespace Supernova {
         void makeFloor( const Vector3& v );
         void makeCeil( const Vector3& v );
 
-        Vector3 perpendicular(void);
+        Vector3 perpendicular() const;
 
         Vector3 reflect(const Vector3& normal) const;
 

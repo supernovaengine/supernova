@@ -2672,21 +2672,21 @@ void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent
 				std::vector<Entity> parentList;
 				auto transforms = scene->getComponentArray<Transform>();
 				for (int i = index; i < transforms->size(); i++){
-					Transform& transform = transforms->getComponentFromIndex(i);
+					Transform& childTransform = transforms->getComponentFromIndex(i);
 
 					// Finding childs
 					if (i > index){
-						if (std::find(parentList.begin(), parentList.end(), transform.parent) != parentList.end()){
-							transform.needUpdate = true;
+						if (std::find(parentList.begin(), parentList.end(), childTransform.parent) != parentList.end()){
+							childTransform.needUpdate = true;
 						}else{
 							break;
 						}
 					}
 
-					if (transform.needUpdate){
+					if (childTransform.needUpdate){
 						Entity entity = transforms->getEntity(i);
 						parentList.push_back(entity);
-						updateTransform(transform);
+						updateTransform(childTransform);
 					}
 				}
 			}

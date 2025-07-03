@@ -208,25 +208,17 @@ void Vector3::makeCeil( const Vector3& v ){
     if( v.z > z ) z = v.z;
 }
 
-Vector3 Vector3::perpendicular(void){
-    static float fSquareZero = 1e-06f * 1e-06f;
+Vector3 Vector3::perpendicular() const {
+    static const float fSquareZero = 1e-06f * 1e-06f;
 
-    Vector3 perp = this->crossProduct( Vector3::UNIT_X );
-
-    // Check length
-    if( perp.squaredLength() < fSquareZero ) {
-        perp = this->crossProduct( Vector3::UNIT_Y );
+    Vector3 perp = this->crossProduct(Vector3::UNIT_X);
+    if (perp.squaredLength() < fSquareZero) {
+        perp = this->crossProduct(Vector3::UNIT_Y);
     }
-
-    // If still degenerate, return a default perpendicular vector
-    if( perp.squaredLength() < fSquareZero ) {
-        if (std::abs(x) < std::abs(y) && std::abs(x) < std::abs(z))
-            perp = Vector3(1, 0, 0);
-        else if (std::abs(y) < std::abs(z))
-            perp = Vector3(0, 1, 0);
-        else
-            perp = Vector3(0, 0, 1);
+    if (perp.squaredLength() < fSquareZero) {
+        perp = this->crossProduct(Vector3::UNIT_Z);
     }
+    perp.normalize();
 
     return perp;
 }
