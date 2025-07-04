@@ -147,14 +147,15 @@ float shadowCalculationPCF(int shadowMapIndex, float NdotL) {
 }
 
 float shadowCascadedCalculationPCF(int shadowMapIndex, int numShadowCascades, float NdotL) {
+    float viewDepth = length(lighting.eyePos.xyz - v_position);
+
     for (int c = 0; c < MAX_SHADOWCASCADES; c++){
         if (c < numShadowCascades){
             int casShadowMapIndex = shadowMapIndex + c;
             Shadow shadowConf = getShadow2DConf(casShadowMapIndex);
-            if ((v_clipSpacePosZ >= shadowConf.nearFar.x) && (v_clipSpacePosZ <= shadowConf.nearFar.y)){
 
+            if ((viewDepth >= shadowConf.nearFar.x) && (viewDepth <= shadowConf.nearFar.y)){
                 return shadowCalculationAux(casShadowMapIndex, shadowConf, NdotL);
-
             }
         }
     }

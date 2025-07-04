@@ -64,7 +64,6 @@ in vec3 a_position;
     };
  
     out vec4 v_lightProjPos[MAX_SHADOWSMAP];
-    out float v_clipSpacePosZ;
 #endif
 
 #ifdef HAS_INSTANCING
@@ -197,8 +196,4 @@ void main() {
     #endif
 
     gl_Position = pbrParams.mvpMatrix * pos;
-
-    #ifdef USE_SHADOWS
-        v_clipSpacePosZ = gl_Position.z;
-    #endif
 }

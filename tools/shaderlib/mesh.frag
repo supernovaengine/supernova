@@ -74,7 +74,6 @@ uniform u_fs_pbrParams {
     } uShadows;
 
     in vec4 v_lightProjPos[MAX_SHADOWSMAP];
-    in float v_clipSpacePosZ;
 
     #if MAX_SHADOWSMAP >= 1
     uniform texture2D u_shadowMap1;

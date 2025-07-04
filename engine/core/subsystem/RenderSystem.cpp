@@ -2382,18 +2382,29 @@ float RenderSystem::lerp(float a, float b, float fraction) {
     return (a * (1.0f - fraction)) + (b * fraction);
 }
 
-Matrix4 RenderSystem::getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv){
-	Matrix4 t = viewMatrix * sceneCameraInv;
-	std::vector<Vector4> v = {
-			t * Vector4(-1.f, 1.f, -1.f, 1.f),
-			t * Vector4(1.f, 1.f, -1.f, 1.f),
-			t * Vector4(1.f, -1.f, -1.f, 1.f),
-			t * Vector4(-1.f, -1.f, -1.f, 1.f),
-			t * Vector4(-1.f, 1.f, 1.f, 1.f),
-			t * Vector4(1.f, 1.f, 1.f, 1.f),
-			t * Vector4(1.f, -1.f, 1.f, 1.f),
-			t * Vector4(-1.f, -1.f, 1.f, 1.f)
+Matrix4 RenderSystem::getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv, float shadowMaxDistance, const Vector3& lightDirection, const Vector3& cameraPosition){
+	// Calculate extended frustum bounds
+	Matrix4 extendedSceneCameraInv = sceneCameraInv;
+
+	// Extend the frustum backwards to include more geometry
+	float extension = shadowMaxDistance * 0.5f;
+
+	Matrix4 t = viewMatrix * extendedSceneCameraInv;
+	std::vector<Vector4> frustumCorners = {
+		t * Vector4(-1.f, 1.f, -1.f, 1.f),
+		t * Vector4(1.f, 1.f, -1.f, 1.f),
+		t * Vector4(1.f, -1.f, -1.f, 1.f),
+		t * Vector4(-1.f, -1.f, -1.f, 1.f),
+		t * Vector4(-1.f, 1.f, 1.f, 1.f),
+		t * Vector4(1.f, 1.f, 1.f, 1.f),
+		t * Vector4(1.f, -1.f, 1.f, 1.f),
+		t * Vector4(-1.f, -1.f, 1.f, 1.f)
 	};
+
+	// Add additional points behind the camera
+	Vector3 backwardOffset = -lightDirection * extension;
+	Vector4 backPoint = viewMatrix * Vector4(cameraPosition + backwardOffset, 1.0f);
+	frustumCorners.push_back(backPoint);
 
 	float minX = std::numeric_limits<float>::max();
 	float maxX = std::numeric_limits<float>::lowest();
@@ -2402,21 +2413,34 @@ Matrix4 RenderSystem::getDirLightProjection(const Matrix4& viewMatrix, const Mat
 	float minZ = std::numeric_limits<float>::max();
 	float maxZ = std::numeric_limits<float>::lowest();
 
-	for (auto& p : v){
-		p = p / p.w;
+	for (auto& p : frustumCorners){
+		if (p.w != 0.0f) {
+			p = p / p.w;
+		}
 
-		if (p.x < minX) minX = p.x;
-		if (p.x > maxX) maxX = p.x;
-		if (p.y < minY) minY = p.y;
-		if (p.y > maxY) maxY = p.y;
-		if (p.z < minZ) minZ = p.z;
-		if (p.z > maxZ) maxZ = p.z;
+		minX = std::min(minX, p.x);
+		maxX = std::max(maxX, p.x);
+		minY = std::min(minY, p.y);
+		maxY = std::max(maxY, p.y);
+		minZ = std::min(minZ, p.z);
+		maxZ = std::max(maxZ, p.z);
 	}
+
+	float paddingX = (maxX - minX) * 0.05f;
+	float paddingY = (maxY - minY) * 0.05f;
+	float paddingZ = (maxZ - minZ) * 0.1f;
+
+	minX -= paddingX;
+	maxX += paddingX;
+	minY -= paddingY;
+	maxY += paddingY;
+	minZ -= paddingZ;
+	maxZ += paddingZ;
 
 	return Matrix4::orthoMatrix(minX, maxX, minY, maxY, -maxZ, -minZ);
 }
 
-void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera){
+void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
 	light.worldDirection = transform.worldRotation * light.direction;
 
 	if (hasShadows && (light.intensity > 0)){
@@ -2430,8 +2454,9 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 		//TODO: perspective aspect based on shadow map size
 		if (light.type == LightType::DIRECTIONAL){
-			
-			float shadowSplitLogFactor = .7f;
+
+			float shadowSplitLogFactor = 0.7f;
+			float shadowMaxDistance = light.shadowCameraNearFar.y;
 
 			Matrix4 projectionMatrix[MAX_SHADOWCASCADES];
 			Matrix4 viewMatrix;
@@ -2441,54 +2466,54 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			//TODO: light directional cascades is only considering main camera
 			if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
 
-				float zNear = light.shadowCameraNearFar.x;
-				float zFar = light.shadowCameraNearFar.y;
-				float fov = 0;
-				float ratio = 1;
-
-				float planeOffset = (zFar - zNear) * 0.05;
+				float zNear = camera.nearClip;
+				float zFar = std::min(camera.farClip, shadowMaxDistance);
+				float planeFarOffset = (zFar - zNear) * 0.05f;
 
 				std::vector<float> splitFar;
 				std::vector<float> splitNear;
 
-				// Split perspective frustrum to create cascades
-                Matrix4 projection = camera.projectionMatrix;
-                Matrix4 invProjection = projection.inverse();
-                std::vector<Vector4> v1 = {
-                    invProjection * Vector4(-1.f, 1.f, -1.f, 1.f),
-                    invProjection * Vector4(1.f, 1.f, -1.f, 1.f),
-                    invProjection * Vector4(1.f, -1.f, -1.f, 1.f),
-                    invProjection * Vector4(-1.f, -1.f, -1.f, 1.f),
-                    invProjection * Vector4(-1.f, 1.f, 1.f, 1.f),
-                    invProjection * Vector4(1.f, 1.f, 1.f, 1.f),
-                    invProjection * Vector4(1.f, -1.f, 1.f, 1.f),
-                    invProjection * Vector4(-1.f, -1.f, 1.f, 1.f)
-                };
+				// Split perspective frustum to create cascades
+				Matrix4 projection = camera.projectionMatrix;
+				Matrix4 invProjection = projection.inverse();
 
-                zFar = std::min(zFar, -(v1[4] / v1[4].w).z);
-                zNear = -(v1[0] / v1[0].w).z;
-                fov = atanf(1.f / projection[1][1]) * 2.f;
-                ratio = projection[1][1] / projection[0][0];
+				std::vector<Vector4> v1 = {
+					invProjection * Vector4(-1.f, 1.f, -1.f, 1.f),
+					invProjection * Vector4(1.f, 1.f, -1.f, 1.f),
+					invProjection * Vector4(1.f, -1.f, -1.f, 1.f),
+					invProjection * Vector4(-1.f, -1.f, -1.f, 1.f),
+					invProjection * Vector4(-1.f, 1.f, 1.f, 1.f),
+					invProjection * Vector4(1.f, 1.f, 1.f, 1.f),
+					invProjection * Vector4(1.f, -1.f, 1.f, 1.f),
+					invProjection * Vector4(-1.f, -1.f, 1.f, 1.f)
+				};
+
+				zFar = std::min(zFar, -(v1[4] / v1[4].w).z);
+				zNear = -(v1[0] / v1[0].w).z;
+				float fov = atanf(1.f / projection[1][1]) * 2.f;
+				float ratio = projection[1][1] / projection[0][0];
 
 				splitFar.resize(light.numShadowCascades);
 				splitNear.resize(light.numShadowCascades);
 				splitNear[0] = zNear;
 				splitFar[light.numShadowCascades - 1] = zFar;
-                float j = 1.f;
-                for (auto i = 0u; i < light.numShadowCascades - 1; ++i, j+= 1.f){
-                    splitFar[i] = lerp(
-                            zNear + (j / (float)light.numShadowCascades) * (zFar - zNear),
-                            zNear * powf(zFar / zNear, j / (float)light.numShadowCascades),
-                            shadowSplitLogFactor
-                    );
-                    splitNear[i + 1] = splitFar[i];
-                }
 
-				// Get frustrum box and create light ortho
+				float j = 1.f;
+				for (auto i = 0u; i < light.numShadowCascades - 1; ++i, j += 1.f) {
+					splitFar[i] = lerp(
+						zNear + (j / (float)light.numShadowCascades) * (zFar - zNear),
+						zNear * powf(zFar / zNear, j / (float)light.numShadowCascades),
+						shadowSplitLogFactor
+					);
+					splitNear[i + 1] = splitFar[i];
+				}
+
+				// Get frustum box and create light ortho
 				for (int ca = 0; ca < light.numShadowCascades; ca++) {
-					Matrix4 sceneCameraInv = (Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca]-planeOffset, splitFar[ca]+planeOffset) * camera.viewMatrix).inverse();
+					Matrix4 cascadeProjection = Matrix4::perspectiveMatrix(fov, ratio, splitNear[ca], splitFar[ca] + planeFarOffset);
+					Matrix4 sceneCameraInv = (cascadeProjection * camera.viewMatrix).inverse();
 
-					projectionMatrix[ca] = getDirLightProjection(viewMatrix, sceneCameraInv);
+					projectionMatrix[ca] = getDirLightProjection(viewMatrix, sceneCameraInv, shadowMaxDistance, light.worldDirection, cameraTransform.worldPosition);
 
 					light.cameras[ca].lightViewMatrix = viewMatrix;
 					light.cameras[ca].lightProjectionMatrix = projectionMatrix[ca];
@@ -2496,9 +2521,9 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 					light.cameras[ca].nearFar = Vector2(splitNear[ca], splitFar[ca]);
 					updateCameraFrustumPlanes(light.cameras[ca].lightViewProjectionMatrix, light.cameras[ca].frustumPlanes);
 				}
-				
-			} else {
 
+			} else {
+				// Orthographic camera handling remains the same
 				if (light.numShadowCascades > 1){
 					light.numShadowCascades = 1;
 					Log::warn("Can not have multiple cascades shadows when using ortho scene camera. Reducing num shadow cascades to 1");
@@ -2506,12 +2531,12 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 
 				Matrix4 sceneCameraInv = camera.viewProjectionMatrix.inverse();
 
-				projectionMatrix[0] = getDirLightProjection(viewMatrix, sceneCameraInv);
+				projectionMatrix[0] = getDirLightProjection(viewMatrix, sceneCameraInv, shadowMaxDistance, light.worldDirection, cameraTransform.worldPosition);
 
 				light.cameras[0].lightViewMatrix = viewMatrix;
 				light.cameras[0].lightProjectionMatrix = projectionMatrix[0];
 				light.cameras[0].lightViewProjectionMatrix = projectionMatrix[0] * viewMatrix;
-				light.cameras[0].nearFar = Vector2(-1, 1);
+				light.cameras[0].nearFar = Vector2(-shadowMaxDistance, shadowMaxDistance);
 				updateCameraFrustumPlanes(light.cameras[0].lightViewProjectionMatrix, light.cameras[0].frustumPlanes);
 
 			}
@@ -2955,7 +2980,7 @@ void RenderSystem::update(double dt){
 
 			if (mainCamera.needUpdate || transform.needUpdate || light.needUpdateShadowCamera){
 				// need to be updated ONLY for main camera
-				updateLightFromScene(light, transform, mainCamera);
+				updateLightFromScene(light, transform, mainCamera, mainCameraTransform);
 
 				light.needUpdateShadowCamera = false;
 			}

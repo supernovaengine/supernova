@@ -114,7 +114,7 @@ namespace Supernova{
 		TextureShaderType getShadowMapByIndex(int index);
 		TextureShaderType getShadowMapCubeByIndex(int index);
 		void configureLightShadowNearFar(LightComponent& light, const CameraComponent& camera);
-		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv);
+		Matrix4 getDirLightProjection(const Matrix4& viewMatrix, const Matrix4& sceneCameraInv, float shadowMaxDistance, const Vector3& lightDirection, const Vector3& cameraPosition);
 		bool checkPBRFrabebufferUpdate(Material& material);
 		bool checkPBRTextures(Material& material, bool receiveLights);
 		bool loadPBRTextures(Material& material, ShaderData& shaderData, ObjectRender& render, bool receiveLights);
@@ -152,7 +152,7 @@ namespace Supernova{
 		void destroyCamera(CameraComponent& camera, bool entityDestroyed);
 		
 		void updateSkyViewProjection(SkyComponent& sky, CameraComponent& camera);
-		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera);
+		void updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 		void updatePoints(PointsComponent& points, Transform& transform, CameraComponent& camera, Transform& camTransform);
 		void updateTerrain(TerrainComponent& terrain, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 		void updateCameraFrustumPlanes(const Matrix4 viewProjectionMatrix, Plane* frustumPlanes);
