@@ -201,7 +201,7 @@ def get_bin_exec():
 def create_c_header(engine_root):
     filesshaderlist =  {}
 
-    for file in list(glob.glob(os.path.join("shaders_cache", '*.sbs'))):
+    for file in list(glob.glob(os.path.join(get_binary_shader_dir(), '*.sbs'))):
         shadername = os.path.splitext(os.path.basename(file))[0]
 
         shadersplit = shadername.split('_')
