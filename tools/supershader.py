@@ -65,7 +65,7 @@ def get_frag(shaderType):
     return 'shaderlib/'+shaderType+'.frag'
 
 def get_binary_shader_dir():
-    return os.path.join("binshaders")
+    return os.path.join("shaders_cache")
 
 def get_header_output(engine_root):
     return os.path.join(engine_root, "engine", "shaders")
@@ -194,7 +194,7 @@ def get_bin_exec():
 def create_c_header(engine_root):
     filesshaderlist =  {}
 
-    for file in list(glob.glob(os.path.join("binshaders", '*.sbs'))):
+    for file in list(glob.glob(os.path.join("shaders_cache", '*.sbs'))):
         shadername = os.path.splitext(os.path.basename(file))[0]
 
         shadersplit = shadername.split('_')
