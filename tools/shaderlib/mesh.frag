@@ -247,7 +247,8 @@ void main() {
 
         // Apply light sources
         #ifdef USE_PUNCTUAL
-            vec3 v = normalize(lighting.eyePos.xyz - v_position);
+            vec3 toEye = lighting.eyePos.xyz - v_position;
+            vec3 v = normalize(toEye);
 
             for (int i = 0; i < MAX_LIGHTS; ++i){
 
@@ -290,7 +291,7 @@ void main() {
                             if(light.type == LightType_Spot){ 
                                 shadow = 1.0 - shadowCalculationPCF(light.shadowMapIndex, NdotL);
                             }else if(light.type == LightType_Directional){
-                                shadow = 1.0 - shadowCascadedCalculationPCF(light.shadowMapIndex, light.numShadowCascades, NdotL);
+                                shadow = 1.0 - shadowCascadedCalculationPCF(light.shadowMapIndex, light.numShadowCascades, length(toEye), NdotL);
                             }else if(light.type == LightType_Point){
                                 shadow = 1.0 - shadowCubeCalculationPCF(light.shadowMapIndex, -pointToLight, NdotL);
                             }

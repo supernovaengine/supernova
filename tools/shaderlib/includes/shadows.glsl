@@ -146,9 +146,7 @@ float shadowCalculationPCF(int shadowMapIndex, float NdotL) {
     return shadowCalculationAux(shadowMapIndex, shadowConf, NdotL);
 }
 
-float shadowCascadedCalculationPCF(int shadowMapIndex, int numShadowCascades, float NdotL) {
-    float viewDepth = length(lighting.eyePos.xyz - v_position);
-
+float shadowCascadedCalculationPCF(int shadowMapIndex, int numShadowCascades, float viewDepth, float NdotL) {
     for (int c = 0; c < MAX_SHADOWCASCADES; c++){
         if (c < numShadowCascades){
             int casShadowMapIndex = shadowMapIndex + c;

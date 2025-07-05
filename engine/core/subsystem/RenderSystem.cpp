@@ -2466,8 +2466,8 @@ void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transf
 			//TODO: light directional cascades is only considering main camera
 			if (camera.type == CameraType::CAMERA_PERSPECTIVE) {
 
-				float zNear = camera.nearClip;
-				float zFar = std::min(camera.farClip, shadowMaxDistance);
+				float zNear = light.shadowCameraNearFar.x;
+				float zFar = light.shadowCameraNearFar.y;
 				float planeFarOffset = (zFar - zNear) * 0.05f;
 
 				std::vector<float> splitFar;
