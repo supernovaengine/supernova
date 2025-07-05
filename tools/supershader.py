@@ -59,13 +59,16 @@ def get_define(property):
         sys.exit('Not found value for property: '+property)
 
 def get_vert(shaderType):
-    return 'shaderlib/'+shaderType+'.vert'
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(script_dir, "shaderlib", shaderType+'.vert')
 
 def get_frag(shaderType):
-    return 'shaderlib/'+shaderType+'.frag'
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(script_dir, "shaderlib", shaderType+'.frag')
 
 def get_binary_shader_dir():
-    return os.path.join("shaders_cache")
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    return os.path.join(script_dir, "shaders_cache")
 
 def get_header_output(engine_root):
     return os.path.join(engine_root, "engine", "shaders")
@@ -276,13 +279,16 @@ def create_c_header(engine_root):
 @click.command()
 @click.option('--shaders', '-s', default=get_default_shaders(), help="Target shader type, seperated by ';'")
 @click.option('--langs', '-l', default=get_default_langs(), required=True, help="Target shader language, seperated by ';'")
-@click.option('--engine-root', '-r', default='..', type=click.Path(), help="Source root path of Supernova")
+@click.option('--engine-root', '-r', default='', type=click.Path(), help="Source root path of Supernova")
 @click.option('--verbose/--no-verbose', '-v', default=False, help="Output more information")
 @click.option('--max-lights', '-ml', default=6, type=int, help="Value of MAX_LIGHTS macro")
 @click.option('--max-shadowsmap', default=6, type=int, help="Value of MAX_SHADOWSMAP macro")
 @click.option('--max-shadowscubemap', default=1, type=int, help="Value of MAX_SHADOWSCUBEMAP macro")
 @click.option('--max-shadowcascades', default=4, type=int, help="Value of MAX_SHADOWCASCADES macro")
 def generate(shaders, langs, engine_root, verbose, max_lights, max_shadowsmap, max_shadowscubemap, max_shadowcascades):
+
+    if (engine_root == ''):
+        engine_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
     shadersList = [x.strip() for x in shaders.split(';')]
     langsList = [x.strip() for x in langs.split(';')]
