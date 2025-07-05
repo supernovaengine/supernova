@@ -436,34 +436,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "iOS")
 
 endif()
 
-# Create shader header files if they don't exist
-set(SHADER_HEADERS_DIR ${SUPERNOVA_ROOT}/engine/shaders)
-set(SHADER_TYPES glsl300es glsl410 hlsl5 msl21ios msl21macos)
-
-foreach(SHADER_TYPE ${SHADER_TYPES})
-    set(SHADER_HEADER_FILE ${SHADER_HEADERS_DIR}/${SHADER_TYPE}.h)
-    if(NOT EXISTS ${SHADER_HEADER_FILE})
-        message(STATUS "Creating missing shader header: ${SHADER_TYPE}.h")
-        # Create the directory if it doesn't exist
-        file(MAKE_DIRECTORY ${SHADER_HEADERS_DIR})
-        # Generate the header content
-        string(CONCAT HEADER_CONTENT
-            "#ifndef SHADER_${SHADER_TYPE}_h\n"
-            "#define SHADER_${SHADER_TYPE}_h\n"
-            "\n"
-            "#include <string>\n"
-            "\n"
-            "std::string getBase64Shader(std::string name) {\n"
-            "    return \"\";\n"
-            "}\n"
-            "\n"
-            "#endif //SHADER_${SHADER_TYPE}_h"
-        )
-        # Write the file
-        file(WRITE ${SHADER_HEADER_FILE} "${HEADER_CONTENT}")
-    endif()
-endforeach()
-
 include_directories (${PLATFORM_ROOT})
 
 include_directories (${SUPERNOVA_ROOT}/engine/libs/sokol)
