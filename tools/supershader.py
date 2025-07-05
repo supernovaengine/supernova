@@ -176,7 +176,11 @@ def get_bin_exec():
     plt = platform.system()
 
     execname = "supershader"
-    binpath = "bin"
+
+    # Get the directory where this script is located
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    binpath = os.path.join(script_dir, "bin")
+
     outpath = os.path.join(binpath, execname)
 
     if plt == "Windows":
