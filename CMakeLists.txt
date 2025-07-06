@@ -133,16 +133,19 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
         list(APPEND PLATFORM_OPTIONS -pthread)
     endif()
 
+    set(ALLOW_MEMORY_GROWTH "-s ALLOW_MEMORY_GROWTH=1")
+
     list(APPEND PLATFORM_PROPERTIES
         LINK_FLAGS
             "-g \
-            -s INITIAL_MEMORY=64MB \
+            -s INITIAL_MEMORY=256MB \
             -s STACK_SIZE=4MB \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
             -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\" \
             ${EM_PRELOAD_FILES} \
             ${EM_ADDITIONAL_LINK_FLAGS} \
             ${USE_PTHREADS} \
+            ${ALLOW_MEMORY_GROWTH} \
             ${USE_WEBGL2}"
     )
 endif()
