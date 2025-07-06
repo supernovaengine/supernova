@@ -1,9 +1,15 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef engine_h
 #define engine_h
+
+#if defined(__EMSCRIPTEN__)
+#  if !defined(__EMSCRIPTEN_PTHREADS__)
+#    define NO_THREAD_SUPPORT
+#  endif
+#endif
 
 #ifndef MAX_LIGHTS
 #define MAX_LIGHTS 6

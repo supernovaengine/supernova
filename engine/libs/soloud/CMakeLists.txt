@@ -65,18 +65,18 @@ if(APPLE)
     )
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_options(
-        soloud 
+find_package(Threads REQUIRED)
+target_link_libraries(soloud PRIVATE Threads::Threads)
 
-        PUBLIC 
-
-        "-pthread"
-    )
+if(EMSCRIPTEN AND EMSCRIPTEN_THREAD_SUPPORT)
+	target_compile_options(soloud PRIVATE -pthread)
 endif()
 
 target_link_libraries(
         soloud
+
+        PUBLIC
+
         stb
         ${SOLOUD_PLATFORM_LIBS}
 )

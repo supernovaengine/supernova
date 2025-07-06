@@ -6,12 +6,9 @@ add_library(
     tinyxml2.cpp
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_options(
-        tinyxml2 
+find_package(Threads REQUIRED)
+target_link_libraries(tinyxml2 PRIVATE Threads::Threads)
 
-        PUBLIC 
-
-        "-pthread"
-    )
+if(EMSCRIPTEN AND EMSCRIPTEN_THREAD_SUPPORT)
+	target_compile_options(tinyxml2 PRIVATE -pthread)
 endif()

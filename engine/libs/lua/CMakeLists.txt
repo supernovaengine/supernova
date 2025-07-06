@@ -53,30 +53,9 @@ add_library(
     ${LUA_SOURCE}
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_options(
-        lua 
+find_package(Threads REQUIRED)
+target_link_libraries(lua PRIVATE Threads::Threads)
 
-        PUBLIC 
-
-        "-pthread"
-    )
+if(EMSCRIPTEN AND EMSCRIPTEN_THREAD_SUPPORT)
+	target_compile_options(lua PRIVATE -pthread)
 endif()
-
-if(NOT CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    target_link_libraries(
-        lua
-
-        dl
-    )
-endif()
-
-# Lua in C++ was getting errors in luaD_rawrunprotected on Emscripten
-#if (NOT MSVC)
-#    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -x c++")
-#endif()
-#set_source_files_properties(
-#    ${LUA_SOURCE}
-#
-#    PROPERTIES LANGUAGE CXX
-#)

@@ -93,6 +93,8 @@ set(PLATFORM_RESOURCES)
 set(PLATFORM_PROPERTIES)
 set(PLATFORM_OPTIONS)
 
+find_package(Threads REQUIRED)
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     add_definitions("-DSUPERNOVA_WEB")
 
@@ -124,17 +126,17 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
         idbfs.js
     )
 
-    add_definitions("-DNO_THREAD_SUPPORT")
-    #list(APPEND PLATFORM_OPTIONS
-    #    "-pthread"
-    #)
-    #set(USE_PTHREADS "-s USE_PTHREADS=1")
+    option(EMSCRIPTEN_THREAD_SUPPORT "Enable pthreads for Emscripten builds" OFF)
+
+    if(EMSCRIPTEN_THREAD_SUPPORT)
+        set(USE_PTHREADS "-s USE_PTHREADS=1 -s PTHREAD_POOL_SIZE=4")
+        list(APPEND PLATFORM_OPTIONS -pthread)
+    endif()
 
     list(APPEND PLATFORM_PROPERTIES
         LINK_FLAGS
             "-g \
-            -s ALLOW_MEMORY_GROWTH=1 \
-            -s INITIAL_MEMORY=32MB \
+            -s INITIAL_MEMORY=64MB \
             -s STACK_SIZE=4MB \
             -s EXPORTED_FUNCTIONS=\"['_getScreenWidth','_getScreenHeight','_changeCanvasSize','_main']\" \
             -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\" \
@@ -251,10 +253,6 @@ if((CMAKE_SYSTEM_NAME STREQUAL "Linux") OR (CMAKE_SYSTEM_NAME STREQUAL "FreeBSD"
     if (EXISTS "${PROJECT_ROOT}/lua")
         set(LUA_DEST_DIR ${CMAKE_BINARY_DIR}/lua)
     endif()
-
-    list(APPEND PLATFORM_OPTIONS
-        "-pthread"
-    )
 
     if (APP_BACKEND STREQUAL "glfw")
         add_definitions("-DSUPERNOVA_GLFW")
@@ -536,6 +534,7 @@ target_link_libraries(
     ${APP_NAME}
 
     supernova
+    Threads::Threads
     ${PLATFORM_LIBS}
  )
  

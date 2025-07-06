@@ -6,12 +6,9 @@ add_library(
     tiny_obj_loader.cc
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_options(
-        tinyobjloader 
+find_package(Threads REQUIRED)
+target_link_libraries(tinyobjloader PRIVATE Threads::Threads)
 
-        PUBLIC 
-
-        "-pthread"
-    )
+if(EMSCRIPTEN AND EMSCRIPTEN_THREAD_SUPPORT)
+	target_compile_options(tinyobjloader PRIVATE -pthread)
 endif()

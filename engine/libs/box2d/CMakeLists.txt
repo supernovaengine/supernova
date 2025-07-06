@@ -78,16 +78,13 @@ add_library(
 	${BOX2D_API_FILES}
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_options(
-        box2d 
+find_package(Threads REQUIRED)
+target_link_libraries(box2d PRIVATE Threads::Threads)
 
-        PUBLIC 
-
-        "-pthread"
-    )
+if(EMSCRIPTEN AND EMSCRIPTEN_THREAD_SUPPORT)
+	target_compile_options(box2d PRIVATE -pthread)
+	#target_compile_definitions(box2d PRIVATE B2_MAX_WORKER_COUNT=0)
 endif()
-
 
 # part of Box2D CMakeLists.txt configuration
 

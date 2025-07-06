@@ -13,12 +13,9 @@ add_library(
 
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_options(
-        stb 
+find_package(Threads REQUIRED)
+target_link_libraries(stb PRIVATE Threads::Threads)
 
-        PUBLIC 
-
-        "-pthread"
-    )
+if(EMSCRIPTEN AND EMSCRIPTEN_THREAD_SUPPORT)
+	target_compile_options(stb PRIVATE -pthread)
 endif()

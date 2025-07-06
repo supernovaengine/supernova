@@ -12,18 +12,18 @@ add_library(
 
 )
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-    target_compile_options(
-        tinygltf 
+find_package(Threads REQUIRED)
+target_link_libraries(tinygltf PRIVATE Threads::Threads)
 
-        PUBLIC 
-
-        "-pthread"
-    )
+if(EMSCRIPTEN AND EMSCRIPTEN_THREAD_SUPPORT)
+	target_compile_options(tinygltf PRIVATE -pthread)
 endif()
 
 target_link_libraries(
     tinygltf
+
+    PUBLIC
+
     stb
 )
 
