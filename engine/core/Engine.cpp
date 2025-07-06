@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Engine.h"
@@ -14,7 +14,9 @@
 #include "pool/TextureDataPool.h"
 #include "pool/ShaderPool.h"
 #include "pool/FontPool.h"
-#include "thread/ThreadPoolManager.h"
+#ifndef NO_THREAD_SUPPORT
+    #include "thread/ThreadPoolManager.h"
+#endif
 
 #include "sokol_time.h"
 
@@ -420,7 +422,11 @@ float Engine::getDeltatime(){
 }
 
 void Engine::startAsyncThread(){
-    asyncThread = true;
+    #ifndef NO_THREAD_SUPPORT
+        asyncThread = true;
+    #else
+        Log::warn("Threads are not available");
+    #endif
 }
 
 void Engine::commitThreadQueue(){
@@ -441,12 +447,18 @@ bool Engine::isViewLoaded(){
 }
 
 void Engine::setMaxResourceLoadingThreads(size_t maxThreads) {
-    ThreadPoolManager::shutdown();
-    ThreadPoolManager::initialize(maxThreads);
+    #ifndef NO_THREAD_SUPPORT
+        ThreadPoolManager::shutdown();
+        ThreadPoolManager::initialize(maxThreads);
+    #endif
 }
 
 size_t Engine::getQueuedResourceCount() {
-    return ThreadPoolManager::getInstance().getQueueSize();
+    #ifndef NO_THREAD_SUPPORT
+        return ThreadPoolManager::getInstance().getQueueSize();
+    #else
+        return 0;
+    #endif
 }
 
 void Engine::setFramebuffer(Framebuffer* framebuffer){
@@ -482,9 +494,10 @@ void Engine::calculateCanvas(){
 }
 
 void Engine::systemInit(int argc, char* argv[]){
-
-    size_t maxThreads = std::max(1u, std::thread::hardware_concurrency() - 1);
-    ThreadPoolManager::initialize(maxThreads);
+    #ifndef NO_THREAD_SUPPORT
+        size_t maxThreads = std::max(1u, std::thread::hardware_concurrency() - 1);
+        ThreadPoolManager::initialize(maxThreads);
+    #endif
 
     Engine::setCanvasSize(1000,480);
 
@@ -705,7 +718,9 @@ void Engine::systemViewDestroyed(){
 
     drawSemaphore.release();
 
-    ThreadPoolManager::shutdown();
+    #ifndef NO_THREAD_SUPPORT
+        ThreadPoolManager::shutdown();
+    #endif
 }
 
 void Engine::systemShutdown(){

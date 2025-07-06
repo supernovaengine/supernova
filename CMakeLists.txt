@@ -108,7 +108,6 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
     set(PLATFORM_ROOT ${SUPERNOVA_ROOT}/platform/emscripten)
 
     set(EM_PRELOAD_FILES)
-
     if (EXISTS "${PROJECT_ROOT}/assets")
         set(EM_PRELOAD_FILES "${EM_PRELOAD_FILES} --preload-file ${PROJECT_ROOT}/assets@/")
     endif()
@@ -125,9 +124,11 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
         idbfs.js
     )
 
-    list(APPEND PLATFORM_OPTIONS
-        "-pthread"
-    )
+    add_definitions("-DNO_THREAD_SUPPORT")
+    #list(APPEND PLATFORM_OPTIONS
+    #    "-pthread"
+    #)
+    #set(USE_PTHREADS "-s USE_PTHREADS=1")
 
     list(APPEND PLATFORM_PROPERTIES
         LINK_FLAGS
@@ -139,6 +140,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Emscripten")
             -s EXPORTED_RUNTIME_METHODS=\"['ccall', 'cwrap']\" \
             ${EM_PRELOAD_FILES} \
             ${EM_ADDITIONAL_LINK_FLAGS} \
+            ${USE_PTHREADS} \
             ${USE_WEBGL2}"
     )
 endif()
