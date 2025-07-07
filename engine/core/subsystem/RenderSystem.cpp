@@ -718,7 +718,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
 		if (mesh.submeshes[i].hasTexCoord1 && hasPBRTextures){
 			p_hasTexture1 = true;
 		}
-		if (terrain && !terrain->blendMap.empty()){
+		if (terrain && (!terrain->blendMap.empty() || hasPBRTextures)){
 			p_hasTexture1 = true;
 		}
 		if (hasLights && mesh.receiveLights){
