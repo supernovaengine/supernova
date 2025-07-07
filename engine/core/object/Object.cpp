@@ -116,8 +116,6 @@ void Object::setVisibleOnly(bool visible){
 void Object::setBillboard(bool billboard, bool fake, bool cylindrical){
     Transform& transform = getComponent<Transform>();
 
-    transform.billboardRotation = transform.rotation;
-
     transform.billboard = billboard;
     transform.fakeBillboard = fake;
     transform.cylindricalBillboard = cylindrical;
@@ -125,8 +123,6 @@ void Object::setBillboard(bool billboard, bool fake, bool cylindrical){
 
 void Object::setBillboard(bool billboard){
     Transform& transform = getComponent<Transform>();
-
-    transform.billboardRotation = transform.rotation;
 
     transform.billboard = billboard;
 }

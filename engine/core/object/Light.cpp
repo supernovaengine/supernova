@@ -27,6 +27,8 @@ void Light::setType(LightType type){
     if (lightcomp.type != type){
         lightcomp.type = type;
 
+        lightcomp.needUpdateShadowCamera = true;
+        lightcomp.needUpdateShadowMap = true;
         scene->getSystem<RenderSystem>()->needReloadMeshes();
     }
 }
