@@ -280,6 +280,10 @@ bool Vector4::operator > ( const Vector4& v ) const{
     return ( x > v.x && y > v.y && z > v.z  && w > v.w );
 }
 
+bool Vector4::isValid() const {
+    return std::isfinite(x) && std::isfinite(y) && std::isfinite(z) && std::isfinite(w);
+}
+
 void Vector4::swap(Vector4& other){
     std::swap(x, other.x);
     std::swap(y, other.y);

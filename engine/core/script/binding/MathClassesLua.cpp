@@ -76,6 +76,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<float>(&Vector2::operator*),
             luabridge::overload<const Vector2&>(&Vector2::operator*))
         .addFunction("__unm", (Vector2 (Vector2::*)() const)&Vector2::operator-)
+        .addFunction("isValid", &Vector2::isValid)
         .addFunction("swap", &Vector2::swap)
         .addFunction("length", &Vector2::length)
         .addFunction("squaredLength", &Vector2::squaredLength)
@@ -120,6 +121,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<float>(&Vector3::operator*), // need float operator first to fix estrange error in Emscripten
             luabridge::overload<const Vector3&>(&Vector3::operator*))
         .addFunction("__unm", (Vector3 (Vector3::*)() const)&Vector3::operator-)
+        .addFunction("isValid", &Vector3::isValid)
         .addFunction("length", &Vector3::length)
         .addFunction("squaredLength", &Vector3::squaredLength)
         .addFunction("dotProduct", &Vector3::dotProduct)
@@ -167,6 +169,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
             luabridge::overload<float>(&Vector4::operator*),
             luabridge::overload<const Vector4&>(&Vector4::operator*))
         .addFunction("__unm", (Vector4 (Vector4::*)() const)&Vector4::operator-)
+        .addFunction("isValid", &Vector4::isValid)
         .addFunction("swap", &Vector4::swap)
         .addFunction("divideByW", &Vector4::divideByW)
         .addFunction("dotProduct", &Vector4::dotProduct)
@@ -229,6 +232,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("get", &Matrix3::get)
         .addFunction("setRow", &Matrix3::setRow)
         .addFunction("setColumn", &Matrix3::setColumn)
+        .addFunction("isValid", &Matrix3::isValid)
         .addFunction("identity", &Matrix3::identity)
         .addFunction("calcInverse", &Matrix3::calcInverse)
         .addFunction("inverse", &Matrix3::inverse)
@@ -265,6 +269,7 @@ void LuaBinding::registerMathClasses(lua_State *L){
         .addFunction("get", &Matrix4::get)
         .addFunction("setRow", &Matrix4::setRow)
         .addFunction("setColumn", &Matrix4::setColumn)
+        .addFunction("isValid", &Matrix4::isValid)
         .addFunction("identity", &Matrix4::identity)
         .addFunction("translateInPlace", &Matrix4::translateInPlace)
         .addFunction("linear", &Matrix4::linear)

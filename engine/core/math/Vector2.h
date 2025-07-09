@@ -80,6 +80,8 @@ namespace Supernova {
         bool operator < ( const Vector2& rhs ) const;
         bool operator > ( const Vector2& rhs ) const;
 
+        bool isValid() const;
+
         void swap(Vector2& other);
         float length () const;
         float squaredLength () const;

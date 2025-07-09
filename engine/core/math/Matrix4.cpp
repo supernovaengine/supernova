@@ -234,6 +234,17 @@ void Matrix4::setColumn(const unsigned int column, const Vector4& vec){
     matrix[column][3] = vec.w;
 }
 
+bool Matrix4::isValid() const {
+    for (int i = 0; i < 4; ++i) {
+        for (int j = 0; j < 4; ++j) {
+            if (!std::isfinite(matrix[i][j])) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 Matrix4& Matrix4::identity(){
     int i, j;
     for(i=0; i<4; ++i)
@@ -541,44 +552,44 @@ Matrix4 Matrix4::scaleMatrix(const Vector3& sf){
     return r;
  }
 
- Matrix4 Matrix4::lookAtMatrix(Vector3 eye, Vector3 center, Vector3 up){
-     Vector3 f;
-     f = center - eye;
-     f = f.normalize();
+Matrix4 Matrix4::lookAtMatrix(Vector3 eye, Vector3 center, Vector3 up){
+    Vector3 f;
+    f = center - eye;
+    f = f.normalize();
 
-     Vector3 s;
-     s = f.crossProduct(up);
-     s = s.normalize();
+    Vector3 s;
+    s = f.crossProduct(up);
+    s = s.normalize();
 
-     Vector3 t;
-     t = s.crossProduct(f);
+    Vector3 t;
+    t = s.crossProduct(f);
 
-     Matrix4 r;
+    Matrix4 r;
 
-     r.set(0, 0, s.x);
-     r.set(0, 1, t.x);
-     r.set(0, 2, -f.x);
-     r.set(0, 3, 0.f);
+    r.set(0, 0, s.x);
+    r.set(0, 1, t.x);
+    r.set(0, 2, -f.x);
+    r.set(0, 3, 0.f);
 
-     r.set(1, 0, s.y);
-     r.set(1, 1, t.y);
-     r.set(1, 2, -f.y);
-     r.set(1, 3, 0.f);
+    r.set(1, 0, s.y);
+    r.set(1, 1, t.y);
+    r.set(1, 2, -f.y);
+    r.set(1, 3, 0.f);
 
-     r.set(2, 0, s.z);
-     r.set(2, 1, t.z);
-     r.set(2, 2, -f.z);
-     r.set(2, 3, 0.f);
+    r.set(2, 0, s.z);
+    r.set(2, 1, t.z);
+    r.set(2, 2, -f.z);
+    r.set(2, 3, 0.f);
 
-     r.set(3, 0, 0.f);
-     r.set(3, 1, 0.f);
-     r.set(3, 2, 0.f);
-     r.set(3, 3, 1.f);
+    r.set(3, 0, 0.f);
+    r.set(3, 1, 0.f);
+    r.set(3, 2, 0.f);
+    r.set(3, 3, 1.f);
 
-     r.translateInPlace(-eye.x, -eye.y, -eye.z);
+    r.translateInPlace(-eye.x, -eye.y, -eye.z);
 
-     return r;
- }
+    return r;
+}
 
 Matrix4 Matrix4::frustumMatrix(float left, float right, float bottom, float top, float near, float far){
 

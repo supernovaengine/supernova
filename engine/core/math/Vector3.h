@@ -59,6 +59,8 @@ namespace Supernova {
         bool operator < ( const Vector3& v ) const;
         bool operator > ( const Vector3& v ) const;
 
+        bool isValid() const;
+
         float length () const;
         float squaredLength () const;
         float dotProduct(const Vector3& v) const;

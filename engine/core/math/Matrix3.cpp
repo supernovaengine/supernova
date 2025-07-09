@@ -181,6 +181,17 @@ void Matrix3::setColumn(const unsigned int column, const Vector3& vec){
     matrix[column][2] = vec.z;
 }
 
+bool Matrix3::isValid() const {
+    for (int i = 0; i < 3; ++i) {
+        for (int j = 0; j < 3; ++j) {
+            if (!std::isfinite(matrix[i][j])) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 Matrix3& Matrix3::identity() {
     int i, j;
     for(i=0; i<3; ++i)

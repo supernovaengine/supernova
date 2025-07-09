@@ -83,6 +83,8 @@ namespace Supernova {
         bool operator < ( const Vector4& v ) const;
         bool operator > ( const Vector4& v ) const;
 
+        bool isValid() const;
+
         void swap(Vector4& other);
 
         void divideByW();

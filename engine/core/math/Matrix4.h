@@ -56,6 +56,8 @@ namespace Supernova {
         void setRow(const unsigned int row, const Vector4& vec);
         void setColumn(const unsigned int column, const Vector4& vec);
 
+        bool isValid() const;
+
         Matrix4& identity();
         Matrix4& translateInPlace(float x, float y, float z);
 

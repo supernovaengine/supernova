@@ -219,6 +219,10 @@ bool Vector2::operator > ( const Vector2& rhs ) const{
     return false;
 }
 
+bool Vector2::isValid() const {
+    return std::isfinite(x) && std::isfinite(y);
+}
+
 void Vector2::swap(Vector2& other){
     std::swap(x, other.x);
     std::swap(y, other.y);
