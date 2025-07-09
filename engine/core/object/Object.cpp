@@ -142,6 +142,10 @@ void Object::setBillboardRotation(Quaternion rotation){
     }
 }
 
+void Object::setBillboardRotation(const float xAngle, const float yAngle, const float zAngle){
+    setBillboardRotation(Quaternion(xAngle, yAngle, zAngle));
+}
+
 Quaternion Object::getBillboardRotation() const{
     Transform& transform = getComponent<Transform>();
 

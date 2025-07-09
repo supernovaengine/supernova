@@ -57,6 +57,7 @@ namespace Supernova{
         bool isBillboard() const;
 
         void setBillboardRotation(Quaternion rotation);
+        void setBillboardRotation(const float xAngle, const float yAngle, const float zAngle);
         Quaternion getBillboardRotation() const;
 
         void setFakeBillboard(bool fakeBillboard);
