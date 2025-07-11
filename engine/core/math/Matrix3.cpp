@@ -4,6 +4,7 @@
 #include <string.h>
 #include <algorithm>
 #include <assert.h>
+#include <cmath>
 
 using namespace Supernova;
 

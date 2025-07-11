@@ -3,6 +3,8 @@
 #include "Vector2.h"
 #include "Vector3.h"
 
+#include <cmath>
+
 using namespace Supernova;
 
 const Vector4 Vector4::ZERO( 0, 0, 0, 0 );
