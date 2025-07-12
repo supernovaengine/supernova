@@ -137,9 +137,7 @@ namespace Supernova{
 
 		//Entity methods
 
-		Entity createEntityInternal(Entity entity); // for internal editor use only
-		void setLastEntityInternal(Entity lastEntity); // for internal editor use only
-		Entity getLastEntityInternal() const; // for internal editor use only
+		bool recreateEntity(Entity entity); // for internal editor use only
 
 		Entity createEntity();
 

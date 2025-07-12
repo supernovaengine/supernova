@@ -246,16 +246,8 @@ void Scene::updateSizeFromCamera(){
 	getSystem<RenderSystem>()->updateCameraSize(getCamera());
 }
 
-Entity Scene::createEntityInternal(Entity entity){
-	return entityManager.createEntityInternal(entity);
-}
-
-void Scene::setLastEntityInternal(Entity lastEntity){
-	entityManager.setLastEntityInternal(lastEntity);
-}
-
-Entity Scene::getLastEntityInternal() const{
-	return entityManager.getLastEntityInternal();
+bool Scene::recreateEntity(Entity entity){
+	return entityManager.recreateEntity(entity);
 }
 
 Entity Scene::createEntity(){

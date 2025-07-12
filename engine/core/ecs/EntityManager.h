@@ -25,14 +25,14 @@ namespace Supernova{
 
     public:
 
-        Entity createEntityInternal(Entity entity) { // for internal editor use only
-            metadata[entity];
+        bool recreateEntity(Entity entity) { // for internal editor use only
+            if (!isCreated(entity)){
+                metadata[entity];
 
-            return entity;
-        }
+                return true;
+            }
 
-        void setLastEntityInternal(Entity lastEntity){ // for internal editor use only
-            this->lastEntity = lastEntity;
+            return false;
         }
 
         Entity getLastEntityInternal() const{ // for internal editor use only
