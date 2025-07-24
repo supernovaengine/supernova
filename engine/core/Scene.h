@@ -218,7 +218,7 @@ namespace Supernova{
 		}
 
 		template<typename T>
-		std::shared_ptr<ComponentArray<T>> getComponentArray() {
+		std::shared_ptr<ComponentArray<T>> getComponentArray() const{
 			return componentManager.getComponentArray<T>();
 		}
 
