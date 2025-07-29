@@ -529,14 +529,20 @@ void Scene::moveChildToIndex(Entity entity, size_t index, bool adjustFinalPositi
 			size_t length = lastChildIndex - entityIndex + 1;
 
 			if (adjustFinalPosition && (index > entityIndex)){
-				index--;
+				if (index > 0){ // Prevent underflow
+					index--;
+				}
 			}
 
 			if (length == 1){
 				transforms->moveEntityToIndex(entity, index);
 			}else{
-				if (index > entityIndex){
-					index = index - length + 1;
+				if (adjustFinalPosition && (index > entityIndex)){
+					if (index >= length - 1) { // Prevent underflow
+						index = index - length + 1;
+					} else {
+						index = 0;
+					}
 				}
 				transforms->moveEntityRangeToIndex(entity, transforms->getEntity(lastChildIndex), index);
 			}
