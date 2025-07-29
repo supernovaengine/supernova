@@ -372,18 +372,20 @@ void Scene::addEntityChild(Entity parent, Entity child, bool changeTransform){
 
 		transformChild.needUpdate = true;
 
+		if (transformChild.parent == parent){
+			return;
+		}
+
 		if (parent == NULL_ENTITY){
-			if (transformChild.parent != NULL_ENTITY){
-				size_t newIndex = findBranchLastIndex(findOldestParent(child)) + 1;
-				moveChildToIndex(child, newIndex, true);
+			size_t newIndex = findBranchLastIndex(findOldestParent(child)) + 1;
+			moveChildToIndex(child, newIndex, true);
 
-				Transform& transformChild = componentManager.getComponent<Transform>(child);
+			Transform& transformChild = componentManager.getComponent<Transform>(child);
 
-				transformChild.parent = NULL_ENTITY;
-				if (changeTransform){
-					// set local position to be the same of world position
-					transformChild.modelMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
-				}
+			transformChild.parent = NULL_ENTITY;
+			if (changeTransform){
+				// set local position to be the same of world position
+				transformChild.modelMatrix.decompose(transformChild.position, transformChild.scale, transformChild.rotation);
 			}
 		}else{
 			Signature parentSignature = entityManager.getSignature(parent);
