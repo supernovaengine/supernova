@@ -1038,6 +1038,9 @@
 		71F97B7F262D1FFE00CD6F2B /* tiny_gltf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */; };
 		71F97B98262D202300CD6F2B /* libstb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 710AD6E325B6053400A7B12F /* libstb-ios.a */; };
 		71F97B9B262D203E00CD6F2B /* libtinygltf-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */; };
+		71FC93DD2E3D8D05006FAE16 /* EntityContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FC93DC2E3D8D05006FAE16 /* EntityContainer.cpp */; };
+		71FC93DE2E3D8D05006FAE16 /* EntityContainer.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FC93DB2E3D8D05006FAE16 /* EntityContainer.h */; };
+		71FC93DF2E3D8D05006FAE16 /* EntityContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FC93DC2E3D8D05006FAE16 /* EntityContainer.cpp */; };
 		71FCE4BE28E0FA01003C5217 /* LuaFunction.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BA28E0FA01003C5217 /* LuaFunction.h */; };
 		71FCE4BF28E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */; };
 		71FCE4C028E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */; };
@@ -2281,6 +2284,8 @@
 		71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_gltf.h; sourceTree = "<group>"; };
 		71F97B57262D1EF200CD6F2B /* json.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = json.hpp; sourceTree = "<group>"; };
 		71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinygltf-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		71FC93DB2E3D8D05006FAE16 /* EntityContainer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EntityContainer.h; sourceTree = "<group>"; };
+		71FC93DC2E3D8D05006FAE16 /* EntityContainer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EntityContainer.cpp; sourceTree = "<group>"; };
 		71FCE4BA28E0FA01003C5217 /* LuaFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunction.h; sourceTree = "<group>"; };
 		71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaFunctionBase.cpp; sourceTree = "<group>"; };
 		71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunctionBase.h; sourceTree = "<group>"; };
@@ -3278,6 +3283,8 @@
 				7105A55728B305910092EA05 /* Color.h */,
 				7105A55628B305910092EA05 /* Color.cpp */,
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
+				71FC93DB2E3D8D05006FAE16 /* EntityContainer.h */,
+				71FC93DC2E3D8D05006FAE16 /* EntityContainer.cpp */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
 				7105CAA62AD61BD5007C91BA /* JoltPhysicsAux.h */,
 				71451BF2270CA3EA00712643 /* SpriteFrameData.h */,
@@ -4314,6 +4321,7 @@
 				713E580827BA9CB700376680 /* MeshPolygon.h in Headers */,
 				71ABBD23277A31E6001CE3AF /* UISystem.h in Headers */,
 				71033D662BD1A7D200D81FB5 /* ScrollbarComponent.h in Headers */,
+				71FC93DE2E3D8D05006FAE16 /* EntityContainer.h in Headers */,
 				71E54518284D5BE000C68FAB /* KeyframeTracksComponent.h in Headers */,
 				71ABBD4027A879B9001CE3AF /* MeshPolygonComponent.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
@@ -5529,6 +5537,7 @@
 				71E824902A9C23A600C8E6F2 /* Body2D.cpp in Sources */,
 				71E5450A284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
 				71C33FBD2A315918007A5822 /* Model.cpp in Sources */,
+				71FC93DF2E3D8D05006FAE16 /* EntityContainer.cpp in Sources */,
 				713D82B6259D307F00567F9F /* SokolTexture.cpp in Sources */,
 				713D82B7259D307F00567F9F /* SokolCamera.cpp in Sources */,
 			);
@@ -5697,6 +5706,7 @@
 				71E8248F2A9C23A600C8E6F2 /* Body2D.cpp in Sources */,
 				71E54509284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
 				71C33FBC2A315918007A5822 /* Model.cpp in Sources */,
+				71FC93DD2E3D8D05006FAE16 /* EntityContainer.cpp in Sources */,
 				7162FD5E25963AE10075B97D /* ExternalBuffer.cpp in Sources */,
 				7162FD6025963AE10075B97D /* IndexBuffer.cpp in Sources */,
 			);
