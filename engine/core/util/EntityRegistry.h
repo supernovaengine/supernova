@@ -1,5 +1,5 @@
-#ifndef ENTITYCONTAINER_H
-#define ENTITYCONTAINER_H
+#ifndef ENTITYREGISTRY_H
+#define ENTITYREGISTRY_H
 
 #include "Entity.h"
 #include "EntityManager.h"
@@ -54,7 +54,7 @@
 
 namespace Supernova {
 
-    class SUPERNOVA_API EntityContainer {
+    class SUPERNOVA_API EntityRegistry {
     private:
         EntityManager entityManager;
         ComponentManager componentManager;
@@ -68,8 +68,8 @@ namespace Supernova {
         virtual void onEntityDestroyed(Entity entity, Signature signature) {}
 
     public:
-        EntityContainer();
-        virtual ~EntityContainer();
+        EntityRegistry();
+        virtual ~EntityRegistry();
 
         //Entity methods
 
@@ -159,4 +159,4 @@ namespace Supernova {
 
 } // namespace Supernova
 
-#endif // ENTITYCONTAINER_H
+#endif // ENTITYREGISTRY_H

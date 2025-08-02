@@ -7,7 +7,7 @@
 
 #include "Entity.h"
 #include "SubSystem.h"
-#include "EntityContainer.h"
+#include "EntityRegistry.h"
 #include "Export.h"
 #include <vector>
 #include <unordered_map>
@@ -23,7 +23,7 @@ namespace Supernova{
 		AUTO
 	};
 
-	class SUPERNOVA_API Scene : public EntityContainer {
+	class SUPERNOVA_API Scene : public EntityRegistry {
 	private:
 
 		Entity camera;

@@ -1,8 +1,8 @@
-#include "EntityContainer.h"
+#include "EntityRegistry.h"
 
 using namespace Supernova;
 
-EntityContainer::EntityContainer() {
+EntityRegistry::EntityRegistry() {
     registerComponent<MeshComponent>();
     registerComponent<ModelComponent>();
     registerComponent<BoneComponent>();
@@ -50,7 +50,7 @@ EntityContainer::EntityContainer() {
     registerComponent<InstancedMeshComponent>();
 }
 
-EntityContainer::~EntityContainer(){
+EntityRegistry::~EntityRegistry(){
     std::vector<Entity> entityList = entityManager.getEntityList();
     while(entityList.size() > 0){
         destroyEntity(entityList.front());
@@ -59,7 +59,7 @@ EntityContainer::~EntityContainer(){
     }
 }
 
-void EntityContainer::sortComponentsByTransform(Signature entitySignature){
+void EntityRegistry::sortComponentsByTransform(Signature entitySignature){
     // Mesh component
     if (entitySignature.test(getComponentId<MeshComponent>())){
         auto meshes = componentManager.getComponentArray<MeshComponent>();
@@ -121,7 +121,7 @@ void EntityContainer::sortComponentsByTransform(Signature entitySignature){
     }
 }
 
-void EntityContainer::moveChildAux(Entity entity, bool increase, bool stopIfFound){
+void EntityRegistry::moveChildAux(Entity entity, bool increase, bool stopIfFound){
     Signature signature = entityManager.getSignature(entity);
 
     if (signature.test(getComponentId<Transform>())){
@@ -157,38 +157,38 @@ void EntityContainer::moveChildAux(Entity entity, bool increase, bool stopIfFoun
     }
 }
 
-Entity EntityContainer::createEntity() {
+Entity EntityRegistry::createEntity() {
     return entityManager.createEntity();
 }
 
-bool EntityContainer::recreateEntity(Entity entity) {
+bool EntityRegistry::recreateEntity(Entity entity) {
     return entityManager.recreateEntity(entity);
 }
 
-bool EntityContainer::isEntityCreated(Entity entity) const {
+bool EntityRegistry::isEntityCreated(Entity entity) const {
     return entityManager.isCreated(entity);
 }
 
-void EntityContainer::destroyEntity(Entity entity) {
+void EntityRegistry::destroyEntity(Entity entity) {
     onEntityDestroyed(entity, entityManager.getSignature(entity));
 
     componentManager.entityDestroyed(entity);
     entityManager.destroy(entity);
 }
 
-Signature EntityContainer::getSignature(Entity entity) const {
+Signature EntityRegistry::getSignature(Entity entity) const {
     return entityManager.getSignature(entity);
 }
 
-void EntityContainer::setEntityName(Entity entity, const std::string& name) {
+void EntityRegistry::setEntityName(Entity entity, const std::string& name) {
     entityManager.setName(entity, name);
 }
 
-std::string EntityContainer::getEntityName(Entity entity) const {
+std::string EntityRegistry::getEntityName(Entity entity) const {
     return entityManager.getName(entity);
 }
 
-Entity EntityContainer::findOldestParent(Entity entity){
+Entity EntityRegistry::findOldestParent(Entity entity){
     auto transforms = componentManager.getComponentArray<Transform>();
 
     size_t index = transforms->getIndex(entity);
@@ -209,7 +209,7 @@ Entity EntityContainer::findOldestParent(Entity entity){
     return entity;
 }
 
-bool EntityContainer::isParentOf(Entity parent, Entity child){
+bool EntityRegistry::isParentOf(Entity parent, Entity child){
     auto transforms = componentManager.getComponentArray<Transform>();
 
     size_t index = transforms->getIndex(child);
@@ -240,7 +240,7 @@ bool EntityContainer::isParentOf(Entity parent, Entity child){
     return false;
 }
 
-size_t EntityContainer::findBranchLastIndex(Entity entity){
+size_t EntityRegistry::findBranchLastIndex(Entity entity){
     auto transforms = componentManager.getComponentArray<Transform>();
 
     // will throw error if entity has not Transform
@@ -271,7 +271,7 @@ size_t EntityContainer::findBranchLastIndex(Entity entity){
     return currentIndex;
 }
 
-void EntityContainer::addEntityChild(Entity parent, Entity child, bool changeTransform){
+void EntityRegistry::addEntityChild(Entity parent, Entity child, bool changeTransform){
     //----------DEBUG
     //printf("Add child - BEFORE\n");
     //auto transforms = componentManager.getComponentArray<Transform>();
@@ -334,7 +334,7 @@ void EntityContainer::addEntityChild(Entity parent, Entity child, bool changeTra
     //----------DEBUG
 }
 
-void EntityContainer::moveChildToIndex(Entity entity, size_t index, bool adjustFinalPosition){
+void EntityRegistry::moveChildToIndex(Entity entity, size_t index, bool adjustFinalPosition){
     Signature signature = entityManager.getSignature(entity);
 
     if (signature.test(getComponentId<Transform>())){
@@ -369,18 +369,18 @@ void EntityContainer::moveChildToIndex(Entity entity, size_t index, bool adjustF
     }
 }
 
-void EntityContainer::moveChildToTop(Entity entity){
+void EntityRegistry::moveChildToTop(Entity entity){
     moveChildAux(entity, true, false);
 }
 
-void EntityContainer::moveChildUp(Entity entity){
+void EntityRegistry::moveChildUp(Entity entity){
     moveChildAux(entity, true, true);
 }
 
-void EntityContainer::moveChildDown(Entity entity){
+void EntityRegistry::moveChildDown(Entity entity){
     moveChildAux(entity, false, true);
 }
 
-void EntityContainer::moveChildToBottom(Entity entity){
+void EntityRegistry::moveChildToBottom(Entity entity){
     moveChildAux(entity, false, false);
 }
