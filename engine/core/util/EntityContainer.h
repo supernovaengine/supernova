@@ -58,7 +58,6 @@ namespace Supernova {
     private:
         EntityManager entityManager;
         ComponentManager componentManager;
-        bool componentsRegistered = false;
 
         void sortComponentsByTransform(Signature entitySignature);
 		void moveChildAux(Entity entity, bool increase, bool stopIfFound);
