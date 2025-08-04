@@ -271,6 +271,22 @@ size_t EntityRegistry::findBranchLastIndex(Entity entity){
     return currentIndex;
 }
 
+Entity EntityRegistry::getLastEntity() const{
+    return entityManager.getLastEntity();
+}
+
+std::vector<Entity> EntityRegistry::getEntityList() const{
+    return entityManager.getEntityList();
+}
+
+void EntityRegistry::clear() {
+    std::vector<Entity> entities = getEntityList();
+    for (Entity entity : entities) {
+        destroyEntity(entity);
+    }
+    entityManager.setLastEntity(NULL_ENTITY);
+}
+
 void EntityRegistry::addEntityChild(Entity parent, Entity child, bool changeTransform){
     //----------DEBUG
     //printf("Add child - BEFORE\n");

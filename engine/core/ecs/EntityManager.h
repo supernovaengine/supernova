@@ -20,7 +20,7 @@ namespace Supernova{
 
     class SUPERNOVA_API EntityManager {
     private:
-        unsigned lastEntity = 0;
+        unsigned lastEntity = NULL_ENTITY;
         std::map<Entity, EntityMetadata> metadata;
 
     public:
@@ -35,8 +35,12 @@ namespace Supernova{
             return false;
         }
 
-        Entity getLastEntityInternal() const{ // for internal editor use only
+        Entity getLastEntity() const{
             return this->lastEntity;
+        }
+
+        void setLastEntity(Entity entity) {
+            this->lastEntity = entity;
         }
 
         Entity createEntity() {
@@ -54,7 +58,7 @@ namespace Supernova{
             metadata.erase(entity);
         }
 
-        std::vector<Entity> getEntityList(){
+        std::vector<Entity> getEntityList() const{
             std::vector<Entity> list;
             for (auto const& [key, val] : metadata){
                 list.push_back(key);

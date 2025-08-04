@@ -99,6 +99,11 @@ namespace Supernova {
         bool isParentOf(Entity parent, Entity child);
         size_t findBranchLastIndex(Entity entity);
 
+        Entity getLastEntity() const;
+        std::vector<Entity> getEntityList() const;
+
+        void clear();
+
         // Component methods
 
         template<typename T>
