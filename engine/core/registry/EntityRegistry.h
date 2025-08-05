@@ -73,9 +73,8 @@ namespace Supernova {
 
         //Entity methods
 
-        bool recreateEntity(Entity entity); // for internal editor use only
-
         Entity createEntity();
+        bool recreateEntity(Entity entity); // for internal editor use only
 
         bool isEntityCreated(Entity entity) const;
 

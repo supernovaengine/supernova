@@ -161,12 +161,12 @@ Entity EntityRegistry::createEntity() {
     return entityManager.createEntity();
 }
 
-bool EntityRegistry::recreateEntity(Entity entity) {
-    return entityManager.recreateEntity(entity);
-}
-
 bool EntityRegistry::isEntityCreated(Entity entity) const {
     return entityManager.isCreated(entity);
+}
+
+bool EntityRegistry::recreateEntity(Entity entity) {
+    return entityManager.recreateEntity(entity);
 }
 
 void EntityRegistry::destroyEntity(Entity entity) {

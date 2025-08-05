@@ -142,6 +142,8 @@
 #include "pool/TextureDataPool.h"
 #include "pool/TexturePool.h"
 
+#include "registry/EntityRegistry.h"
+
 #include "render/BufferRender.h"
 #include "render/CameraRender.h"
 #include "render/FramebufferRender.h"
@@ -177,7 +179,6 @@
 //#include "util/Box2DAux.h"
 #include "util/Color.h"
 //#include "util/DefaultFont.h"
-#include "util/EntityRegistry.h"
 #include "util/SpriteFrameData.h"
 #include "util/FunctionSubscribe.h"
 //#include "util/JoltPhysicsAux.h"
