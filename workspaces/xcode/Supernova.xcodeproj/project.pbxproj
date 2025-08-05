@@ -317,6 +317,9 @@
 		710AD78625B7A1F600A7B12F /* EngineView.mm in Sources */ = {isa = PBXBuildFile; fileRef = 710AD76C25B79D8300A7B12F /* EngineView.mm */; };
 		710EE49D2A2E1E9200EB04EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49C2A2E1E9200EB04EC /* Assets.xcassets */; };
 		710EE49E2A2E1E9200EB04EC /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 710EE49C2A2E1E9200EB04EC /* Assets.xcassets */; };
+		71125F1A2E41845E006D11A1 /* EntityRegistry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71125F182E41845E006D11A1 /* EntityRegistry.cpp */; };
+		71125F1B2E41845E006D11A1 /* EntityRegistry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71125F182E41845E006D11A1 /* EntityRegistry.cpp */; };
+		71125F1C2E41845E006D11A1 /* EntityRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = 71125F172E41845E006D11A1 /* EntityRegistry.h */; };
 		711607082A0D1F0C0052A9C3 /* AdMobAdapter.m in Sources */ = {isa = PBXBuildFile; fileRef = 711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */; };
 		7116070B2A0D84660052A9C3 /* GoogleMobileAds.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7116070A2A0D84660052A9C3 /* GoogleMobileAds.xcframework */; };
 		711607122A0D86500052A9C3 /* GoogleAppMeasurement.xcframework in Frameworks */ = {isa = PBXBuildFile; fileRef = 7116070C2A0D864F0052A9C3 /* GoogleAppMeasurement.xcframework */; };
@@ -1038,9 +1041,6 @@
 		71F97B7F262D1FFE00CD6F2B /* tiny_gltf.cc in Sources */ = {isa = PBXBuildFile; fileRef = 71F97B1F262D1E2B00CD6F2B /* tiny_gltf.cc */; };
 		71F97B98262D202300CD6F2B /* libstb-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 710AD6E325B6053400A7B12F /* libstb-ios.a */; };
 		71F97B9B262D203E00CD6F2B /* libtinygltf-ios.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */; };
-		71FC93DD2E3D8D05006FAE16 /* EntityRegistry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FC93DC2E3D8D05006FAE16 /* EntityRegistry.cpp */; };
-		71FC93DE2E3D8D05006FAE16 /* EntityRegistry.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FC93DB2E3D8D05006FAE16 /* EntityRegistry.h */; };
-		71FC93DF2E3D8D05006FAE16 /* EntityRegistry.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FC93DC2E3D8D05006FAE16 /* EntityRegistry.cpp */; };
 		71FCE4BE28E0FA01003C5217 /* LuaFunction.h in Headers */ = {isa = PBXBuildFile; fileRef = 71FCE4BA28E0FA01003C5217 /* LuaFunction.h */; };
 		71FCE4BF28E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */; };
 		71FCE4C028E0FA01003C5217 /* LuaFunctionBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */; };
@@ -1697,6 +1697,8 @@
 		710EE49C2A2E1E9200EB04EC /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		710EE49F2A2E291100EB04EC /* ios */ = {isa = PBXFileReference; lastKnownFileType = folder; path = ios; sourceTree = "<group>"; };
 		710EE4A12A2E2A2000EB04EC /* macos */ = {isa = PBXFileReference; lastKnownFileType = folder; path = macos; sourceTree = "<group>"; };
+		71125F172E41845E006D11A1 /* EntityRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EntityRegistry.h; sourceTree = "<group>"; };
+		71125F182E41845E006D11A1 /* EntityRegistry.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EntityRegistry.cpp; sourceTree = "<group>"; };
 		711607072A0D1F0C0052A9C3 /* AdMobAdapter.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AdMobAdapter.m; sourceTree = "<group>"; };
 		711607092A0D1F360052A9C3 /* AdMobAdapter.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AdMobAdapter.h; sourceTree = "<group>"; };
 		7116070A2A0D84660052A9C3 /* GoogleMobileAds.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = GoogleMobileAds.xcframework; path = "../../platform/apple/GoogleMobileAdsSdkiOS-10.14.0/GoogleMobileAds.xcframework"; sourceTree = "<group>"; };
@@ -2284,8 +2286,6 @@
 		71F97B20262D1E2B00CD6F2B /* tiny_gltf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tiny_gltf.h; sourceTree = "<group>"; };
 		71F97B57262D1EF200CD6F2B /* json.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = json.hpp; sourceTree = "<group>"; };
 		71F97B85262D1FFE00CD6F2B /* libtinygltf-ios.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libtinygltf-ios.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		71FC93DB2E3D8D05006FAE16 /* EntityRegistry.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = EntityRegistry.h; sourceTree = "<group>"; };
-		71FC93DC2E3D8D05006FAE16 /* EntityRegistry.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = EntityRegistry.cpp; sourceTree = "<group>"; };
 		71FCE4BA28E0FA01003C5217 /* LuaFunction.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunction.h; sourceTree = "<group>"; };
 		71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LuaFunctionBase.cpp; sourceTree = "<group>"; };
 		71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LuaFunctionBase.h; sourceTree = "<group>"; };
@@ -3112,6 +3112,15 @@
 			path = NodeCodec;
 			sourceTree = "<group>";
 		};
+		71125F192E41845E006D11A1 /* registry */ = {
+			isa = PBXGroup;
+			children = (
+				71125F172E41845E006D11A1 /* EntityRegistry.h */,
+				71125F182E41845E006D11A1 /* EntityRegistry.cpp */,
+			);
+			path = registry;
+			sourceTree = "<group>";
+		};
 		71393ED328F8EF200074442E /* tinyxml2 */ = {
 			isa = PBXGroup;
 			children = (
@@ -3256,6 +3265,7 @@
 				7162FC4825962A0E0075B97D /* math */,
 				7162FC6225962A0E0075B97D /* object */,
 				71BE623325B1DB9E006D6E02 /* pool */,
+				71125F192E41845E006D11A1 /* registry */,
 				7162FC3825962A0E0075B97D /* render */,
 				7162FC8625962A0E0075B97D /* Scene.h */,
 				7162FC2D25962A0E0075B97D /* Scene.cpp */,
@@ -3283,8 +3293,6 @@
 				7105A55728B305910092EA05 /* Color.h */,
 				7105A55628B305910092EA05 /* Color.cpp */,
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
-				71FC93DB2E3D8D05006FAE16 /* EntityRegistry.h */,
-				71FC93DC2E3D8D05006FAE16 /* EntityRegistry.cpp */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
 				7105CAA62AD61BD5007C91BA /* JoltPhysicsAux.h */,
 				71451BF2270CA3EA00712643 /* SpriteFrameData.h */,
@@ -4251,6 +4259,7 @@
 				7105CAAD2AD61C7A007C91BA /* Joint3DComponent.h in Headers */,
 				71D7494E296731A800348AB8 /* FogComponent.h in Headers */,
 				71FCE4C528E0FA31003C5217 /* LuaBridge.h in Headers */,
+				71125F1C2E41845E006D11A1 /* EntityRegistry.h in Headers */,
 				71F225482C587388006ED3CA /* Particles.h in Headers */,
 				71BE621225B1DB37006D6E02 /* FunctionSubscribe.h in Headers */,
 				718FDDF52837CA9A00AF314C /* msl21ios.h in Headers */,
@@ -4321,7 +4330,6 @@
 				713E580827BA9CB700376680 /* MeshPolygon.h in Headers */,
 				71ABBD23277A31E6001CE3AF /* UISystem.h in Headers */,
 				71033D662BD1A7D200D81FB5 /* ScrollbarComponent.h in Headers */,
-				71FC93DE2E3D8D05006FAE16 /* EntityRegistry.h in Headers */,
 				71E54518284D5BE000C68FAB /* KeyframeTracksComponent.h in Headers */,
 				71ABBD4027A879B9001CE3AF /* MeshPolygonComponent.h in Headers */,
 				7128D0B025BB18DC00965B51 /* StringUtils.h in Headers */,
@@ -5505,6 +5513,7 @@
 				71ABBD1D277A31BA001CE3AF /* Text.cpp in Sources */,
 				71ABBD4A27A87A2E001CE3AF /* MeshSystem.cpp in Sources */,
 				71ABBD25277A31E6001CE3AF /* UISystem.cpp in Sources */,
+				71125F1A2E41845E006D11A1 /* EntityRegistry.cpp in Sources */,
 				713D82AF259D307F00567F9F /* InterleavedBuffer.cpp in Sources */,
 				71E54500284D5BB700C68FAB /* Animation.cpp in Sources */,
 				71F2254A2C587388006ED3CA /* Particles.cpp in Sources */,
@@ -5537,7 +5546,6 @@
 				71E824902A9C23A600C8E6F2 /* Body2D.cpp in Sources */,
 				71E5450A284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
 				71C33FBD2A315918007A5822 /* Model.cpp in Sources */,
-				71FC93DF2E3D8D05006FAE16 /* EntityRegistry.cpp in Sources */,
 				713D82B6259D307F00567F9F /* SokolTexture.cpp in Sources */,
 				713D82B7259D307F00567F9F /* SokolCamera.cpp in Sources */,
 			);
@@ -5674,6 +5682,7 @@
 				71ABBD1C277A31BA001CE3AF /* Text.cpp in Sources */,
 				71ABBD4927A87A2E001CE3AF /* MeshSystem.cpp in Sources */,
 				71ABBD24277A31E6001CE3AF /* UISystem.cpp in Sources */,
+				71125F1B2E41845E006D11A1 /* EntityRegistry.cpp in Sources */,
 				7162FD4525963AE00075B97D /* Object.cpp in Sources */,
 				71E544FF284D5BB700C68FAB /* Animation.cpp in Sources */,
 				71F225492C587388006ED3CA /* Particles.cpp in Sources */,
@@ -5706,7 +5715,6 @@
 				71E8248F2A9C23A600C8E6F2 /* Body2D.cpp in Sources */,
 				71E54509284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
 				71C33FBC2A315918007A5822 /* Model.cpp in Sources */,
-				71FC93DD2E3D8D05006FAE16 /* EntityRegistry.cpp in Sources */,
 				7162FD5E25963AE10075B97D /* ExternalBuffer.cpp in Sources */,
 				7162FD6025963AE10075B97D /* IndexBuffer.cpp in Sources */,
 			);
