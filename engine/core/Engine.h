@@ -187,7 +187,7 @@ namespace Supernova {
         static void addSceneLayer(Scene* scene);
         static void executeSceneOnce(Scene* scene);
         static void removeScene(Scene* scene);
-        static void removeAllSceneLayers();
+        static void removeAllSceneLayers(bool removeOneTimeScenes);
         static void removeAllScenes();
 
         static bool isSceneRunning(Scene* scene);

@@ -171,15 +171,26 @@ void Engine::removeScene(Scene* scene){
         drawSemaphore.release();
 }
 
-void Engine::removeAllSceneLayers(){
+void Engine::removeAllSceneLayers(bool removeOneTimeScenes){
     if (asyncThread)
         drawSemaphore.acquire();
 
-        scenes.erase(
-            std::remove_if(scenes.begin(), scenes.end(),
-                [](Scene* scene) { return scene != mainScene; }),
-            scenes.end()
-        );
+    scenes.erase(
+        std::remove_if(scenes.begin(), scenes.end(),
+            [removeOneTimeScenes](Scene* scene) {
+                // Keep main scene
+                if (scene == mainScene)
+                    return false;
+
+                // If removeOneTimeScenes is false, keep scenes in oneTimeScenes
+                if (!removeOneTimeScenes && oneTimeScenes.find(scene) != oneTimeScenes.end())
+                    return false;
+
+                // Remove all other scenes
+                return true;
+            }),
+        scenes.end()
+    );
 
     if (asyncThread)
         drawSemaphore.release();
@@ -728,7 +739,7 @@ void Engine::systemShutdown(){
 
     LuaBinding::cleanup();
 
-    removeAllSceneLayers();
+    removeAllSceneLayers(true);
 }
 
 void Engine::systemPause(){
