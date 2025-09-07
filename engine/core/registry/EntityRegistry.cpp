@@ -40,6 +40,7 @@ EntityRegistry::EntityRegistry() {
     registerComponent<RotateTracksComponent>();
     registerComponent<TranslateTracksComponent>();
     registerComponent<ScaleTracksComponent>();
+    registerComponent<ScriptComponent>();
     registerComponent<TerrainComponent>();
     registerComponent<AudioComponent>();
     registerComponent<TilemapComponent>();

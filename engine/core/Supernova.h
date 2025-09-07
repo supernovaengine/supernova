@@ -63,6 +63,7 @@
 #include "component/RotationActionComponent.h"
 #include "component/ScaleActionComponent.h"
 #include "component/ScaleTracksComponent.h"
+#include "component/ScriptComponent.h"
 #include "component/ScrollbarComponent.h"
 #include "component/SkyComponent.h"
 #include "component/SpriteAnimationComponent.h"
