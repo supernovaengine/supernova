@@ -331,6 +331,7 @@
 		71165BBF282981BE00CF79C1 /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71165BBD282981BE00CF79C1 /* Base64.cpp */; };
 		71165BC0282981BE00CF79C1 /* Base64.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71165BBD282981BE00CF79C1 /* Base64.cpp */; };
 		71165BC1282981BE00CF79C1 /* Base64.h in Headers */ = {isa = PBXBuildFile; fileRef = 71165BBE282981BE00CF79C1 /* Base64.h */; };
+		711BFE3A2E6E5AE500677D11 /* ScriptComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 711BFE392E6E5AE500677D11 /* ScriptComponent.h */; };
 		7126757E2B65F4470031089C /* LinesComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 7126757D2B65F4470031089C /* LinesComponent.h */; };
 		712675812B65F45D0031089C /* Lines.h in Headers */ = {isa = PBXBuildFile; fileRef = 7126757F2B65F45D0031089C /* Lines.h */; };
 		712675822B65F45D0031089C /* Lines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 712675802B65F45D0031089C /* Lines.cpp */; };
@@ -1710,6 +1711,7 @@
 		711607112A0D86500052A9C3 /* UserMessagingPlatform.xcframework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcframework; name = UserMessagingPlatform.xcframework; path = "../../platform/apple/GoogleMobileAdsSdkiOS-10.14.0/UserMessagingPlatform.xcframework"; sourceTree = "<group>"; };
 		71165BBD282981BE00CF79C1 /* Base64.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Base64.cpp; sourceTree = "<group>"; };
 		71165BBE282981BE00CF79C1 /* Base64.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base64.h; sourceTree = "<group>"; };
+		711BFE392E6E5AE500677D11 /* ScriptComponent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptComponent.h; sourceTree = "<group>"; };
 		7125BA382B9E82890056851E /* ObjectLayerPairFilterTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ObjectLayerPairFilterTable.h; sourceTree = "<group>"; };
 		7125BA392B9E82890056851E /* InternalEdgeRemovingCollector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InternalEdgeRemovingCollector.h; sourceTree = "<group>"; };
 		7125BA3A2B9E82890056851E /* CollideSoftBodyVerticesVsTriangles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CollideSoftBodyVerticesVsTriangles.h; sourceTree = "<group>"; };
@@ -3380,6 +3382,7 @@
 				71451BBB270C9D1000712643 /* RotationActionComponent.h */,
 				71451BB8270C9D0F00712643 /* ScaleActionComponent.h */,
 				71E5450E284D5BDF00C68FAB /* ScaleTracksComponent.h */,
+				711BFE392E6E5AE500677D11 /* ScriptComponent.h */,
 				71033D652BD1A7D200D81FB5 /* ScrollbarComponent.h */,
 				71CC839126B8C49B00EEBB93 /* SkyComponent.h */,
 				71451BB7270C9D0F00712643 /* SpriteAnimationComponent.h */,
@@ -4310,6 +4313,7 @@
 				71ABBD3D279116E1001CE3AF /* UniqueToken.h in Headers */,
 				71E54513284D5BE000C68FAB /* MorphTracksComponent.h in Headers */,
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
+				711BFE3A2E6E5AE500677D11 /* ScriptComponent.h in Headers */,
 				71FCE4BE28E0FA01003C5217 /* LuaFunction.h in Headers */,
 				717AD9882919E1E9007D7DB5 /* ImageComponent.h in Headers */,
 				7170A3CB2818A87E0003E965 /* BoneComponent.h in Headers */,
