@@ -75,7 +75,8 @@ jobs:
       - name: Install dependencies on macOS
         if: startsWith(matrix.config.os, 'macos')
         run: |
-          brew install cmake ninja
+          # cmake is already installed
+          brew install ninja
           ninja --version
           cmake --version
           
