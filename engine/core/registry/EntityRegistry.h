@@ -62,6 +62,7 @@ namespace Supernova {
 
         void sortComponentsByTransform(Signature entitySignature);
 		void moveChildAux(Entity entity, bool increase, bool stopIfFound);
+        void changeTransformChildren(Entity entity);
 
     protected:
         virtual void onComponentAdded(Entity entity, ComponentId componentId) {}
@@ -124,6 +125,10 @@ namespace Supernova {
         template<typename T>
         void removeComponent(Entity entity){
             onComponentRemoved(entity, componentManager.getComponentId<T>());
+
+			if (componentManager.getComponentId<T>() == getComponentId<Transform>()) {
+				changeTransformChildren(entity);
+			}
 
             componentManager.removeComponent<T>(entity);
             auto signature = entityManager.getSignature(entity);
