@@ -15,123 +15,123 @@
 
 namespace Supernova{
 
-	class Camera;
+    class Camera;
 
-	enum class LightState {
-		OFF,
-		ON,
-		AUTO
-	};
+    enum class LightState {
+        OFF,
+        ON,
+        AUTO
+    };
 
-	class SUPERNOVA_API Scene : public EntityRegistry {
-	private:
+    class SUPERNOVA_API Scene : public EntityRegistry {
+    private:
 
-		Entity camera;
-		Entity defaultCamera;
+        Entity camera;
+        Entity defaultCamera;
 
-		Vector4 backgroundColor;
-		bool shadowsPCF;
+        Vector4 backgroundColor;
+        bool shadowsPCF;
 
-		LightState lightState;
-		Vector3 globalIllumColor;
-		float globalIllumIntensity;
+        LightState lightState;
+        Vector3 globalIllumColor;
+        float globalIllumIntensity;
 
-		bool enableUIEvents;
+        bool enableUIEvents;
 
-		std::vector<std::pair<std::string, std::shared_ptr<SubSystem>>> systems;
+        std::vector<std::pair<std::string, std::shared_ptr<SubSystem>>> systems;
 
-		Entity createDefaultCamera();
+        Entity createDefaultCamera();
 
-	protected:
+    protected:
 
-		void onComponentAdded(Entity entity, ComponentId componentId) override {
-			for (auto const& pair : systems) {
-				pair.second->onComponentAdded(entity, componentId);
-			}
-		}
+        void onComponentAdded(Entity entity, ComponentId componentId) override {
+            for (auto const& pair : systems) {
+                pair.second->onComponentAdded(entity, componentId);
+            }
+        }
 
-		void onComponentRemoved(Entity entity, ComponentId componentId) override {
-			for (auto const& pair : systems) {
-				pair.second->onComponentRemoved(entity, componentId);
-			}
-		}
+        void onComponentRemoved(Entity entity, ComponentId componentId) override {
+            for (auto const& pair : systems) {
+                pair.second->onComponentRemoved(entity, componentId);
+            }
+        }
 
-		void onEntityDestroyed(Entity entity, Signature signature) override {
-			for (auto const& pair : systems) {
-				for (ComponentId componentId = 0; componentId < signature.size(); ++componentId) {
-					if (signature.test(componentId)) {
-						pair.second->onComponentRemoved(entity, componentId);
-					}
-				}
-			}
-		}
-		
-	public:
-	
-		Scene();
-		virtual ~Scene();
+        void onEntityDestroyed(Entity entity, Signature signature) override {
+            for (auto const& pair : systems) {
+                for (ComponentId componentId = 0; componentId < signature.size(); ++componentId) {
+                    if (signature.test(componentId)) {
+                        pair.second->onComponentRemoved(entity, componentId);
+                    }
+                }
+            }
+        }
 
-		void load();
-		void destroy();
-		void draw();
-		void update(double dt);
+    public:
 
-		void updateSizeFromCamera();
+        Scene();
+        virtual ~Scene();
 
-		void setCamera(Camera* camera);
-		void setCamera(Entity camera);
-		Entity getCamera() const;
+        void load();
+        void destroy();
+        void draw();
+        void update(double dt);
 
-		void setBackgroundColor(Vector4 color);
-		void setBackgroundColor(float red, float green, float blue);
-		void setBackgroundColor(float red, float green, float blue, float alpha);
-		Vector4 getBackgroundColor() const;
+        void updateSizeFromCamera();
 
-		void setShadowsPCF(bool shadowsPCF);
-		bool isShadowsPCF() const;
+        void setCamera(Camera* camera);
+        void setCamera(Entity camera);
+        Entity getCamera() const;
 
-		void setLightState(LightState state);
-		LightState getLightState() const;
+        void setBackgroundColor(Vector4 color);
+        void setBackgroundColor(float red, float green, float blue);
+        void setBackgroundColor(float red, float green, float blue, float alpha);
+        Vector4 getBackgroundColor() const;
 
-		void setGlobalIllumination(float intensity, Vector3 color);
-		void setGlobalIllumination(float intensity);
-		void setGlobalIllumination(Vector3 color);
+        void setShadowsPCF(bool shadowsPCF);
+        bool isShadowsPCF() const;
 
-		float getGlobalIlluminationIntensity() const;
-		Vector3 getGlobalIlluminationColor() const;
-		Vector3 getGlobalIlluminationColorLinear() const;
+        void setLightState(LightState state);
+        LightState getLightState() const;
 
-		bool canReceiveUIEvents();
+        void setGlobalIllumination(float intensity, Vector3 color);
+        void setGlobalIllumination(float intensity);
+        void setGlobalIllumination(Vector3 color);
 
-		bool isEnableUIEvents() const;
-		void setEnableUIEvents(bool enableUIEvents);
+        float getGlobalIlluminationIntensity() const;
+        Vector3 getGlobalIlluminationColor() const;
+        Vector3 getGlobalIlluminationColorLinear() const;
 
-		// System methods
+        bool canReceiveUIEvents();
 
-		template<typename T>
-		std::shared_ptr<T> registerSystem(){
-			const char* typeName = typeid(T).name();
+        bool isEnableUIEvents() const;
+        void setEnableUIEvents(bool enableUIEvents);
 
-			auto it = std::find_if(systems.begin(), systems.end(), [&](const auto& pair) { return pair.first == typeName; });
+        // System methods
 
-			assert(it == systems.end() && "Registering system more than once");
+        template<typename T>
+        std::shared_ptr<T> registerSystem(){
+            const char* typeName = typeid(T).name();
 
-			auto system = std::make_shared<T>(this);
-			systems.push_back(std::make_pair(typeName, system));
-			return system;
-		}
+            auto it = std::find_if(systems.begin(), systems.end(), [&](const auto& pair) { return pair.first == typeName; });
 
-		template<typename T>
-		std::shared_ptr<T> getSystem(){
-			const char* typeName = typeid(T).name();
+            assert(it == systems.end() && "Registering system more than once");
 
-			auto it = std::find_if(systems.begin(), systems.end(), [&](const auto& pair) { return pair.first == typeName; });
+            auto system = std::make_shared<T>(this);
+            systems.push_back(std::make_pair(typeName, system));
+            return system;
+        }
 
-			assert(it != systems.end() && "System not found.");
+        template<typename T>
+        std::shared_ptr<T> getSystem(){
+            const char* typeName = typeid(T).name();
 
-			return std::dynamic_pointer_cast<T>(it->second);
-		}
-	};
+            auto it = std::find_if(systems.begin(), systems.end(), [&](const auto& pair) { return pair.first == typeName; });
+
+            assert(it != systems.end() && "System not found.");
+
+            return std::dynamic_pointer_cast<T>(it->second);
+        }
+    };
 
 }
 

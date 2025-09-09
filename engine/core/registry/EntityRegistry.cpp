@@ -159,27 +159,27 @@ void EntityRegistry::moveChildAux(Entity entity, bool increase, bool stopIfFound
 }
 
 void EntityRegistry::changeTransformChildren(Entity entity){
-	// Get the parent of the entity being removed before it's deleted
-	Transform* removedTransform = findComponent<Transform>(entity);
-	Entity newParent = NULL_ENTITY;
-	if (removedTransform) {
-		newParent = removedTransform->parent;
-	}
+    // Get the parent of the entity being removed before it's deleted
+    Transform* removedTransform = findComponent<Transform>(entity);
+    Entity newParent = NULL_ENTITY;
+    if (removedTransform) {
+        newParent = removedTransform->parent;
+    }
 
-	// Find all entities with Transform components that have this entity as parent
-	auto transformArray = getComponentArray<Transform>();
-	if (transformArray) {
-		for (size_t i = 0; i < transformArray->size(); i++) {
-			Transform* childTransform = transformArray->findComponentFromIndex(i);
-			if (childTransform && childTransform->parent == entity) {
-				// Set the parent to the grandparent (parent of removed entity)
-				childTransform->parent = newParent;
-				// Mark for update since hierarchy changed
-				childTransform->needUpdate = true;
-				childTransform->needUpdateChildVisibility = true;
-			}
-		}
-	}
+    // Find all entities with Transform components that have this entity as parent
+    auto transformArray = getComponentArray<Transform>();
+    if (transformArray) {
+        for (size_t i = 0; i < transformArray->size(); i++) {
+            Transform* childTransform = transformArray->findComponentFromIndex(i);
+            if (childTransform && childTransform->parent == entity) {
+                // Set the parent to the grandparent (parent of removed entity)
+                childTransform->parent = newParent;
+                // Mark for update since hierarchy changed
+                childTransform->needUpdate = true;
+                childTransform->needUpdateChildVisibility = true;
+            }
+        }
+    }
 }
 
 Entity EntityRegistry::createEntity() {
