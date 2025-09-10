@@ -326,11 +326,11 @@ void EntityRegistry::addEntityChild(Entity parent, Entity child, bool changeTran
     if (childSignature.test(getComponentId<Transform>())){
         Transform& transformChild = componentManager.getComponent<Transform>(child);
 
-        transformChild.needUpdate = true;
-
         if (transformChild.parent == parent){
             return;
         }
+
+        transformChild.needUpdate = true;
 
         if (parent == NULL_ENTITY){
             size_t newIndex = findBranchLastIndex(findOldestParent(child)) + 1;
