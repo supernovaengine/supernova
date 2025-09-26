@@ -8,7 +8,7 @@
 struct ScriptComponent {
     std::string scriptPath;
     std::string scriptClassName;
-    bool enabled = true;
+    bool enabled = false;
 
     std::map<std::string, std::any> variables;
 };
