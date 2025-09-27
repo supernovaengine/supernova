@@ -110,9 +110,9 @@ void EntityRegistry::sortComponentsByTransform(Signature entitySignature){
     }
 
     // Lines component
-    if (entitySignature.test(getComponentId<PointsComponent>())){
-        auto points = componentManager.getComponentArray<PointsComponent>();
-        points->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
+    if (entitySignature.test(getComponentId<LinesComponent>())){
+        auto lines = componentManager.getComponentArray<LinesComponent>();
+        lines->sortByComponent<Transform>(componentManager.getComponentArray<Transform>());
     }
 
     // Audio component

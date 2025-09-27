@@ -65,9 +65,9 @@ namespace Supernova {
         void changeTransformChildren(Entity entity);
 
     protected:
-        virtual void onComponentAdded(Entity entity, ComponentId componentId) {}
-        virtual void onComponentRemoved(Entity entity, ComponentId componentId) {}
-        virtual void onEntityDestroyed(Entity entity, Signature signature) {}
+        virtual void onComponentAdded(Entity entity, ComponentId componentId) { (void)entity; (void)componentId; }
+        virtual void onComponentRemoved(Entity entity, ComponentId componentId) { (void)entity; (void)componentId; }
+        virtual void onEntityDestroyed(Entity entity, Signature signature) { (void)entity; (void)signature; }
 
     public:
         EntityRegistry();

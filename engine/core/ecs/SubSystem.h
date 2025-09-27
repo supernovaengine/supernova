@@ -13,32 +13,32 @@
 
 namespace Supernova{
 
-	class Scene;
+    class Scene;
 
-	class SUPERNOVA_API SubSystem {
+    class SUPERNOVA_API SubSystem {
 
-	protected:
-		Signature signature;
-		Scene* scene;
-	
-	public:
+        protected:
+        Signature signature;
+        Scene* scene;
 
-		SubSystem(Scene* scene) {
-			this->scene = scene;
-		}
+    public:
 
-		virtual void load() = 0;
+        SubSystem(Scene* scene) {
+            this->scene = scene;
+        }
 
-		virtual void draw() = 0;
+        virtual void load() = 0;
 
-		virtual void destroy() = 0;
-	
-		virtual void update(double dt) = 0;
+        virtual void draw() = 0;
 
-		virtual void onComponentAdded(Entity entity, ComponentId componentId) {}
-		virtual void onComponentRemoved(Entity entity, ComponentId componentId) {}
-	
-	};
+        virtual void destroy() = 0;
+
+        virtual void update(double dt) = 0;
+
+        virtual void onComponentAdded(Entity entity, ComponentId componentId) { (void)entity; (void)componentId; }
+        virtual void onComponentRemoved(Entity entity, ComponentId componentId) { (void)entity; (void)componentId; }
+
+    };
 
 }
 
