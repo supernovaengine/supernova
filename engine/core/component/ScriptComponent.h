@@ -6,8 +6,8 @@
 #define SCRIPT_COMPONENT_H
 
 struct ScriptComponent {
-    std::string scriptPath;
-    std::string scriptClassName;
+    std::string path;
+    std::string className;
     bool enabled = false;
 
     std::map<std::string, std::any> variables;
