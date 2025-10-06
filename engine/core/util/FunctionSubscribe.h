@@ -36,8 +36,9 @@ namespace Supernova {
 
         std::vector<std::function<Ret(Args...)>> functions;
         std::vector<std::string> tags;
+        bool enabled = false;
 
-        bool addImpl(const std::string& tag, std::function<Ret(Args...)> function) {
+        bool addImpl(const std::string& tag, std::function<Ret(Args...)> function){
             if (find(tags.begin(), tags.end(), tag) != tags.end())
             {
                 remove(tag);
@@ -50,12 +51,12 @@ namespace Supernova {
         }
 
         template<typename T, size_t... Idx>
-        std::function<Ret(Args...)> bindImpl(T *obj, Ret(T::*funcPtr)(Args...), std::index_sequence<Idx...>) {
+        std::function<Ret(Args...)> bindImpl(T *obj, Ret(T::*funcPtr)(Args...), std::index_sequence<Idx...>){
             return std::bind(funcPtr, obj, getPlaceholder<Idx>()...);
         }
 
         template<size_t N>
-        MyPlaceholder<N + 1> getPlaceholder() {
+        MyPlaceholder<N + 1> getPlaceholder(){
             return {};
         }
 
@@ -67,16 +68,18 @@ namespace Supernova {
         FunctionSubscribe(const FunctionSubscribe& t){
             this->functions = t.functions;
             this->tags = t.tags;
+            this->enabled = t.enabled;
         }
 
         FunctionSubscribe& operator = (const FunctionSubscribe& t){
             this->functions = t.functions;
             this->tags = t.tags;
+            this->enabled = t.enabled;
 
             return *this;
         }
 
-        FunctionSubscribe(std::function<Ret(Args...)> function) {
+        FunctionSubscribe(std::function<Ret(Args...)> function){
             add("cFunction", function);
         }
 
@@ -96,7 +99,15 @@ namespace Supernova {
             return *this;
         }
 
-        bool add(const std::string& tag, lua_State *L) {
+        void setEnabled(bool enabled) {
+            this->enabled = enabled;
+        }
+
+        bool isEnabled() const {
+            return enabled;
+        }
+
+        bool add(const std::string& tag, lua_State *L){
             std::function<Ret(Args...)> function = LuaFunction<Ret>(L);
             addImpl(tag, function);
             return true;
@@ -108,38 +119,32 @@ namespace Supernova {
         }
 
         template<Ret(*funcPtr)(Args...)>
-        bool add(const std::string& tag)
-        {
+        bool add(const std::string& tag){
             addImpl(tag, std::function<Ret(Args...)>(funcPtr));
             return true;
         }
 
         template<typename T, Ret(T::*funcPtr)(Args...)>
-        bool add(const std::string& tag, std::shared_ptr<T> obj)
-        {
+        bool add(const std::string& tag, std::shared_ptr<T> obj){
             addImpl(tag, bindImpl(obj.get(), funcPtr, std::index_sequence_for<Args...>{}));
             return true;
         }
 
         template<typename T, Ret(T::*funcPtr)(Args...)>
-        bool add(const std::string& tag, T* obj)
-        {
+        bool add(const std::string& tag, T* obj){
             addImpl(tag, bindImpl(obj, funcPtr, std::index_sequence_for<Args...>{}));
             return true;
         }
 
         template<typename T>
-        bool add(const std::string& tag, std::shared_ptr<T> t)
-        {
+        bool add(const std::string& tag, std::shared_ptr<T> t){
             addImpl(tag, *t.get());
             return true;
         }
 
-        bool remove(const std::string& tag)
-        {
+        bool remove(const std::string& tag){
             auto it = find(tags.begin(), tags.end(), tag);
-            if (it == tags.end())
-            {
+            if (it == tags.end()){
                 return false;
             }
 
@@ -152,27 +157,33 @@ namespace Supernova {
         }
 
         Ret call(Args... args){
-            if constexpr (std::is_void<Ret>::value) {
-                for (auto& function : functions)
-                {
-                    function(args...);
-                };
-            } else {
-                return callRet(args..., Ret());
+            if (!enabled){
+                if constexpr (!std::is_void<Ret>::value) {
+                    return Ret();
+                }
+            }else{
+                if constexpr (std::is_void<Ret>::value) {
+                    for (auto& function : functions){
+                        function(args...);
+                    };
+                } else {
+                    return callRet(args..., Ret());
+                }
             }
         }
 
         template<typename T>
         Ret callRet(Args... args, T def){
-            for (auto& function : functions)
-            {
+            if (!enabled){
+                return def;
+            }
+            for (auto& function : functions){
                 return function(args...);
             };
             return def;
         }
 
-        Ret operator()(Args... args)
-        {
+        Ret operator()(Args... args){
             return call(args...);
         }
 

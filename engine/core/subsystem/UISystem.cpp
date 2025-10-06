@@ -1144,6 +1144,9 @@ void UISystem::calculateUIAABB(UIComponent& ui){
 }
 
 void UISystem::update(double dt){
+    if (paused) {
+        return;
+    }
 
     // need to be ordered by Transform
     auto layouts = scene->getComponentArray<UILayoutComponent>();

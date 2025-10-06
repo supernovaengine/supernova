@@ -173,6 +173,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticFunction("isSceneRunning", &Engine::isSceneRunning)
         .addStaticFunction("getMainScene", &Engine::getMainScene)
         .addStaticFunction("getLastScene", &Engine::getLastScene)
+        .addStaticFunction("pauseGameEvents", &Engine::pauseGameEvents)
         .addStaticProperty("canvasWidth", &Engine::getCanvasWidth)
         .addStaticProperty("canvasHeight", &Engine::getCanvasHeight)
         .addStaticFunction("setCanvasSize", &Engine::setCanvasSize)

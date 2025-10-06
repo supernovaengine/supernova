@@ -2725,6 +2725,9 @@ void MeshSystem::destroy(){
 }
 
 void MeshSystem::update(double dt){
+    if (paused) {
+        return;
+    }
 
     auto sprites = scene->getComponentArray<SpriteComponent>();
     for (int i = 0; i < sprites->size(); i++){

@@ -20,6 +20,7 @@ namespace Supernova{
         protected:
         Signature signature;
         Scene* scene;
+        bool paused = false;
 
     public:
 
@@ -27,12 +28,17 @@ namespace Supernova{
             this->scene = scene;
         }
 
+        virtual void setPaused(bool paused) {
+            this->paused = paused;
+        }
+
+        virtual bool isPaused() const {
+            return paused;
+        }
+
         virtual void load() = 0;
-
         virtual void draw() = 0;
-
         virtual void destroy() = 0;
-
         virtual void update(double dt) = 0;
 
         virtual void onComponentAdded(Entity entity, ComponentId componentId) { (void)entity; (void)componentId; }

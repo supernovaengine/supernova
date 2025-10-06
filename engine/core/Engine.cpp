@@ -224,6 +224,24 @@ Scene* Engine::getLastScene(){
     return scenes.back();
 }
 
+void Engine::pauseGameEvents(bool pause) {
+    // Pause ALL subscriptions for game events
+    // Don't pause drawing and lifecycle events
+    onUpdate.setEnabled(!pause);
+    onPostUpdate.setEnabled(!pause);
+    onTouchStart.setEnabled(!pause);
+    onTouchEnd.setEnabled(!pause);
+    onTouchMove.setEnabled(!pause);
+    onTouchCancel.setEnabled(!pause);
+    onMouseDown.setEnabled(!pause);
+    onMouseUp.setEnabled(!pause);
+    onMouseMove.setEnabled(!pause);
+    onMouseScroll.setEnabled(!pause);
+    onKeyDown.setEnabled(!pause);
+    onKeyUp.setEnabled(!pause);
+    onCharInput.setEnabled(!pause);
+}
+
 void Engine::includeScene(size_t index, Scene* scene){
     if (viewLoaded){
         scene->load();

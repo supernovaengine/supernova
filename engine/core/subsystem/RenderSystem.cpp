@@ -2751,6 +2751,10 @@ void RenderSystem::updateMVP(size_t index, Transform& transform, CameraComponent
 }
 
 void RenderSystem::update(double dt){
+    if (paused) {
+        return;
+    }
+
 	int numLights = checkLightsAndShadow();
 
 	auto transforms = scene->getComponentArray<Transform>();

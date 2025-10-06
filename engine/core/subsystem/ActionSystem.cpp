@@ -932,6 +932,9 @@ void ActionSystem::actionStateChange(Entity entity, ActionComponent& action){
 }
 
 void ActionSystem::update(double dt){
+    if (paused) {
+        return;
+    }
 
     //Animations actions
     auto animations = scene->getComponentArray<AnimationComponent>();

@@ -1805,6 +1805,10 @@ void PhysicsSystem::destroy(){
 }
 
 void PhysicsSystem::update(double dt){
+    if (paused) {
+        return;
+    }
+
 	auto bodies2d = scene->getComponentArray<Body2DComponent>();
 
 	for (int i = 0; i < bodies2d->size(); i++){

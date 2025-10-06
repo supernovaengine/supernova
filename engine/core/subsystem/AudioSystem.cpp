@@ -148,6 +148,10 @@ void AudioSystem::destroy(){
 }
 
 void AudioSystem::update(double dt){
+    if (paused) {
+        return;
+    }
+
     auto audios = scene->getComponentArray<AudioComponent>();
     for (int i = 0; i < audios->size(); i++){
 		AudioComponent& audio = audios->getComponentFromIndex(i);

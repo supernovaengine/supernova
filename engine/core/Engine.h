@@ -193,6 +193,8 @@ namespace Supernova {
         static bool isSceneRunning(Scene* scene);
         static Scene* getMainScene();
         static Scene* getLastScene();
+
+        static void pauseGameEvents(bool pause);
         
         static int getCanvasWidth();
         static int getCanvasHeight();
