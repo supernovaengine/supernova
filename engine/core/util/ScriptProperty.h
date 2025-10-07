@@ -28,16 +28,7 @@ public:
         prop.defaultValue = DefaultValue; \
         prop.type = prop.value.type; \
         VarName = DefaultValue; \
-        Supernova::ScriptPropertyType propType = prop.type; \
-        prop.getter = [this, propType]() -> Supernova::ScriptPropertyValue { \
-            Supernova::ScriptPropertyValue val; \
-            val.type = propType; \
-            val.set(this->VarName); \
-            return val; \
-        }; \
-        prop.setter = [this](const Supernova::ScriptPropertyValue& val) { \
-            this->VarName = val.get<decltype(this->VarName)>(); \
-        }; \
+        prop.memberPtr = static_cast<void*>(&this->VarName); \
         __scriptProperties.push_back(prop); \
     } while(0)
 
@@ -108,15 +99,14 @@ template<> inline void ScriptPropertyValue::set<Vector3>(const Vector3& value) {
 template<> inline void ScriptPropertyValue::set<Vector4>(const Vector4& value) { vector4Value = value; }
 
 struct ScriptProperty {
-    std::string name;           // Internal name (variable name)
-    std::string displayName;    // Display name in editor
+    std::string name;
+    std::string displayName;
     ScriptPropertyType type;
     ScriptPropertyValue value;
     ScriptPropertyValue defaultValue;
 
-    // Getter and setter function pointers for accessing the actual C++ member variable
-    std::function<void(const ScriptPropertyValue&)> setter;
-    std::function<ScriptPropertyValue()> getter;
+    // Direct pointer to the underlying member, captured at registration
+    void* memberPtr = nullptr;
 
     ScriptProperty() : type(ScriptPropertyType::Bool) {}
 
@@ -126,5 +116,6 @@ struct ScriptProperty {
         defaultValue.type = type;
     }
 };
+
 
 } // namespace Supernova
