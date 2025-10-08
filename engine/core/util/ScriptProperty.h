@@ -1,13 +1,13 @@
 #pragma once
 
 #include <string>
-#include <vector>
-#include <functional>
+#include <variant>
+
 #include "math/Vector2.h"
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 
-#define SPROPERTY(DisplayName, DefaultValue) \
+#define SPROPERTY(DisplayName) \
 public:
 
 namespace Supernova {
@@ -41,7 +41,6 @@ struct ScriptPropertyValue {
     Vector4 vector4Value;
 
     ScriptPropertyValue() : type(ScriptPropertyType::Bool), boolValue(false) {}
-
     ScriptPropertyValue(bool val) : type(ScriptPropertyType::Bool), boolValue(val) {}
     ScriptPropertyValue(int val) : type(ScriptPropertyType::Int), intValue(val) {}
     ScriptPropertyValue(float val) : type(ScriptPropertyType::Float), floatValue(val) {}
@@ -81,17 +80,6 @@ struct ScriptProperty {
     ScriptPropertyType type;
     ScriptPropertyValue value;
     ScriptPropertyValue defaultValue;
-
-    // Direct pointer to the underlying member, captured at registration
-    void* memberPtr = nullptr;
-
-    ScriptProperty() : type(ScriptPropertyType::Bool) {}
-
-    ScriptProperty(const std::string& name, const std::string& displayName, ScriptPropertyType type)
-        : name(name), displayName(displayName), type(type) {
-        value.type = type;
-        defaultValue.type = type;
-    }
 };
 
-} // namespace Supernova
+}
