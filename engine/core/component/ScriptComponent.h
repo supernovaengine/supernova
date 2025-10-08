@@ -7,12 +7,17 @@
 
 #include "ScriptProperty.h"
 
-struct ScriptComponent {
-    std::string path;
-    std::string className;
-    bool enabled = false;
+namespace Supernova{
 
-    std::vector<Supernova::ScriptProperty> properties;
-};
+    struct SUPERNOVA_API ScriptComponent {
+        std::string path;
+        std::string headerPath;
+        std::string className;
+        bool enabled = false;
+
+        std::vector<ScriptProperty> properties;
+    };
+
+}
 
 #endif //SCRIPT_COMPONENT_H
