@@ -7,31 +7,8 @@
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 
-// Macros to make property declaration easier
-#define SCRIPT_PROPERTY_BODY() \
-private: \
-    std::vector<Supernova::ScriptProperty> __scriptProperties; \
-public: \
-    const std::vector<Supernova::ScriptProperty>& getScriptProperties() const { return __scriptProperties; } \
-    std::vector<Supernova::ScriptProperty>& getScriptPropertiesMutable() { return __scriptProperties; } \
-private:
-
-#define SPROPERTY(Type, DisplayName) \
+#define SPROPERTY(DisplayName, DefaultValue) \
 public:
-
-#define REGISTER_PROPERTY(VarName, DisplayName, DefaultValue) \
-    do { \
-        Supernova::ScriptProperty prop; \
-        prop.name = #VarName; \
-        prop.displayName = DisplayName; \
-        prop.value = DefaultValue; \
-        prop.defaultValue = DefaultValue; \
-        prop.type = prop.value.type; \
-        VarName = DefaultValue; \
-        prop.memberPtr = static_cast<void*>(&this->VarName); \
-        __scriptProperties.push_back(prop); \
-    } while(0)
-
 
 namespace Supernova {
 
@@ -116,6 +93,5 @@ struct ScriptProperty {
         defaultValue.type = type;
     }
 };
-
 
 } // namespace Supernova
