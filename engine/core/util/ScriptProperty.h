@@ -80,6 +80,70 @@ struct ScriptProperty {
     ScriptPropertyType type;
     ScriptPropertyValue value;
     ScriptPropertyValue defaultValue;
+
+    void* memberPtr = nullptr; // For editor use only
+
+    // Synchronize the stored value to the actual member variable
+    void syncToMember() {
+        if (!memberPtr) return;
+
+        switch (type) {
+            case ScriptPropertyType::Bool:
+                *static_cast<bool*>(memberPtr) = value.get<bool>();
+                break;
+            case ScriptPropertyType::Int:
+                *static_cast<int*>(memberPtr) = value.get<int>();
+                break;
+            case ScriptPropertyType::Float:
+                *static_cast<float*>(memberPtr) = value.get<float>();
+                break;
+            case ScriptPropertyType::String:
+                *static_cast<std::string*>(memberPtr) = value.get<std::string>();
+                break;
+            case ScriptPropertyType::Vector2:
+                *static_cast<Vector2*>(memberPtr) = value.get<Vector2>();
+                break;
+            case ScriptPropertyType::Vector3:
+            case ScriptPropertyType::Color3:
+                *static_cast<Vector3*>(memberPtr) = value.get<Vector3>();
+                break;
+            case ScriptPropertyType::Vector4:
+            case ScriptPropertyType::Color4:
+                *static_cast<Vector4*>(memberPtr) = value.get<Vector4>();
+                break;
+        }
+    }
+
+    // Synchronize from the actual member variable to the stored value
+    void syncFromMember() {
+        if (!memberPtr) return;
+
+        switch (type) {
+            case ScriptPropertyType::Bool:
+                value.set<bool>(*static_cast<bool*>(memberPtr));
+                break;
+            case ScriptPropertyType::Int:
+                value.set<int>(*static_cast<int*>(memberPtr));
+                break;
+            case ScriptPropertyType::Float:
+                value.set<float>(*static_cast<float*>(memberPtr));
+                break;
+            case ScriptPropertyType::String:
+                value.set<std::string>(*static_cast<std::string*>(memberPtr));
+                break;
+            case ScriptPropertyType::Vector2:
+                value.set<Vector2>(*static_cast<Vector2*>(memberPtr));
+                break;
+            case ScriptPropertyType::Vector3:
+            case ScriptPropertyType::Color3:
+                value.set<Vector3>(*static_cast<Vector3*>(memberPtr));
+                break;
+            case ScriptPropertyType::Vector4:
+            case ScriptPropertyType::Color4:
+                value.set<Vector4>(*static_cast<Vector4*>(memberPtr));
+                break;
+        }
+    }
 };
 
 }
