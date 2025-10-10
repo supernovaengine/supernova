@@ -20,59 +20,22 @@ enum class ScriptPropertyType {
     Vector2,
     Vector3,
     Vector4,
-    Color3,  // Vector3 but edited as color
-    Color4   // Vector4 but edited as color
+    Color3,
+    Color4,
+    ObjectPtr  // Generic pointer type for any object
 };
 
-struct ScriptPropertyValue {
-    ScriptPropertyType type;
-
-    // POD values stored in union for efficiency
-    union {
-        bool boolValue;
-        int intValue;
-        float floatValue;
-    };
-
-    // Complex types stored separately
-    std::string stringValue;
-    Vector2 vector2Value;
-    Vector3 vector3Value;
-    Vector4 vector4Value;
-
-    ScriptPropertyValue() : type(ScriptPropertyType::Bool), boolValue(false) {}
-    ScriptPropertyValue(bool val) : type(ScriptPropertyType::Bool), boolValue(val) {}
-    ScriptPropertyValue(int val) : type(ScriptPropertyType::Int), intValue(val) {}
-    ScriptPropertyValue(float val) : type(ScriptPropertyType::Float), floatValue(val) {}
-    ScriptPropertyValue(const std::string& val) : type(ScriptPropertyType::String), stringValue(val) {}
-    ScriptPropertyValue(const Vector2& val) : type(ScriptPropertyType::Vector2), vector2Value(val) {}
-    ScriptPropertyValue(const Vector3& val) : type(ScriptPropertyType::Vector3), vector3Value(val) {}
-    ScriptPropertyValue(const Vector4& val) : type(ScriptPropertyType::Vector4), vector4Value(val) {}
-
-    // Getter templates
-    template<typename T> T get() const;
-
-    // Setter templates
-    template<typename T> void set(const T& value);
-};
-
-// Template specializations for get
-template<> inline bool ScriptPropertyValue::get<bool>() const { return boolValue; }
-template<> inline int ScriptPropertyValue::get<int>() const { return intValue; }
-template<> inline float ScriptPropertyValue::get<float>() const { return floatValue; }
-template<> inline std::string ScriptPropertyValue::get<std::string>() const { return stringValue; }
-template<> inline Vector2 ScriptPropertyValue::get<Vector2>() const { return vector2Value; }
-template<> inline Vector3 ScriptPropertyValue::get<Vector3>() const { return vector3Value; }
-template<> inline Vector4 ScriptPropertyValue::get<Vector4>() const { return vector4Value; }
-
-// Template specializations for set
-template<> inline void ScriptPropertyValue::set<bool>(const bool& value) { boolValue = value; }
-template<> inline void ScriptPropertyValue::set<int>(const int& value) { intValue = value; }
-template<> inline void ScriptPropertyValue::set<float>(const float& value) { floatValue = value; }
-template<> inline void ScriptPropertyValue::set<std::string>(const std::string& value) { stringValue = value; }
-template<> inline void ScriptPropertyValue::set<Vector2>(const Vector2& value) { vector2Value = value; }
-template<> inline void ScriptPropertyValue::set<Vector3>(const Vector3& value) { vector3Value = value; }
-template<> inline void ScriptPropertyValue::set<Vector4>(const Vector4& value) { vector4Value = value; }
+using ScriptPropertyValue = std::variant<
+    std::monostate,  // For empty/uninitialized state
+    bool,
+    int, 
+    float,
+    std::string,
+    Vector2,
+    Vector3,
+    Vector4,
+    void*  // For ObjectPtr
+>;
 
 struct ScriptProperty {
     std::string name;
@@ -83,33 +46,70 @@ struct ScriptProperty {
 
     void* memberPtr = nullptr; // For editor use only
 
+    // Optional: Store the actual type name for editor UI/debugging
+    std::string ptrTypeName; // e.g., "Mesh*", "Object*", "EntityHandle*"
+
+    // Helper template to get typed value
+    template<typename T>
+    T getValue() const {
+        if (std::holds_alternative<T>(value)) {
+            return std::get<T>(value);
+        }
+        return T{}; // Return default value if type mismatch
+    }
+
+    // Helper template to set typed value
+    template<typename T>
+    void setValue(const T& val) {
+        value = val;
+    }
+
     // Synchronize the stored value to the actual member variable
     void syncToMember() {
         if (!memberPtr) return;
 
         switch (type) {
             case ScriptPropertyType::Bool:
-                *static_cast<bool*>(memberPtr) = value.get<bool>();
+                if (std::holds_alternative<bool>(value)) {
+                    *static_cast<bool*>(memberPtr) = std::get<bool>(value);
+                }
                 break;
             case ScriptPropertyType::Int:
-                *static_cast<int*>(memberPtr) = value.get<int>();
+                if (std::holds_alternative<int>(value)) {
+                    *static_cast<int*>(memberPtr) = std::get<int>(value);
+                }
                 break;
             case ScriptPropertyType::Float:
-                *static_cast<float*>(memberPtr) = value.get<float>();
+                if (std::holds_alternative<float>(value)) {
+                    *static_cast<float*>(memberPtr) = std::get<float>(value);
+                }
                 break;
             case ScriptPropertyType::String:
-                *static_cast<std::string*>(memberPtr) = value.get<std::string>();
+                if (std::holds_alternative<std::string>(value)) {
+                    *static_cast<std::string*>(memberPtr) = std::get<std::string>(value);
+                }
                 break;
             case ScriptPropertyType::Vector2:
-                *static_cast<Vector2*>(memberPtr) = value.get<Vector2>();
+                if (std::holds_alternative<Vector2>(value)) {
+                    *static_cast<Vector2*>(memberPtr) = std::get<Vector2>(value);
+                }
                 break;
             case ScriptPropertyType::Vector3:
             case ScriptPropertyType::Color3:
-                *static_cast<Vector3*>(memberPtr) = value.get<Vector3>();
+                if (std::holds_alternative<Vector3>(value)) {
+                    *static_cast<Vector3*>(memberPtr) = std::get<Vector3>(value);
+                }
                 break;
             case ScriptPropertyType::Vector4:
             case ScriptPropertyType::Color4:
-                *static_cast<Vector4*>(memberPtr) = value.get<Vector4>();
+                if (std::holds_alternative<Vector4>(value)) {
+                    *static_cast<Vector4*>(memberPtr) = std::get<Vector4>(value);
+                }
+                break;
+            case ScriptPropertyType::ObjectPtr:
+                if (std::holds_alternative<void*>(value)) {
+                    *static_cast<void**>(memberPtr) = std::get<void*>(value);
+                }
                 break;
         }
     }
@@ -120,27 +120,30 @@ struct ScriptProperty {
 
         switch (type) {
             case ScriptPropertyType::Bool:
-                value.set<bool>(*static_cast<bool*>(memberPtr));
+                value = *static_cast<bool*>(memberPtr);
                 break;
             case ScriptPropertyType::Int:
-                value.set<int>(*static_cast<int*>(memberPtr));
+                value = *static_cast<int*>(memberPtr);
                 break;
             case ScriptPropertyType::Float:
-                value.set<float>(*static_cast<float*>(memberPtr));
+                value = *static_cast<float*>(memberPtr);
                 break;
             case ScriptPropertyType::String:
-                value.set<std::string>(*static_cast<std::string*>(memberPtr));
+                value = *static_cast<std::string*>(memberPtr);
                 break;
             case ScriptPropertyType::Vector2:
-                value.set<Vector2>(*static_cast<Vector2*>(memberPtr));
+                value = *static_cast<Vector2*>(memberPtr);
                 break;
             case ScriptPropertyType::Vector3:
             case ScriptPropertyType::Color3:
-                value.set<Vector3>(*static_cast<Vector3*>(memberPtr));
+                value = *static_cast<Vector3*>(memberPtr);
                 break;
             case ScriptPropertyType::Vector4:
             case ScriptPropertyType::Color4:
-                value.set<Vector4>(*static_cast<Vector4*>(memberPtr));
+                value = *static_cast<Vector4*>(memberPtr);
+                break;
+            case ScriptPropertyType::ObjectPtr:
+                value = *static_cast<void**>(memberPtr);
                 break;
         }
     }
