@@ -6,6 +6,7 @@
 #define supernova_h
 
 #include "Engine.h"
+//#include "Export.h"
 #include "Input.h"
 #include "Log.h"
 #include "Scene.h"
@@ -45,6 +46,7 @@
 #include "component/ColorActionComponent.h"
 #include "component/FogComponent.h"
 #include "component/ImageComponent.h"
+#include "component/InstancedMeshComponent.h"
 #include "component/Joint2DComponent.h"
 #include "component/Joint3DComponent.h"
 #include "component/KeyframeTracksComponent.h"
@@ -94,6 +96,7 @@
 #include "math/AABB.h"
 #include "math/Matrix3.h"
 #include "math/Matrix4.h"
+#include "math/OBB.h"
 #include "math/Plane.h"
 #include "math/Quaternion.h"
 #include "math/Ray.h"
