@@ -73,7 +73,7 @@ namespace Supernova{
 		};
 
 		struct MeshComparison{
-			bool const operator()(const TransparentMeshesData& lhs, const TransparentMeshesData& rhs) const{
+			bool operator()(const TransparentMeshesData& lhs, const TransparentMeshesData& rhs) const{
 				return lhs.distanceToCamera < rhs.distanceToCamera;
 			}
 		};
