@@ -7,8 +7,16 @@
 #include "math/Vector3.h"
 #include "math/Vector4.h"
 
-#define SPROPERTY(DisplayName) \
+// Macro with optional type parameter
+#define SPROPERTY_1(DisplayName) \
 public:
+
+#define SPROPERTY_2(DisplayName, Type) \
+public: /* @SPROPERTY_TYPE: Type */
+
+// Macro overload selector
+#define GET_SPROPERTY_MACRO(_1, _2, NAME, ...) NAME
+#define SPROPERTY(...) GET_SPROPERTY_MACRO(__VA_ARGS__, SPROPERTY_2, SPROPERTY_1)(__VA_ARGS__)
 
 namespace Supernova {
 
