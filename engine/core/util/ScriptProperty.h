@@ -30,7 +30,7 @@ enum class ScriptPropertyType {
     Vector4,
     Color3,
     Color4,
-    ObjectPtr  // Generic pointer type for any object
+    Pointer  // Generic pointer type for any object
 };
 
 using ScriptPropertyValue = std::variant<
@@ -42,7 +42,7 @@ using ScriptPropertyValue = std::variant<
     Vector2,
     Vector3,
     Vector4,
-    void*  // For ObjectPtr
+    void*  // For Pointer
 >;
 
 struct ScriptProperty {
@@ -114,7 +114,7 @@ struct ScriptProperty {
                     *static_cast<Vector4*>(memberPtr) = std::get<Vector4>(value);
                 }
                 break;
-            case ScriptPropertyType::ObjectPtr:
+            case ScriptPropertyType::Pointer:
                 if (std::holds_alternative<void*>(value)) {
                     *static_cast<void**>(memberPtr) = std::get<void*>(value);
                 }
@@ -150,7 +150,7 @@ struct ScriptProperty {
             case ScriptPropertyType::Color4:
                 value = *static_cast<Vector4*>(memberPtr);
                 break;
-            case ScriptPropertyType::ObjectPtr:
+            case ScriptPropertyType::Pointer:
                 value = *static_cast<void**>(memberPtr);
                 break;
         }
