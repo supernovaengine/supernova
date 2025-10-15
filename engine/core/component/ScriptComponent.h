@@ -11,8 +11,8 @@
 namespace Supernova{
 
     enum class ScriptType {
-        SUBCLASS,    // Inherits from EntityHandle
-        PLAIN_CLASS  // Plain C++ class
+        SUBCLASS,    // Inherits from EntityHandle or specific base class
+        SCRIPT_CLASS  // Inherits from ScriptBase
     };
 
     struct SUPERNOVA_API ScriptEntry {
