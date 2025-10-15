@@ -447,7 +447,6 @@
 		715253542CD057C400D294D8 /* Sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = 715253522CD057C400D294D8 /* Sphere.h */; };
 		715253552CD057C400D294D8 /* Sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715253532CD057C400D294D8 /* Sphere.cpp */; };
 		715253562CD057C400D294D8 /* Sphere.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 715253532CD057C400D294D8 /* Sphere.cpp */; };
-		7152570A2E9491E7003DEBB7 /* ScriptProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 715257092E9491E7003DEBB7 /* ScriptProperty.h */; };
 		7157344B2D9A23A40078952E /* OBB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157344A2D9A23A40078952E /* OBB.cpp */; };
 		7157344C2D9A23A40078952E /* OBB.h in Headers */ = {isa = PBXBuildFile; fileRef = 715734492D9A23A40078952E /* OBB.h */; };
 		7157344D2D9A23A40078952E /* OBB.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 7157344A2D9A23A40078952E /* OBB.cpp */; };
@@ -821,6 +820,10 @@
 		71ABBD4927A87A2E001CE3AF /* MeshSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD4727A87A2E001CE3AF /* MeshSystem.cpp */; };
 		71ABBD4A27A87A2E001CE3AF /* MeshSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD4727A87A2E001CE3AF /* MeshSystem.cpp */; };
 		71ABBD4B27A87A2E001CE3AF /* MeshSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD4827A87A2E001CE3AF /* MeshSystem.h */; };
+		71AD5E702E9F2B86004951AB /* ScriptBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */; };
+		71AD5E712E9F2B86004951AB /* ScriptProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */; };
+		71AD5E722E9F2B86004951AB /* ScriptBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E6D2E9F2B86004951AB /* ScriptBase.h */; };
+		71AD5E732E9F2B86004951AB /* ScriptBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */; };
 		71BE60E425B1D019006D6E02 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE60E325B1D019006D6E02 /* assets */; };
 		71BE60E525B1D019006D6E02 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE60E325B1D019006D6E02 /* assets */; };
 		71BE61C525B1DA3E006D6E02 /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61BA25B1DA3E006D6E02 /* stb_truetype.c */; };
@@ -1806,7 +1809,6 @@
 		7151E79E2D2E01CB00FC3F38 /* TaperedCylinderShape.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = TaperedCylinderShape.cpp; sourceTree = "<group>"; };
 		715253522CD057C400D294D8 /* Sphere.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Sphere.h; sourceTree = "<group>"; };
 		715253532CD057C400D294D8 /* Sphere.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = Sphere.cpp; sourceTree = "<group>"; };
-		715257092E9491E7003DEBB7 /* ScriptProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptProperty.h; sourceTree = "<group>"; };
 		715734492D9A23A40078952E /* OBB.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OBB.h; sourceTree = "<group>"; };
 		7157344A2D9A23A40078952E /* OBB.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = OBB.cpp; sourceTree = "<group>"; };
 		7157764C2B050C230049C970 /* FontPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FontPool.h; sourceTree = "<group>"; };
@@ -2121,6 +2123,9 @@
 		71ABBD4327A879D4001CE3AF /* Button.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Button.h; sourceTree = "<group>"; };
 		71ABBD4727A87A2E001CE3AF /* MeshSystem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MeshSystem.cpp; sourceTree = "<group>"; };
 		71ABBD4827A87A2E001CE3AF /* MeshSystem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MeshSystem.h; sourceTree = "<group>"; };
+		71AD5E6D2E9F2B86004951AB /* ScriptBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptBase.h; sourceTree = "<group>"; };
+		71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptBase.cpp; sourceTree = "<group>"; };
+		71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptProperty.h; sourceTree = "<group>"; };
 		71BE602825B1C49C006D6E02 /* liblua-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "liblua-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BE60E325B1D019006D6E02 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		71BE612625B1D088006D6E02 /* libstb-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libstb-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3299,7 +3304,6 @@
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
 				7105CAA62AD61BD5007C91BA /* JoltPhysicsAux.h */,
-				715257092E9491E7003DEBB7 /* ScriptProperty.h */,
 				71451BF2270CA3EA00712643 /* SpriteFrameData.h */,
 				71ABBD27277A3210001CE3AF /* STBText.h */,
 				71ABBD26277A3210001CE3AF /* STBText.cpp */,
@@ -3953,15 +3957,18 @@
 		71BE622C25B1DB9D006D6E02 /* script */ = {
 			isa = PBXGroup;
 			children = (
+				7105A55B28B305B20092EA05 /* binding */,
+				71BE623125B1DB9D006D6E02 /* LuaBinding.h */,
+				71BE622D25B1DB9D006D6E02 /* LuaBinding.cpp */,
 				71FCE4BD28E0FA01003C5217 /* LuaBridgeAddon.h */,
 				71FCE4BA28E0FA01003C5217 /* LuaFunction.h */,
-				71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */,
 				71FCE4BC28E0FA01003C5217 /* LuaFunctionBase.h */,
-				7105A55B28B305B20092EA05 /* binding */,
-				71BE622D25B1DB9D006D6E02 /* LuaBinding.cpp */,
-				71BE623125B1DB9D006D6E02 /* LuaBinding.h */,
-				71BE622F25B1DB9D006D6E02 /* LuaScript.cpp */,
+				71FCE4BB28E0FA01003C5217 /* LuaFunctionBase.cpp */,
 				71BE623025B1DB9D006D6E02 /* LuaScript.h */,
+				71BE622F25B1DB9D006D6E02 /* LuaScript.cpp */,
+				71AD5E6D2E9F2B86004951AB /* ScriptBase.h */,
+				71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */,
+				71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */,
 			);
 			path = script;
 			sourceTree = "<group>";
@@ -4318,9 +4325,10 @@
 				71CC83A526B8C54A00EEBB93 /* SBSReader.h in Headers */,
 				711BFE3A2E6E5AE500677D11 /* ScriptComponent.h in Headers */,
 				71FCE4BE28E0FA01003C5217 /* LuaFunction.h in Headers */,
+				71AD5E712E9F2B86004951AB /* ScriptProperty.h in Headers */,
+				71AD5E722E9F2B86004951AB /* ScriptBase.h in Headers */,
 				717AD9882919E1E9007D7DB5 /* ImageComponent.h in Headers */,
 				7170A3CB2818A87E0003E965 /* BoneComponent.h in Headers */,
-				7152570A2E9491E7003DEBB7 /* ScriptProperty.h in Headers */,
 				71FFE3FF2A369FE90089A6C9 /* ThreadUtils.h in Headers */,
 				717AD964290B65E6007D7DB5 /* AudioComponent.h in Headers */,
 				71CC83AA26B8D54800EEBB93 /* SokolFramebuffer.h in Headers */,
@@ -5552,6 +5560,7 @@
 				71D74956296731F200348AB8 /* EntityHandle.cpp in Sources */,
 				71ABBD362783C8BB001CE3AF /* Image.cpp in Sources */,
 				71E824902A9C23A600C8E6F2 /* Body2D.cpp in Sources */,
+				71AD5E702E9F2B86004951AB /* ScriptBase.cpp in Sources */,
 				71E5450A284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
 				71C33FBD2A315918007A5822 /* Model.cpp in Sources */,
 				713D82B6259D307F00567F9F /* SokolTexture.cpp in Sources */,
@@ -5721,6 +5730,7 @@
 				71D74955296731F200348AB8 /* EntityHandle.cpp in Sources */,
 				71ABBD352783C8BB001CE3AF /* Image.cpp in Sources */,
 				71E8248F2A9C23A600C8E6F2 /* Body2D.cpp in Sources */,
+				71AD5E732E9F2B86004951AB /* ScriptBase.cpp in Sources */,
 				71E54509284D5BB700C68FAB /* RotateTracks.cpp in Sources */,
 				71C33FBC2A315918007A5822 /* Model.cpp in Sources */,
 				7162FD5E25963AE10075B97D /* ExternalBuffer.cpp in Sources */,
