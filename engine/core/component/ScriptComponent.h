@@ -6,16 +6,28 @@
 #define SCRIPT_COMPONENT_H
 
 #include "ScriptProperty.h"
+#include <vector>
 
 namespace Supernova{
 
-    struct SUPERNOVA_API ScriptComponent {
+    enum class ScriptType {
+        SUBCLASS,    // Inherits from EntityHandle
+        PLAIN_CLASS  // Plain C++ class
+    };
+
+    struct SUPERNOVA_API ScriptEntry {
+        ScriptType type;
         std::string path;
         std::string headerPath;
         std::string className;
         bool enabled = false;
-
         std::vector<ScriptProperty> properties;
+
+        void* instance = nullptr;
+    };
+
+    struct SUPERNOVA_API ScriptComponent {
+        std::vector<ScriptEntry> scripts;
     };
 
 }

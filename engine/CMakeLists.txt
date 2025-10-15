@@ -149,6 +149,7 @@ set(SUPERNOVA_SRCS
     core/script/LuaBinding.cpp
     core/script/LuaFunctionBase.cpp
     core/script/LuaScript.cpp
+    core/script/ScriptBase.cpp
     core/script/binding/ActionClassesLua.cpp
     core/script/binding/CoreClassesLua.cpp
     core/script/binding/ECSClassesLua.cpp
