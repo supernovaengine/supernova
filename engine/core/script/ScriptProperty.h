@@ -21,7 +21,7 @@ public: /* @SPROPERTY_TYPE: Type */
 
 namespace Supernova {
 
-    class EntityRegistry;
+    class Scene;
 
     enum class ScriptPropertyType {
         Bool,
@@ -38,7 +38,7 @@ namespace Supernova {
 
     struct EntityRef {
         Entity entity = NULL_ENTITY;
-        EntityRegistry* registry = nullptr;
+        Scene* scene = nullptr;
     };
 
     using ScriptPropertyValue = std::variant<
