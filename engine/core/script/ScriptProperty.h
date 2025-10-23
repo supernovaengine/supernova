@@ -122,6 +122,9 @@ namespace Supernova {
                         *static_cast<Vector4*>(memberPtr) = std::get<Vector4>(value);
                     }
                     break;
+                case ScriptPropertyType::EntityPointer:
+                    // Do nothing for EntityPointer here
+                    break;
             }
         }
 
@@ -152,6 +155,9 @@ namespace Supernova {
                 case ScriptPropertyType::Vector4:
                 case ScriptPropertyType::Color4:
                     value = *static_cast<Vector4*>(memberPtr);
+                    break;
+                case ScriptPropertyType::EntityPointer:
+                    // Do nothing for EntityPointer here
                     break;
             }
         }
