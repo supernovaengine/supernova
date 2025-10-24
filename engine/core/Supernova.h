@@ -162,6 +162,8 @@
 #include "script/LuaFunctionBase.h"
 #include "script/LuaFunction.h"
 #include "script/LuaScript.h"
+#include "script/ScriptBase.h"
+#include "script/ScriptProperty.h"
 
 #include "shader/SBSReader.h"
 #include "shader/ShaderData.h"
