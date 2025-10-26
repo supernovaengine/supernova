@@ -824,6 +824,7 @@
 		71AD5E712E9F2B86004951AB /* ScriptProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */; };
 		71AD5E722E9F2B86004951AB /* ScriptBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E6D2E9F2B86004951AB /* ScriptBase.h */; };
 		71AD5E732E9F2B86004951AB /* ScriptBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */; };
+		71AD5E752EAECC69004951AB /* CrashGuard.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E742EAECC69004951AB /* CrashGuard.h */; };
 		71BE60E425B1D019006D6E02 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE60E325B1D019006D6E02 /* assets */; };
 		71BE60E525B1D019006D6E02 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE60E325B1D019006D6E02 /* assets */; };
 		71BE61C525B1DA3E006D6E02 /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61BA25B1DA3E006D6E02 /* stb_truetype.c */; };
@@ -2126,6 +2127,7 @@
 		71AD5E6D2E9F2B86004951AB /* ScriptBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptBase.h; sourceTree = "<group>"; };
 		71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptBase.cpp; sourceTree = "<group>"; };
 		71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptProperty.h; sourceTree = "<group>"; };
+		71AD5E742EAECC69004951AB /* CrashGuard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CrashGuard.h; sourceTree = "<group>"; };
 		71BE602825B1C49C006D6E02 /* liblua-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "liblua-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BE60E325B1D019006D6E02 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		71BE612625B1D088006D6E02 /* libstb-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libstb-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3301,6 +3303,7 @@
 				7105CAA72AD61BD5007C91BA /* Box2DAux.h */,
 				7105A55728B305910092EA05 /* Color.h */,
 				7105A55628B305910092EA05 /* Color.cpp */,
+				71AD5E742EAECC69004951AB /* CrashGuard.h */,
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
 				7105CAA62AD61BD5007C91BA /* JoltPhysicsAux.h */,
@@ -4306,6 +4309,7 @@
 				71CC839A26B8C4FD00EEBB93 /* FramebufferRender.h in Headers */,
 				71F225452C58736B006ED3CA /* InstancedMeshComponent.h in Headers */,
 				7105CAA92AD61BD5007C91BA /* Box2DAux.h in Headers */,
+				71AD5E752EAECC69004951AB /* CrashGuard.h in Headers */,
 				71E824912A9C23A600C8E6F2 /* Body2D.h in Headers */,
 				718FDDFA2837CA9A00AF314C /* hlsl5.h in Headers */,
 				7170A3D82818A8A30003E965 /* Fog.h in Headers */,
