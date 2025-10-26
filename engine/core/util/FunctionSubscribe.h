@@ -3,7 +3,7 @@
  */
 
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #ifndef FUNCTIONSUBSCRIBE_H
@@ -14,9 +14,10 @@
 #include <memory>
 #include <string>
 #include <vector>
-#include <algorithm> 
+#include <algorithm>
 
 #include "LuaFunction.h"
+#include "util/CrashGuard.h"
 
 template<size_t>
 struct MyPlaceholder {};
@@ -26,6 +27,16 @@ struct std::is_placeholder<MyPlaceholder<N>> : public std::integral_constant<siz
 
 namespace Supernova {
 
+    using CrashHandler = std::function<void(const std::string& tag, const std::string& errorInfo)>;
+
+    class FunctionSubscribeGlobal {
+    public:
+        static CrashHandler& getCrashHandler() {
+            static CrashHandler handler = nullptr;
+            return handler;
+        }
+    };
+
     template<typename T>
     class FunctionSubscribe;
 
@@ -33,10 +44,15 @@ namespace Supernova {
     class FunctionSubscribe<Ret(Args...)> {
 
     private:
-
         std::vector<std::function<Ret(Args...)>> functions;
         std::vector<std::string> tags;
         bool enabled = false;
+
+        // Helper to remove subscriber by index
+        void removeAt(size_t index) {
+            functions.erase(functions.begin() + index);
+            tags.erase(tags.begin() + index);
+        }
 
         bool addImpl(const std::string& tag, std::function<Ret(Args...)> function){
             if (find(tags.begin(), tags.end(), tag) != tags.end())
@@ -163,9 +179,33 @@ namespace Supernova {
                 }
             }else{
                 if constexpr (std::is_void<Ret>::value) {
-                    for (auto& function : functions){
-                        function(args...);
-                    };
+                    for (size_t i = 0; i < functions.size(); ) {
+                        auto& function = functions[i];
+                        auto& tag = tags[i];
+
+                        // Use crash protection if handler is registered
+                        auto& crashHandler = FunctionSubscribeGlobal::getCrashHandler();
+                        if (crashHandler) {
+                            CrashInfo ci{};
+                            bool ok = callWithCrashGuard([&](){
+                                function(args...);
+                            }, &ci);
+
+                            if (!ok) {
+                                std::string errorInfo = std::string(ci.name ? ci.name : "UNKNOWN") + 
+                                                    " (" + (ci.description ? ci.description : "") + 
+                                                    ") [code=" + std::to_string(ci.code) + "]";
+
+                                crashHandler(tag, errorInfo);
+
+                                removeAt(i);
+                                continue;
+                            }
+                        } else {
+                            function(args...);
+                        }
+                        ++i;
+                    }
                 } else {
                     return callRet(args..., Ret());
                 }
@@ -177,9 +217,35 @@ namespace Supernova {
             if (!enabled){
                 return def;
             }
-            for (auto& function : functions){
-                return function(args...);
-            };
+            for (size_t i = 0; i < functions.size(); ) {
+                auto& function = functions[i];
+                auto& tag = tags[i];
+
+                // Use crash protection if handler is registered
+                auto& crashHandler = FunctionSubscribeGlobal::getCrashHandler();
+                if (crashHandler) {
+                    Ret result{};
+                    CrashInfo ci{};
+                    bool ok = callWithCrashGuard([&](){
+                        result = function(args...);
+                    }, &ci);
+
+                    if (ok) {
+                        return result;
+                    } else {
+                        std::string errorInfo = std::string(ci.name ? ci.name : "UNKNOWN") + 
+                                            " (" + (ci.description ? ci.description : "") + 
+                                            ") [code=" + std::to_string(ci.code) + "]";
+
+                        crashHandler(tag, errorInfo);
+
+                        removeAt(i);
+                        continue;
+                    }
+                } else {
+                    return function(args...);
+                }
+            }
             return def;
         }
 
