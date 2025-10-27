@@ -47,10 +47,10 @@ namespace Supernova{
         void setShadowMapSize(unsigned int size);
         unsigned int getShadowMapSize() const;
 
-        void setShadowCameraNearFar(float near, float far);
-        void setCameraNear(float near);
+        void setShadowCameraNearFar(float nearValue, float farValue);
+        void setCameraNear(float nearValue);
         float getCameraNear() const;
-        void setCameraFar(float far);
+        void setCameraFar(float farValue);
         float getCameraFar() const;
 
         void setAutomaticShadowCamera(bool automatic);

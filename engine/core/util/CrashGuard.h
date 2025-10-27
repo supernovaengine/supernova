@@ -14,14 +14,14 @@
 
 // IMPORTANT: Include platform headers at global scope (not inside any namespace)
 // to avoid injecting standard names inside Supernova::std, which breaks builds.
-#if defined(_WIN32)
+#if defined(_WIN32) && defined(_MSC_VER)
     #ifndef NOMINMAX
     #define NOMINMAX
     #endif
     #include <windows.h>
 #elif defined(__EMSCRIPTEN__)
 // no special headers
-#else
+#elif !defined(_WIN32)
     // Use C headers for POSIX signal and setjmp APIs to get C-level names.
     #include <signal.h>
     #include <setjmp.h>
@@ -35,7 +35,7 @@ namespace Supernova {
         const char* description; // human-friendly description
     };
 
-#if defined(_WIN32)
+#if defined(_WIN32) && defined(_MSC_VER)
 
     inline const char* winExceptionName(DWORD code) {
         switch (code) {
@@ -92,7 +92,7 @@ namespace Supernova {
         return true;
     }
 
-#else
+#elif !defined(_WIN32)
     // POSIX implementation
 
     namespace detail {
@@ -207,6 +207,16 @@ namespace Supernova {
             scope.restore();
             return false;
         }
+    }
+
+#else
+    // Windows with non-MSVC compilers (e.g., MinGW/clang-mingw):
+    // SEH __try/__except is not available, and POSIX sigaction isn't reliable on Windows.
+    // Fall back to direct execution (no crash guard).
+    template<typename Fn>
+    inline bool callWithCrashGuard(Fn&& fn, CrashInfo* /*outInfo*/) {
+        fn();
+        return true;
     }
 #endif
 

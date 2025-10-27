@@ -205,22 +205,22 @@ unsigned int Light::getShadowMapSize() const{
     return lightcomp.mapResolution;
 }
 
-void Light::setShadowCameraNearFar(float near, float far){
+void Light::setShadowCameraNearFar(float nearValue, float farValue){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    if (lightcomp.shadowCameraNearFar != Vector2(near, far)){
-        lightcomp.shadowCameraNearFar = Vector2(near, far);
+    if (lightcomp.shadowCameraNearFar != Vector2(nearValue, farValue)){
+        lightcomp.shadowCameraNearFar = Vector2(nearValue, farValue);
 
         lightcomp.automaticShadowCamera = false;
         lightcomp.needUpdateShadowCamera = true;
     }
 }
 
-void Light::setCameraNear(float near){
+void Light::setCameraNear(float nearValue){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    if (lightcomp.shadowCameraNearFar.x != near){
-        lightcomp.shadowCameraNearFar.x = near;
+    if (lightcomp.shadowCameraNearFar.x != nearValue){
+        lightcomp.shadowCameraNearFar.x = nearValue;
 
         lightcomp.automaticShadowCamera = false;
         lightcomp.needUpdateShadowCamera = true;
@@ -233,11 +233,11 @@ float Light::getCameraNear() const{
     return lightcomp.shadowCameraNearFar.x;
 }
 
-void Light::setCameraFar(float far){
+void Light::setCameraFar(float farValue){
     LightComponent& lightcomp = getComponent<LightComponent>();
 
-    if (lightcomp.shadowCameraNearFar.y != far){
-        lightcomp.shadowCameraNearFar.y = far;
+    if (lightcomp.shadowCameraNearFar.y != farValue){
+        lightcomp.shadowCameraNearFar.y = farValue;
 
         lightcomp.automaticShadowCamera = false;
         lightcomp.needUpdateShadowCamera = true;

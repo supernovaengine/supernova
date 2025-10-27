@@ -24,13 +24,13 @@ namespace Supernova{
 
         void activate();
 
-        void setOrtho(float left, float right, float bottom, float top, float near, float far);
-        void setPerspective(float yfov, float aspect, float near, float far);
+        void setOrtho(float left, float right, float bottom, float top, float nearValue, float farValue);
+        void setPerspective(float yfov, float aspect, float nearValue, float farValue);
 
-        void setNearClip(float near);
+        void setNearClip(float nearValue);
         float getNearClip() const;
 
-        void setFarClip(float far);
+        void setFarClip(float farValue);
         float getFarClip() const;
 
         void setLeftClip(float left);

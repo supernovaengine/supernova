@@ -54,7 +54,7 @@ void Camera::activate(){
     scene->setCamera(entity);
 }
 
-void Camera::setOrtho(float left, float right, float bottom, float top, float near, float far){
+void Camera::setOrtho(float left, float right, float bottom, float top, float nearValue, float farValue){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     camera.type = CameraType::CAMERA_ORTHO;
@@ -63,34 +63,34 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
     camera.rightClip = right;
     camera.bottomClip = bottom;
     camera.topClip = top;
-    camera.nearClip = near;
-    camera.farClip = far;
+    camera.nearClip = nearValue;
+    camera.farClip = farValue;
     
     camera.automatic = false;
 
     camera.needUpdate = true;
 }
 
-void Camera::setPerspective(float yfov, float aspect, float near, float far){
+void Camera::setPerspective(float yfov, float aspect, float nearValue, float farValue){
     CameraComponent& camera = getComponent<CameraComponent>();
 
     camera.type = CameraType::CAMERA_PERSPECTIVE;
 
     camera.yfov = Angle::defaultToRad(yfov);
     camera.aspect = aspect;
-    camera.nearClip = near;
-    camera.farClip = far;
+    camera.nearClip = nearValue;
+    camera.farClip = farValue;
     
     camera.automatic = false;
 
     camera.needUpdate = true;
 }
 
-void Camera::setNearClip(float near){
+void Camera::setNearClip(float nearValue){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    if (camera.nearClip != near){
-        camera.nearClip = near;
+    if (camera.nearClip != nearValue){
+        camera.nearClip = nearValue;
 
         camera.needUpdate = true;
     }
@@ -102,11 +102,11 @@ float Camera::getNearClip() const{
     return camera.nearClip;
 }
 
-void Camera::setFarClip(float far){
+void Camera::setFarClip(float farValue){
     CameraComponent& camera = getComponent<CameraComponent>();
 
-    if (camera.farClip != far){
-        camera.farClip = far;
+    if (camera.farClip != farValue){
+        camera.farClip = farValue;
 
         camera.needUpdate = true;
     }
