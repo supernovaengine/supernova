@@ -17,7 +17,9 @@
 #include <algorithm>
 
 #include "LuaFunction.h"
+#ifdef SUPERNOVA_CRASH_GUARD
 #include "util/CrashGuard.h"
+#endif
 
 template<size_t>
 struct MyPlaceholder {};
@@ -27,6 +29,7 @@ struct std::is_placeholder<MyPlaceholder<N>> : public std::integral_constant<siz
 
 namespace Supernova {
 
+    #ifdef SUPERNOVA_CRASH_GUARD
     using CrashHandler = std::function<void(const std::string& tag, const std::string& errorInfo)>;
 
     class FunctionSubscribeGlobal {
@@ -36,6 +39,7 @@ namespace Supernova {
             return handler;
         }
     };
+    #endif
 
     template<typename T>
     class FunctionSubscribe;
@@ -182,7 +186,7 @@ namespace Supernova {
                     for (size_t i = 0; i < functions.size(); ) {
                         auto& function = functions[i];
                         auto& tag = tags[i];
-
+                        #ifdef SUPERNOVA_CRASH_GUARD
                         // Use crash protection if handler is registered
                         auto& crashHandler = FunctionSubscribeGlobal::getCrashHandler();
                         if (crashHandler) {
@@ -204,6 +208,10 @@ namespace Supernova {
                         } else {
                             function(args...);
                         }
+                        #else
+                        function(args...);
+                        #endif
+
                         ++i;
                     }
                 } else {
@@ -220,7 +228,7 @@ namespace Supernova {
             for (size_t i = 0; i < functions.size(); ) {
                 auto& function = functions[i];
                 auto& tag = tags[i];
-
+                #ifdef SUPERNOVA_CRASH_GUARD
                 // Use crash protection if handler is registered
                 auto& crashHandler = FunctionSubscribeGlobal::getCrashHandler();
                 if (crashHandler) {
@@ -245,6 +253,9 @@ namespace Supernova {
                 } else {
                     return function(args...);
                 }
+                #else
+                return function(args...);
+                #endif
             }
             return def;
         }

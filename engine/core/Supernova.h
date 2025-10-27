@@ -184,6 +184,7 @@
 #include "util/Base64.h"
 //#include "util/Box2DAux.h"
 #include "util/Color.h"
+//#include "util/CrashGuard.h"
 //#include "util/DefaultFont.h"
 #include "util/SpriteFrameData.h"
 #include "util/FunctionSubscribe.h"

@@ -25,7 +25,7 @@ Text TextEdit::getTextObject() const{
     return Text(scene, tecomp.text);
 }
 
-Polygon TextEdit::getCursorObject() const{
+Supernova::Polygon TextEdit::getCursorObject() const{
     TextEditComponent& tecomp = getComponent<TextEditComponent>();
 
     return Polygon(scene, tecomp.cursor);
