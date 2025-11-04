@@ -39,6 +39,8 @@ namespace Supernova {
     struct EntityRef {
         Entity entity = NULL_ENTITY;
         Scene* scene = nullptr;
+        int entityIndex = -1;       // Index of entity for editor use only
+        unsigned int sceneId = 0;   // Id of scene for editor use only
     };
 
     using ScriptPropertyValue = std::variant<
