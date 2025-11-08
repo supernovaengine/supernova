@@ -183,7 +183,17 @@ void EntityRegistry::changeTransformChildren(Entity entity){
 }
 
 Entity EntityRegistry::createEntity() {
-    return entityManager.createEntity();
+    return (defaultPool == EntityPool::System)
+        ? entityManager.createSystemEntity()
+        : entityManager.createUserEntity();
+}
+
+Entity EntityRegistry::createUserEntity() {
+    return entityManager.createUserEntity();
+}
+
+Entity EntityRegistry::createSystemEntity() {
+    return entityManager.createSystemEntity();
 }
 
 bool EntityRegistry::isEntityCreated(Entity entity) const {
@@ -297,11 +307,19 @@ size_t EntityRegistry::findBranchLastIndex(Entity entity){
 }
 
 Entity EntityRegistry::getLastEntity() const{
-    return entityManager.getLastEntity();
+    return entityManager.getLastUserEntity();
 }
 
 std::vector<Entity> EntityRegistry::getEntityList() const{
     return entityManager.getEntityList();
+}
+
+void EntityRegistry::setDefaultEntityPool(EntityPool pool) { 
+    defaultPool = pool;
+}
+
+EntityPool EntityRegistry::getDefaultEntityPool() const {
+    return defaultPool;
 }
 
 void EntityRegistry::clear() {
@@ -309,7 +327,8 @@ void EntityRegistry::clear() {
     for (Entity entity : entities) {
         destroyEntity(entity);
     }
-    entityManager.setLastEntity(NULL_ENTITY);
+    // Reset user counter to just before the user range
+    entityManager.setLastUserEntity(EntityManager::lastSystemEntity());
 }
 
 void EntityRegistry::addEntityChild(Entity parent, Entity child, bool changeTransform){

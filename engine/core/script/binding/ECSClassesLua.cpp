@@ -247,12 +247,16 @@ void LuaBinding::registerECSClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginClass<EntityManager>("EntityManager")
         .addConstructor <void (*) (void)> ()
-        .addFunction("createEntity", &EntityManager::createEntity)
+        .addFunction("createUserEntity", &EntityManager::createUserEntity)
+        .addFunction("createSystemEntity", &EntityManager::createSystemEntity)
         .addFunction("destroy", &EntityManager::destroy)
         .addFunction("setSignature", &EntityManager::setSignature)
         .addFunction("getSignature", &EntityManager::getSignature)
         .addFunction("setName", &EntityManager::setName)
         .addFunction("getName", &EntityManager::getName)
+        .addFunction("isCreated", &EntityManager::isCreated)
+        .addFunction("recreateEntity", &EntityManager::recreateEntity)
+        .addFunction("getLastUserEntity", &EntityManager::getLastUserEntity)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

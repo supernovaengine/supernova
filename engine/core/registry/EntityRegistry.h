@@ -55,10 +55,13 @@
 
 namespace Supernova {
 
+    enum class EntityPool { User, System };
+
     class SUPERNOVA_API EntityRegistry {
     private:
         EntityManager entityManager;
         ComponentManager componentManager;
+        EntityPool defaultPool = EntityPool::User;
 
         void sortComponentsByTransform(Signature entitySignature);
         void moveChildAux(Entity entity, bool increase, bool stopIfFound);
@@ -76,6 +79,8 @@ namespace Supernova {
         //Entity methods
 
         Entity createEntity();
+        Entity createUserEntity();   // 101..max
+        Entity createSystemEntity(); // 1..100
         bool recreateEntity(Entity entity); // for internal editor use only
 
         bool isEntityCreated(Entity entity) const;
@@ -102,6 +107,9 @@ namespace Supernova {
 
         Entity getLastEntity() const;
         std::vector<Entity> getEntityList() const;
+
+        void setDefaultEntityPool(EntityPool pool);
+        EntityPool getDefaultEntityPool() const;
 
         void clear();
 
