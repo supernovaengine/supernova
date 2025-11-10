@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cstdint>
 #include <string>
 #include <variant>
 
@@ -36,11 +37,30 @@ namespace Supernova {
         EntityPointer
     };
 
+    enum class EntityRefKind {
+        None,
+        LocalEntity,    // Resolved by sceneId + local entity id
+        SharedEntity    // Resolved by shared group path + registry entity id
+    };
+
+    struct EntityLocator {
+        EntityRefKind kind = EntityRefKind::None;
+        Entity scopedEntity = NULL_ENTITY;
+
+        // Scene-local addressing
+        uint32_t sceneId = 0;
+
+        // Shared-group addressing
+        std::string sharedPath;
+    };
+
     struct EntityRef {
+        // Runtime resolution (valid during play/edit once resolved)
         Entity entity = NULL_ENTITY;
         Scene* scene = nullptr;
-        int entityIndex = -1;       // Index of entity for editor use only
-        unsigned int sceneId = 0;   // Id of scene for editor use only
+
+        // Editor locator (persistent, used to resolve 'entity' and 'scene')
+        EntityLocator locator;
     };
 
     using ScriptPropertyValue = std::variant<
@@ -73,7 +93,7 @@ namespace Supernova {
             if (std::holds_alternative<T>(value)) {
                 return std::get<T>(value);
             }
-            return T{}; // Return default value if type mismatch
+            return T{};
         }
 
         // Helper template to set typed value
@@ -125,7 +145,7 @@ namespace Supernova {
                     }
                     break;
                 case ScriptPropertyType::EntityPointer:
-                    // Do nothing for EntityPointer here
+                    // Intentionally no-op for runtime member sync
                     break;
             }
         }
@@ -159,7 +179,7 @@ namespace Supernova {
                     value = *static_cast<Vector4*>(memberPtr);
                     break;
                 case ScriptPropertyType::EntityPointer:
-                    // Do nothing for EntityPointer here
+                    // Intentionally no-op. EntityRef is resolved by editor
                     break;
             }
         }
