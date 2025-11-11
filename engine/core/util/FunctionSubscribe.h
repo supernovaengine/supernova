@@ -185,9 +185,9 @@ namespace Supernova {
                 if constexpr (std::is_void<Ret>::value) {
                     for (size_t i = 0; i < functions.size(); ) {
                         auto& function = functions[i];
-                        auto& tag = tags[i];
                         #ifdef SUPERNOVA_CRASH_GUARD
                         // Use crash protection if handler is registered
+                        auto& tag = tags[i];
                         auto& crashHandler = FunctionSubscribeGlobal::getCrashHandler();
                         if (crashHandler) {
                             CrashInfo ci{};
@@ -227,9 +227,9 @@ namespace Supernova {
             }
             for (size_t i = 0; i < functions.size(); ) {
                 auto& function = functions[i];
-                auto& tag = tags[i];
                 #ifdef SUPERNOVA_CRASH_GUARD
                 // Use crash protection if handler is registered
+                auto& tag = tags[i];
                 auto& crashHandler = FunctionSubscribeGlobal::getCrashHandler();
                 if (crashHandler) {
                     Ret result{};

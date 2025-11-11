@@ -59,6 +59,19 @@
 #define MAX_BROADPHASELAYER_3D 6
 #endif
 
+#define REGISTER_EVENT_IMPL(EVENT, METHOD) \
+    do { \
+        std::string __tag = std::string(typeid(std::remove_pointer_t<decltype(this)>).name()) + \
+                            "_" + std::to_string(reinterpret_cast<std::uintptr_t>(this)) + \
+                            "_" #METHOD; \
+        ::Supernova::Engine::EVENT.add< \
+            std::remove_pointer_t<decltype(this)>, \
+            &std::remove_pointer_t<decltype(this)>::METHOD \
+        >(__tag, this); \
+    } while (0)
+
+#define REGISTER_EVENT(EVENT)    REGISTER_EVENT_IMPL(EVENT, EVENT)
+
 #include "Export.h"
 #include "System.h"
 #include "util/FunctionSubscribe.h"
