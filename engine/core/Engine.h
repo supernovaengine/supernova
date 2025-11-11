@@ -264,6 +264,8 @@ namespace Supernova {
         static void setFramebuffer(Framebuffer* framebuffer);
         static Framebuffer* getFramebuffer();
 
+        static void clearAllSubscriptions(bool includeLifecycle);
+
         //-----Supernova API functions-----
         static void systemInit(int argc, char* argv[]);
         static void systemViewLoaded();

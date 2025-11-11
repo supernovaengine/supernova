@@ -214,6 +214,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticFunction("setMaxResourceLoadingThreads", &Engine::setMaxResourceLoadingThreads)
         .addStaticFunction("getQueuedResourceCount", &Engine::getQueuedResourceCount)
         .addStaticProperty("framebuffer", &Engine::getFramebuffer, &Engine::setFramebuffer)
+        .addStaticFunction("clearAllSubscriptions", &Engine::clearAllSubscriptions)
 
         .addStaticProperty("onViewLoaded", [] () { return &Engine::onViewLoaded; }, [] (lua_State* L) { Engine::onViewLoaded = L; })
         .addStaticProperty("onCanvasChanged", [] () { return &Engine::onViewChanged; }, [] (lua_State* L) { Engine::onViewChanged = L; })

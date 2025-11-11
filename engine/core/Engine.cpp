@@ -498,6 +498,38 @@ Framebuffer* Engine::getFramebuffer(){
     return Engine::framebuffer;
 }
 
+void Engine::clearAllSubscriptions(bool includeLifecycle) {
+    // Gameplay/input/update events
+    onUpdate.clear();
+    onPostUpdate.clear();
+
+    onTouchStart.clear();
+    onTouchEnd.clear();
+    onTouchMove.clear();
+    onTouchCancel.clear();
+
+    onMouseDown.clear();
+    onMouseUp.clear();
+    onMouseScroll.clear();
+    onMouseMove.clear();
+    onMouseEnter.clear();
+    onMouseLeave.clear();
+
+    onKeyDown.clear();
+    onKeyUp.clear();
+    onCharInput.clear();
+
+    if (includeLifecycle) {
+        onViewLoaded.clear();
+        onViewChanged.clear();
+        onViewDestroyed.clear();
+        onDraw.clear();
+        onPause.clear();
+        onResume.clear();
+        onShutdown.clear();
+    }
+}
+
 void Engine::calculateCanvas(){
     Engine::canvasWidth = preferredCanvasWidth;
     Engine::canvasHeight = preferredCanvasHeight;
