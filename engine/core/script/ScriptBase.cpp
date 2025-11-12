@@ -10,9 +10,6 @@ ScriptBase::ScriptBase(Scene* scene, Entity entity)
     : scene(scene), entity(entity) {
 }
 
-ScriptBase::~ScriptBase() {
-}
-
 Scene* ScriptBase::getScene() const {
     return scene;
 }

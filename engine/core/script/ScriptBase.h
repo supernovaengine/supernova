@@ -17,7 +17,7 @@ namespace Supernova {
 
     public:
         ScriptBase(Scene* scene, Entity entity);
-        virtual ~ScriptBase();
+        ~ScriptBase() = default;
 
         Scene* getScene() const;
         Entity getEntity() const;
