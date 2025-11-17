@@ -24,6 +24,8 @@ namespace Supernova {
         static int setLuaSearcher(lua_CFunction f, bool cleanSearchers = false);
 
         static int luaRegisterEvent(lua_State* L);
+        static int luaRegisterEngineEvent(lua_State* L);
+        static int luaRegisterEventImpl(lua_State* L, int eventIndex, int selfIndex, const char* methodName, const char* tag);
         
         static int moduleLoader(lua_State *L);
         static int handleLuaError(lua_State* L);

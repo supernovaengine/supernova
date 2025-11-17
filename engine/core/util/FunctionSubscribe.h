@@ -21,6 +21,29 @@
 #include "util/CrashGuard.h"
 #endif
 
+#define REGISTER_EVENT(EVENT_OBJ, METHOD) \
+    do { \
+        std::string __tag = std::string(typeid(std::remove_pointer_t<decltype(this)>).name()) + \
+                            "_" + std::to_string(reinterpret_cast<std::uintptr_t>(this)) + \
+                            "_" #METHOD; \
+        (EVENT_OBJ).add< \
+            std::remove_pointer_t<decltype(this)>, \
+            &std::remove_pointer_t<decltype(this)>::METHOD \
+        >(__tag, this); \
+    } while (0)
+
+#define REGISTER_ENGINE_EVENT(EVENT) \
+    do { \
+        std::string __tag = std::string(typeid(std::remove_pointer_t<decltype(this)>).name()) + \
+                            "_" + std::to_string(reinterpret_cast<std::uintptr_t>(this)) + \
+                            "_" #EVENT; \
+        ::Supernova::Engine::EVENT.add< \
+            std::remove_pointer_t<decltype(this)>, \
+            &std::remove_pointer_t<decltype(this)>::EVENT \
+        >(__tag, this); \
+    } while (0)
+
+
 template<size_t>
 struct MyPlaceholder {};
 
