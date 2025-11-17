@@ -37,6 +37,7 @@ void LuaBinding::createLuaState(){
     LuaBinding::luastate = luaL_newstate();
 
     registerClasses(luastate);
+    registerHelpersFunctions(luastate);
 }
 
 lua_State* LuaBinding::getLuaState(){
@@ -102,6 +103,97 @@ int LuaBinding::setLuaSearcher(lua_CFunction f, bool cleanSearchers) {
     }
 
     lua_pop(L, 1);
+
+    return 0;
+}
+
+int LuaBinding::luaRegisterEvent(lua_State* L) {
+    int top = lua_gettop(L);
+    if (top < 3)
+        return luaL_error(L, "Event.register(self, event, methodName [, tag]) requires at least 3 arguments");
+
+    if (!lua_istable(L, 1))
+        return luaL_error(L, "Event.register: 'self' must be a table");
+
+    if (!lua_isstring(L, 3))
+        return luaL_error(L, "Event.register: methodName must be a string");
+    const char* methodName = lua_tostring(L, 3);
+
+    const char* tag = nullptr;
+    std::string tagStr;
+    if (top >= 4 && !lua_isnil(L, 4)) {
+        if (!lua_isstring(L, 4))
+            return luaL_error(L, "Event.register: tag must be a string");
+        tag = lua_tostring(L, 4);
+    }
+
+    // Look up self[methodName] using __index
+    lua_pushvalue(L, 1);
+    lua_pushstring(L, methodName);
+    lua_gettable(L, -2);
+    lua_remove(L, -2);
+
+    int methodIndex = lua_gettop(L);
+    if (!lua_isfunction(L, methodIndex)) {
+        return luaL_error(L, "Event.register: method '%s' not found on script", methodName);
+    }
+
+    // Build tag if needed
+    if (!tag) {
+        lua_getfield(L, 1, "__name");
+        const char* typeName = lua_tostring(L, -1);
+        if (!typeName) {
+            lua_pop(L, 1);
+            lua_getfield(L, 1, "name");
+            typeName = lua_tostring(L, -1);
+        }
+        if (!typeName)
+            typeName = "Script";
+
+        lua_pushvalue(L, 1);
+        const char* selfStr = luaL_tolstring(L, -1, nullptr);
+
+        tagStr = std::string(typeName) + "_" + methodName + "_" + selfStr;
+        tag = tagStr.c_str();
+
+        lua_pop(L, 2);
+        lua_pop(L, 1);
+    }
+
+    // Build closure: function(...) method(self, ...) end
+    lua_pushvalue(L, methodIndex); // method
+    lua_pushvalue(L, 1);           // self
+    lua_pushcclosure(L,
+        [](lua_State* Linner) -> int {
+            // upvalues: 1 = method, 2 = self
+            int nargs = lua_gettop(Linner);
+
+            lua_pushvalue(Linner, lua_upvalueindex(1)); // method
+            lua_pushvalue(Linner, lua_upvalueindex(2)); // self
+
+            // Push all arguments passed to closure
+            for (int i = 1; i <= nargs; ++i) {
+                lua_pushvalue(Linner, i);
+            }
+
+            // Call: method(self, arg1, arg2, ...)
+            lua_call(Linner, 1 + nargs, 0);
+            return 0;
+        },
+        2);
+    int closureIndex = lua_gettop(L);
+
+    // event:add(tag, closure)
+    lua_getfield(L, 2, "add");
+    if (!lua_isfunction(L, -1)) {
+        return luaL_error(L, "Event.register: event object has no 'add' method");
+    }
+
+    lua_pushvalue(L, 2);
+    lua_pushstring(L, tag);
+    lua_pushvalue(L, closureIndex);
+
+    lua_call(L, 3, 0);
 
     return 0;
 }
@@ -229,6 +321,13 @@ void LuaBinding::registerClasses(lua_State *L){
     registerThreadClasses(L);
 
 #endif //DISABLE_LUA_BINDINGS
+}
+
+void LuaBinding::registerHelpersFunctions(lua_State *L){
+    // Event helper
+    lua_newtable(L);
+    lua_pushcfunction(L, luaRegisterEvent);
+    lua_setglobal(L, "RegisterEvent");
 }
 
 

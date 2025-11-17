@@ -22,10 +22,13 @@ namespace Supernova {
         static void createLuaState();
         static int setLuaPath(const char* path);
         static int setLuaSearcher(lua_CFunction f, bool cleanSearchers = false);
+
+        static int luaRegisterEvent(lua_State* L);
         
         static int moduleLoader(lua_State *L);
         static int handleLuaError(lua_State* L);
         static void registerClasses(lua_State *L);
+        static void registerHelpersFunctions(lua_State *L);
 
         // in binding directory
         static void registerActionClasses(lua_State *L);
