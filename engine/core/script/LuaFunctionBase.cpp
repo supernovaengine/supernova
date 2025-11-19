@@ -81,7 +81,17 @@ void LuaFunctionBase::call(int args, int results) {
         #ifdef SUPERNOVA_CRASH_GUARD
         auto& crashHandler = FunctionSubscribeGlobal::getCrashHandler();
         if (crashHandler) {
-            crashHandler("Lua Error", error);
+            std::string funcName = "Lua Script Error";
+
+            // Try to get the actual function name from the call stack
+            lua_Debug ar;
+            if (lua_getstack(m_vm, 0, &ar) && lua_getinfo(m_vm, "n", &ar)) {
+                if (ar.name && strlen(ar.name) > 0) {
+                    funcName = ar.name;
+                }
+            }
+
+            crashHandler(funcName, error);
             // Push nil values to satisfy the expected results count
             // This prevents stack underflow if the caller tries to retrieve return values
             for (int i = 0; i < results; i++) {
