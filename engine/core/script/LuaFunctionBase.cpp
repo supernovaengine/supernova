@@ -77,6 +77,20 @@ void LuaFunctionBase::call(int args, int results) {
         // call failed; throw an exception
         std::string error = lua_tostring(m_vm, -1);
         lua_pop(m_vm, 1);
+
+        #ifdef SUPERNOVA_CRASH_GUARD
+        auto& crashHandler = FunctionSubscribeGlobal::getCrashHandler();
+        if (crashHandler) {
+            crashHandler("Lua Error", error);
+            // Push nil values to satisfy the expected results count
+            // This prevents stack underflow if the caller tries to retrieve return values
+            for (int i = 0; i < results; i++) {
+                lua_pushnil(m_vm);
+            }
+            return;
+        }
+        #endif
+
         // in reality you'd want to use your own exception class here
         throw std::runtime_error(error.c_str());
     }

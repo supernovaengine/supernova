@@ -133,14 +133,15 @@ int LuaBinding::luaRegisterEventImpl(lua_State* L, int eventIndex, int selfIndex
         if (!typeName)
             typeName = "Script";
 
-        lua_pushvalue(L, selfIndex);
-        const char* selfStr = luaL_tolstring(L, -1, nullptr);
+        // Get pointer address of the table
+        const void* ptr = lua_topointer(L, selfIndex);
+        std::uintptr_t address = reinterpret_cast<std::uintptr_t>(ptr);
 
-        tagStr = std::string(typeName) + "_" + methodName + "_" + selfStr;
+        // Format: ClassName_Address_MethodName
+        tagStr = std::string(typeName) + "_" + std::to_string(address) + "_" + methodName;
         tag = tagStr.c_str();
 
-        lua_pop(L, 2);
-        lua_pop(L, 1);
+        lua_pop(L, 1); // pop typeName
     }
 
     // Build closure: function(...) method(self, ...) end
