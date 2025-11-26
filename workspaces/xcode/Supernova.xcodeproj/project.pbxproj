@@ -821,6 +821,8 @@
 		71ABBD4A27A87A2E001CE3AF /* MeshSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD4727A87A2E001CE3AF /* MeshSystem.cpp */; };
 		71ABBD4B27A87A2E001CE3AF /* MeshSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD4827A87A2E001CE3AF /* MeshSystem.h */; };
 		71AD5E702E9F2B86004951AB /* ScriptBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */; };
+		71AD5E742E9F2B87004951AB /* ScriptProperty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */; };
+		71AD5E762E9F2B87004951AB /* ScriptProperty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */; };
 		71AD5E712E9F2B86004951AB /* ScriptProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */; };
 		71AD5E722E9F2B86004951AB /* ScriptBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E6D2E9F2B86004951AB /* ScriptBase.h */; };
 		71AD5E732E9F2B86004951AB /* ScriptBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */; };
@@ -2127,6 +2129,7 @@
 		71AD5E6D2E9F2B86004951AB /* ScriptBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptBase.h; sourceTree = "<group>"; };
 		71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptBase.cpp; sourceTree = "<group>"; };
 		71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptProperty.h; sourceTree = "<group>"; };
+		71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptProperty.cpp; sourceTree = "<group>"; };
 		71AD5E742EAECC69004951AB /* CrashGuard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CrashGuard.h; sourceTree = "<group>"; };
 		71BE602825B1C49C006D6E02 /* liblua-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "liblua-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BE60E325B1D019006D6E02 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
@@ -3972,6 +3975,7 @@
 				71AD5E6D2E9F2B86004951AB /* ScriptBase.h */,
 				71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */,
 				71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */,
+				71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */,
 			);
 			path = script;
 			sourceTree = "<group>";
@@ -5562,6 +5566,7 @@
 				71451BD5270CA17F00712643 /* TimedAction.cpp in Sources */,
 				713D82B5259D307F00567F9F /* SokolShader.cpp in Sources */,
 				71D74956296731F200348AB8 /* EntityHandle.cpp in Sources */,
+				71AD5E742E9F2B87004951AB /* ScriptProperty.cpp in Sources */,
 				71ABBD362783C8BB001CE3AF /* Image.cpp in Sources */,
 				71E824902A9C23A600C8E6F2 /* Body2D.cpp in Sources */,
 				71AD5E702E9F2B86004951AB /* ScriptBase.cpp in Sources */,
@@ -5731,6 +5736,7 @@
 				71E54506284D5BB700C68FAB /* MorphTracks.cpp in Sources */,
 				71451BD4270CA17F00712643 /* TimedAction.cpp in Sources */,
 				7162FD5C25963AE00075B97D /* Attribute.cpp in Sources */,
+				71AD5E762E9F2B87004951AB /* ScriptProperty.cpp in Sources */,
 				71D74955296731F200348AB8 /* EntityHandle.cpp in Sources */,
 				71ABBD352783C8BB001CE3AF /* Image.cpp in Sources */,
 				71E8248F2A9C23A600C8E6F2 /* Body2D.cpp in Sources */,

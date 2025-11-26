@@ -83,6 +83,7 @@ namespace Supernova {
         ScriptPropertyValue defaultValue;
 
         void* memberPtr = nullptr; // For editor use only
+        int luaRef = 0; // For Lua script instance
 
         // Optional: Store the actual type name for editor UI/debugging
         std::string ptrTypeName; // e.g., "Mesh*", "Object*", "EntityHandle*"
@@ -103,86 +104,10 @@ namespace Supernova {
         }
 
         // Synchronize the stored value to the actual member variable
-        void syncToMember() {
-            if (!memberPtr) return;
-
-            switch (type) {
-                case ScriptPropertyType::Bool:
-                    if (std::holds_alternative<bool>(value)) {
-                        *static_cast<bool*>(memberPtr) = std::get<bool>(value);
-                    }
-                    break;
-                case ScriptPropertyType::Int:
-                    if (std::holds_alternative<int>(value)) {
-                        *static_cast<int*>(memberPtr) = std::get<int>(value);
-                    }
-                    break;
-                case ScriptPropertyType::Float:
-                    if (std::holds_alternative<float>(value)) {
-                        *static_cast<float*>(memberPtr) = std::get<float>(value);
-                    }
-                    break;
-                case ScriptPropertyType::String:
-                    if (std::holds_alternative<std::string>(value)) {
-                        *static_cast<std::string*>(memberPtr) = std::get<std::string>(value);
-                    }
-                    break;
-                case ScriptPropertyType::Vector2:
-                    if (std::holds_alternative<Vector2>(value)) {
-                        *static_cast<Vector2*>(memberPtr) = std::get<Vector2>(value);
-                    }
-                    break;
-                case ScriptPropertyType::Vector3:
-                case ScriptPropertyType::Color3:
-                    if (std::holds_alternative<Vector3>(value)) {
-                        *static_cast<Vector3*>(memberPtr) = std::get<Vector3>(value);
-                    }
-                    break;
-                case ScriptPropertyType::Vector4:
-                case ScriptPropertyType::Color4:
-                    if (std::holds_alternative<Vector4>(value)) {
-                        *static_cast<Vector4*>(memberPtr) = std::get<Vector4>(value);
-                    }
-                    break;
-                case ScriptPropertyType::EntityPointer:
-                    // Intentionally no-op for runtime member sync
-                    break;
-            }
-        }
+        void syncToMember();
 
         // Synchronize from the actual member variable to the stored value
-        void syncFromMember() {
-            if (!memberPtr) return;
-
-            switch (type) {
-                case ScriptPropertyType::Bool:
-                    value = *static_cast<bool*>(memberPtr);
-                    break;
-                case ScriptPropertyType::Int:
-                    value = *static_cast<int*>(memberPtr);
-                    break;
-                case ScriptPropertyType::Float:
-                    value = *static_cast<float*>(memberPtr);
-                    break;
-                case ScriptPropertyType::String:
-                    value = *static_cast<std::string*>(memberPtr);
-                    break;
-                case ScriptPropertyType::Vector2:
-                    value = *static_cast<Vector2*>(memberPtr);
-                    break;
-                case ScriptPropertyType::Vector3:
-                case ScriptPropertyType::Color3:
-                    value = *static_cast<Vector3*>(memberPtr);
-                    break;
-                case ScriptPropertyType::Vector4:
-                case ScriptPropertyType::Color4:
-                    value = *static_cast<Vector4*>(memberPtr);
-                    break;
-                case ScriptPropertyType::EntityPointer:
-                    // Intentionally no-op. EntityRef is resolved by editor
-                    break;
-            }
-        }
+        void syncFromMember();
     };
 
 }
