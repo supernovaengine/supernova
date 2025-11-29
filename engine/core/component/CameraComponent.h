@@ -73,7 +73,9 @@ namespace Supernova{
 
         bool transparentSort = true;
 
-        bool automatic = true;
+        bool useTarget = true;
+        bool autoResize = true;
+
         bool needUpdate = true;
     };
 

@@ -66,7 +66,7 @@ void Camera::setOrtho(float left, float right, float bottom, float top, float ne
     camera.nearClip = nearValue;
     camera.farClip = farValue;
     
-    camera.automatic = false;
+    camera.autoResize = false;
 
     camera.needUpdate = true;
 }
@@ -81,7 +81,7 @@ void Camera::setPerspective(float yfov, float aspect, float nearValue, float far
     camera.nearClip = nearValue;
     camera.farClip = farValue;
     
-    camera.automatic = false;
+    camera.autoResize = false;
 
     camera.needUpdate = true;
 }
@@ -124,7 +124,7 @@ void Camera::setLeftClip(float left){
     if (camera.leftClip != left){
         camera.leftClip = left;
 
-        camera.automatic = false;
+        camera.autoResize = false;
 
         camera.needUpdate = true;
     }
@@ -142,7 +142,7 @@ void Camera::setRightClip(float right){
     if (camera.rightClip != right){
         camera.rightClip = right;
 
-        camera.automatic = false;
+        camera.autoResize = false;
 
         camera.needUpdate = true;
     }
@@ -160,7 +160,7 @@ void Camera::setBottomClip(float bottom){
     if (camera.bottomClip != bottom){
         camera.bottomClip = bottom;
 
-        camera.automatic = false;
+        camera.autoResize = false;
 
         camera.needUpdate = true;
     }
@@ -178,7 +178,7 @@ void Camera::setTopClip(float top){
     if (camera.topClip != top){
         camera.topClip = top;
 
-        camera.automatic = false;
+        camera.autoResize = false;
 
         camera.needUpdate = true;
     }
@@ -196,7 +196,7 @@ void Camera::setAspect(float aspect){
     if (camera.aspect != aspect){
         camera.aspect = aspect;
 
-        camera.automatic = false;
+        camera.autoResize = false;
 
         camera.needUpdate = true;
     }
@@ -254,6 +254,7 @@ void Camera::setTarget(Vector3 target){
 
         camera.needUpdate = true;
     }
+    camera.useTarget = true;
 }
 
 void Camera::setTarget(const float x, const float y, const float z){
@@ -263,6 +264,17 @@ void Camera::setTarget(const float x, const float y, const float z){
 Vector3 Camera::getTarget() const{
     CameraComponent& camera = getComponent<CameraComponent>();
     return camera.target;
+}
+
+void Camera::disableTarget(){
+    CameraComponent& camera = getComponent<CameraComponent>();
+    camera.useTarget = false;
+    camera.needUpdate = true;
+}
+
+bool Camera::isUsingTarget() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+    return camera.useTarget;
 }
 
 void Camera::setUp(Vector3 up){
@@ -334,13 +346,20 @@ void Camera::rotateView(float angle){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 viewCenter = camera.target - transf.position;
+        if (camera.useTarget){
+            Vector3 viewCenter = camera.target - transf.position;
 
-        Matrix4 rotation;
-        rotation = Matrix4::rotateMatrix(angle, camera.up);
-        viewCenter = rotation * viewCenter;
+            Matrix4 rotation;
+            rotation = Matrix4::rotateMatrix(angle, camera.up);
+            viewCenter = rotation * viewCenter;
 
-        camera.target = viewCenter + transf.position;
+            camera.target = viewCenter + transf.position;
+        }else{
+            Quaternion rotation;
+            rotation.fromAngleAxis(angle, camera.up);
+            transf.rotation = rotation * transf.rotation;
+            transf.needUpdate = true;
+        }
 
         camera.needUpdate = true;
     }
@@ -369,13 +388,20 @@ void Camera::elevateView(float angle){
         CameraComponent& camera = getComponent<CameraComponent>();
         Transform& transf = getComponent<Transform>();
 
-        Vector3 viewCenter = camera.target - transf.position;
+        if (camera.useTarget){
+            Vector3 viewCenter = camera.target - transf.position;
 
-        Matrix4 rotation;
-        rotation = Matrix4::rotateMatrix(angle, viewCenter.crossProduct(camera.up));
-        viewCenter = rotation * viewCenter;
+            Matrix4 rotation;
+            rotation = Matrix4::rotateMatrix(angle, viewCenter.crossProduct(camera.up));
+            viewCenter = rotation * viewCenter;
 
-        camera.target = viewCenter + transf.position;
+            camera.target = viewCenter + transf.position;
+        }else{
+            Quaternion rotation;
+            rotation.fromAngleAxis(angle, camera.right);
+            transf.rotation = rotation * transf.rotation;
+            transf.needUpdate = true;
+        }
 
         camera.needUpdate = true;
     }

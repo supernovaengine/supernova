@@ -1912,23 +1912,35 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
         camera.projectionMatrix = Matrix4::perspectiveMatrix(camera.yfov, camera.aspect, camera.nearClip, camera.farClip);
     }
 
-    camera.direction = (transform.position - camera.target).normalize();
-    camera.right = (camera.up.crossProduct(camera.direction)).normalize();
-    //camera.up = camera.direction.crossProduct(camera.right); // no need to align, keep "up" always same
+    if (camera.useTarget){
+        camera.direction = (transform.position - camera.target).normalize();
+        camera.right = (camera.up.crossProduct(camera.direction)).normalize();
+        //camera.up = camera.direction.crossProduct(camera.right); // no need to align, keep "up" always same
 
-    if (transform.parent != NULL_ENTITY){
-        camera.worldTarget = transform.modelMatrix * (camera.target - transform.position);
-        camera.worldUp = ((transform.modelMatrix * camera.up) - (transform.modelMatrix * Vector3(0,0,0))).normalize();
+        if (transform.parent != NULL_ENTITY){
+            camera.worldTarget = transform.modelMatrix * (camera.target - transform.position);
+            camera.worldUp = ((transform.modelMatrix * camera.up) - (transform.modelMatrix * Vector3(0,0,0))).normalize();
+        }else{
+            camera.worldTarget = camera.target;
+            camera.worldUp = camera.up;
+        }
+
+        //Update ViewMatrix
+        camera.viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, camera.worldTarget, camera.worldUp);
     }else{
-        camera.worldTarget = camera.target;
-        camera.worldUp = camera.up;
+        camera.direction = transform.rotation * Vector3(0, 0, 1);
+        camera.right = transform.rotation * Vector3(1, 0, 0);
+
+        camera.worldTarget = transform.worldPosition - (transform.worldRotation * Vector3(0, 0, 1));
+
+        //Update ViewMatrix
+        camera.viewMatrix = transform.worldRotation.inverse().getRotationMatrix();
+        camera.viewMatrix.translateInPlace(-transform.worldPosition.x, -transform.worldPosition.y, -transform.worldPosition.z);
     }
 
-    //Update ViewMatrix
-    camera.viewMatrix = Matrix4::lookAtMatrix(transform.worldPosition, camera.worldTarget, camera.worldUp);
-
-    camera.worldDirection = Vector3(camera.viewMatrix[0][2], camera.viewMatrix[1][2], camera.viewMatrix[2][2]);
     camera.worldRight = Vector3(camera.viewMatrix[0][0], camera.viewMatrix[1][0], camera.viewMatrix[2][0]);
+    camera.worldUp = Vector3(camera.viewMatrix[0][1], camera.viewMatrix[1][1], camera.viewMatrix[2][1]);
+    camera.worldDirection = Vector3(camera.viewMatrix[0][2], camera.viewMatrix[1][2], camera.viewMatrix[2][2]);
 
     //Update ViewProjectionMatrix
     camera.viewProjectionMatrix = camera.projectionMatrix * camera.viewMatrix;
@@ -2111,7 +2123,7 @@ void RenderSystem::updateCameraSize(Entity entity){
             rect = Rect(0, 0, Engine::getCanvasWidth(), Engine::getCanvasHeight());
         }
 
-        if (camera.automatic){
+        if (camera.autoResize){
             float newLeft = rect.getX();
             float newBottom = rect.getY();
             float newRight = rect.getWidth();

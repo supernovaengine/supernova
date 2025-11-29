@@ -233,6 +233,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setType", &Camera::setType)
         .addProperty("target",  &Camera::getTarget, (void(Camera::*)(Vector3))&Camera::setTarget)
         .addFunction("setTarget", (void(Camera::*)(const float, const float, const float))&Camera::setTarget)
+        .addFunction("disableTarget", &Camera::disableTarget)
+        .addFunction("isUsingTarget", &Camera::isUsingTarget)
         .addProperty("up",  &Camera::getUp, (void(Camera::*)(Vector3))&Camera::setUp)
         .addFunction("setUp", (void(Camera::*)(const float, const float, const float))&Camera::setUp)
         .addFunction("getUp", &Camera::getUp)

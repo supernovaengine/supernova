@@ -58,6 +58,9 @@ namespace Supernova{
         void setTarget(const float x, const float y, const float z);
         Vector3 getTarget() const;
 
+        void disableTarget();
+        bool isUsingTarget() const;
+
         void setUp(Vector3 up);
         void setUp(const float x, const float y, const float z);
         Vector3 getUp() const;
