@@ -49,12 +49,13 @@ void Scene::setCamera(Camera* camera){
 }
 
 void Scene::setCamera(Entity camera){
-    if (findComponent<CameraComponent>(camera)){
+    if (CameraComponent* cameracomp = findComponent<CameraComponent>(camera)){
         this->camera = camera;
         if (defaultCamera != NULL_ENTITY){
             destroyEntity(defaultCamera);
             defaultCamera = NULL_ENTITY;
         }
+        cameracomp->needUpdate = true;
     }else{
         Log::error("Invalid camera entity: need CameraComponent");
     }
