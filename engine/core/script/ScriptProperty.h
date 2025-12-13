@@ -43,7 +43,7 @@ namespace Supernova {
         SharedEntity    // Resolved by shared group path + registry entity id
     };
 
-    struct EntityLocator {
+    struct SUPERNOVA_API EntityLocator {
         EntityRefKind kind = EntityRefKind::None;
         Entity scopedEntity = NULL_ENTITY;
 
@@ -54,7 +54,7 @@ namespace Supernova {
         std::string sharedPath;
     };
 
-    struct EntityRef {
+    struct SUPERNOVA_API EntityRef {
         // Runtime resolution (valid during play/edit once resolved)
         Entity entity = NULL_ENTITY;
         Scene* scene = nullptr;
@@ -66,7 +66,7 @@ namespace Supernova {
     using ScriptPropertyValue = std::variant<
         std::monostate,  // For empty/uninitialized state
         bool,
-        int, 
+        int,
         float,
         std::string,
         Vector2,
@@ -75,7 +75,7 @@ namespace Supernova {
         EntityRef
     >;
 
-    struct ScriptProperty {
+    struct SUPERNOVA_API ScriptProperty {
         std::string name;
         std::string displayName;
         ScriptPropertyType type;

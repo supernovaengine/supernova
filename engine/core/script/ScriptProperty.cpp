@@ -59,6 +59,15 @@ namespace Supernova {
                 return;
             }
 
+            auto pushOrNil = [&](auto&& v) {
+                const int top = lua_gettop(L);
+                auto r = luabridge::push(L, std::forward<decltype(v)>(v));
+                if (!r) {
+                    lua_settop(L, top); // rollback anything partially pushed
+                    lua_pushnil(L);
+                }
+            };
+
             // Push the value based on type
             switch (type) {
                 case ScriptPropertyType::Bool:
@@ -91,7 +100,7 @@ namespace Supernova {
                     break;
                 case ScriptPropertyType::Vector2:
                     if (std::holds_alternative<Vector2>(value)) {
-                        luabridge::push<Vector2>(L, std::get<Vector2>(value));
+                        pushOrNil(std::get<Vector2>(value));
                     } else {
                         lua_pushnil(L);
                     }
@@ -99,7 +108,7 @@ namespace Supernova {
                 case ScriptPropertyType::Vector3:
                 case ScriptPropertyType::Color3:
                     if (std::holds_alternative<Vector3>(value)) {
-                        luabridge::push<Vector3>(L, std::get<Vector3>(value));
+                        pushOrNil(std::get<Vector3>(value));
                     } else {
                         lua_pushnil(L);
                     }
@@ -107,7 +116,7 @@ namespace Supernova {
                 case ScriptPropertyType::Vector4:
                 case ScriptPropertyType::Color4:
                     if (std::holds_alternative<Vector4>(value)) {
-                        luabridge::push<Vector4>(L, std::get<Vector4>(value));
+                        pushOrNil(std::get<Vector4>(value));
                     } else {
                         lua_pushnil(L);
                     }
