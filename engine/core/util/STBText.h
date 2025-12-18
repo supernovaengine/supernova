@@ -5,6 +5,8 @@
 #ifndef STBText_h
 #define STBText_h
 
+#include <cstdint>
+#include <string>
 #include <vector>
 #include "math/Vector2.h"
 #include "math/Vector3.h"

@@ -7,9 +7,8 @@
 #include <string>
 #include "Log.h"
 #include "io/Data.h"
-#include <codecvt>
-#include <locale>
 #include "DefaultFont.h"
+#include "StringUtils.h"
 
 using namespace Supernova;
 
@@ -155,14 +154,10 @@ TextureData* STBText::load(const std::string& fontpath, unsigned int fontSize){
 
 void STBText::createText(const std::string& text, Buffer* buffer, std::vector<uint16_t>& indices, std::vector<Vector2>& charPositions,
                          unsigned int& width, unsigned int& height, bool fixedWidth, bool fixedHeight, bool multiline, bool invert){
-    
-    std::wstring_convert< std::codecvt_utf8_utf16<wchar_t> > convert;
-    std::wstring utf16String;
 
-    try {
-        utf16String = convert.from_bytes( text );
-    } catch(const std::range_error& e) {
-        utf16String = convert.from_bytes(text.substr(0, convert.converted()));
+    bool hadInvalid = false;
+    std::vector<uint32_t> codepoints = StringUtils::decodeUtf8ToCodepoints(text, hadInvalid);
+    if (hadInvalid) {
         Log::warn("Invalid character");
     }
     
@@ -175,8 +170,8 @@ void STBText::createText(const std::string& text, Buffer* buffer, std::vector<ui
     if (multiline && fixedWidth){
 
         int lastSpace = 0;
-        for (int i = 0; i < utf16String.size(); i++){
-            int intchar = uint_least32_t(utf16String[i]);
+        for (int i = 0; i < (int)codepoints.size(); i++){
+            int intchar = (int)codepoints[(size_t)i];
             if (intchar == 32){ //space
                 lastSpace = i;
             }
@@ -187,13 +182,13 @@ void STBText::createText(const std::string& text, Buffer* buffer, std::vector<ui
                 stbtt_aligned_quad quad;
                 stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
                 
-                if (offsetX > width){
+                if (offsetX > (float)width){
                     if (lastSpace > 0){
-                        utf16String[lastSpace] = '\n';
+                        codepoints[(size_t)lastSpace] = '\n';
                         i = lastSpace;
                         lastSpace = 0;
                     }else{
-                        utf16String.insert(i, { '\n' });
+                        codepoints.insert(codepoints.begin() + i, (uint32_t)'\n');
                     }
                     offsetX = 0;
                 }
@@ -209,9 +204,9 @@ void STBText::createText(const std::string& text, Buffer* buffer, std::vector<ui
     int lineCount = 1;
     charPositions.clear();
 
-    for (int i = 0; i < utf16String.size(); i++){
+    for (int i = 0; i < (int)codepoints.size(); i++){
 
-        int intchar = uint_least32_t(utf16String[i]);
+        int intchar = (int)codepoints[(size_t)i];
 
         if (intchar == 10){ //\n
             offsetY += lineHeight;
@@ -277,7 +272,7 @@ void STBText::createText(const std::string& text, Buffer* buffer, std::vector<ui
 
     }
     //Empty text
-    if (utf16String.size() == 0){
+    if (codepoints.size() == 0){
         buffer->addVector3(atrVertice, Vector3(0.0f, 0.0f, 0.0f));
         buffer->addVector3(atrVertice, Vector3(0.0f, 0.0f, 0.0f));
         buffer->addVector3(atrVertice, Vector3(0.0f, 0.0f, 0.0f));

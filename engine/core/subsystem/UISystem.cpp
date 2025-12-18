@@ -4,8 +4,6 @@
 
 #include "UISystem.h"
 
-#include <locale>
-#include <codecvt>
 #include <algorithm>
 #include "Scene.h"
 #include "Input.h"
@@ -1501,10 +1499,7 @@ bool UISystem::eventOnCharInput(wchar_t codepoint){
                 TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
                 if (codepoint == '\b'){
                     if (text.text.length() > 0){
-                        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t> > convert;
-                        std::wstring utf16OldText = convert.from_bytes(text.text);
-
-                        text.text = convert.to_bytes(utf16OldText.substr(0, utf16OldText.size() - 1));
+                        StringUtils::eraseLastCodepointUtf8(text.text);
                     }
                 }else{
                     text.text = text.text + StringUtils::toUTF8(codepoint);
@@ -1590,10 +1585,9 @@ bool UISystem::eventOnPointerDown(float x, float y){
                 TextEditComponent& textedit = scene->getComponent<TextEditComponent>(lastUIFromPointer);
                 TextComponent& text = scene->getComponent<TextComponent>(textedit.text);
 
-                std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
-                std::wstring utf16Text = convert.from_bytes(text.text);
-
-                System::instance().showVirtualKeyboard(utf16Text);
+                bool hadInvalid = false;
+                std::wstring wideText = StringUtils::utf8ToWString(text.text, hadInvalid);
+                System::instance().showVirtualKeyboard(wideText);
             }else{
                 System::instance().hideVirtualKeyboard();
             }
