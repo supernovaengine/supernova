@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2025 Eduardo Doria.
 //
 
 #include "Buffer.h"
@@ -333,7 +333,10 @@ Vector2 Buffer::getVector2(Attribute* attribute, unsigned int index){
 
     unsigned pos = (index * stride) + attribute->offset;
     if ((pos + 2*sizeof(float)) <= size){
-        memcpy(&ret, &data[pos], sizeof(float) * 2);
+        float tmp[2];
+        memcpy(tmp, &data[pos], sizeof(float) * 2);
+        ret.x = tmp[0];
+        ret.y = tmp[1];
     }else{
         Log::error("Attribute index is bigger than buffer");
     }
@@ -346,7 +349,11 @@ Vector3 Buffer::getVector3(Attribute* attribute, unsigned int index){
 
     unsigned pos = (index * stride) + attribute->offset;
     if ((pos + 3*sizeof(float)) <= size){
-        memcpy(&ret, &data[pos], sizeof(float) * 3);
+        float tmp[3];
+        memcpy(tmp, &data[pos], sizeof(float) * 3);
+        ret.x = tmp[0];
+        ret.y = tmp[1];
+        ret.z = tmp[2];
     }else{
         Log::error("Attribute index is bigger than buffer");
     }
@@ -359,7 +366,12 @@ Vector4 Buffer::getVector4(Attribute* attribute, unsigned int index){
 
     unsigned pos = (index * stride) + attribute->offset;
     if ((pos + 4*sizeof(float)) <= size){
-        memcpy(&ret, &data[pos], sizeof(float) * 4);
+        float tmp[4];
+        memcpy(tmp, &data[pos], sizeof(float) * 4);
+        ret.x = tmp[0];
+        ret.y = tmp[1];
+        ret.z = tmp[2];
+        ret.w = tmp[3];
     }else{
         Log::error("Attribute index is bigger than buffer");
     }
