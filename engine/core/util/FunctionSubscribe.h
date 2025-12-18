@@ -73,7 +73,7 @@ namespace Supernova {
     private:
         std::vector<std::function<Ret(Args...)>> functions;
         std::vector<std::string> tags;
-        bool enabled = false;
+        bool enabled = true;
 
         // Helper to remove subscriber by index
         void removeAt(size_t index) {
