@@ -414,11 +414,13 @@ void EntityRegistry::moveChildToIndex(Entity entity, size_t index, bool adjustFi
             if (length == 1){
                 transforms->moveEntityToIndex(entity, index);
             }else{
-                if (adjustFinalPosition && (index > entityIndex)){
-                    if (index >= length - 1) { // Prevent underflow
+                if (index > entityIndex){
+                    // Only adjust if moving past the entire range
+                    if (index >= entityIndex + length) {
                         index = index - length + 1;
                     } else {
-                        index = 0;
+                        // Target is within our own range - nothing to do
+                        return;
                     }
                 }
                 transforms->moveEntityRangeToIndex(entity, transforms->getEntity(lastChildIndex), index);
