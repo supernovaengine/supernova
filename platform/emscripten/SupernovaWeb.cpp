@@ -330,12 +330,15 @@ std::string SupernovaWeb::toUTF8(wchar_t cp) {
 }
 
 EM_BOOL SupernovaWeb::key_callback(int eventType, const EmscriptenKeyboardEvent *e, void *userData){
-    const char *key=e->key;
-    if ( (!key)||(!(*key)) ){
-        key = toUTF8(e->keyCode).c_str();
+    std::string keyStorage;
+    const char* key = e->key;
+    if ((!key) || (!(*key))) {
+        keyStorage = toUTF8(e->keyCode);
+        key = keyStorage.c_str();
     }
-    if (!(*key)){
-        key = toUTF8(e->which).c_str();
+    if (!(*key)) {
+        keyStorage = toUTF8(e->which);
+        key = keyStorage.c_str();
     }
 
     int modifiers = 0;
