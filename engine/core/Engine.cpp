@@ -245,7 +245,7 @@ void Engine::pauseGameEvents(bool pause) {
 void Engine::includeScene(size_t index, Scene* scene){
     if (viewLoaded){
         scene->load();
-        scene->updateSizeFromCamera();
+        scene->updateCameraSize();
     }
 }
 
@@ -670,7 +670,7 @@ void Engine::systemViewChanged(){
     }
 
     for (int i = 0; i < scenes.size(); i++){
-        scenes[i]->updateSizeFromCamera();
+        scenes[i]->updateCameraSize();
     }
 
     onViewChanged.call();

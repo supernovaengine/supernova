@@ -509,6 +509,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("destroy", &Scene::destroy)
         .addFunction("draw", &Scene::draw)
         .addFunction("update", &Scene::update)
+        .addFunction("updateCameraSize", &Scene::updateCameraSize)
         .addProperty("camera", (Entity(Scene::*)()const)&Scene::getCamera, (void(Scene::*)(Entity))&Scene::setCamera)
         .addFunction("setCamera", 
             luabridge::overload<Camera*>(&Scene::setCamera),

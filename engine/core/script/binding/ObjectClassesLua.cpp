@@ -221,6 +221,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("activate", &Camera::activate)
         .addFunction("setOrtho", &Camera::setOrtho)
         .addFunction("setPerspective", &Camera::setPerspective)
+        .addProperty("autoResize",  &Camera::isAutoResize, &Camera::setAutoResize)
         .addProperty("nearClip",  &Camera::getNearClip, &Camera::setNearClip)
         .addProperty("farClip",  &Camera::getFarClip, &Camera::setFarClip)
         .addProperty("leftClip",  &Camera::getLeftClip, &Camera::setLeftClip)

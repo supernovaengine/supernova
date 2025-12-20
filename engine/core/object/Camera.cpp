@@ -86,6 +86,22 @@ void Camera::setPerspective(float yfov, float aspect, float nearValue, float far
     camera.needUpdate = true;
 }
 
+void Camera::setAutoResize(bool autoResize){
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    if (camera.autoResize != autoResize){
+        camera.autoResize = autoResize;
+
+        camera.needUpdate = true;
+    }
+}
+
+bool Camera::isAutoResize() const{
+    CameraComponent& camera = getComponent<CameraComponent>();
+
+    return camera.autoResize;
+}
+
 void Camera::setNearClip(float nearValue){
     CameraComponent& camera = getComponent<CameraComponent>();
 

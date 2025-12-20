@@ -27,6 +27,9 @@ namespace Supernova{
         void setOrtho(float left, float right, float bottom, float top, float nearValue, float farValue);
         void setPerspective(float yfov, float aspect, float nearValue, float farValue);
 
+        void setAutoResize(bool autoResize);
+        bool isAutoResize() const;
+
         void setNearClip(float nearValue);
         float getNearClip() const;
 

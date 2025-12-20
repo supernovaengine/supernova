@@ -76,7 +76,7 @@ namespace Supernova{
         void draw();
         void update(double dt);
 
-        void updateSizeFromCamera();
+        void updateCameraSize();
 
         void setCamera(Camera* camera);
         void setCamera(Entity camera);
