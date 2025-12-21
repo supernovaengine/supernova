@@ -3154,6 +3154,11 @@ void RenderSystem::draw(){
 
         if (Engine::getMainScene() == scene || camera.renderToTexture){
             camera.render.setClearColor(scene->getBackgroundColor());
+        } else {
+            // When drawing a scene as an Engine layer, don't clear the color buffer.
+            // Otherwise a scene that was previously the main scene would keep clearing
+            // and hide the main scene when reused as a layer.
+            camera.render.setLoadActionLoad();
         }
         
         if (!camera.renderToTexture){

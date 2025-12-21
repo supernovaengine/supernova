@@ -24,6 +24,7 @@ namespace Supernova{
         virtual ~SokolCamera();
 
         void setClearColor(Vector4 clearColor);
+        void setLoadActionLoad();
 
         void startRenderPass(FramebufferRender* framebuffer, size_t face);
         void startRenderPass(int width, int height);

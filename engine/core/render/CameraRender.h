@@ -22,6 +22,7 @@ namespace Supernova{
         virtual ~CameraRender();
 
         void setClearColor(Vector4 clearColor);
+        void setLoadActionLoad();
 
         void startRenderPass(FramebufferRender* framebuffer, size_t face = 0);
         void startRenderPass(int width, int height);

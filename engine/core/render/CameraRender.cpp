@@ -23,6 +23,10 @@ void CameraRender::setClearColor(Vector4 clearColor){
     backend.setClearColor(clearColor);
 }
 
+void CameraRender::setLoadActionLoad(){
+    backend.setLoadActionLoad();
+}
+
 void CameraRender::startRenderPass(FramebufferRender* framebuffer, size_t face){
     backend.startRenderPass(framebuffer, face);
 }

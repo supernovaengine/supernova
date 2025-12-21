@@ -33,6 +33,10 @@ void SokolCamera::setClearColor(Vector4 clearColor){
     pass.action.colors[0].clear_value = { clearColor.x, clearColor.y, clearColor.z, clearColor.w };
 }
 
+void SokolCamera::setLoadActionLoad(){
+    pass.action.colors[0].load_action = SG_LOADACTION_LOAD;
+}
+
 void SokolCamera::startRenderPass(FramebufferRender* framebuffer, size_t face){
     pass.attachments = framebuffer->backend.get(face);
     //SokolCmdQueue::add_command_begin_pass(pass);
