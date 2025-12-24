@@ -42,7 +42,7 @@ namespace Supernova{
 
         ObjectRender render;
         std::shared_ptr<ShaderRender> shader;
-        uint32_t shaderProperties;
+        uint32_t shaderProperties = 0;
         int slotVSParams = -1;
 
         Texture texture;

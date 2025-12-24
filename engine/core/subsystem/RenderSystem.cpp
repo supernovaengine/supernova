@@ -1160,10 +1160,16 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh){
         Submesh& submesh = mesh.submeshes[i];
         if (!mesh.needReload){
             //Destroy shader
-            submesh.shader.reset();
-            ShaderPool::remove(ShaderType::MESH, mesh.submeshes[i].shaderProperties);
-            if (hasShadows && mesh.castShadows)
-                ShaderPool::remove(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
+            if (submesh.shader){
+                submesh.shader.reset();
+                ShaderPool::remove(ShaderType::MESH, submesh.shaderProperties);
+            }
+            if (hasShadows && mesh.castShadows){
+                if (submesh.depthShader){
+                    submesh.depthShader.reset();
+                    ShaderPool::remove(ShaderType::DEPTH, submesh.depthShaderProperties);
+                }
+            }
 
             //Destroy texture
             submesh.material.baseColorTexture.destroy();
@@ -1374,8 +1380,10 @@ void RenderSystem::destroyUI(Entity entity, UIComponent& ui){
 
     if (!ui.needReload){
         //Destroy shader
-        ui.shader.reset();
-        ShaderPool::remove(ShaderType::UI, ui.shaderProperties);
+        if (ui.shader){
+            ui.shader.reset();
+            ShaderPool::remove(ShaderType::UI, ui.shaderProperties);
+        }
 
         //Destroy texture
         ui.texture.destroy();
@@ -1569,8 +1577,10 @@ void RenderSystem::destroyPoints(Entity entity, PointsComponent& points){
 
     if (!points.needReload){
         //Destroy shader
-        points.shader.reset();
-        ShaderPool::remove(ShaderType::POINTS, points.shaderProperties);
+        if (points.shader){
+            points.shader.reset();
+            ShaderPool::remove(ShaderType::POINTS, points.shaderProperties);
+        }
 
         //Destroy texture
         points.texture.destroy();
@@ -1620,8 +1630,10 @@ void RenderSystem::destroyLines(Entity entity, LinesComponent& lines){
 
     if (!lines.needReload){
         //Destroy shader
-        lines.shader.reset();
-        ShaderPool::remove(ShaderType::LINES, lines.shaderProperties);
+        if (lines.shader){
+            lines.shader.reset();
+            ShaderPool::remove(ShaderType::LINES, lines.shaderProperties);
+        }
     }
 
     //Destroy render
@@ -1765,8 +1777,10 @@ void RenderSystem::destroySky(Entity entity, SkyComponent& sky){
 
     if (!sky.needReload){
         //Destroy shader
-        sky.shader.reset();
-        ShaderPool::remove(ShaderType::SKYBOX, 0);
+        if (sky.shader){
+            sky.shader.reset();
+            ShaderPool::remove(ShaderType::SKYBOX, 0);
+        }
 
         //Destroy texture
         sky.texture.destroy();
