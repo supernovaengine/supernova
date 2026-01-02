@@ -60,8 +60,8 @@ namespace Supernova{
         float yfov = 0.75;
         float aspect = 1.0;
 
-        float nearClip = -10.0;
-        float farClip = 10.0;
+        float nearClip = DEFAULT_ORTHO_NEAR;
+        float farClip = DEFAULT_ORTHO_FAR;
 
         Plane frustumPlanes[6];
 
