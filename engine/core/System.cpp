@@ -10,52 +10,22 @@
 
 using namespace Supernova;
 
-System* System::external = nullptr;
+System* System::systemInstance = nullptr;
 
 #define USERSETTINGS_ROOT "userSettings"
 #define USERSETTINGS_XML_FILE "data://UserSettings.xml"
 
-#ifdef SUPERNOVA_ANDROID
-#include "SupernovaAndroid.h"
-#endif
-#ifdef SUPERNOVA_IOS
-#include "SupernovaIOS.h"
-#endif
-#ifdef SUPERNOVA_WEB
-#include "SupernovaWeb.h"
-#endif
-#ifdef SUPERNOVA_SOKOL
-#include "SupernovaSokol.h"
-#endif
-#ifdef SUPERNOVA_GLFW
-#include "SupernovaGLFW.h"
-#endif
-#ifdef SUPERNOVA_APPLE
-#include "SupernovaApple.h"
-#endif
-
 System& System::instance(){
-#ifdef SUPERNOVA_ANDROID
-    static System* instance = new SupernovaAndroid();
-#elif defined(SUPERNOVA_IOS)
-    static System* instance = new SupernovaIOS();
-#elif defined(SUPERNOVA_WEB)
-    static System* instance = new SupernovaWeb();
-#elif defined(SUPERNOVA_SOKOL)
-    static System* instance = new SupernovaSokol();
-#elif defined(SUPERNOVA_GLFW)
-    static System* instance = new SupernovaGLFW();
-#elif defined(SUPERNOVA_APPLE)
-    static System* instance = new SupernovaApple();
-#else
-    static System* instance = external;
-#endif
+    if (!systemInstance) {
+        Log::error("System instance not set. Engine must call System::setSystemInstance() during initialization.");
+        abort();
+    }
 
-    return *instance;
+    return *systemInstance;
 }
 
-void System::setExternalSystem(System* system){
-    external = system;
+void System::setSystemInstance(System* system){
+    systemInstance = system;
 }
 
 sg_environment System::getSokolEnvironment(){

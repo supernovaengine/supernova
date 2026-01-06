@@ -33,7 +33,7 @@ int SupernovaGLFW::init(int argc, char **argv){
 
     sampleCount = 1;
 
-    Supernova::Engine::systemInit(argc, argv);
+    Supernova::Engine::systemInit(argc, argv, new SupernovaGLFW());
 
     /* create window and GL context via GLFW */
     glfwInit();

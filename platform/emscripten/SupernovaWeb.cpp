@@ -147,7 +147,7 @@ int SupernovaWeb::init(int argc, char **argv){
 		});
 	);
 
-    Supernova::Engine::systemInit(argc, argv);
+    Supernova::Engine::systemInit(argc, argv, new SupernovaWeb());
 
     sampleCount = (antiAlias) ? 4 : 1;
 

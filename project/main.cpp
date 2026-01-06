@@ -6,8 +6,7 @@ using namespace Supernova;
 Scene scene;
 Image image(&scene);
 
-void init(){
-
+SUPERNOVA_INIT void init(){
     image.setAnchorPreset(AnchorPreset::CENTER);
     image.setTexture("supernova.png");
 

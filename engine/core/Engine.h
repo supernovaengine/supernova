@@ -68,7 +68,16 @@
 #include <atomic>
 #include <unordered_set>
 
-void init();
+#define SUPERNOVA_INIT \
+    void init(); \
+    namespace { \
+        struct InitRegistrar { \
+            InitRegistrar() { \
+                Supernova::Engine::getOnInit().add("user_init", &init); \
+            } \
+        }; \
+        static InitRegistrar _supernova_init_registrar; \
+    }
 
 namespace Supernova {
 
@@ -267,7 +276,7 @@ namespace Supernova {
         static void clearAllSubscriptions(bool includeLifecycle);
 
         //-----Supernova API functions-----
-        static void systemInit(int argc, char* argv[]);
+        static void systemInit(int argc, char* argv[], System* system);
         static void systemViewLoaded();
         static void systemViewChanged();
         static void systemDraw();
@@ -295,6 +304,10 @@ namespace Supernova {
         static void systemCharInput(wchar_t codepoint);
 
         //-----Supernova user events-----
+        // Safe accessor for the Init event
+        static FunctionSubscribe<void()>& getOnInit();
+
+        // Existing events (keep these as they are safe for runtime usage)
         static FunctionSubscribe<void()> onViewLoaded;
         static FunctionSubscribe<void()> onViewChanged;
         static FunctionSubscribe<void()> onViewDestroyed;

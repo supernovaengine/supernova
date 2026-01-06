@@ -87,7 +87,7 @@ sapp_desc sokol_main(int argc, char* argv[]) {
     app_desc.sample_count = 4;
     app_desc.window_title = "Supernova";
 
-    Supernova::Engine::systemInit(argc, argv);
+    Supernova::Engine::systemInit(argc, argv, new SupernovaSokol());
 
     return app_desc;
 }

@@ -93,6 +93,11 @@ FunctionSubscribe<void(int,bool,int)> Engine::onKeyDown;
 FunctionSubscribe<void(int,bool,int)> Engine::onKeyUp;
 FunctionSubscribe<void(wchar_t)> Engine::onCharInput;
 
+FunctionSubscribe<void()>& Engine::getOnInit() {
+    // This static variable is guaranteed to be created the first time this function is called
+    static FunctionSubscribe<void()> onInit;
+    return onInit;
+}
 
 void Engine::setScene(Scene* scene){
     if (asyncThread)
@@ -554,11 +559,13 @@ void Engine::calculateCanvas(){
     }
 }
 
-void Engine::systemInit(int argc, char* argv[]){
+void Engine::systemInit(int argc, char* argv[], System* system){
     #ifndef NO_THREAD_SUPPORT
         size_t maxThreads = std::max(1u, std::thread::hardware_concurrency() - 1);
         ThreadPoolManager::initialize(maxThreads);
     #endif
+
+    System::setSystemInstance(system);
 
     Engine::setCanvasSize(1000,480);
 
@@ -580,7 +587,7 @@ void Engine::systemInit(int argc, char* argv[]){
     LuaBinding::init();
     #endif
     #ifndef NO_CPP_INIT
-    init();
+    getOnInit().call();
     #endif
 }
 

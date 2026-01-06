@@ -18,6 +18,8 @@
 #include "sokol_gfx.h"
 
 namespace Supernova {
+    class Engine;
+
     enum class AdMobRating{
         General,
         ParentalGuidance,
@@ -41,7 +43,12 @@ namespace Supernova {
     class SUPERNOVA_API System {
     private:
 
-        static System* external;
+        friend class Engine;
+
+        static System* systemInstance;
+
+        // Only Engine is allowed to inject an external System implementation.
+        static void setSystemInstance(System* system);
 
     protected:
 
@@ -53,8 +60,6 @@ namespace Supernova {
         static System& instance();
 
         virtual ~System() {}
-
-        static void setExternalSystem(System* system);
 
         // *******
         // Used for user and Lua

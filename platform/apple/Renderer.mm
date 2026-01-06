@@ -43,7 +43,7 @@ static CGSize _screenSize;
 
 - (nonnull instancetype)initWithMetalKitView:(nonnull MTKView *)view withArgs:(NSArray*)args;
 {
-    Supernova::Engine::systemInit((int)[args count], [self getArray:args]);
+    Supernova::Engine::systemInit((int)[args count], [self getArray:args], new SupernovaApple());
     
     self = [super init];
     if(self)

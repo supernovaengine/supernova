@@ -110,7 +110,7 @@ NativeEngine::NativeEngine(struct android_app *app) {
 
     setupJNI();
 
-    Supernova::Engine::systemInit(0, nullptr);
+    Supernova::Engine::systemInit(0, nullptr, new SupernovaAndroid());
 }
 
 NativeEngine::~NativeEngine() {
