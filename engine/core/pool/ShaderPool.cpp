@@ -7,6 +7,7 @@
 #include "Log.h"
 #include "Engine.h"
 #include "shader/SBSReader.h"
+#include "shader/ShaderDataSerializer.h"
 #include "util/Base64.h"
 #include <cstdint>
 #include <algorithm>
@@ -68,10 +69,10 @@ std::string ShaderPool::getShaderLangStr(){
 }
 
 
-std::string ShaderPool::getShaderFile(const std::string& shaderStr){
+std::string ShaderPool::getShaderFile(const std::string& shaderStr, const std::string& extension){
 	std::string filename = getShaderName(shaderStr);
 
-	filename += ".sbs";
+	filename += extension;
 
 	return filename;
 }
@@ -193,11 +194,16 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t pr
             }
         } else {
             SBSReader sbs;
+            ShaderData tempShaderData;
+
             std::string shaderStr = getShaderStr(shaderType, properties);
             std::string base64Shd = getBase64Shader(getShaderName(shaderStr));
+
             if (!base64Shd.empty() && sbs.read(Base64::decode(base64Shd))){
                 shared->createShader(sbs.getShaderData());
-            } else if (sbs.read("shader://"+getShaderFile(shaderStr))){
+            } else if (ShaderDataSerializer::readFromFile("shader://"+getShaderFile(shaderStr, ".sdat"), shaderKey, tempShaderData)){
+                shared->createShader(tempShaderData);
+            } else if (sbs.read("shader://"+getShaderFile(shaderStr, ".sbs"))){
                 shared->createShader(sbs.getShaderData());
             } else {
                 addMissingShader(shaderStr);

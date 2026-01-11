@@ -45,7 +45,7 @@ namespace Supernova{
 
         static ShaderBuilderFn shaderBuilderFn;
 
-        static std::string getShaderFile(const std::string& shaderStr);
+        static std::string getShaderFile(const std::string& shaderStr, const std::string& extension);
         static std::string getShaderName(const std::string& shaderStr);
 
         static ShaderKey createShaderKey(ShaderType shaderType, uint32_t properties);

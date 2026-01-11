@@ -4,7 +4,8 @@
 
 #include "ShaderDataSerializer.h"
 
-#include <fstream>
+#include "io/File.h"
+
 #include <limits>
 #include <vector>
 
@@ -32,17 +33,17 @@ static bool setErr(std::string* err, const std::string& msg) {
 }
 
 // Little-endian write helpers (portable across architectures)
-static void writeU32(std::ofstream& out, uint32_t v) {
+static void writeU32(Supernova::File& out, uint32_t v) {
     uint8_t buf[4] = {
         static_cast<uint8_t>(v),
         static_cast<uint8_t>(v >> 8),
         static_cast<uint8_t>(v >> 16),
         static_cast<uint8_t>(v >> 24)
     };
-    out.write(reinterpret_cast<const char*>(buf), 4);
+    out.write(buf, 4);
 }
 
-static void writeU64(std::ofstream& out, uint64_t v) {
+static void writeU64(Supernova::File& out, uint64_t v) {
     uint8_t buf[8] = {
         static_cast<uint8_t>(v),
         static_cast<uint8_t>(v >> 8),
@@ -53,35 +54,34 @@ static void writeU64(std::ofstream& out, uint64_t v) {
         static_cast<uint8_t>(v >> 48),
         static_cast<uint8_t>(v >> 56)
     };
-    out.write(reinterpret_cast<const char*>(buf), 8);
+    out.write(buf, 8);
 }
 
-static void writeI32(std::ofstream& out, int32_t v) {
+static void writeI32(Supernova::File& out, int32_t v) {
     writeU32(out, static_cast<uint32_t>(v));
 }
 
-static void writeU8(std::ofstream& out, uint8_t v) {
-    out.write(reinterpret_cast<const char*>(&v), sizeof(v));
+static void writeU8(Supernova::File& out, uint8_t v) {
+    out.write(&v, sizeof(v));
 }
 
-static void writeBool(std::ofstream& out, bool v) {
+static void writeBool(Supernova::File& out, bool v) {
     uint8_t b = v ? 1 : 0;
     writeU8(out, b);
 }
 
-static void writeString(std::ofstream& out, const std::string& s) {
+static void writeString(Supernova::File& out, const std::string& s) {
     uint32_t len = static_cast<uint32_t>(s.size());
     writeU32(out, len);
     if (len > 0) {
-        out.write(s.data(), len);
+        out.write((unsigned char*)s.data(), len);
     }
 }
 
 // Little-endian read helpers (portable across architectures)
-static bool readU32(std::ifstream& in, uint32_t& v) {
+static bool readU32(Supernova::File& in, uint32_t& v) {
     uint8_t buf[4];
-    in.read(reinterpret_cast<char*>(buf), 4);
-    if (!in) return false;
+    if (in.read(buf, 4) != 4) return false;
     v = static_cast<uint32_t>(buf[0])
       | (static_cast<uint32_t>(buf[1]) << 8)
       | (static_cast<uint32_t>(buf[2]) << 16)
@@ -89,10 +89,9 @@ static bool readU32(std::ifstream& in, uint32_t& v) {
     return true;
 }
 
-static bool readU64(std::ifstream& in, uint64_t& v) {
+static bool readU64(Supernova::File& in, uint64_t& v) {
     uint8_t buf[8];
-    in.read(reinterpret_cast<char*>(buf), 8);
-    if (!in) return false;
+    if (in.read(buf, 8) != 8) return false;
     v = static_cast<uint64_t>(buf[0])
       | (static_cast<uint64_t>(buf[1]) << 8)
       | (static_cast<uint64_t>(buf[2]) << 16)
@@ -104,19 +103,18 @@ static bool readU64(std::ifstream& in, uint64_t& v) {
     return true;
 }
 
-static bool readI32(std::ifstream& in, int32_t& v) {
+static bool readI32(Supernova::File& in, int32_t& v) {
     uint32_t u = 0;
     if (!readU32(in, u)) return false;
     v = static_cast<int32_t>(u);
     return true;
 }
 
-static bool readU8(std::ifstream& in, uint8_t& v) {
-    in.read(reinterpret_cast<char*>(&v), sizeof(v));
-    return static_cast<bool>(in);
+static bool readU8(Supernova::File& in, uint8_t& v) {
+    return in.read(&v, sizeof(v)) == sizeof(v);
 }
 
-static bool readBool(std::ifstream& in, bool& v) {
+static bool readBool(Supernova::File& in, bool& v) {
     uint8_t b = 0;
     if (!readU8(in, b)) {
         return false;
@@ -125,7 +123,7 @@ static bool readBool(std::ifstream& in, bool& v) {
     return true;
 }
 
-static bool readString(std::ifstream& in, std::string& s) {
+static bool readString(Supernova::File& in, std::string& s) {
     uint32_t len = 0;
     if (!readU32(in, len)) {
         return false;
@@ -141,8 +139,7 @@ static bool readString(std::ifstream& in, std::string& s) {
     }
 
     s.resize(len);
-    in.read(&s[0], len);
-    return static_cast<bool>(in);
+    return in.read((unsigned char*)&s[0], len) == len;
 }
 
 } // namespace
@@ -150,8 +147,8 @@ static bool readString(std::ifstream& in, std::string& s) {
 namespace Supernova {
 
 bool ShaderDataSerializer::writeToFile(const std::string& filepath, uint64_t shaderKey, const ShaderData& shaderData, std::string* err) {
-    std::ofstream out(filepath, std::ios::binary | std::ios::out | std::ios::trunc);
-    if (!out.is_open()) {
+    File out;
+    if (out.open(filepath.c_str(), true) != FileErrors::FILEDATA_OK) {
         return setErr(err, "Cannot open file for writing: " + filepath);
     }
 
@@ -242,16 +239,13 @@ bool ShaderDataSerializer::writeToFile(const std::string& filepath, uint64_t sha
     }
 
     out.flush();
-    if (!out.good()) {
-        return setErr(err, "Failed while writing file: " + filepath);
-    }
 
     return true;
 }
 
 bool ShaderDataSerializer::readFromFile(const std::string& filepath, uint64_t expectedShaderKey, ShaderData& outShaderData, std::string* err) {
-    std::ifstream in(filepath, std::ios::binary | std::ios::in);
-    if (!in.is_open()) {
+    File in;
+    if (in.open(filepath.c_str()) != FileErrors::FILEDATA_OK) {
         return setErr(err, "Cannot open file for reading: " + filepath);
     }
 
