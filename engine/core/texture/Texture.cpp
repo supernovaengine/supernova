@@ -211,6 +211,13 @@ void Texture::setCubePath(size_t index, const std::string& path){
 
     this->paths[index] = path;
 
+    for (int f = 0; f < 6; f++){
+        if (this->paths[f].empty()){
+            // Cannot set cube texture path, all 6 faces must be set
+            return;
+        }
+    }
+
     this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_CUBE;
     this->numFaces = 6;
