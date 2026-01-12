@@ -153,6 +153,23 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
 
     std::array<TextureData,6> data;
 
+    if (numFaces == 6 && !paths[0].empty() && paths[1].empty()){
+        if (!TextureData::loadCubeMapFromSingleFile(paths[0].c_str(), data)){
+            ResourceProgress::failBuild(std::hash<std::string>{}(id));
+            throw std::runtime_error("Failed to load cube texture from file: " + paths[0]);
+        }
+
+        if (asyncLoading) {
+            if (shutdownRequested.load()) {
+                throw std::runtime_error("Shutdown requested");
+            }
+            ResourceProgress::updateProgress(buildId, 1.0f);
+            ResourceProgress::completeBuild(buildId);
+        }
+
+        return data;
+    }
+
     for (size_t f = 0; f < numFaces; f++) {
         if (paths[f].empty()) {
             ResourceProgress::failBuild(std::hash<std::string>{}(id));

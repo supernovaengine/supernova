@@ -47,6 +47,8 @@ namespace Supernova {
         bool loadTextureFromFile(const char* filename);
         bool loadTextureFromMemory(unsigned char* data, unsigned int dataLength);
 
+        static bool loadCubeMapFromSingleFile(const char* filename, std::array<TextureData, 6>& data);
+
         void releaseImageData();
         
         bool hasAlpha();

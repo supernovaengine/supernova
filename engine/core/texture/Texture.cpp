@@ -206,17 +206,52 @@ void Texture::setId(const std::string& id){
     this->id = id;
 }
 
-void Texture::setCubePath(size_t index, const std::string& path){
+void Texture::setCubeMap(const std::string& path){
     destroy();
+
+    this->paths[0] = path;
+
+    // Single-file cubemap uses only paths[0]. Clear previous per-face paths
+    // so TextureDataPool can correctly detect the single-file cubemap case.
+    for (int f = 1; f < 6; f++){
+        this->paths[f].clear();
+    }
+
+    this->framebuffer = NULL;
+    this->type = TextureType::TEXTURE_CUBE;
+    this->numFaces = 6;
+    this->loadFromPath = true;
+    this->releaseDataAfterLoad = true;
+    this->needLoad = true;
+
+    this->id = "cube|" + path;
+}
+
+void Texture::setCubePath(size_t index, const std::string& path){
+    // If this texture currently represents a single-file cubemap, switching to per-face
+    // assignment should start clean.
+    bool isSingleFileCube = (!this->paths[0].empty());
+    for (int f = 1; f < 6 && isSingleFileCube; f++){
+        if (!this->paths[f].empty())
+            isSingleFileCube = false;
+    }
+    if (isSingleFileCube && id.rfind("cube|", 0) == 0){
+        for (int f = 0; f < 6; f++){
+            this->paths[f].clear();
+        }
+    }
 
     this->paths[index] = path;
 
+    // Allow setting faces one-by-one. Only when all faces are set we rebuild the id and
+    // invalidate cached GPU/data resources.
     for (int f = 0; f < 6; f++){
         if (this->paths[f].empty()){
-            // Cannot set cube texture path, all 6 faces must be set
             return;
         }
     }
+
+    destroy();
 
     this->framebuffer = NULL;
     this->type = TextureType::TEXTURE_CUBE;
@@ -238,8 +273,11 @@ void Texture::setCubePaths(const std::string& front, const std::string& back,
 
     destroy();
 
-    this->paths[5] = front;
-    this->paths[4] = back;
+    // OpenGL-style cubemap naming:
+    // Front = +Z (face index 4)
+    // Back  = -Z (face index 5)
+    this->paths[4] = front;
+    this->paths[5] = back;
     this->paths[1] = left;
     this->paths[0] = right;
     this->paths[2] = up;
@@ -271,8 +309,11 @@ void Texture::setCubeDatas(const std::string& id, TextureData front, TextureData
     this->needLoad = true;
 
     this->data = std::make_shared<std::array<TextureData,6>>();
-    this->data->at(5) = front;
-    this->data->at(4) = back;
+    // OpenGL-style cubemap naming:
+    // Front = +Z (face index 4)
+    // Back  = -Z (face index 5)
+    this->data->at(4) = front;
+    this->data->at(5) = back;
     this->data->at(1) = left;
     this->data->at(0) = right;
     this->data->at(2) = up;

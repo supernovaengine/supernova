@@ -177,6 +177,111 @@ bool TextureData::loadTextureFromMemory(unsigned char* data, unsigned int dataLe
     return result;
 }
 
+bool TextureData::loadCubeMapFromSingleFile(const char* filename, std::array<TextureData, 6>& data){
+    TextureData texture;
+    if (!texture.loadTextureFromFile(filename))
+        return false;
+
+    int tileW = 0;
+    int tileH = 0;
+
+    int right[2];
+    int left[2];
+    int top[2];
+    int bottom[2];
+    int front[2];
+    int back[2];
+
+    uint64_t ratio = texture.getWidth() * 100 / texture.getHeight();
+
+    // Horizontal Cross
+    if (ratio == 133){ // 4:3
+        tileW = texture.getWidth() / 4;
+        tileH = texture.getHeight() / 3;
+
+        right[0] = 2; right[1] = 1;
+        left[0] = 0; left[1] = 1;
+        top[0] = 1; top[1] = 0;
+        bottom[0] = 1; bottom[1] = 2;
+        front[0] = 1; front[1] = 1;
+        back[0] = 3; back[1] = 1;
+
+    // Vertical Cross
+    }else if (ratio == 75){ // 3:4
+        tileW = texture.getWidth() / 3;
+        tileH = texture.getHeight() / 4;
+
+        right[0] = 2; right[1] = 1;
+        left[0] = 0; left[1] = 1;
+        top[0] = 1; top[1] = 0;
+        bottom[0] = 1; bottom[1] = 2;
+        front[0] = 1; front[1] = 1;
+        back[0] = 1; back[1] = 3;
+    }else{
+        Log::error("Failed to load cubemap: format not supported");
+        return false;
+    }
+
+    // Face indices follow the backend cubemap convention (sokol/OpenGL style):
+    // 0=+X (Right), 1=-X (Left), 2=+Y (Top), 3=-Y (Bottom), 4=+Z, 5=-Z.
+    // This loader uses OpenGL-style naming: Front = +Z (4), Back = -Z (5).
+
+    // IMPORTANT:
+    // Do not assign/copy 'texture' into each face and then call crop(), because TextureData::copy()
+    // is shallow and would make all faces share the same underlying pixel pointer. The first crop()
+    // frees that buffer, and subsequent crops crash.
+    //
+    // Instead, extract each face into its own buffer.
+
+    auto extractFace = [&](int faceIndex, int xTile, int yTile){
+        const int xOffset = xTile * tileW;
+        const int yOffset = yTile * tileH;
+
+        unsigned char* src = (unsigned char*)texture.getData();
+        const int srcW = texture.getWidth();
+        const int srcChannels = texture.getChannels();
+        const ColorFormat srcFormat = texture.getColorFormat();
+
+        const int rowBytes = tileW * srcChannels;
+        const int bufsize = tileW * tileH * srcChannels;
+        unsigned char* faceData = (unsigned char*)malloc(bufsize * sizeof(unsigned char));
+        if (!faceData)
+            throw std::runtime_error("Out of memory while extracting cubemap face");
+
+        for (int y = 0; y < tileH; y++){
+            const size_t srcOffset = ((size_t)(yOffset + y) * (size_t)srcW + (size_t)xOffset) * (size_t)srcChannels;
+            const size_t dstOffset = (size_t)y * (size_t)rowBytes;
+            memcpy(faceData + dstOffset, src + srcOffset, (size_t)rowBytes);
+        }
+
+        data[faceIndex] = TextureData(tileW, tileH, (unsigned int)bufsize, srcFormat, srcChannels, faceData);
+    };
+
+    try {
+        // Using SUPERNOVA convention:
+        // Right (+X)
+        extractFace(0, right[0], right[1]);
+        // Left (-X)
+        extractFace(1, left[0], left[1]);
+        // Top (+Y)
+        extractFace(2, top[0], top[1]);
+        // Bottom (-Y)
+        extractFace(3, bottom[0], bottom[1]);
+        // Front (+Z)
+        extractFace(4, front[0], front[1]);
+        // Back (-Z)
+        extractFace(5, back[0], back[1]);
+    } catch (...) {
+        texture.releaseImageData();
+        throw;
+    }
+
+    // Release temporary source image data (it is not stored in the returned faces)
+    texture.releaseImageData();
+
+    return true;
+}
+
 void TextureData::copy ( const TextureData& v ){
     this->width = v.width;
     this->height = v.height;

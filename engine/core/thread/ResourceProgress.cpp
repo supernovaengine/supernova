@@ -38,15 +38,25 @@ void ResourceProgress::updateProgress(uint64_t id, float progress) {
 }
 
 void ResourceProgress::completeBuild(uint64_t id) {
-    Log::debug("Loading completed [%s]: %s", getResourceTypeName(activeBuilds[id].type).c_str(), activeBuilds[id].name.c_str());
     std::lock_guard<std::mutex> lock(progressMutex);
-    activeBuilds.erase(id);
+    auto it = activeBuilds.find(id);
+    if (it != activeBuilds.end()) {
+        Log::debug("Loading completed [%s]: %s", getResourceTypeName(it->second.type).c_str(), it->second.name.c_str());
+        activeBuilds.erase(it);
+        return;
+    }
+    Log::debug("Loading completed [Resource]: <unknown>");
 }
 
 void ResourceProgress::failBuild(uint64_t id) {
-    Log::debug("Loading failed [%s]: %s", getResourceTypeName(activeBuilds[id].type).c_str(), activeBuilds[id].name.c_str());
     std::lock_guard<std::mutex> lock(progressMutex);
-    activeBuilds.erase(id);
+    auto it = activeBuilds.find(id);
+    if (it != activeBuilds.end()) {
+        Log::debug("Loading failed [%s]: %s", getResourceTypeName(it->second.type).c_str(), it->second.name.c_str());
+        activeBuilds.erase(it);
+        return;
+    }
+    Log::debug("Loading failed [Resource]: <unknown>");
 }
 
 bool ResourceProgress::hasActiveBuilds() {
