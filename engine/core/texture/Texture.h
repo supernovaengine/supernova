@@ -74,6 +74,10 @@ namespace Supernova{
             TextureData& getData(size_t index = 0) const;
             std::string getId() const;
 
+            size_t getNumFaces() const;
+            TextureType getType() const;
+            bool isCubeMap() const;
+
             unsigned int getWidth() const;
             unsigned int getHeight() const;
             bool isTransparent() const;

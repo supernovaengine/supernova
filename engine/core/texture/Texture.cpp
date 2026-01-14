@@ -228,19 +228,6 @@ void Texture::setCubeMap(const std::string& path){
 }
 
 void Texture::setCubePath(size_t index, const std::string& path){
-    // If this texture currently represents a single-file cubemap, switching to per-face
-    // assignment should start clean.
-    bool isSingleFileCube = (!this->paths[0].empty());
-    for (int f = 1; f < 6 && isSingleFileCube; f++){
-        if (!this->paths[f].empty())
-            isSingleFileCube = false;
-    }
-    if (isSingleFileCube && id.rfind("cube|", 0) == 0){
-        for (int f = 0; f < 6; f++){
-            this->paths[f].clear();
-        }
-    }
-
     this->paths[index] = path;
 
     // Allow setting faces one-by-one. Only when all faces are set we rebuild the id and
@@ -440,6 +427,18 @@ TextureData& Texture::getData(size_t index) const{
 
 std::string Texture::getId() const{
     return id;
+}
+
+size_t Texture::getNumFaces() const{
+    return numFaces;
+}
+
+TextureType Texture::getType() const{
+    return type;
+}
+
+bool Texture::isCubeMap() const{
+    return type == TextureType::TEXTURE_CUBE;
 }
 
 unsigned int Texture::getWidth() const{

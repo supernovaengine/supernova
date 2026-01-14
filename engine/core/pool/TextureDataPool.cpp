@@ -153,7 +153,13 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
 
     std::array<TextureData,6> data;
 
-    if (numFaces == 6 && !paths[0].empty() && paths[1].empty()){
+    bool isSingleFileCube = (!paths[0].empty());
+    for (int f = 1; f < 6 && isSingleFileCube; f++){
+        if (!paths[f].empty())
+            isSingleFileCube = false;
+    }
+
+    if (numFaces == 6 && isSingleFileCube) {
         if (!TextureData::loadCubeMapFromSingleFile(paths[0].c_str(), data)){
             ResourceProgress::failBuild(std::hash<std::string>{}(id));
             throw std::runtime_error("Failed to load cube texture from file: " + paths[0]);
