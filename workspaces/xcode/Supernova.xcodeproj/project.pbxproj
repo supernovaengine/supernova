@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		1789660C2F1D764600E89E52 /* ShaderDataSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */; };
+		1789660D2F1D764600E89E52 /* ShaderDataSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1789660A2F1D764600E89E52 /* ShaderDataSerializer.h */; };
+		1789660E2F1D764600E89E52 /* ShaderDataSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */; };
 		71033D662BD1A7D200D81FB5 /* ScrollbarComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71033D652BD1A7D200D81FB5 /* ScrollbarComponent.h */; };
 		71033D692BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */; };
 		71033D6A2BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */; };
@@ -821,12 +824,12 @@
 		71ABBD4A27A87A2E001CE3AF /* MeshSystem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71ABBD4727A87A2E001CE3AF /* MeshSystem.cpp */; };
 		71ABBD4B27A87A2E001CE3AF /* MeshSystem.h in Headers */ = {isa = PBXBuildFile; fileRef = 71ABBD4827A87A2E001CE3AF /* MeshSystem.h */; };
 		71AD5E702E9F2B86004951AB /* ScriptBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */; };
-		71AD5E742E9F2B87004951AB /* ScriptProperty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */; };
-		71AD5E762E9F2B87004951AB /* ScriptProperty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */; };
 		71AD5E712E9F2B86004951AB /* ScriptProperty.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */; };
 		71AD5E722E9F2B86004951AB /* ScriptBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E6D2E9F2B86004951AB /* ScriptBase.h */; };
 		71AD5E732E9F2B86004951AB /* ScriptBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */; };
+		71AD5E742E9F2B87004951AB /* ScriptProperty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */; };
 		71AD5E752EAECC69004951AB /* CrashGuard.h in Headers */ = {isa = PBXBuildFile; fileRef = 71AD5E742EAECC69004951AB /* CrashGuard.h */; };
+		71AD5E762E9F2B87004951AB /* ScriptProperty.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */; };
 		71BE60E425B1D019006D6E02 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE60E325B1D019006D6E02 /* assets */; };
 		71BE60E525B1D019006D6E02 /* assets in Resources */ = {isa = PBXBuildFile; fileRef = 71BE60E325B1D019006D6E02 /* assets */; };
 		71BE61C525B1DA3E006D6E02 /* stb_truetype.c in Sources */ = {isa = PBXBuildFile; fileRef = 71BE61BA25B1DA3E006D6E02 /* stb_truetype.c */; };
@@ -1269,6 +1272,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		1789660A2F1D764600E89E52 /* ShaderDataSerializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderDataSerializer.h; sourceTree = "<group>"; };
+		1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderDataSerializer.cpp; sourceTree = "<group>"; };
 		71033D652BD1A7D200D81FB5 /* ScrollbarComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollbarComponent.h; sourceTree = "<group>"; };
 		71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scrollbar.cpp; sourceTree = "<group>"; };
 		71033D682BD1A7F000D81FB5 /* Scrollbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scrollbar.h; sourceTree = "<group>"; };
@@ -2129,8 +2134,8 @@
 		71AD5E6D2E9F2B86004951AB /* ScriptBase.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptBase.h; sourceTree = "<group>"; };
 		71AD5E6E2E9F2B86004951AB /* ScriptBase.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptBase.cpp; sourceTree = "<group>"; };
 		71AD5E6F2E9F2B86004951AB /* ScriptProperty.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ScriptProperty.h; sourceTree = "<group>"; };
-		71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptProperty.cpp; sourceTree = "<group>"; };
 		71AD5E742EAECC69004951AB /* CrashGuard.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CrashGuard.h; sourceTree = "<group>"; };
+		71AD5E752E9F2B87004951AB /* ScriptProperty.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ScriptProperty.cpp; sourceTree = "<group>"; };
 		71BE602825B1C49C006D6E02 /* liblua-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "liblua-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		71BE60E325B1D019006D6E02 /* assets */ = {isa = PBXFileReference; lastKnownFileType = folder; path = assets; sourceTree = "<group>"; };
 		71BE612625B1D088006D6E02 /* libstb-macos.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libstb-macos.a"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -3998,10 +4003,12 @@
 		71CC839D26B8C54A00EEBB93 /* shader */ = {
 			isa = PBXGroup;
 			children = (
-				71CC839E26B8C54A00EEBB93 /* SBSReader.cpp */,
 				71CC83A026B8C54A00EEBB93 /* SBSReader.h */,
-				71CC83A126B8C54A00EEBB93 /* ShaderData.cpp */,
+				71CC839E26B8C54A00EEBB93 /* SBSReader.cpp */,
 				71CC839F26B8C54A00EEBB93 /* ShaderData.h */,
+				71CC83A126B8C54A00EEBB93 /* ShaderData.cpp */,
+				1789660A2F1D764600E89E52 /* ShaderDataSerializer.h */,
+				1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */,
 			);
 			path = shader;
 			sourceTree = "<group>";
@@ -4320,6 +4327,7 @@
 				71BE624525B1DB9E006D6E02 /* TexturePool.h in Headers */,
 				7105CAAC2AD61C7A007C91BA /* Body3DComponent.h in Headers */,
 				713E581227BA9CE400376680 /* Polygon.h in Headers */,
+				1789660D2F1D764600E89E52 /* ShaderDataSerializer.h in Headers */,
 				71393EE928F8EF9F0074442E /* XMLUtils.h in Headers */,
 				71FCE4C228E0FA01003C5217 /* LuaBridgeAddon.h in Headers */,
 				71033D6B2BD1A7F100D81FB5 /* Scrollbar.h in Headers */,
@@ -5563,6 +5571,7 @@
 				71ED64C628B45E0B005D2D96 /* Angle.cpp in Sources */,
 				71CC83AC26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
 				71E54507284D5BB700C68FAB /* MorphTracks.cpp in Sources */,
+				1789660E2F1D764600E89E52 /* ShaderDataSerializer.cpp in Sources */,
 				71451BD5270CA17F00712643 /* TimedAction.cpp in Sources */,
 				713D82B5259D307F00567F9F /* SokolShader.cpp in Sources */,
 				71D74956296731F200348AB8 /* EntityHandle.cpp in Sources */,
@@ -5734,6 +5743,7 @@
 				71ED64C528B45E0B005D2D96 /* Angle.cpp in Sources */,
 				71CC83AB26B8D54800EEBB93 /* SokolFramebuffer.cpp in Sources */,
 				71E54506284D5BB700C68FAB /* MorphTracks.cpp in Sources */,
+				1789660C2F1D764600E89E52 /* ShaderDataSerializer.cpp in Sources */,
 				71451BD4270CA17F00712643 /* TimedAction.cpp in Sources */,
 				7162FD5C25963AE00075B97D /* Attribute.cpp in Sources */,
 				71AD5E762E9F2B87004951AB /* ScriptProperty.cpp in Sources */,
