@@ -157,12 +157,13 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("setTextures", 
             luabridge::overload<const std::string&,const std::string&,const std::string&,const std::string&,const std::string&,const std::string&>(&SkyBox::setTextures),
             luabridge::overload<const std::string&,TextureData,TextureData,TextureData,TextureData,TextureData,TextureData>(&SkyBox::setTextures))
-        .addFunction("setTextureFront", &SkyBox::setTextureFront)
-        .addFunction("setTextureBack", &SkyBox::setTextureBack)
-        .addFunction("setTextureLeft", &SkyBox::setTextureLeft)
-        .addFunction("setTextureRight", &SkyBox::setTextureRight)
-        .addFunction("setTextureUp", &SkyBox::setTextureUp)
-        .addFunction("setTextureDown", &SkyBox::setTextureDown)
+        .addFunction("setTexture", &SkyBox::setTexture)
+        .addFunction("setTexturePositiveX", &SkyBox::setTexturePositiveX)
+        .addFunction("setTextureNegativeX", &SkyBox::setTextureNegativeX)
+        .addFunction("setTexturePositiveY", &SkyBox::setTexturePositiveY)
+        .addFunction("setTextureNegativeY", &SkyBox::setTextureNegativeY)
+        .addFunction("setTexturePositiveZ", &SkyBox::setTexturePositiveZ)
+        .addFunction("setTextureNegativeZ", &SkyBox::setTextureNegativeZ)
         .addProperty("color", &SkyBox::getColor, (void(SkyBox::*)(Vector4))&SkyBox::setColor)
         .addFunction("setColor", 
             luabridge::overload<const float, const float, const float>(&SkyBox::setColor),

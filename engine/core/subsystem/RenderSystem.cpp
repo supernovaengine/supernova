@@ -2859,6 +2859,12 @@ void RenderSystem::update(double dt){
             }
         }
 
+        if (sky.needUpdateTexture){
+            if (sky.texture.empty()){
+                sky.needReload = true;
+            }
+        }
+
         if (sky.loaded && sky.needReload){
             destroySky(entity, sky);
         }
