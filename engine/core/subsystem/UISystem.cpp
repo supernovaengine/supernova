@@ -194,7 +194,6 @@ bool UISystem::loadFontAtlas(TextComponent& text, UIComponent& ui, UILayoutCompo
     }
 
     ui.texture.setData(fontId, *text.stbtext->getTextureData());
-    ui.texture.setReleaseDataAfterLoad(true);
 
     ui.needUpdateTexture = true;
 
@@ -899,7 +898,6 @@ void UISystem::destroyText(TextComponent& text){
 
     if (text.stbtext){
         text.stbtext.reset();
-        text.stbtext = NULL;
     }
 }
 

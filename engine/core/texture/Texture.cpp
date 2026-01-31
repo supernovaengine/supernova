@@ -366,13 +366,11 @@ void Texture::destroy(){
 
         if (render) {
             render.reset();
-            render = NULL;
             TexturePool::remove(id);
         }
 
         if (data) {
             data.reset();
-            data = NULL;
             TextureDataPool::remove(id);
         }
 
