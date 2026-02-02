@@ -710,6 +710,18 @@ bool UISystem::createOrUpdateImage(ImageComponent& img, UIComponent& ui, UILayou
     return true;
 }
 
+Vector2 UISystem::getTextMinSize(TextComponent& text){
+    int minHeight = 0;
+    float minWidth = 0;
+
+    if (text.stbtext){
+        minHeight = text.stbtext->getLineHeight();
+        minWidth = text.stbtext->getCharWidth('W');
+    }
+
+    return Vector2(minWidth, minHeight);
+}
+
 bool UISystem::createOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
     if (text.needUpdateText){
         if (ui.automaticFlipY){
@@ -1448,6 +1460,10 @@ void UISystem::update(double dt){
 
             if (signature.test(scene->getComponentId<TextComponent>())){
                 TextComponent& text = scene->getComponent<TextComponent>(entity);
+
+                Vector2 minSize = getTextMinSize(text);
+                if (layout.width < minSize.x) layout.width = minSize.x;
+                if (layout.height < minSize.y) layout.height = minSize.y;
 
                 text.needUpdateText = true;
             }

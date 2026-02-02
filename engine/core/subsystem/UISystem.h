@@ -78,6 +78,8 @@ namespace Supernova{
 
 		bool isTextEditFocused();
 
+		Vector2 getTextMinSize(TextComponent& text);
+
 		bool eventOnCharInput(wchar_t codepoint);
 		bool eventOnPointerDown(float x, float y);
 		bool eventOnPointerUp(float x, float y);

@@ -81,6 +81,19 @@ int STBText::getLineHeight(){
     return lineHeight;
 }
 
+float STBText::getCharWidth(char c){
+    int intchar = (int)c;
+    if (intchar < firstChar || intchar > lastChar)
+        return 0;
+
+    float offsetX = 0;
+    float offsetY = 0;
+    stbtt_aligned_quad quad;
+    stbtt_GetPackedQuad(charInfo, atlasWidth, atlasHeight, intchar - firstChar, &offsetX, &offsetY, &quad, 1);
+
+    return offsetX;
+}
+
 TextureData* STBText::load(const std::string& fontpath, unsigned int fontSize){
 
     Data fontData;

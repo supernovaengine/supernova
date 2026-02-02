@@ -670,6 +670,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getLineHeight", &Text::getLineHeight)
         .addFunction("getNumChars", &Text::getNumChars)
         .addFunction("getCharPosition", &Text::getCharPosition)
+        .addFunction("getCharWidth", &Text::getCharWidth)
         .addProperty("flipY", &Text::isFlipY, &Text::setFlipY)
         .addProperty("pivotBaseline", &Text::isPivotBaseline, &Text::setPivotBaseline)
         .addProperty("pivotCentered", &Text::isPivotCentered, &Text::setPivotCentered)
