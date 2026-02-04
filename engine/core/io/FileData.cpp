@@ -137,6 +137,11 @@ std::string FileData::getFilePathExtension(const std::string &filepath) {
 }
 
 std::string FileData::getSystemPath(std::string path){
+    // Return full/absolute paths unchanged
+    if (beginWith(path, "/") || (path.length() > 1 && path[1] == ':')){
+        return path;
+    }
+
     if (beginWith(path, "data://")){
         path = path.substr(7, path.length());
         return System::instance().getUserDataPath() + "/" + FileData::simplifyPath(path);
@@ -153,10 +158,7 @@ std::string FileData::getSystemPath(std::string path){
         path = path.substr(9, path.length());
         return System::instance().getShaderPath() + "/" + FileData::simplifyPath(path);
     }
-    if (beginWith(path, "/")){
-        path = path.substr(1, path.length());
-        return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);
-    }
+
     return System::instance().getAssetPath() + "/" + FileData::simplifyPath(path);
 }
 
