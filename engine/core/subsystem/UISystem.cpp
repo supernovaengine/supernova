@@ -218,8 +218,14 @@ void UISystem::createText(TextComponent& text, UIComponent& ui, UILayoutComponen
     std::vector<uint16_t> indices_array;
 
     if (text.text.length() > text.maxTextSize){
-        Log::warn("Text is bigger than maxTextSize: %i. Increasing it to: %i", text.maxTextSize, text.text.length());
-        text.maxTextSize = text.text.length();
+        unsigned int newSize = text.maxTextSize;
+        if (newSize == 0) newSize = 1;
+        while (newSize < text.text.length()){
+            newSize *= 2;
+        }
+
+        Log::warn("Text is bigger than maxTextSize: %i. Increasing it to: %i", text.maxTextSize, newSize);
+        text.maxTextSize = newSize;
         if (ui.loaded){
             ui.needReload = true;
         }
