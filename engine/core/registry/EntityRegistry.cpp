@@ -142,7 +142,7 @@ void EntityRegistry::moveChildAux(Entity entity, bool increase, bool stopIfFound
                         break;
                 }
             }
-            nextIndex = findBranchLastIndex(transforms->getEntity(nextIndex));
+            nextIndex = findBranchLastIndex(transforms->getEntity(nextIndex)) + 1;
         }else{
             for (int i = (entityIndex-1); i >= 0; i--){
                 Transform& next = transforms->getComponentFromIndex(i);
@@ -154,7 +154,7 @@ void EntityRegistry::moveChildAux(Entity entity, bool increase, bool stopIfFound
             }
         }
 
-        moveChildToIndex(entity, nextIndex, false);
+        moveChildToIndex(entity, nextIndex);
     }
 }
 
@@ -353,7 +353,7 @@ void EntityRegistry::addEntityChild(Entity parent, Entity child, bool changeTran
 
         if (parent == NULL_ENTITY){
             size_t newIndex = findBranchLastIndex(findOldestParent(child)) + 1;
-            moveChildToIndex(child, newIndex, true);
+            moveChildToIndex(child, newIndex);
 
             Transform& transformChild = componentManager.getComponent<Transform>(child);
 
@@ -366,7 +366,7 @@ void EntityRegistry::addEntityChild(Entity parent, Entity child, bool changeTran
             Signature parentSignature = entityManager.getSignature(parent);
             if (parentSignature.test(getComponentId<Transform>())){
                 size_t newIndex = findBranchLastIndex(parent) + 1;
-                moveChildToIndex(child, newIndex, true);
+                moveChildToIndex(child, newIndex);
 
                 Transform& transformParent = componentManager.getComponent<Transform>(parent);
                 Transform& transformChild = componentManager.getComponent<Transform>(child);
@@ -394,7 +394,7 @@ void EntityRegistry::addEntityChild(Entity parent, Entity child, bool changeTran
     //----------DEBUG
 }
 
-void EntityRegistry::moveChildToIndex(Entity entity, size_t index, bool adjustFinalPosition){
+void EntityRegistry::moveChildToIndex(Entity entity, size_t index){
     Signature signature = entityManager.getSignature(entity);
 
     if (signature.test(getComponentId<Transform>())){
@@ -405,7 +405,7 @@ void EntityRegistry::moveChildToIndex(Entity entity, size_t index, bool adjustFi
             size_t lastChildIndex = findBranchLastIndex(entity);
             size_t length = lastChildIndex - entityIndex + 1;
 
-            if (adjustFinalPosition && (index > entityIndex)){
+            if (index > entityIndex){
                 if (index > 0){ // Prevent underflow
                     index--;
                 }

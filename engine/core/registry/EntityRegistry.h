@@ -89,7 +89,7 @@ namespace Supernova {
 
         void addEntityChild(Entity parent, Entity child, bool changeTransform);
 
-        void moveChildToIndex(Entity entity, size_t index, bool adjustFinalPosition); // for internal/editor use
+        void moveChildToIndex(Entity entity, size_t index); // for internal/editor use
 
         void moveChildToTop(Entity entity);
         void moveChildUp(Entity entity);
