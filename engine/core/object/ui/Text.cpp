@@ -39,14 +39,22 @@ bool Text::load(){
 void Text::setFixedSize(bool fixedSize){
     TextComponent& textcomp = getComponent<TextComponent>();
 
-    textcomp.fixedWidth = fixedSize;
-    textcomp.fixedHeight = fixedSize;
+    if (textcomp.fixedWidth != fixedSize || textcomp.fixedHeight != fixedSize){
+        textcomp.fixedWidth = fixedSize;
+        textcomp.fixedHeight = fixedSize;
+
+        textcomp.needUpdateText = true;
+    }
 }
 
 void Text::setFixedWidth(bool fixedWidth){
     TextComponent& textcomp = getComponent<TextComponent>();
 
-    textcomp.fixedWidth = fixedWidth;
+    if (textcomp.fixedWidth != fixedWidth){
+        textcomp.fixedWidth = fixedWidth;
+
+        textcomp.needUpdateText = true;
+    }
 }
 
 bool Text::isFixedWidth() const{
@@ -58,7 +66,11 @@ bool Text::isFixedWidth() const{
 void Text::setFixedHeight(bool fixedHeight){
     TextComponent& textcomp = getComponent<TextComponent>();
 
-    textcomp.fixedHeight = fixedHeight;
+    if (textcomp.fixedHeight != fixedHeight){
+        textcomp.fixedHeight = fixedHeight;
+
+        textcomp.needUpdateText = true;
+    }
 }
 
 bool Text::isFixedHeight() const{
