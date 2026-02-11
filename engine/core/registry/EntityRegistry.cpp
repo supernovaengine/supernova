@@ -51,6 +51,10 @@ EntityRegistry::EntityRegistry() {
     registerComponent<InstancedMeshComponent>();
 }
 
+EntityRegistry::EntityRegistry(EntityPool defaultPool) : EntityRegistry() {
+    this->defaultPool = defaultPool;
+}
+
 EntityRegistry::~EntityRegistry(){
     std::vector<Entity> entityList = entityManager.getEntityList();
     while(entityList.size() > 0){

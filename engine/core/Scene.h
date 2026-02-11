@@ -40,6 +40,7 @@ namespace Supernova{
 
         std::vector<std::pair<std::string, std::shared_ptr<SubSystem>>> systems;
 
+        void init();
         Entity createDefaultCamera();
 
     protected:
@@ -69,6 +70,7 @@ namespace Supernova{
     public:
 
         Scene();
+        Scene(EntityPool defaultPool);
         virtual ~Scene();
 
         void load();

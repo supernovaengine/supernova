@@ -479,7 +479,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<EntityRegistry>("EntityRegistry")
-        .addConstructor <void (*) (void)> ()
+        .addConstructor <void (*) (void), void (*) (EntityPool)> ()
         .addFunction("createEntity", &EntityRegistry::createEntity)
         .addFunction("createUserEntity", &EntityRegistry::createUserEntity)
         .addFunction("createSystemEntity", &EntityRegistry::createSystemEntity)
@@ -507,7 +507,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .deriveClass<Scene, EntityRegistry>("Scene")
-        .addConstructor <void (*) (void)> ()
+        .addConstructor <void (*) (void), void (*) (EntityPool)> ()
         .addFunction("load", &Scene::load)
         .addFunction("destroy", &Scene::destroy)
         .addFunction("draw", &Scene::draw)

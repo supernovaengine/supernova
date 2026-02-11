@@ -19,7 +19,15 @@
 
 using namespace Supernova;
 
-Scene::Scene(){
+Scene::Scene() : EntityRegistry() {
+    init();
+}
+
+Scene::Scene(EntityPool defaultPool) : EntityRegistry(defaultPool) {
+    init();
+}
+
+void Scene::init(){
     registerSystem<ActionSystem>();
     registerSystem<MeshSystem>();
     registerSystem<UISystem>();

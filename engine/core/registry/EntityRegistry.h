@@ -74,6 +74,7 @@ namespace Supernova {
 
     public:
         EntityRegistry();
+        EntityRegistry(EntityPool defaultPool);
         virtual ~EntityRegistry();
 
         //Entity methods
