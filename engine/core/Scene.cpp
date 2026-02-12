@@ -82,7 +82,7 @@ Entity Scene::createDefaultCamera(){
     addComponent<Transform>(defaultCamera, {});
 
     CameraComponent& camera = getComponent<CameraComponent>(defaultCamera);
-    camera.type = CameraType::CAMERA_2D;
+    camera.type = CameraType::CAMERA_UI;
     camera.transparentSort = false;
 
     Transform& cameratransform = getComponent<Transform>(defaultCamera);
@@ -164,7 +164,7 @@ bool Scene::canReceiveUIEvents(){
         default:
             Signature cameraSignature = getSignature(getCamera());
             if (cameraSignature.test(getComponentId<CameraComponent>())){
-                return getComponent<CameraComponent>(getCamera()).type == CameraType::CAMERA_2D;
+                return getComponent<CameraComponent>(getCamera()).type == CameraType::CAMERA_UI;
             }
 
             return false;

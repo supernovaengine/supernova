@@ -899,7 +899,7 @@ void UISystem::applyAnchorPreset(UILayoutComponent& layout){
 
 void UISystem::changeFlipY(UIComponent& ui, CameraComponent& camera){
     ui.flipY = false;
-    if (camera.type != CameraType::CAMERA_2D){
+    if (camera.type != CameraType::CAMERA_UI){
         ui.flipY = !ui.flipY;
     }
 

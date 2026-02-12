@@ -51,7 +51,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginNamespace("CameraType")
-        .addVariable("CAMERA_2D", CameraType::CAMERA_2D)
+        .addVariable("CAMERA_UI", CameraType::CAMERA_UI)
         .addVariable("CAMERA_ORTHO", CameraType::CAMERA_ORTHO)
         .addVariable("CAMERA_PERSPECTIVE", CameraType::CAMERA_PERSPECTIVE)
         .endNamespace();

@@ -19,7 +19,7 @@
 namespace Supernova{
 
     enum class CameraType{
-        CAMERA_2D,
+        CAMERA_UI,
         CAMERA_ORTHO,
         CAMERA_PERSPECTIVE
     };
@@ -35,7 +35,7 @@ namespace Supernova{
 
     struct SUPERNOVA_API CameraComponent{
 
-        CameraType type = CameraType::CAMERA_2D;
+        CameraType type = CameraType::CAMERA_UI;
         
         Matrix4 projectionMatrix;
         Matrix4 viewMatrix;

@@ -1846,7 +1846,7 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
         objScreenWidth = layout.width * widthRatio * camScaleX;
         objScreenHeight = layout.height * heightRatio * camScaleY;
 
-        if (camera.type == CameraType::CAMERA_2D)
+        if (camera.type == CameraType::CAMERA_UI)
             objScreenPosY = (float) System::instance().getScreenHeight() - objScreenHeight - objScreenPosY;
 
         if (!(img.patchMarginLeft == 0 && img.patchMarginTop == 0 && img.patchMarginRight == 0 && img.patchMarginBottom == 0)) {
@@ -1868,7 +1868,7 @@ Rect RenderSystem::getScissorRect(UILayoutComponent& layout, ImageComponent& img
         objScreenWidth = layout.width;
         objScreenHeight = layout.height;
 
-        if (camera.type == CameraType::CAMERA_2D)
+        if (camera.type == CameraType::CAMERA_UI)
             objScreenPosY = (float) camera.framebuffer->getHeight() - objScreenHeight - objScreenPosY;
 
         if (!(img.patchMarginLeft == 0 && img.patchMarginTop == 0 && img.patchMarginRight == 0 && img.patchMarginBottom == 0)) {
@@ -1918,7 +1918,7 @@ void RenderSystem::updateTransform(Transform& transform){
 
 void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
     //Update ProjectionMatrix
-    if (camera.type == CameraType::CAMERA_2D){
+    if (camera.type == CameraType::CAMERA_UI){
         camera.projectionMatrix = Matrix4::orthoMatrix(camera.leftClip, camera.rightClip, camera.topClip, camera.bottomClip, camera.nearClip, camera.farClip);
     }else if (camera.type == CameraType::CAMERA_ORTHO) {
         camera.projectionMatrix = Matrix4::orthoMatrix(camera.leftClip, camera.rightClip, camera.bottomClip, camera.topClip, camera.nearClip, camera.farClip);
@@ -2886,7 +2886,7 @@ void RenderSystem::update(double dt){
 
             InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
             if (instmesh){
-                bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_2D;
+                bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_UI;
 
                 if (instmesh->needUpdateInstances && !instmesh->instancedBillboard){
                     updateInstancedMesh(*instmesh, mesh, transform, mainCamera, mainCameraTransform);
@@ -2991,7 +2991,7 @@ void RenderSystem::update(double dt){
                 loadPoints(entity, points, pipelines);
             }
 
-            bool sortTransparentPoints = points.transparent && mainCamera.type != CameraType::CAMERA_2D;
+            bool sortTransparentPoints = points.transparent && mainCamera.type != CameraType::CAMERA_UI;
 
             if (points.needUpdate){
                 updatePoints(points, transform, mainCamera, mainCameraTransform);
@@ -3266,7 +3266,7 @@ void RenderSystem::draw(){
 
                     InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
                     if (instmesh){
-                        bool sortTransparentInstances = mesh.transparent && camera.type != CameraType::CAMERA_2D;
+                        bool sortTransparentInstances = mesh.transparent && camera.type != CameraType::CAMERA_UI;
 
                         if (hasMultipleCameras && sortTransparentInstances){
                             if (instmesh->instancedBillboard){
@@ -3302,7 +3302,7 @@ void RenderSystem::draw(){
             }else if (signature.test(scene->getComponentId<PointsComponent>())){
                 PointsComponent& points = scene->getComponent<PointsComponent>(entity);
 
-                bool sortTransparentPoints = points.transparent && camera.type != CameraType::CAMERA_2D;
+                bool sortTransparentPoints = points.transparent && camera.type != CameraType::CAMERA_UI;
 
                 if (hasMultipleCameras && sortTransparentPoints){
                     sortPoints(points, transform, camera, cameraTransform);

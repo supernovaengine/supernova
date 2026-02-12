@@ -15,7 +15,7 @@ Camera::Camera(Scene* scene): Object(scene){
 
     CameraComponent& cameraComponent = getComponent<CameraComponent>();
     applyPerspectiveDefaults(cameraComponent);
-    // default CameraComponent is CAMERA_2D
+    // default CameraComponent is CAMERA_UI
     cameraComponent.type = CameraType::CAMERA_PERSPECTIVE;
 
     Transform& transform = getComponent<Transform>();

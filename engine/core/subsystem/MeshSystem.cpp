@@ -93,7 +93,7 @@ bool MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
         pivotPos.y = sprite.height / 2.0;
     }
 
-    if (camera.type == CameraType::CAMERA_2D){
+    if (camera.type == CameraType::CAMERA_UI){
         pivotPos.y = sprite.height - pivotPos.y;
     }
 
@@ -365,7 +365,7 @@ bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
 
 void MeshSystem::changeFlipY(bool& flipY, CameraComponent& camera, MeshComponent& mesh){
     flipY = false;
-    if (camera.type != CameraType::CAMERA_2D){
+    if (camera.type != CameraType::CAMERA_UI){
         flipY = !flipY;
     }
 
