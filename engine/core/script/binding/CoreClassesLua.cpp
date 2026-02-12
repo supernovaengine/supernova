@@ -160,6 +160,13 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .endNamespace();
 
     luabridge::getGlobalNamespace(L)
+        .beginNamespace("UIEventState")
+        .addVariable("NOT_SET", UIEventState::NOT_SET)
+        .addVariable("ENABLED", UIEventState::ENABLED)
+        .addVariable("DISABLED", UIEventState::DISABLED)
+        .endNamespace();
+
+    luabridge::getGlobalNamespace(L)
         .beginNamespace("EntityPool")
         .addVariable("User", EntityPool::User)
         .addVariable("System", EntityPool::System)
@@ -528,7 +535,7 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addFunction("getGlobalIlluminationColorLinear", &Scene::getGlobalIlluminationColorLinear)
         .addFunction("setGlobalIllumination", (void (Scene::*)(float, Vector3))&Scene::setGlobalIllumination)
         .addFunction("canReceiveUIEvents", &Scene::canReceiveUIEvents)
-        .addProperty("enableUIEvents", &Scene::isEnableUIEvents, &Scene::setEnableUIEvents)
+        .addProperty("enableUIEvents", &Scene::getEnableUIEvents, (void (Scene::*)(UIEventState))&Scene::setEnableUIEvents)
         .addFunction("getActionSystem", [] (Scene* self, lua_State* L) { return self->getSystem<ActionSystem>().get(); })
         .addFunction("getAudioSystem", [] (Scene* self, lua_State* L) { return self->getSystem<AudioSystem>().get(); })
         .addFunction("getMeshSystem", [] (Scene* self, lua_State* L) { return self->getSystem<MeshSystem>().get(); })

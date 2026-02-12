@@ -54,6 +54,7 @@ namespace luabridge
     template<> struct Stack<CursorType> : EnumWrapper<CursorType>{};
     template<> struct Stack<ResourceLoadState> : EnumWrapper<ResourceLoadState>{};
     template<> struct Stack<LightState> : EnumWrapper<LightState>{};
+    template<> struct Stack<UIEventState> : EnumWrapper<UIEventState>{};
 
     template<> struct Stack<EntityPool> : EnumWrapper<EntityPool>{};
 

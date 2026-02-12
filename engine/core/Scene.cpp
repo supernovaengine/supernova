@@ -45,7 +45,7 @@ void Scene::init(){
     globalIllumColor = Vector3(1.0, 1.0, 1.0);
     globalIllumIntensity = 0.1;
 
-    enableUIEvents = true;
+    uiEventState = UIEventState::NOT_SET;
 }
 
 Scene::~Scene(){
@@ -155,18 +155,40 @@ Vector3 Scene::getGlobalIlluminationColorLinear() const{
 }
 
 bool Scene::canReceiveUIEvents(){
-    if (Engine::getLastScene() == this && this->enableUIEvents){
-        return true;
+    switch (this->uiEventState) {
+        case UIEventState::ENABLED:
+            return true;
+        case UIEventState::DISABLED:
+            return false;
+        case UIEventState::NOT_SET:
+        default:
+            Signature cameraSignature = getSignature(getCamera());
+            if (cameraSignature.test(getComponentId<CameraComponent>())){
+                return getComponent<CameraComponent>(getCamera()).type == CameraType::CAMERA_2D;
+            }
+
+            return false;
     }
-    return false;
+}
+
+UIEventState Scene::getEnableUIEvents() const{
+    return this->uiEventState;
+}
+
+void Scene::setEnableUIEvents(UIEventState enableUIEvents){
+    this->uiEventState = enableUIEvents;
+}
+
+void Scene::enableUIEvents(){
+    this->uiEventState = UIEventState::ENABLED;
 }
 
 bool Scene::isEnableUIEvents() const{
-    return this->enableUIEvents;
+    return this->uiEventState != UIEventState::DISABLED;
 }
 
 void Scene::setEnableUIEvents(bool enableUIEvents){
-    this->enableUIEvents = enableUIEvents;
+    this->uiEventState = enableUIEvents ? UIEventState::ENABLED : UIEventState::DISABLED;
 }
 
 void Scene::load(){

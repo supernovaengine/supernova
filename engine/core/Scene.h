@@ -23,6 +23,12 @@ namespace Supernova{
         AUTO
     };
 
+    enum class UIEventState {
+        NOT_SET,
+        ENABLED,
+        DISABLED
+    };
+
     class SUPERNOVA_API Scene : public EntityRegistry {
     private:
 
@@ -36,7 +42,7 @@ namespace Supernova{
         Vector3 globalIllumColor;
         float globalIllumIntensity;
 
-        bool enableUIEvents;
+        UIEventState uiEventState;
 
         std::vector<std::pair<std::string, std::shared_ptr<SubSystem>>> systems;
 
@@ -104,6 +110,10 @@ namespace Supernova{
         Vector3 getGlobalIlluminationColorLinear() const;
 
         bool canReceiveUIEvents();
+
+        UIEventState getEnableUIEvents() const;
+        void setEnableUIEvents(UIEventState enableUIEvents);
+        void enableUIEvents();
 
         bool isEnableUIEvents() const;
         void setEnableUIEvents(bool enableUIEvents);
