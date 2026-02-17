@@ -1375,6 +1375,8 @@ bool RenderSystem::drawUI(UIComponent& ui, Transform& transform, bool renderToTe
 }
 
 void RenderSystem::destroyUI(Entity entity, UIComponent& ui){
+    TextComponent* text = scene->findComponent<TextComponent>(entity);
+
     if (!ui.loaded)
         return;
 
@@ -1399,6 +1401,10 @@ void RenderSystem::destroyUI(Entity entity, UIComponent& ui){
     }
     ui.buffer.getRender()->destroyBuffer();
     ui.indices.getRender()->destroyBuffer();
+
+    if (text){
+        text->needReloadAtlas = true;
+    }
 
     //Shaders uniforms
     ui.slotVSParams = -1;

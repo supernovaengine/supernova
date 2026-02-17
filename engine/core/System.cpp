@@ -17,7 +17,8 @@ System* System::systemInstance = nullptr;
 
 System& System::instance(){
     if (!systemInstance) {
-        Log::error("System instance not set. Engine must call System::setSystemInstance() during initialization.");
+        // Need to be printf here, Log class uses instance()
+        printf("System instance not set. Engine must call System::setSystemInstance() during initialization.\n");
         abort();
     }
 

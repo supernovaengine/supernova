@@ -237,6 +237,10 @@ void LuaBinding::registerECSClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<UISystem>("UISystem")
+        .addFunction("setCustomAnchorSize", &UISystem::setCustomAnchorSize)
+        .addFunction("clearCustomAnchorSize", &UISystem::clearCustomAnchorSize)
+        .addFunction("getCustomAnchorWidth", &UISystem::getCustomAnchorWidth)
+        .addFunction("getCustomAnchorHeight", &UISystem::getCustomAnchorHeight)
         .addFunction("isTextEditFocused", &UISystem::isTextEditFocused)
         .addFunction("eventOnCharInput", &UISystem::eventOnCharInput)
         .addFunction("eventOnPointerDown", &UISystem::eventOnPointerDown)

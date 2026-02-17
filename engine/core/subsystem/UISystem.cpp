@@ -23,9 +23,30 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
     lastUIFromPointer = NULL_ENTITY;
     lastPanelFromPointer = NULL_ENTITY;
     lastPointerPos = Vector2(-1, -1);
+
+    customAnchorWidth = 0;
+    customAnchorHeight = 0;
 }
 
 UISystem::~UISystem(){
+}
+
+void UISystem::setCustomAnchorSize(int width, int height){
+    this->customAnchorWidth = width;
+    this->customAnchorHeight = height;
+}
+
+void UISystem::clearCustomAnchorSize(){
+    this->customAnchorWidth = 0;
+    this->customAnchorHeight = 0;
+}
+
+int UISystem::getCustomAnchorWidth() const{
+    return customAnchorWidth;
+}
+
+int UISystem::getCustomAnchorHeight() const{
+    return customAnchorHeight;
 }
 
 bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
@@ -729,15 +750,16 @@ Vector2 UISystem::getTextMinSize(TextComponent& text){
 }
 
 bool UISystem::createOrUpdateText(TextComponent& text, UIComponent& ui, UILayoutComponent& layout){
+    if (text.loaded && text.needReloadAtlas){
+        destroyText(text);
+    }
+
     if (text.needUpdateText){
         if (ui.automaticFlipY){
             CameraComponent& camera = scene->getComponent<CameraComponent>(scene->getCamera());
             changeFlipY(ui, camera);
         }
 
-        if (text.loaded && text.needReloadAtlas){
-            destroyText(text);
-        }
         if (!text.loaded){
             loadFontAtlas(text, ui, layout);
         }
@@ -1298,10 +1320,18 @@ void UISystem::update(double dt){
             float abAnchorTop = 0;
             float abAnchorBottom = 0;
             if (transform.parent == NULL_ENTITY){
-                abAnchorLeft = Engine::getCanvasWidth() * layout.anchorPointLeft;
-                abAnchorRight = Engine::getCanvasWidth() * layout.anchorPointRight;
-                abAnchorTop = Engine::getCanvasHeight() * layout.anchorPointTop;
-                abAnchorBottom = Engine::getCanvasHeight() * layout.anchorPointBottom;
+                int finalCanvasWidth = Engine::getCanvasWidth();
+                if (customAnchorWidth != 0)
+                    finalCanvasWidth = customAnchorWidth;
+
+                int finalCanvasHeight = Engine::getCanvasHeight();
+                if (customAnchorHeight != 0)
+                    finalCanvasHeight = customAnchorHeight;
+
+                abAnchorLeft = finalCanvasWidth * layout.anchorPointLeft;
+                abAnchorRight = finalCanvasWidth * layout.anchorPointRight;
+                abAnchorTop = finalCanvasHeight * layout.anchorPointTop;
+                abAnchorBottom = finalCanvasHeight * layout.anchorPointBottom;
             }else{
                 UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
                 if (parentlayout){
