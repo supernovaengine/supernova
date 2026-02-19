@@ -24,29 +24,74 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
     lastPanelFromPointer = NULL_ENTITY;
     lastPointerPos = Vector2(-1, -1);
 
-    customAnchorWidth = 0;
-    customAnchorHeight = 0;
+    anchorReferenceWidth = 0;
+    anchorReferenceHeight = 0;
 }
 
 UISystem::~UISystem(){
 }
 
-void UISystem::setCustomAnchorSize(int width, int height){
-    this->customAnchorWidth = width;
-    this->customAnchorHeight = height;
+Rect UISystem::getAnchorReferenceRect(const UILayoutComponent& layout, const Transform& transform, bool worldPosition){
+    if (transform.parent == NULL_ENTITY){
+        int finalCanvasWidth = Engine::getCanvasWidth();
+        if (anchorReferenceWidth != 0)
+            finalCanvasWidth = anchorReferenceWidth;
+
+        int finalCanvasHeight = Engine::getCanvasHeight();
+        if (anchorReferenceHeight != 0)
+            finalCanvasHeight = anchorReferenceHeight;
+
+        return Rect(0, 0, finalCanvasWidth, finalCanvasHeight);
+    }
+
+    UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
+    if (!parentlayout){
+        return Rect(0, 0, 0, 0);
+    }
+
+    Rect boxRect = Rect(0, 0, parentlayout->width, parentlayout->height);
+
+    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
+    if (parentcontainer){
+        boxRect = parentcontainer->boxes[layout.containerBoxIndex].rect;
+    }
+
+    ImageComponent* parentimage = scene->findComponent<ImageComponent>(transform.parent);
+    if (parentimage && !layout.ignoreScissor){
+        boxRect.setX(boxRect.getX() + parentimage->patchMarginLeft);
+        boxRect.setWidth(boxRect.getWidth() - parentimage->patchMarginRight - parentimage->patchMarginLeft);
+        boxRect.setY(boxRect.getY() + parentimage->patchMarginTop);
+        boxRect.setHeight(boxRect.getHeight() - parentimage->patchMarginBottom - parentimage->patchMarginTop);
+    }
+
+    if (worldPosition){
+        Transform* parentTransform = scene->findComponent<Transform>(transform.parent);
+        if (parentTransform){
+            Vector3 worldPos = parentTransform->worldPosition;
+            boxRect.setX(boxRect.getX() + worldPos.x);
+            boxRect.setY(boxRect.getY() + worldPos.y);
+        }
+    }
+
+    return boxRect;
 }
 
-void UISystem::clearCustomAnchorSize(){
-    this->customAnchorWidth = 0;
-    this->customAnchorHeight = 0;
+void UISystem::setAnchorReferenceSize(int width, int height){
+    this->anchorReferenceWidth = width;
+    this->anchorReferenceHeight = height;
 }
 
-int UISystem::getCustomAnchorWidth() const{
-    return customAnchorWidth;
+void UISystem::clearAnchorReferenceSize(){
+    this->anchorReferenceWidth = 0;
+    this->anchorReferenceHeight = 0;
 }
 
-int UISystem::getCustomAnchorHeight() const{
-    return customAnchorHeight;
+int UISystem::getAnchorReferenceWidth() const{
+    return anchorReferenceWidth;
+}
+
+int UISystem::getAnchorReferenceHeight() const{
+    return anchorReferenceHeight;
 }
 
 bool UISystem::createImagePatches(ImageComponent& img, UIComponent& ui, UILayoutComponent& layout){
@@ -1315,62 +1360,36 @@ void UISystem::update(double dt){
                 applyAnchorPreset(layout);
             }
 
-            float abAnchorLeft = 0;
-            float abAnchorRight = 0;
-            float abAnchorTop = 0;
-            float abAnchorBottom = 0;
-            if (transform.parent == NULL_ENTITY){
-                int finalCanvasWidth = Engine::getCanvasWidth();
-                if (customAnchorWidth != 0)
-                    finalCanvasWidth = customAnchorWidth;
-
-                int finalCanvasHeight = Engine::getCanvasHeight();
-                if (customAnchorHeight != 0)
-                    finalCanvasHeight = customAnchorHeight;
-
-                abAnchorLeft = finalCanvasWidth * layout.anchorPointLeft;
-                abAnchorRight = finalCanvasWidth * layout.anchorPointRight;
-                abAnchorTop = finalCanvasHeight * layout.anchorPointTop;
-                abAnchorBottom = finalCanvasHeight * layout.anchorPointBottom;
-            }else{
-                UILayoutComponent* parentlayout = scene->findComponent<UILayoutComponent>(transform.parent);
-                if (parentlayout){
-                    Rect boxRect = Rect(0, 0, parentlayout->width, parentlayout->height);
-
-                    UIContainerComponent* parentcontainer = scene->findComponent<UIContainerComponent>(transform.parent);
-                    if (parentcontainer){
-                        boxRect = parentcontainer->boxes[layout.containerBoxIndex].rect;
-                    }
-
-                    ImageComponent* parentimage = scene->findComponent<ImageComponent>(transform.parent);
-                    if (parentimage){
-                        if (!layout.ignoreScissor){
-                            boxRect.setX(boxRect.getX() + parentimage->patchMarginLeft);
-                            boxRect.setWidth(boxRect.getWidth() - parentimage->patchMarginRight - parentimage->patchMarginLeft);
-                            boxRect.setY(boxRect.getY() + parentimage->patchMarginTop);
-                            boxRect.setHeight(boxRect.getHeight() - parentimage->patchMarginBottom - parentimage->patchMarginTop);
-                        }else{
-                            boxRect.setX(boxRect.getX());
-                            boxRect.setWidth(boxRect.getWidth());
-                            boxRect.setY(boxRect.getY());
-                            boxRect.setHeight(boxRect.getHeight());
-                        }
-                    }
-
-                    abAnchorLeft = (boxRect.getWidth() * layout.anchorPointLeft) + boxRect.getX();
-                    abAnchorRight = (boxRect.getWidth() * layout.anchorPointRight) + boxRect.getX();
-                    abAnchorTop = (boxRect.getHeight() * layout.anchorPointTop) + boxRect.getY();
-                    abAnchorBottom = (boxRect.getHeight() * layout.anchorPointBottom) + boxRect.getY();
-                }
-            }
+            Rect anchorRefRect = getAnchorReferenceRect(layout, transform, false);
+            float abAnchorLeft = (anchorRefRect.getWidth() * layout.anchorPointLeft) + anchorRefRect.getX();
+            float abAnchorRight = (anchorRefRect.getWidth() * layout.anchorPointRight) + anchorRefRect.getX();
+            float abAnchorTop = (anchorRefRect.getHeight() * layout.anchorPointTop) + anchorRefRect.getY();
+            float abAnchorBottom = (anchorRefRect.getHeight() * layout.anchorPointBottom) + anchorRefRect.getY();
 
             if (layout.usingAnchors){
+
+                if (layout.anchorPreset == AnchorPreset::NONE && (layout.needUpdateSizes || transform.needUpdate)){
+                    // Convert current manual transform/size back into anchor offsets
+                    float rawPosX = transform.position.x - layout.positionOffset.x;
+                    float rawPosY = transform.position.y - layout.positionOffset.y;
+
+                    layout.anchorOffsetLeft = rawPosX - abAnchorLeft;
+                    layout.anchorOffsetTop = rawPosY - abAnchorTop;
+
+                    layout.anchorOffsetRight = layout.width - (abAnchorRight - abAnchorLeft) + layout.anchorOffsetLeft;
+                    layout.anchorOffsetBottom = layout.height - (abAnchorBottom - abAnchorTop) + layout.anchorOffsetTop;
+                }
 
                 float posX = abAnchorLeft + layout.anchorOffsetLeft;
                 float posY = abAnchorTop + layout.anchorOffsetTop;
 
-                float width = abAnchorRight - posX + layout.anchorOffsetRight;
-                float height = abAnchorBottom - posY + layout.anchorOffsetBottom;
+                float computedWidth = abAnchorRight - posX + layout.anchorOffsetRight;
+                float computedHeight = abAnchorBottom - posY + layout.anchorOffsetBottom;
+
+                if (computedWidth < 1.0f) computedWidth = 1.0f;
+                if (computedHeight < 1.0f) computedHeight = 1.0f;
+                unsigned int width = static_cast<unsigned int>(std::ceil(computedWidth));
+                unsigned int height = static_cast<unsigned int>(std::ceil(computedHeight));
 
                 if (width != layout.width || height != layout.height){
                     layout.width = width;

@@ -32,8 +32,8 @@ namespace Supernova{
         Vector2 lastPointerPos;
         Vector2 panelSizeAcc; // to add accumulation from float to int
 
-        int customAnchorWidth;
-        int customAnchorHeight;
+        int anchorReferenceWidth;
+        int anchorReferenceHeight;
 
         void createOrUpdateUiComponent(double dt, UILayoutComponent& layout, Entity entity, Signature signature);
         void getPanelEdges(const PanelComponent& panel, const UILayoutComponent& layout, const Transform& transform, const UILayoutComponent& headerlayout,  Rect& edgeRight, Rect& edgeRightBottom, Rect& edgeBottom, Rect& edgeLeftBottom, Rect& edgeLeft);
@@ -79,17 +79,12 @@ namespace Supernova{
         UISystem(Scene* scene);
         virtual ~UISystem();
 
-        static void setAnchorReferenceSize(Entity entity, unsigned int width, unsigned int height);
-        static void setAnchorReferenceWidth(Entity entity, unsigned int width);
-        static void setAnchorReferenceHeight(Entity entity, unsigned int height);
-        static void clearAnchorReferenceSize(Entity entity);
-        static unsigned int getAnchorReferenceWidth(Entity entity);
-        static unsigned int getAnchorReferenceHeight(Entity entity);
+        Rect getAnchorReferenceRect(const UILayoutComponent& layout, const Transform& transform, bool worldPosition);
 
-        void setCustomAnchorSize(int width, int height);
-        void clearCustomAnchorSize();
-        int getCustomAnchorWidth() const;
-        int getCustomAnchorHeight() const;
+        void setAnchorReferenceSize(int width, int height);
+        void clearAnchorReferenceSize();
+        int getAnchorReferenceWidth() const;
+        int getAnchorReferenceHeight() const;
 
         bool isTextEditFocused();
 
