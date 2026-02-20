@@ -237,6 +237,7 @@ void LuaBinding::registerECSClasses(lua_State *L){
 
     luabridge::getGlobalNamespace(L)
         .beginClass<UISystem>("UISystem")
+        .addFunction("getAnchorReferenceRect", &UISystem::getAnchorReferenceRect)
         .addFunction("setAnchorReferenceSize", &UISystem::setAnchorReferenceSize)
         .addFunction("clearAnchorReferenceSize", &UISystem::clearAnchorReferenceSize)
         .addFunction("getAnchorReferenceWidth", &UISystem::getAnchorReferenceWidth)
