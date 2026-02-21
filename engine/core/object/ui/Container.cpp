@@ -28,6 +28,42 @@ ContainerType Container::getType() const{
     return container.type;
 }
 
+void Container::setUseAllWrapSpace(bool useAllWrapSpace){
+    UIContainerComponent& container = getComponent<UIContainerComponent>();
+
+    container.useAllWrapSpace = useAllWrapSpace;
+}
+
+bool Container::isUseAllWrapSpace() const{
+    UIContainerComponent& container = getComponent<UIContainerComponent>();
+
+    return container.useAllWrapSpace;
+}
+
+void Container::setWrapCellWidth(unsigned int width){
+    UIContainerComponent& container = getComponent<UIContainerComponent>();
+
+    container.wrapCellWidth = width;
+}
+
+unsigned int Container::getWrapCellWidth() const{
+    UIContainerComponent& container = getComponent<UIContainerComponent>();
+
+    return container.wrapCellWidth;
+}
+
+void Container::setWrapCellHeight(unsigned int height){
+    UIContainerComponent& container = getComponent<UIContainerComponent>();
+
+    container.wrapCellHeight = height;
+}
+
+unsigned int Container::getWrapCellHeight() const{
+    UIContainerComponent& container = getComponent<UIContainerComponent>();
+
+    return container.wrapCellHeight;
+}
+
 void Container::resize(){
     setSize(0, 0);
 }

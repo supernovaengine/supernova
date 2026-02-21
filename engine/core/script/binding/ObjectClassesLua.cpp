@@ -621,6 +621,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .deriveClass<Container, UILayout>("Container")
         .addConstructor <void (*) (Scene*), void (*) (Scene*, Entity)> ()
         .addProperty("type", &Container::getType, &Container::setType)
+        .addProperty("useAllWrapSpace", &Container::isUseAllWrapSpace, &Container::setUseAllWrapSpace)
+        .addProperty("wrapCellWidth", &Container::getWrapCellWidth, &Container::setWrapCellWidth)
+        .addProperty("wrapCellHeight", &Container::getWrapCellHeight, &Container::setWrapCellHeight)
         .addFunction("resize", &Container::resize)
         .addFunction("setBoxExpand", 
             luabridge::overload<size_t, bool>(&Container::setBoxExpand),

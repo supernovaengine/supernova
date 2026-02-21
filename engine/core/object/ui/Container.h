@@ -17,6 +17,13 @@ namespace Supernova{
         
         void setType(ContainerType type);
         ContainerType getType() const;
+        void setUseAllWrapSpace(bool useAllWrapSpace);
+        bool isUseAllWrapSpace() const;
+
+        void setWrapCellWidth(unsigned int width);
+        unsigned int getWrapCellWidth() const;
+        void setWrapCellHeight(unsigned int height);
+        unsigned int getWrapCellHeight() const;
 
         void resize();
 

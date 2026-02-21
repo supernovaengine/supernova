@@ -1325,11 +1325,19 @@ void UISystem::update(double dt){
                     layout.width = (layout.width > container.maxWidth)? layout.width : container.maxWidth;
                     layout.height = (layout.height > totalHeight)? layout.height : totalHeight;
                 }else if (container.type == ContainerType::HORIZONTAL_WRAP){
-                    layout.width = (layout.width > totalWidth)? layout.width : totalWidth;
-                    // layout.height is calculated later
+                    if (layout.width == 0){
+                        layout.width = container.maxWidth;
+                    }
+                    if (layout.height == 0){
+                        layout.height = container.maxHeight;
+                    }
                 }else if (container.type == ContainerType::VERTICAL_WRAP){
-                    // layout.width is calculated later
-                    layout.height = (layout.height > totalHeight)? layout.height : totalHeight;
+                    if (layout.width == 0){
+                        layout.width = container.maxWidth;
+                    }
+                    if (layout.height == 0){
+                        layout.height = container.maxHeight;
+                    }
                 }
             }
         }
@@ -1419,18 +1427,21 @@ void UISystem::update(double dt){
         if (signature.test(scene->getComponentId<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
             int numObjInLine = 0;
+
+            // Resolve effective cell sizes: custom override or auto from children
+            unsigned int effectiveCellWidth = (container.wrapCellWidth > 0) ? container.wrapCellWidth : container.maxWidth;
+            unsigned int effectiveCellHeight = (container.wrapCellHeight > 0) ? container.wrapCellHeight : container.maxHeight;
+
             if (container.type == ContainerType::HORIZONTAL_WRAP){
-                numObjInLine = floor((float)layout.width / (float)container.maxWidth);
+                if (effectiveCellWidth > 0){
+                    numObjInLine = floor((float)layout.width / (float)effectiveCellWidth);
+                }
                 if (numObjInLine < 1) numObjInLine = 1;
-                int numLines = ceil((float)container.numBoxes / (float)numObjInLine);
-
-                layout.height = numLines * container.maxHeight;
             }else if (container.type == ContainerType::VERTICAL_WRAP){
-                numObjInLine = floor((float)layout.height / (float)container.maxHeight);
+                if (effectiveCellHeight > 0){
+                    numObjInLine = floor((float)layout.height / (float)effectiveCellHeight);
+                }
                 if (numObjInLine < 1) numObjInLine = 1;
-                int numLines = ceil((float)container.numBoxes / (float)numObjInLine);
-
-                layout.width = numLines * container.maxWidth;
             }
             // configuring all container boxes
             if (container.numBoxes > 0){
@@ -1475,33 +1486,111 @@ void UISystem::update(double dt){
                             }
                             container.boxes[b].rect.setWidth(layout.width);
                         }else if (container.type == ContainerType::HORIZONTAL_WRAP){
-                            if (b > 0){
-                                container.boxes[b].rect.setX(container.boxes[b-1].rect.getX() + container.boxes[b-1].rect.getWidth());
-                                container.boxes[b].rect.setY(container.boxes[b-1].rect.getY());
+                            if (container.useAllWrapSpace){
+                                int line = b / numObjInLine;
+                                int lineIndex = b % numObjInLine;
+                                int firstInLine = line * numObjInLine;
+                                int itemsInLine = std::min(numObjInLine, static_cast<int>(container.numBoxes) - firstInLine);
+
+                                if (itemsInLine > 0){
+                                    int baseWidth = layout.width / itemsInLine;
+                                    int remainder = layout.width % itemsInLine;
+
+                                    int lineX = 0;
+                                    for (int item = 0; item < lineIndex; item++){
+                                        lineX += baseWidth + ((item < remainder) ? 1 : 0);
+                                    }
+
+                                    int itemWidth = baseWidth + ((lineIndex < remainder) ? 1 : 0);
+
+                                    container.boxes[b].rect.setX(lineX);
+                                    container.boxes[b].rect.setY(line * effectiveCellHeight);
+                                    container.boxes[b].rect.setWidth(itemWidth);
+                                }
+                            }else{
+                                // compute box width using signed math to avoid unsigned underflow
+                                int containerW = static_cast<int>(layout.width);
+                                int cellW = static_cast<int>(effectiveCellWidth);
+                                int boxWidth = static_cast<int>(container.boxes[b].rect.getWidth());
+
+                                if (container.boxes[b].expand && numObjInLine > 0 && cellW > 0){
+                                    int diff = containerW - (numObjInLine * cellW);
+                                    boxWidth = cellW + diff / numObjInLine;
+                                }
+                                boxWidth = std::clamp(boxWidth, 1, std::max(1, containerW));
+
+                                container.boxes[b].rect.setWidth(boxWidth);
+
+                                if (b == 0){
+                                    container.boxes[b].rect.setX(0);
+                                    container.boxes[b].rect.setY(0);
+                                }else{
+                                    int nextX = static_cast<int>(container.boxes[b-1].rect.getX() + container.boxes[b-1].rect.getWidth());
+                                    int nextY = static_cast<int>(container.boxes[b-1].rect.getY());
+
+                                    if (nextX + boxWidth > containerW){
+                                        nextX = 0;
+                                        nextY = static_cast<int>(container.boxes[b-1].rect.getY()) + static_cast<int>(effectiveCellHeight);
+                                    }
+
+                                    container.boxes[b].rect.setX(nextX);
+                                    container.boxes[b].rect.setY(nextY);
+                                }
                             }
-                            if (container.boxes[b].expand){
-                                float diff = layout.width - (numObjInLine * container.maxWidth);
-                                container.boxes[b].rect.setWidth(container.maxWidth + (diff / numObjInLine));
-                            }
-                            if ((container.boxes[b].rect.getX()+container.boxes[b].rect.getWidth()) > layout.width){
-                                container.boxes[b].rect.setX(0);
-                                container.boxes[b].rect.setY(container.boxes[b-1].rect.getY() + container.maxHeight);
-                            }
-                            container.boxes[b].rect.setHeight(container.maxHeight);
+                            container.boxes[b].rect.setHeight(effectiveCellHeight);
                         }else if (container.type == ContainerType::VERTICAL_WRAP){
-                            if (b > 0){
-                                container.boxes[b].rect.setX(container.boxes[b-1].rect.getX());
-                                container.boxes[b].rect.setY(container.boxes[b-1].rect.getY() + container.boxes[b-1].rect.getHeight());
+                            if (container.useAllWrapSpace){
+                                int column = b / numObjInLine;
+                                int columnIndex = b % numObjInLine;
+                                int firstInColumn = column * numObjInLine;
+                                int itemsInColumn = std::min(numObjInLine, static_cast<int>(container.numBoxes) - firstInColumn);
+
+                                if (itemsInColumn > 0){
+                                    int baseHeight = layout.height / itemsInColumn;
+                                    int remainder = layout.height % itemsInColumn;
+
+                                    int columnY = 0;
+                                    for (int item = 0; item < columnIndex; item++){
+                                        columnY += baseHeight + ((item < remainder) ? 1 : 0);
+                                    }
+
+                                    int itemHeight = baseHeight + ((columnIndex < remainder) ? 1 : 0);
+
+                                    container.boxes[b].rect.setX(column * effectiveCellWidth);
+                                    container.boxes[b].rect.setY(columnY);
+                                    container.boxes[b].rect.setHeight(itemHeight);
+                                }
+                            }else{
+                                // compute box height using signed math to avoid unsigned underflow
+                                int containerH = static_cast<int>(layout.height);
+                                int cellH = static_cast<int>(effectiveCellHeight);
+                                int boxHeight = static_cast<int>(container.boxes[b].rect.getHeight());
+
+                                if (container.boxes[b].expand && numObjInLine > 0 && cellH > 0){
+                                    int diff = containerH - (numObjInLine * cellH);
+                                    boxHeight = cellH + diff / numObjInLine;
+                                }
+                                boxHeight = std::clamp(boxHeight, 1, std::max(1, containerH));
+
+                                container.boxes[b].rect.setHeight(boxHeight);
+
+                                if (b == 0){
+                                    container.boxes[b].rect.setX(0);
+                                    container.boxes[b].rect.setY(0);
+                                }else{
+                                    int nextX = static_cast<int>(container.boxes[b-1].rect.getX());
+                                    int nextY = static_cast<int>(container.boxes[b-1].rect.getY() + container.boxes[b-1].rect.getHeight());
+
+                                    if (nextY + boxHeight > containerH){
+                                        nextX = static_cast<int>(container.boxes[b-1].rect.getX()) + static_cast<int>(effectiveCellWidth);
+                                        nextY = 0;
+                                    }
+
+                                    container.boxes[b].rect.setX(nextX);
+                                    container.boxes[b].rect.setY(nextY);
+                                }
                             }
-                            if (container.boxes[b].expand){
-                                float diff = layout.height - (numObjInLine * container.maxHeight);
-                                container.boxes[b].rect.setHeight(container.maxHeight + (diff / numObjInLine));
-                            }
-                            if ((container.boxes[b].rect.getY()+container.boxes[b].rect.getHeight()) > layout.height){
-                                container.boxes[b].rect.setX(container.boxes[b-1].rect.getX() + container.maxWidth);
-                                container.boxes[b].rect.setY(0);
-                            }
-                            container.boxes[b].rect.setWidth(container.maxWidth);
+                            container.boxes[b].rect.setWidth(effectiveCellWidth);
                         }
                     }
                 }

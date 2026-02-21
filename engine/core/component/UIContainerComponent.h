@@ -26,6 +26,10 @@ namespace Supernova{
 
     struct SUPERNOVA_API UIContainerComponent{
         ContainerType type = ContainerType::VERTICAL;
+        bool useAllWrapSpace = false;
+
+        unsigned int wrapCellWidth = 0;  // 0 = auto (use maxWidth from children)
+        unsigned int wrapCellHeight = 0; // 0 = auto (use maxHeight from children)
 
         ContainerBox boxes[MAX_CONTAINER_BOXES];
 
