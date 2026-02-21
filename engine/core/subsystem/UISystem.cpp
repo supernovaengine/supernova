@@ -1368,7 +1368,7 @@ void UISystem::update(double dt){
 
             if (layout.usingAnchors){
 
-                if (layout.anchorPreset == AnchorPreset::NONE && (layout.needUpdateSizes || layout.lastAnchorPos != Vector2(transform.position))){
+                if (layout.anchorPreset == AnchorPreset::NONE && layout.needUpdateAnchorOffsets){
                     // Convert current manual transform/size back into anchor offsets
                     float rawPosX = transform.position.x - layout.positionOffset.x;
                     float rawPosY = transform.position.y - layout.positionOffset.y;
@@ -1379,6 +1379,8 @@ void UISystem::update(double dt){
                     layout.anchorOffsetRight = layout.width - (abAnchorRight - abAnchorLeft) + layout.anchorOffsetLeft;
                     layout.anchorOffsetBottom = layout.height - (abAnchorBottom - abAnchorTop) + layout.anchorOffsetTop;
                 }
+
+                layout.needUpdateAnchorOffsets = false;
 
                 float posX = abAnchorLeft + layout.anchorOffsetLeft;
                 float posY = abAnchorTop + layout.anchorOffsetTop;
@@ -1405,8 +1407,6 @@ void UISystem::update(double dt){
                     transform.position.y = posY;
                     transform.needUpdate = true;
                 }
-
-                layout.lastAnchorPos = Vector2(transform.position.x, transform.position.y);
 
             }else{
                 layout.anchorOffsetLeft = transform.position.x - abAnchorLeft;

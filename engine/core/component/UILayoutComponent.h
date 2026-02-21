@@ -49,7 +49,6 @@ namespace Supernova{
         int anchorOffsetBottom = 0;
 
         Vector2 positionOffset = Vector2(0, 0); // for anchors
-        Vector2 lastAnchorPos = Vector2(0, 0); // last position computed by anchor system
 
         AnchorPreset anchorPreset = AnchorPreset::NONE;
         bool usingAnchors = false;
@@ -63,6 +62,7 @@ namespace Supernova{
         bool ignoreEvents = false;
 
         bool needUpdateSizes = false;
+        bool needUpdateAnchorOffsets = false;
     };
     
 }
