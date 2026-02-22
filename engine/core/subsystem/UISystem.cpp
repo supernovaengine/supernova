@@ -1299,6 +1299,12 @@ void UISystem::update(double dt){
                 container.maxHeight = 0;
                 int totalWidth = 0;
                 int totalHeight = 0;
+                // Content-min totals exclude children whose size is derived from parent via anchors
+                // to avoid a circular dependency that prevents the container from shrinking
+                int contentMinTotalWidth = 0;
+                int contentMinTotalHeight = 0;
+                unsigned int contentMinMaxWidth = 0;
+                unsigned int contentMinMaxHeight = 0;
                 for (int b = 0; b < container.numBoxes; b++){
                     if (container.boxes[b].layout != NULL_ENTITY){
                         if (!container.boxes[b].expand){
@@ -1311,6 +1317,22 @@ void UISystem::update(double dt){
                         totalHeight += container.boxes[b].rect.getHeight();
                         container.maxHeight = std::max(container.maxHeight, (unsigned int)container.boxes[b].rect.getHeight());
                         container.maxWidth = std::max(container.maxWidth, (unsigned int)container.boxes[b].rect.getWidth());
+
+                        // Check if child size is anchor-derived from parent in each dimension
+                        UILayoutComponent* childLayout = scene->findComponent<UILayoutComponent>(container.boxes[b].layout);
+                        bool widthFromParent = childLayout && childLayout->usingAnchors &&
+                            (childLayout->anchorPointLeft != childLayout->anchorPointRight);
+                        bool heightFromParent = childLayout && childLayout->usingAnchors &&
+                            (childLayout->anchorPointTop != childLayout->anchorPointBottom);
+
+                        if (!widthFromParent){
+                            contentMinTotalWidth += container.boxes[b].rect.getWidth();
+                            contentMinMaxWidth = std::max(contentMinMaxWidth, (unsigned int)container.boxes[b].rect.getWidth());
+                        }
+                        if (!heightFromParent){
+                            contentMinTotalHeight += container.boxes[b].rect.getHeight();
+                            contentMinMaxHeight = std::max(contentMinMaxHeight, (unsigned int)container.boxes[b].rect.getHeight());
+                        }
                     }
                     if (container.boxes[b].expand){
                         container.numBoxExpand++;
@@ -1319,11 +1341,11 @@ void UISystem::update(double dt){
 
 
                 if (container.type == ContainerType::HORIZONTAL){
-                    layout.width = (layout.width > totalWidth)? layout.width : totalWidth;
-                    layout.height = (layout.height > container.maxHeight)? layout.height : container.maxHeight;
+                    layout.width = (layout.width > contentMinTotalWidth)? layout.width : contentMinTotalWidth;
+                    layout.height = (layout.height > contentMinMaxHeight)? layout.height : contentMinMaxHeight;
                 }else if (container.type == ContainerType::VERTICAL){
-                    layout.width = (layout.width > container.maxWidth)? layout.width : container.maxWidth;
-                    layout.height = (layout.height > totalHeight)? layout.height : totalHeight;
+                    layout.width = (layout.width > contentMinMaxWidth)? layout.width : contentMinMaxWidth;
+                    layout.height = (layout.height > contentMinTotalHeight)? layout.height : contentMinTotalHeight;
                 }else if (container.type == ContainerType::HORIZONTAL_WRAP){
                     if (layout.width == 0){
                         layout.width = container.maxWidth;
@@ -1339,6 +1361,9 @@ void UISystem::update(double dt){
                         layout.height = container.maxHeight;
                     }
                 }
+
+                if (layout.width < 1) layout.width = 1;
+                if (layout.height < 1) layout.height = 1;
             }
         }
 
