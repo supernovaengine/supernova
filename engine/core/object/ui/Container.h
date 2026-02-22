@@ -25,6 +25,9 @@ namespace Supernova{
         void setWrapCellHeight(unsigned int height);
         unsigned int getWrapCellHeight() const;
 
+        unsigned int getContentWidth() const;
+        unsigned int getContentHeight() const;
+
         void resize();
 
         void setBoxExpand(bool expand);

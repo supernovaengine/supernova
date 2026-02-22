@@ -4,6 +4,9 @@
 
 #include "Container.h"
 
+#include <algorithm>
+#include <cmath>
+
 using namespace Supernova;
 
 Container::Container(Scene* scene): UILayout(scene){
@@ -62,6 +65,32 @@ unsigned int Container::getWrapCellHeight() const{
     UIContainerComponent& container = getComponent<UIContainerComponent>();
 
     return container.wrapCellHeight;
+}
+
+unsigned int Container::getContentWidth() const{
+    UIContainerComponent& container = getComponent<UIContainerComponent>();
+
+    float maxX = 0.0f;
+    for (int b = 0; b < container.numBoxes; b++){
+        if (container.boxes[b].layout != NULL_ENTITY){
+            maxX = std::max(maxX, container.boxes[b].rect.getX() + container.boxes[b].rect.getWidth());
+        }
+    }
+
+    return static_cast<unsigned int>(std::ceil(maxX));
+}
+
+unsigned int Container::getContentHeight() const{
+    UIContainerComponent& container = getComponent<UIContainerComponent>();
+
+    float maxY = 0.0f;
+    for (int b = 0; b < container.numBoxes; b++){
+        if (container.boxes[b].layout != NULL_ENTITY){
+            maxY = std::max(maxY, container.boxes[b].rect.getY() + container.boxes[b].rect.getHeight());
+        }
+    }
+
+    return static_cast<unsigned int>(std::ceil(maxY));
 }
 
 void Container::resize(){

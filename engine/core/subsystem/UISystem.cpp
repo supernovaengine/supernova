@@ -1453,17 +1453,23 @@ void UISystem::update(double dt){
                             if (b > 0){
                                 container.boxes[b].rect.setX(container.boxes[b-1].rect.getX() + container.boxes[b-1].rect.getWidth());
                             }
-                            if (container.boxes[b].rect.getWidth() >= layout.width){
-                                container.boxes[b].rect.setWidth(layout.width / container.numBoxes);
-                            }
-                            if (container.boxes[b].expand){
-                                float diff = layout.width - container.fixedWidth;
-                                float sizeInc = (diff / container.numBoxExpand) - usedSize;
-                                if (sizeInc >= container.boxes[b].rect.getWidth()) {
-                                    container.boxes[b].rect.setWidth(sizeInc);
-                                    usedSize = 0;
+
+                            if (container.boxes[b].expand && container.numBoxExpand > 0){
+                                int availableWidth = static_cast<int>(layout.width) - static_cast<int>(container.fixedWidth);
+                                if (availableWidth > 0){
+                                    float sizeInc = (static_cast<float>(availableWidth) / container.numBoxExpand) - usedSize;
+                                    int currentWidth = container.boxes[b].rect.getWidth();
+                                    bool acceptReduce = scene->findComponent<UIContainerComponent>(container.boxes[b].layout) != nullptr;
+
+                                    if (sizeInc >= currentWidth || acceptReduce){
+                                        if (sizeInc < 1.0f) sizeInc = 1.0f;
+                                        container.boxes[b].rect.setWidth(sizeInc);
+                                        usedSize = 0;
+                                    }else{
+                                        usedSize += currentWidth;
+                                    }
                                 }else{
-                                    usedSize += container.boxes[b].rect.getWidth();
+                                    container.boxes[b].rect.setWidth(1);
                                 }
                             }
                             container.boxes[b].rect.setHeight(layout.height);
@@ -1471,17 +1477,23 @@ void UISystem::update(double dt){
                             if (b > 0){
                                 container.boxes[b].rect.setY(container.boxes[b-1].rect.getY() + container.boxes[b-1].rect.getHeight());
                             }
-                            if (container.boxes[b].rect.getHeight() >= layout.height){
-                                container.boxes[b].rect.setHeight(layout.height / container.numBoxes);
-                            }
-                            if (container.boxes[b].expand){
-                                float diff = layout.height - container.fixedHeight;
-                                float sizeInc = (diff / container.numBoxExpand) - usedSize;
-                                if (sizeInc >= container.boxes[b].rect.getHeight()) {
-                                    container.boxes[b].rect.setHeight(sizeInc);
-                                    usedSize = 0;
+
+                            if (container.boxes[b].expand && container.numBoxExpand > 0){
+                                int availableHeight = static_cast<int>(layout.height) - static_cast<int>(container.fixedHeight);
+                                if (availableHeight > 0){
+                                    float sizeInc = (static_cast<float>(availableHeight) / container.numBoxExpand) - usedSize;
+                                    int currentHeight = container.boxes[b].rect.getHeight();
+                                    bool acceptReduce = scene->findComponent<UIContainerComponent>(container.boxes[b].layout) != nullptr;
+
+                                    if (sizeInc >= currentHeight || acceptReduce){
+                                        if (sizeInc < 1.0f) sizeInc = 1.0f;
+                                        container.boxes[b].rect.setHeight(sizeInc);
+                                        usedSize = 0;
+                                    }else{
+                                        usedSize += currentHeight;
+                                    }
                                 }else{
-                                    usedSize += container.boxes[b].rect.getHeight();
+                                    container.boxes[b].rect.setHeight(1);
                                 }
                             }
                             container.boxes[b].rect.setWidth(layout.width);

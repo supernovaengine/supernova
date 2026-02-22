@@ -624,6 +624,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("useAllWrapSpace", &Container::isUseAllWrapSpace, &Container::setUseAllWrapSpace)
         .addProperty("wrapCellWidth", &Container::getWrapCellWidth, &Container::setWrapCellWidth)
         .addProperty("wrapCellHeight", &Container::getWrapCellHeight, &Container::setWrapCellHeight)
+        .addProperty("contentWidth", &Container::getContentWidth)
+        .addProperty("contentHeight", &Container::getContentHeight)
         .addFunction("resize", &Container::resize)
         .addFunction("setBoxExpand", 
             luabridge::overload<size_t, bool>(&Container::setBoxExpand),
