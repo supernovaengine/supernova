@@ -1483,7 +1483,48 @@ void UISystem::update(double dt){
             // configuring all container boxes
             if (container.numBoxes > 0){
 
-                int usedSize = 0;
+                // Pre-compute sizes for expand boxes in HORIZONTAL/VERTICAL using
+                // freeze-and-redistribute: non-reducible boxes (images) that exceed
+                // their equal share are frozen at their natural size; the remaining
+                // space is distributed equally among the rest.
+                int resolved[MAX_CONTAINER_BOXES];
+                std::fill(resolved, resolved + container.numBoxes, -1);
+                if (container.type == ContainerType::HORIZONTAL || container.type == ContainerType::VERTICAL){
+                    bool horiz = (container.type == ContainerType::HORIZONTAL);
+                    int available = horiz
+                        ? static_cast<int>(layout.width)  - static_cast<int>(container.fixedWidth)
+                        : static_cast<int>(layout.height) - static_cast<int>(container.fixedHeight);
+                    bool frozen[MAX_CONTAINER_BOXES] = {};
+                    int frozenTotal = 0, frozenCount = 0;
+                    bool changed = true;
+                    while (changed && available > 0){
+                        changed = false;
+                        int freeCount = (int)container.numBoxExpand - frozenCount;
+                        if (freeCount <= 0) break;
+                        int share = (available - frozenTotal) / freeCount;
+                        for (int b = 0; b < container.numBoxes; b++){
+                            if (!frozen[b] && container.boxes[b].layout != NULL_ENTITY && container.boxes[b].expand){
+                                bool ar = scene->findComponent<UIContainerComponent>(container.boxes[b].layout) != nullptr;
+                                int nat = horiz ? (int)container.boxes[b].rect.getWidth() : (int)container.boxes[b].rect.getHeight();
+                                if (!ar && nat > share){
+                                    frozen[b] = true; frozenTotal += nat; frozenCount++; changed = true; break;
+                                }
+                            }
+                        }
+                    }
+                    int fc = (int)container.numBoxExpand - frozenCount;
+                    int rem = available - frozenTotal;
+                    int base = (fc > 0 && rem > 0) ? rem / fc : 1;
+                    int leftover = (fc > 0 && rem > 0) ? rem % fc : 0;
+                    int fi = 0;
+                    for (int b = 0; b < container.numBoxes; b++){
+                        if (container.boxes[b].layout != NULL_ENTITY && container.boxes[b].expand){
+                            int nat = horiz ? (int)container.boxes[b].rect.getWidth() : (int)container.boxes[b].rect.getHeight();
+                            resolved[b] = frozen[b] ? nat : std::max(1, base + (fi++ < leftover ? 1 : 0));
+                        }
+                    }
+                }
+
                 for (int b = 0; b < container.numBoxes; b++){
                     if (container.boxes[b].layout != NULL_ENTITY){
                         if (container.type == ContainerType::HORIZONTAL){
@@ -1492,21 +1533,8 @@ void UISystem::update(double dt){
                             }
 
                             if (container.boxes[b].expand && container.numBoxExpand > 0){
-                                int availableWidth = static_cast<int>(layout.width) - static_cast<int>(container.fixedWidth);
-                                if (availableWidth > 0){
-                                    float sizeInc = (static_cast<float>(availableWidth) / container.numBoxExpand) - usedSize;
-                                    int currentWidth = container.boxes[b].rect.getWidth();
-                                    bool acceptReduce = scene->findComponent<UIContainerComponent>(container.boxes[b].layout) != nullptr;
-
-                                    if (sizeInc >= currentWidth || acceptReduce){
-                                        if (sizeInc < 1.0f) sizeInc = 1.0f;
-                                        container.boxes[b].rect.setWidth(sizeInc);
-                                        usedSize = 0;
-                                    }else{
-                                        usedSize += currentWidth;
-                                    }
-                                }else{
-                                    container.boxes[b].rect.setWidth(1);
+                                if (resolved[b] >= 0){
+                                    container.boxes[b].rect.setWidth(resolved[b]);
                                 }
                             }
                             container.boxes[b].rect.setHeight(layout.height);
@@ -1516,21 +1544,8 @@ void UISystem::update(double dt){
                             }
 
                             if (container.boxes[b].expand && container.numBoxExpand > 0){
-                                int availableHeight = static_cast<int>(layout.height) - static_cast<int>(container.fixedHeight);
-                                if (availableHeight > 0){
-                                    float sizeInc = (static_cast<float>(availableHeight) / container.numBoxExpand) - usedSize;
-                                    int currentHeight = container.boxes[b].rect.getHeight();
-                                    bool acceptReduce = scene->findComponent<UIContainerComponent>(container.boxes[b].layout) != nullptr;
-
-                                    if (sizeInc >= currentHeight || acceptReduce){
-                                        if (sizeInc < 1.0f) sizeInc = 1.0f;
-                                        container.boxes[b].rect.setHeight(sizeInc);
-                                        usedSize = 0;
-                                    }else{
-                                        usedSize += currentHeight;
-                                    }
-                                }else{
-                                    container.boxes[b].rect.setHeight(1);
+                                if (resolved[b] >= 0){
+                                    container.boxes[b].rect.setHeight(resolved[b]);
                                 }
                             }
                             container.boxes[b].rect.setWidth(layout.width);
