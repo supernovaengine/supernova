@@ -1347,18 +1347,30 @@ void UISystem::update(double dt){
                     layout.width = (layout.width > contentMinMaxWidth)? layout.width : contentMinMaxWidth;
                     layout.height = (layout.height > contentMinTotalHeight)? layout.height : contentMinTotalHeight;
                 }else if (container.type == ContainerType::HORIZONTAL_WRAP){
-                    if (layout.width == 0){
-                        layout.width = container.maxWidth;
-                    }
-                    if (layout.height == 0){
-                        layout.height = container.maxHeight;
+                    layout.width = (layout.width > container.maxWidth)? layout.width : container.maxWidth;
+                    unsigned int effCellW = (container.wrapCellWidth > 0) ? container.wrapCellWidth : container.maxWidth;
+                    unsigned int effCellH = (container.wrapCellHeight > 0) ? container.wrapCellHeight : container.maxHeight;
+                    if (effCellW > 0 && effCellH > 0){
+                        int itemsPerRow = layout.width / effCellW;
+                        if (itemsPerRow < 1) itemsPerRow = 1;
+                        int numRows = (container.numBoxes + itemsPerRow - 1) / itemsPerRow;
+                        unsigned int minHeight = numRows * effCellH;
+                        layout.height = (layout.height > minHeight)? layout.height : minHeight;
+                    }else{
+                        layout.height = (layout.height > container.maxHeight)? layout.height : container.maxHeight;
                     }
                 }else if (container.type == ContainerType::VERTICAL_WRAP){
-                    if (layout.width == 0){
-                        layout.width = container.maxWidth;
-                    }
-                    if (layout.height == 0){
-                        layout.height = container.maxHeight;
+                    layout.height = (layout.height > container.maxHeight)? layout.height : container.maxHeight;
+                    unsigned int effCellW = (container.wrapCellWidth > 0) ? container.wrapCellWidth : container.maxWidth;
+                    unsigned int effCellH = (container.wrapCellHeight > 0) ? container.wrapCellHeight : container.maxHeight;
+                    if (effCellH > 0 && effCellW > 0){
+                        int itemsPerCol = layout.height / effCellH;
+                        if (itemsPerCol < 1) itemsPerCol = 1;
+                        int numCols = (container.numBoxes + itemsPerCol - 1) / itemsPerCol;
+                        unsigned int minWidth = numCols * effCellW;
+                        layout.width = (layout.width > minWidth)? layout.width : minWidth;
+                    }else{
+                        layout.width = (layout.width > container.maxWidth)? layout.width : container.maxWidth;
                     }
                 }
 
