@@ -39,6 +39,11 @@ namespace Supernova{
         unsigned int maxWidth = 0;
         unsigned int maxHeight = 0;
         unsigned int numBoxExpand = 0;
+
+        // Intrinsic minimum size from non-anchor-derived content children
+        // Used by parent containers to enforce min size for anchor-derived child containers
+        unsigned int contentMinWidth = 0;
+        unsigned int contentMinHeight = 0;
     };
     
 }

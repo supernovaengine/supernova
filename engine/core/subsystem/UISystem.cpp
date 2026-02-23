@@ -1289,6 +1289,11 @@ void UISystem::update(double dt){
 
         if (signature.test(scene->getComponentId<UIContainerComponent>())){
             UIContainerComponent& container = scene->getComponent<UIContainerComponent>(entity);
+
+            // reset cached intrinsic minimums for this frame
+            container.contentMinWidth = 0;
+            container.contentMinHeight = 0;
+
             // configuring all container boxes
             if (container.numBoxes > 0){
 
@@ -1325,13 +1330,23 @@ void UISystem::update(double dt){
                         bool heightFromParent = childLayout && childLayout->usingAnchors &&
                             (childLayout->anchorPointTop != childLayout->anchorPointBottom);
 
+                        // If child is anchor-derived but is itself a Container, use its intrinsic
+                        // content minimum so the parent cannot shrink below the child's needs
+                        UIContainerComponent* childContainer = scene->findComponent<UIContainerComponent>(container.boxes[b].layout);
+
                         if (!widthFromParent){
                             contentMinTotalWidth += container.boxes[b].rect.getWidth();
                             contentMinMaxWidth = std::max(contentMinMaxWidth, (unsigned int)container.boxes[b].rect.getWidth());
+                        } else if (childContainer) {
+                            contentMinTotalWidth += childContainer->contentMinWidth;
+                            contentMinMaxWidth = std::max(contentMinMaxWidth, childContainer->contentMinWidth);
                         }
                         if (!heightFromParent){
                             contentMinTotalHeight += container.boxes[b].rect.getHeight();
                             contentMinMaxHeight = std::max(contentMinMaxHeight, (unsigned int)container.boxes[b].rect.getHeight());
+                        } else if (childContainer) {
+                            contentMinTotalHeight += childContainer->contentMinHeight;
+                            contentMinMaxHeight = std::max(contentMinMaxHeight, childContainer->contentMinHeight);
                         }
                     }
                     if (container.boxes[b].expand){
@@ -1376,6 +1391,21 @@ void UISystem::update(double dt){
 
                 if (layout.width < 1) layout.width = 1;
                 if (layout.height < 1) layout.height = 1;
+
+                // Store the intrinsic content minimum for parent containers to use
+                if (container.type == ContainerType::HORIZONTAL){
+                    container.contentMinWidth = contentMinTotalWidth;
+                    container.contentMinHeight = contentMinMaxHeight;
+                } else if (container.type == ContainerType::VERTICAL){
+                    container.contentMinWidth = contentMinMaxWidth;
+                    container.contentMinHeight = contentMinTotalHeight;
+                } else if (container.type == ContainerType::HORIZONTAL_WRAP){
+                    container.contentMinWidth = contentMinMaxWidth;
+                    container.contentMinHeight = contentMinMaxHeight;
+                } else if (container.type == ContainerType::VERTICAL_WRAP){
+                    container.contentMinWidth = contentMinMaxWidth;
+                    container.contentMinHeight = contentMinMaxHeight;
+                }
             }
         }
 
