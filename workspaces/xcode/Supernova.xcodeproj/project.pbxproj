@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		177264192F4E711E00646D8E /* SceneManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 177264172F4E711E00646D8E /* SceneManager.h */; };
+		1772641A2F4E711E00646D8E /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 177264182F4E711E00646D8E /* SceneManager.cpp */; };
+		1772641B2F4E711E00646D8E /* SceneManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 177264182F4E711E00646D8E /* SceneManager.cpp */; };
 		1789660C2F1D764600E89E52 /* ShaderDataSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */; };
 		1789660D2F1D764600E89E52 /* ShaderDataSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1789660A2F1D764600E89E52 /* ShaderDataSerializer.h */; };
 		1789660E2F1D764600E89E52 /* ShaderDataSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */; };
@@ -1272,6 +1275,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		177264172F4E711E00646D8E /* SceneManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneManager.h; sourceTree = "<group>"; };
+		177264182F4E711E00646D8E /* SceneManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SceneManager.cpp; sourceTree = "<group>"; };
 		1789660A2F1D764600E89E52 /* ShaderDataSerializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderDataSerializer.h; sourceTree = "<group>"; };
 		1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderDataSerializer.cpp; sourceTree = "<group>"; };
 		71033D652BD1A7D200D81FB5 /* ScrollbarComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollbarComponent.h; sourceTree = "<group>"; };
@@ -3288,6 +3293,8 @@
 				7162FC3825962A0E0075B97D /* render */,
 				7162FC8625962A0E0075B97D /* Scene.h */,
 				7162FC2D25962A0E0075B97D /* Scene.cpp */,
+				177264172F4E711E00646D8E /* SceneManager.h */,
+				177264182F4E711E00646D8E /* SceneManager.cpp */,
 				71BE622C25B1DB9D006D6E02 /* script */,
 				71CC839D26B8C54A00EEBB93 /* shader */,
 				7162FC6F25962A0E0075B97D /* subsystem */,
@@ -4294,6 +4301,7 @@
 				718FDDF92837CA9A00AF314C /* glsl330.h in Headers */,
 				717AD96A290B6602007D7DB5 /* Audio.h in Headers */,
 				71F2254D2C58740F006ED3CA /* Points.h in Headers */,
+				177264192F4E711E00646D8E /* SceneManager.h in Headers */,
 				71ABBD382791167A001CE3AF /* UIComponent.h in Headers */,
 				71BE623E25B1DB9E006D6E02 /* LuaScript.h in Headers */,
 				71ABBD1E277A31BA001CE3AF /* Text.h in Headers */,
@@ -5493,6 +5501,7 @@
 				713D8299259D307F00567F9F /* ObjectRender.cpp in Sources */,
 				71C33FB62A315877007A5822 /* Mesh.cpp in Sources */,
 				71CC839C26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
+				1772641B2F4E711E00646D8E /* SceneManager.cpp in Sources */,
 				713D829A259D307F00567F9F /* TextureRender.cpp in Sources */,
 				713D829B259D307F00567F9F /* BufferRender.cpp in Sources */,
 				713D82EB259D333100567F9F /* Buffer.cpp in Sources */,
@@ -5665,6 +5674,7 @@
 				7162FD1725963AE00075B97D /* UserSettings.cpp in Sources */,
 				71C33FB72A315878007A5822 /* Mesh.cpp in Sources */,
 				71CC839B26B8C4FD00EEBB93 /* FramebufferRender.cpp in Sources */,
+				1772641A2F4E711E00646D8E /* SceneManager.cpp in Sources */,
 				7162FD1925963AE00075B97D /* File.cpp in Sources */,
 				7162FD1A25963AE00075B97D /* FileData.cpp in Sources */,
 				7162FD1C25963AE00075B97D /* ShaderRender.cpp in Sources */,
