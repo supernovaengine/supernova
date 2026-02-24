@@ -10,6 +10,7 @@
 #include "Input.h"
 #include "Log.h"
 #include "Scene.h"
+#include "SceneManager.h"
 #include "System.h"
 
 #include "action/Action.h"

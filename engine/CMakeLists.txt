@@ -64,6 +64,7 @@ set(SUPERNOVA_SRCS
     core/Input.cpp
     core/Log.cpp
     core/Scene.cpp
+    core/SceneManager.cpp
     core/System.cpp
     core/action/Action.cpp
     core/action/AlphaAction.cpp

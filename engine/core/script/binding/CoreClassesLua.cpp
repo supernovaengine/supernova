@@ -12,6 +12,7 @@
 #include "Engine.h"
 #include "Log.h"
 #include "Scene.h"
+#include "SceneManager.h"
 #include "Log.h"
 #include "Input.h"
 #include "System.h"
@@ -246,6 +247,20 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticProperty("onKeyUp", [] () { return &Engine::onKeyUp; }, [] (lua_State* L) { Engine::onKeyUp = L; })
         .addStaticProperty("onCharInput", [] () { return &Engine::onCharInput; }, [] (lua_State* L) { Engine::onCharInput = L; })
 
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<SceneManager>("SceneManager")
+        .addStaticFunction("registerScene", &SceneManager::registerScene)
+        .addStaticFunction("loadScene", static_cast<bool(*)(const std::string&)>(&SceneManager::loadScene))
+        .addStaticFunction("loadSceneByIndex", static_cast<bool(*)(int)>(&SceneManager::loadScene))
+        .addStaticFunction("getSceneIndex", &SceneManager::getSceneIndex)
+        .addStaticFunction("getSceneName", &SceneManager::getSceneName)
+        .addStaticFunction("getSceneNames", &SceneManager::getSceneNames)
+        .addStaticProperty("sceneCount", &SceneManager::getSceneCount)
+        .addStaticProperty("currentSceneIndex", &SceneManager::getCurrentSceneIndex)
+        .addStaticProperty("currentSceneName", &SceneManager::getCurrentSceneName)
+        .addStaticFunction("clearAll", &SceneManager::clearAll)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
