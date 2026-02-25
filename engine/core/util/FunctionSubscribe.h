@@ -199,6 +199,20 @@ namespace Supernova {
             return true;
         }
 
+        size_t removeByTagSubstring(const std::string& substring){
+            size_t removed = 0;
+            for (size_t i = 0; i < tags.size(); ) {
+                if (tags[i].find(substring) != std::string::npos) {
+                    tags.erase(tags.begin() + i);
+                    functions.erase(functions.begin() + i);
+                    ++removed;
+                } else {
+                    ++i;
+                }
+            }
+            return removed;
+        }
+
         Ret call(Args... args){
             if (!enabled){
                 if constexpr (!std::is_void<Ret>::value) {

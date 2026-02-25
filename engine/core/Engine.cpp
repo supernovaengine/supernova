@@ -503,6 +503,35 @@ Framebuffer* Engine::getFramebuffer(){
     return Engine::framebuffer;
 }
 
+void Engine::removeSubscriptionsByTag(const std::string& substring) {
+    onUpdate.removeByTagSubstring(substring);
+    onPostUpdate.removeByTagSubstring(substring);
+
+    onTouchStart.removeByTagSubstring(substring);
+    onTouchEnd.removeByTagSubstring(substring);
+    onTouchMove.removeByTagSubstring(substring);
+    onTouchCancel.removeByTagSubstring(substring);
+
+    onMouseDown.removeByTagSubstring(substring);
+    onMouseUp.removeByTagSubstring(substring);
+    onMouseScroll.removeByTagSubstring(substring);
+    onMouseMove.removeByTagSubstring(substring);
+    onMouseEnter.removeByTagSubstring(substring);
+    onMouseLeave.removeByTagSubstring(substring);
+
+    onKeyDown.removeByTagSubstring(substring);
+    onKeyUp.removeByTagSubstring(substring);
+    onCharInput.removeByTagSubstring(substring);
+
+    onViewLoaded.removeByTagSubstring(substring);
+    onViewChanged.removeByTagSubstring(substring);
+    onViewDestroyed.removeByTagSubstring(substring);
+    onDraw.removeByTagSubstring(substring);
+    onPause.removeByTagSubstring(substring);
+    onResume.removeByTagSubstring(substring);
+    onShutdown.removeByTagSubstring(substring);
+}
+
 void Engine::clearAllSubscriptions(bool includeLifecycle) {
     // Gameplay/input/update events
     onUpdate.clear();

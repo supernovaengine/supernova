@@ -6,6 +6,7 @@
 
 #include "Log.h"
 #include "System.h"
+#include "Engine.h"
 
 #include "lua.hpp"
 
@@ -370,4 +371,21 @@ void LuaBinding::cleanup(){
         lua_close(luastate);
         luastate = NULL;
     }
+}
+
+void LuaBinding::removeScriptSubscriptions(int luaRef){
+    if (!luastate) return;
+
+    lua_rawgeti(luastate, LUA_REGISTRYINDEX, luaRef);
+    const void* ptr = lua_topointer(luastate, -1);
+    if (ptr) {
+        std::string addr = "_" + std::to_string(reinterpret_cast<std::uintptr_t>(ptr)) + "_";
+        Engine::removeSubscriptionsByTag(addr);
+    }
+    lua_pop(luastate, 1);
+}
+
+void LuaBinding::releaseLuaRef(int luaRef){
+    if (!luastate) return;
+    luaL_unref(luastate, LUA_REGISTRYINDEX, luaRef);
 }

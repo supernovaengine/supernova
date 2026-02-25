@@ -56,6 +56,9 @@ namespace Supernova {
         static void stackDump (lua_State *L);
 
         static void cleanup();
+
+        static void removeScriptSubscriptions(int luaRef);
+        static void releaseLuaRef(int luaRef);
         
     };
     

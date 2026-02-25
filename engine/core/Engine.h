@@ -274,6 +274,7 @@ namespace Supernova {
         static Framebuffer* getFramebuffer();
 
         static void clearAllSubscriptions(bool includeLifecycle);
+        static void removeSubscriptionsByTag(const std::string& substring);
 
         //-----Supernova API functions-----
         static void systemInit(int argc, char* argv[], System* system);
