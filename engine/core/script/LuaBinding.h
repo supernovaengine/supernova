@@ -6,11 +6,15 @@
 #define luabinding_h
 
 #include "Export.h"
+#include "ecs/Entity.h"
+#include <string>
 
 typedef struct lua_State lua_State;
 typedef int (*lua_CFunction) (lua_State *L);
 
 namespace Supernova {
+
+    class Scene;
 
     class SUPERNOVA_API LuaBinding {
         
@@ -44,6 +48,12 @@ namespace Supernova {
 
         static void init();
 
+        // For editor scripts use
+        static std::string normalizePtrTypeName(std::string value);
+        template <typename T>
+        static bool pushEntityHandleTyped(lua_State* L, Scene* scene, Entity entity);
+        static bool pushEntityHandleByType(lua_State* L, Scene* scene, Entity entity, const std::string& ptrTypeName);
+
     public:
         LuaBinding();
         virtual ~LuaBinding();
@@ -59,6 +69,10 @@ namespace Supernova {
 
         static void removeScriptSubscriptions(int luaRef);
         static void releaseLuaRef(int luaRef);
+
+        // For editor scripts use
+        static void initializeLuaScripts(Scene* scene);
+        static void cleanupLuaScripts(Scene* scene);
         
     };
     

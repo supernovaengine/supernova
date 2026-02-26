@@ -62,10 +62,10 @@ int SupernovaGLFW::init(int argc, char **argv){
 
         mousePosX = pos_x * xscale;
         mousePosY = pos_y * yscale;
-        Supernova::Engine::systemMouseMove(float(pos_x), float(pos_y), 0);
+        Supernova::Engine::systemMouseMove(float(mousePosX), float(mousePosY), 0);
     });
-    glfwSetScrollCallback(window, [](GLFWwindow*, double pos_x, double pos_y){
-        Supernova::Engine::systemMouseScroll((float)pos_x, (float)pos_y, 0);
+    glfwSetScrollCallback(window, [](GLFWwindow*, double xoffset, double yoffset){
+        Supernova::Engine::systemMouseScroll((float)xoffset, (float)yoffset, 0);
     });
     glfwSetKeyCallback(window, [](GLFWwindow*, int key, int /*scancode*/, int action, int mods){
         if (action==GLFW_PRESS){

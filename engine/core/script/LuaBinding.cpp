@@ -7,12 +7,27 @@
 #include "Log.h"
 #include "System.h"
 #include "Engine.h"
+#include "Scene.h"
+#include "component/ScriptComponent.h"
+#include "ScriptProperty.h"
+#include "object/EntityHandle.h"
+#include "object/Mesh.h"
+#include "object/Object.h"
+#include "object/Shape.h"
+#include "object/Model.h"
+#include "object/Points.h"
+#include "object/Sprite.h"
+#include "object/Terrain.h"
+#include "object/Light.h"
+#include "object/Camera.h"
 
 #include "lua.hpp"
 
 #include "LuaBridge.h"
 #include "LuaBridgeAddon.h"
 
+#include <algorithm>
+#include <cctype>
 #include <map>
 #include <locale>
 #include <vector>
@@ -388,4 +403,254 @@ void LuaBinding::removeScriptSubscriptions(int luaRef){
 void LuaBinding::releaseLuaRef(int luaRef){
     if (!luastate) return;
     luaL_unref(luastate, LUA_REGISTRYINDEX, luaRef);
+}
+
+std::string LuaBinding::normalizePtrTypeName(std::string value) {
+    while (!value.empty() && std::isspace(static_cast<unsigned char>(value.front())))
+        value.erase(value.begin());
+    while (!value.empty() && (std::isspace(static_cast<unsigned char>(value.back())) || value.back() == '*' || value.back() == '&'))
+        value.pop_back();
+    while (!value.empty() && std::isspace(static_cast<unsigned char>(value.back())))
+        value.pop_back();
+    std::transform(value.begin(), value.end(), value.begin(), [](unsigned char c){ return std::tolower(c); });
+    return value;
+}
+
+template <typename T>
+bool LuaBinding::pushEntityHandleTyped(lua_State* L, Supernova::Scene* scene, Supernova::Entity entity) {
+    T* handle = new T(scene, entity);
+    if (!luabridge::push<T*>(L, handle)) {
+        delete handle;
+        lua_pushnil(L);
+        return false;
+    }
+    return true;
+}
+
+bool LuaBinding::pushEntityHandleByType(lua_State* L, Supernova::Scene* scene, Supernova::Entity entity, const std::string& ptrTypeName) {
+    const std::string key = normalizePtrTypeName(ptrTypeName);
+    using namespace Supernova;
+    if (key == "mesh")    return pushEntityHandleTyped<Mesh>(L, scene, entity);
+    if (key == "object")  return pushEntityHandleTyped<Object>(L, scene, entity);
+    if (key == "shape")   return pushEntityHandleTyped<Shape>(L, scene, entity);
+    if (key == "model")   return pushEntityHandleTyped<Model>(L, scene, entity);
+    if (key == "points")  return pushEntityHandleTyped<Points>(L, scene, entity);
+    if (key == "sprite")  return pushEntityHandleTyped<Sprite>(L, scene, entity);
+    if (key == "terrain") return pushEntityHandleTyped<Terrain>(L, scene, entity);
+    if (key == "light")   return pushEntityHandleTyped<Light>(L, scene, entity);
+    if (key == "camera")  return pushEntityHandleTyped<Camera>(L, scene, entity);
+    return pushEntityHandleTyped<EntityHandle>(L, scene, entity);
+}
+
+void LuaBinding::initializeLuaScripts(Scene* scene) {
+    if (!scene) return;
+
+    lua_State* L = luastate;
+    if (!L) {
+        Log::error("Lua state not initialized");
+        return;
+    }
+
+    auto scriptsArray = scene->getComponentArray<ScriptComponent>();
+
+    // PASS 1: Create all Lua script instances (without resolving EntityRef properties)
+    for (size_t i = 0; i < scriptsArray->size(); i++) {
+        ScriptComponent& scriptComp = scriptsArray->getComponentFromIndex(i);
+        Entity entity = scriptsArray->getEntity(i);
+
+        for (auto& scriptEntry : scriptComp.scripts) {
+            if (!scriptEntry.enabled) continue;
+            if (scriptEntry.type != ScriptType::SCRIPT_LUA) continue;
+
+            std::string luaFile = std::string("lua://") + scriptEntry.path;
+            Data filedata;
+            if (filedata.open(luaFile.c_str()) != FileErrors::FILEDATA_OK) {
+                Log::error("Lua script file not found: %s", scriptEntry.path.c_str());
+                continue;
+            }
+
+            int status = luaL_loadbuffer(L, (const char*)filedata.getMemPtr(), filedata.length(), scriptEntry.path.c_str());
+            if (status != LUA_OK) {
+                Log::error("Failed to load Lua file '%s': %s", scriptEntry.path.c_str(), lua_tostring(L, -1));
+                lua_pop(L, 1);
+                continue;
+            }
+
+            status = lua_pcall(L, 0, 1, 0);
+            if (status != LUA_OK) {
+                Log::error("Failed to execute Lua module '%s': %s", scriptEntry.className.c_str(), lua_tostring(L, -1));
+                lua_pop(L, 1);
+                continue;
+            }
+
+            if (!lua_istable(L, -1)) {
+                Log::error("Lua module '%s' did not return a table", scriptEntry.className.c_str());
+                lua_pop(L, 1);
+                continue;
+            }
+
+            // Create instance table with module as prototype
+            lua_newtable(L);
+            lua_newtable(L);
+            lua_pushvalue(L, -3);
+            lua_setfield(L, -2, "__index");
+            lua_setmetatable(L, -2);
+
+            lua_pushstring(L, scriptEntry.className.c_str());
+            lua_setfield(L, -2, "__name");
+
+            if (!luabridge::push<Scene*>(L, scene)) {
+                Log::error("Failed to push scene to Lua");
+                lua_pop(L, 2);
+                continue;
+            }
+            lua_setfield(L, -2, "scene");
+
+            lua_pushinteger(L, static_cast<lua_Integer>(entity));
+            lua_setfield(L, -2, "entity");
+
+            // Set script properties (skip EntityPointer for now)
+            for (auto& prop : scriptEntry.properties) {
+                if (prop.type == ScriptPropertyType::EntityPointer) {
+                    lua_pushnil(L);
+                    lua_setfield(L, -2, prop.name.c_str());
+                    continue;
+                }
+                if (std::holds_alternative<bool>(prop.value)) {
+                    lua_pushboolean(L, std::get<bool>(prop.value));
+                } else if (std::holds_alternative<int>(prop.value)) {
+                    lua_pushinteger(L, std::get<int>(prop.value));
+                } else if (std::holds_alternative<float>(prop.value)) {
+                    lua_pushnumber(L, std::get<float>(prop.value));
+                } else if (std::holds_alternative<std::string>(prop.value)) {
+                    lua_pushstring(L, std::get<std::string>(prop.value).c_str());
+                } else if (std::holds_alternative<Vector2>(prop.value)) {
+                    if (!luabridge::push<Vector2>(L, std::get<Vector2>(prop.value))) lua_pushnil(L);
+                } else if (std::holds_alternative<Vector3>(prop.value)) {
+                    if (!luabridge::push<Vector3>(L, std::get<Vector3>(prop.value))) lua_pushnil(L);
+                } else if (std::holds_alternative<Vector4>(prop.value)) {
+                    if (!luabridge::push<Vector4>(L, std::get<Vector4>(prop.value))) lua_pushnil(L);
+                } else {
+                    lua_pushnil(L);
+                }
+                lua_setfield(L, -2, prop.name.c_str());
+            }
+
+            int ref = luaL_ref(L, LUA_REGISTRYINDEX);
+            scriptEntry.instance = reinterpret_cast<void*>(static_cast<intptr_t>(ref));
+            for (auto& prop : scriptEntry.properties) {
+                prop.luaRef = ref;
+            }
+
+            lua_pop(L, 1); // pop module
+        }
+    }
+
+    // PASS 2: Resolve EntityRef properties
+    for (size_t i = 0; i < scriptsArray->size(); i++) {
+        ScriptComponent& scriptComp = scriptsArray->getComponentFromIndex(i);
+
+        for (auto& scriptEntry : scriptComp.scripts) {
+            if (scriptEntry.type != ScriptType::SCRIPT_LUA || !scriptEntry.enabled) continue;
+
+            int ref = static_cast<int>(reinterpret_cast<intptr_t>(scriptEntry.instance));
+            lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+
+            for (auto& prop : scriptEntry.properties) {
+                if (prop.type != ScriptPropertyType::EntityPointer) continue;
+
+                if (!std::holds_alternative<EntityRef>(prop.value)) {
+                    lua_pushnil(L);
+                    lua_setfield(L, -2, prop.name.c_str());
+                    continue;
+                }
+
+                EntityRef& entityRef = std::get<EntityRef>(prop.value);
+                bool foundScript = false;
+
+                if (entityRef.entity != NULL_ENTITY && entityRef.scene) {
+                    ScriptComponent* targetScriptComp = entityRef.scene->findComponent<ScriptComponent>(entityRef.entity);
+                    if (targetScriptComp) {
+                        if (!prop.ptrTypeName.empty()) {
+                            for (auto& targetScript : targetScriptComp->scripts) {
+                                if (targetScript.type == ScriptType::SCRIPT_LUA &&
+                                    targetScript.className == prop.ptrTypeName &&
+                                    targetScript.enabled && targetScript.instance) {
+                                    int targetRef = static_cast<int>(reinterpret_cast<intptr_t>(targetScript.instance));
+                                    lua_rawgeti(L, LUA_REGISTRYINDEX, targetRef);
+                                    foundScript = true;
+                                    break;
+                                }
+                            }
+                            if (!foundScript)
+                                foundScript = pushEntityHandleByType(L, entityRef.scene, entityRef.entity, prop.ptrTypeName);
+                        } else {
+                            for (auto& targetScript : targetScriptComp->scripts) {
+                                if (targetScript.type == ScriptType::SCRIPT_LUA &&
+                                    targetScript.enabled && targetScript.instance) {
+                                    int targetRef = static_cast<int>(reinterpret_cast<intptr_t>(targetScript.instance));
+                                    lua_rawgeti(L, LUA_REGISTRYINDEX, targetRef);
+                                    foundScript = true;
+                                    break;
+                                }
+                            }
+                            if (!foundScript)
+                                foundScript = pushEntityHandleByType(L, entityRef.scene, entityRef.entity, prop.ptrTypeName);
+                        }
+                    } else {
+                        foundScript = pushEntityHandleByType(L, entityRef.scene, entityRef.entity, prop.ptrTypeName);
+                    }
+                }
+
+                if (!foundScript) lua_pushnil(L);
+                lua_setfield(L, -2, prop.name.c_str());
+            }
+
+            lua_pop(L, 1);
+        }
+    }
+
+    // PASS 3: Call init() methods
+    for (size_t i = 0; i < scriptsArray->size(); i++) {
+        ScriptComponent& scriptComp = scriptsArray->getComponentFromIndex(i);
+        for (auto& scriptEntry : scriptComp.scripts) {
+            if (scriptEntry.type != ScriptType::SCRIPT_LUA || !scriptEntry.enabled) continue;
+
+            int ref = static_cast<int>(reinterpret_cast<intptr_t>(scriptEntry.instance));
+            lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+            lua_getfield(L, -1, "init");
+            if (lua_isfunction(L, -1)) {
+                lua_pushvalue(L, -2);
+                if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+                    Log::error("Lua init() failed for '%s': %s", scriptEntry.className.c_str(), lua_tostring(L, -1));
+                    lua_pop(L, 1);
+                }
+            } else {
+                lua_pop(L, 1);
+            }
+            lua_pop(L, 1);
+        }
+    }
+}
+
+void LuaBinding::cleanupLuaScripts(Scene* scene) {
+    if (!scene) return;
+
+    auto scriptsArray = scene->getComponentArray<ScriptComponent>();
+
+    for (size_t i = 0; i < scriptsArray->size(); i++) {
+        ScriptComponent& scriptComp = scriptsArray->getComponentFromIndex(i);
+        for (auto& scriptEntry : scriptComp.scripts) {
+            if (scriptEntry.type != ScriptType::SCRIPT_LUA) continue;
+            if (scriptEntry.instance) {
+                int ref = static_cast<int>(reinterpret_cast<intptr_t>(scriptEntry.instance));
+                removeScriptSubscriptions(ref);
+                releaseLuaRef(ref);
+                scriptEntry.instance = nullptr;
+                for (auto& prop : scriptEntry.properties) {
+                    prop.luaRef = 0;
+                }
+            }
+        }
+    }
 }
