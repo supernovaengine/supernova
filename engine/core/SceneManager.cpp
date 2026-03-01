@@ -11,52 +11,57 @@
 using namespace Supernova;
 
 std::vector<SceneManager::SceneEntry> SceneManager::entries;
-int SceneManager::currentIndex = -1;
+uint32_t SceneManager::currentId = 0;
 
-void SceneManager::registerScene(const std::string& name, std::function<void()> factory) {
-    // Overwrite if the name already exists
+void SceneManager::registerScene(uint32_t id, const std::string& name, std::function<void()> factory) {
+    // Overwrite if the id already exists
     for (auto& entry : entries) {
-        if (entry.name == name) {
+        if (entry.id == id) {
+            entry.name = name;
             entry.factory = std::move(factory);
             return;
         }
     }
-    entries.push_back({name, std::move(factory)});
+    entries.push_back({id, name, std::move(factory)});
 }
 
 bool SceneManager::loadScene(const std::string& name) {
     for (int i = 0; i < (int)entries.size(); ++i) {
         if (entries[i].name == name) {
-            return loadScene(i);
+            return loadScene(entries[i].id);
         }
     }
     Log::error("SceneManager: scene '%s' not found", name.c_str());
     return false;
 }
 
-bool SceneManager::loadScene(int index) {
-    if (index < 0 || index >= (int)entries.size()) {
-        Log::error("SceneManager: scene index %d out of range (count=%d)", index, (int)entries.size());
-        return false;
-    }
-
-    Engine::removeAllScenes();
-
-    currentIndex = index;
-    entries[index].factory();
-    return true;
-}
-
-int SceneManager::getSceneIndex(const std::string& name) {
+bool SceneManager::loadScene(uint32_t id) {
     for (int i = 0; i < (int)entries.size(); ++i) {
-        if (entries[i].name == name) return i;
+        if (entries[i].id == id) {
+            Engine::removeAllScenes();
+
+            currentId = id;
+            entries[i].factory();
+            return true;
+        }
     }
-    return -1;
+
+    Log::error("SceneManager: scene id %u not found", id);
+    return false;
 }
 
-std::string SceneManager::getSceneName(int index) {
-    if (index < 0 || index >= (int)entries.size()) return "";
-    return entries[index].name;
+uint32_t SceneManager::getSceneId(const std::string& name) {
+    for (int i = 0; i < (int)entries.size(); ++i) {
+        if (entries[i].name == name) return entries[i].id;
+    }
+    return 0;
+}
+
+std::string SceneManager::getSceneName(uint32_t id) {
+    for (int i = 0; i < (int)entries.size(); ++i) {
+        if (entries[i].id == id) return entries[i].name;
+    }
+    return "";
 }
 
 std::vector<std::string> SceneManager::getSceneNames() {
@@ -72,16 +77,15 @@ int SceneManager::getSceneCount() {
     return (int)entries.size();
 }
 
-int SceneManager::getCurrentSceneIndex() {
-    return currentIndex;
+uint32_t SceneManager::getCurrentSceneId() {
+    return currentId;
 }
 
 std::string SceneManager::getCurrentSceneName() {
-    if (currentIndex < 0 || currentIndex >= (int)entries.size()) return "";
-    return entries[currentIndex].name;
+    return getSceneName(currentId);
 }
 
 void SceneManager::clearAll() {
     entries.clear();
-    currentIndex = -1;
+    currentId = 0;
 }

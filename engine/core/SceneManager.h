@@ -9,6 +9,7 @@
 #include <string>
 #include <functional>
 #include <vector>
+#include <cstdint>
 
 namespace Supernova {
 
@@ -29,33 +30,34 @@ namespace Supernova {
     class SUPERNOVA_API SceneManager {
     private:
         struct SceneEntry {
+            uint32_t id;
             std::string name;
             std::function<void()> factory;
         };
 
         static std::vector<SceneEntry> entries;
-        static int currentIndex;
+        static uint32_t currentId;
 
     public:
         // Register a named scene stack.
         // The factory must call Engine::setScene() / Engine::addSceneLayer() to set up
         // the scene hierarchy. It should also call Engine::removeAllScenes() first if
         // a scene transition is desired (this is done automatically by loadScene()).
-        static void registerScene(const std::string& name, std::function<void()> factory);
+        static void registerScene(uint32_t id, const std::string& name, std::function<void()> factory);
 
         // Load a scene stack by name. Calls Engine::removeAllScenes() then invokes the
         // registered factory. Returns false if the name is not found.
         static bool loadScene(const std::string& name);
 
-        // Load a scene stack by index (0-based, in order of registration).
-        // Returns false if the index is out of range.
-        static bool loadScene(int index);
+        // Load a scene stack by id.
+        // Returns false if the id is not found.
+        static bool loadScene(uint32_t id);
 
-        // Return the registration index of a scene by name, or -1 if not found.
-        static int getSceneIndex(const std::string& name);
+        // Return the id of a scene by name, or 0 if not found.
+        static uint32_t getSceneId(const std::string& name);
 
-        // Return the name of the scene at the given registration index, or "" if out of range.
-        static std::string getSceneName(int index);
+        // Return the name of the scene at the given id, or "" if not found.
+        static std::string getSceneName(uint32_t id);
 
         // Return all registered scene names in registration order.
         static std::vector<std::string> getSceneNames();
@@ -63,8 +65,8 @@ namespace Supernova {
         // Return the total number of registered scenes.
         static int getSceneCount();
 
-        // Return the index of the scene most recently loaded via loadScene(), or -1 if none.
-        static int getCurrentSceneIndex();
+        // Return the id of the scene most recently loaded via loadScene(), or 0 if none.
+        static uint32_t getCurrentSceneId();
 
         // Return the name of the scene most recently loaded via loadScene(), or "" if none.
         static std::string getCurrentSceneName();
