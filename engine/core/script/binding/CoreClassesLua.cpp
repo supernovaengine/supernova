@@ -252,8 +252,9 @@ void LuaBinding::registerCoreClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginClass<SceneManager>("SceneManager")
         .addStaticFunction("registerScene", &SceneManager::registerScene)
-        .addStaticFunction("loadScene", static_cast<bool(*)(const std::string&)>(&SceneManager::loadScene))
-        .addStaticFunction("loadSceneById", static_cast<bool(*)(uint32_t)>(&SceneManager::loadScene))
+        .addStaticFunction("loadScene", 
+            luabridge::overload<uint32_t>(&SceneManager::loadScene),
+            luabridge::overload<const std::string&>(&SceneManager::loadScene))
         .addStaticFunction("getSceneId", &SceneManager::getSceneId)
         .addStaticFunction("getSceneName", &SceneManager::getSceneName)
         .addStaticFunction("getSceneNames", &SceneManager::getSceneNames)
