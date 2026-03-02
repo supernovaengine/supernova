@@ -223,6 +223,27 @@ bool PhysicsSystem::loadJoint3D(Entity entity, Joint3DComponent& joint){
         return false;
     }
 
+    Signature signatureA = scene->getSignature(joint.bodyA);
+    Signature signatureB = scene->getSignature(joint.bodyB);
+
+    if (!signatureA.test(scene->getComponentId<Body3DComponent>()) || !signatureB.test(scene->getComponentId<Body3DComponent>())){
+        Log::error("Cannot create joint, error in bodyA or bodyB");
+        return false;
+    }
+
+    if (!loadBody3D(joint.bodyA) || !loadBody3D(joint.bodyB)){
+        Log::error("Cannot create 3D joint, bodyA or bodyB has no valid physics shape/body");
+        return false;
+    }
+
+    Body3DComponent& bodyAComp = scene->getComponent<Body3DComponent>(joint.bodyA);
+    Body3DComponent& bodyBComp = scene->getComponent<Body3DComponent>(joint.bodyB);
+
+    if (bodyAComp.body.IsInvalid() || bodyBComp.body.IsInvalid()){
+        Log::error("Cannot create 3D joint, bodyA or bodyB body id is invalid");
+        return false;
+    }
+
     switch (joint.type){
         case Joint3DType::FIXED:
             return loadFixedJoint3D(joint, joint.bodyA, joint.bodyB);
@@ -1119,7 +1140,14 @@ bool PhysicsSystem::loadFixedJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create fixed 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::FIXED;
@@ -1154,7 +1182,14 @@ bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, E
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create distance 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::DISTANCE;
@@ -1186,7 +1221,14 @@ bool PhysicsSystem::loadPointJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create point 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::POINT;
@@ -1220,7 +1262,14 @@ bool PhysicsSystem::loadHingeJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create hinge 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::HINGE;
@@ -1253,7 +1302,14 @@ bool PhysicsSystem::loadConeJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create cone 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::CONE;
@@ -1288,7 +1344,14 @@ bool PhysicsSystem::loadPrismaticJoint3D(Joint3DComponent& joint, Entity bodyA, 
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create prismatic 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::PRISMATIC;
@@ -1326,7 +1389,14 @@ bool PhysicsSystem::loadSwingTwistJoint3D(Joint3DComponent& joint, Entity bodyA,
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create swing twist 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::SWINGTWIST;
@@ -1361,7 +1431,14 @@ bool PhysicsSystem::loadSixDOFJoint3D(Joint3DComponent& joint, Entity bodyA, Ent
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create six dof 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::SIXDOF;
@@ -1406,7 +1483,14 @@ bool PhysicsSystem::loadPathJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create path 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::PATH;
@@ -1447,11 +1531,18 @@ bool PhysicsSystem::loadGearJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
             JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
             JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
+            JPH::Body* lockBodyA = lock.GetBody(0);
+            JPH::Body* lockBodyB = lock.GetBody(1);
+            if (!lockBodyA || !lockBodyB){
+                Log::error("Cannot create gear 3D joint, bodyA or bodyB is invalid");
+                return false;
+            }
+
             // Disable collision between gears
             JPH::Ref<JPH::GroupFilterTable> group_filter = new JPH::GroupFilterTable(2);
             group_filter->DisableCollision(0, 1);
-            lock.GetBody(0)->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
-            lock.GetBody(1)->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
+            lockBodyA->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
+            lockBodyB->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
 
             JPH::HingeConstraintSettings* hingeSetA = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHingeA.joint)->GetConstraintSettings().GetPtr();
             JPH::HingeConstraintSettings* hingeSetB = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHingeB.joint)->GetConstraintSettings().GetPtr();
@@ -1461,7 +1552,7 @@ bool PhysicsSystem::loadGearJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
             settings.mHingeAxis2 = hingeSetB->mHingeAxis1;
             settings.SetRatio(numTeethGearA, numTeethGearB);
 
-            joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+            joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
             ((JPH::GearConstraint *)joint.joint)->SetConstraints(myHingeA.joint, myHingeB.joint);
             world3D.AddConstraint(joint.joint);
@@ -1507,11 +1598,18 @@ bool PhysicsSystem::loadRackAndPinionJoint3D(Joint3DComponent& joint, Entity bod
             JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
             JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
+            JPH::Body* lockBodyA = lock.GetBody(0);
+            JPH::Body* lockBodyB = lock.GetBody(1);
+            if (!lockBodyA || !lockBodyB){
+                Log::error("Cannot create rack and pinion 3D joint, bodyA or bodyB is invalid");
+                return false;
+            }
+
             // Disable collision between gears
             JPH::Ref<JPH::GroupFilterTable> group_filter = new JPH::GroupFilterTable(2);
             group_filter->DisableCollision(0, 1);
-            lock.GetBody(0)->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
-            lock.GetBody(1)->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
+            lockBodyA->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 0));
+            lockBodyB->SetCollisionGroup(JPH::CollisionGroup(group_filter, 0, 1));
 
             JPH::HingeConstraintSettings* hingeSetA = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHinge.joint)->GetConstraintSettings().GetPtr();
             JPH::SliderConstraintSettings* sliderSetB = (JPH::SliderConstraintSettings*)((JPH::SliderConstraint*)mySlider.joint)->GetConstraintSettings().GetPtr();
@@ -1521,7 +1619,7 @@ bool PhysicsSystem::loadRackAndPinionJoint3D(Joint3DComponent& joint, Entity bod
             settings.mSliderAxis = sliderSetB->mSliderAxis2;
             settings.SetRatio(numTeethRack, rackLength, numTeethGear);
 
-            joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+            joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
             ((JPH::GearConstraint *)joint.joint)->SetConstraints(myHinge.joint, mySlider.joint);
             world3D.AddConstraint(joint.joint);
@@ -1561,7 +1659,14 @@ bool PhysicsSystem::loadPulleyJoint3D(Joint3DComponent& joint, Entity bodyA, Ent
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
 
-        joint.joint = settings.Create(*lock.GetBody(0), *lock.GetBody(1));
+        JPH::Body* lockBodyA = lock.GetBody(0);
+        JPH::Body* lockBodyB = lock.GetBody(1);
+        if (!lockBodyA || !lockBodyB){
+            Log::error("Cannot create pulley 3D joint, bodyA or bodyB is invalid");
+            return false;
+        }
+
+        joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
         world3D.AddConstraint(joint.joint);
         joint.type = Joint3DType::PULLEY;
@@ -1634,8 +1739,9 @@ void PhysicsSystem::update(double dt){
         Entity entity = joints2d->getEntity(i);
 
         if (joint.needUpdateJoint || !b2Joint_IsValid(joint.joint)){
-            loadJoint2D(entity, joint);
-            joint.needUpdateJoint = false;
+            if (loadJoint2D(entity, joint)){
+                joint.needUpdateJoint = false;
+            }
         }
     }
 
@@ -1702,8 +1808,9 @@ void PhysicsSystem::update(double dt){
         Entity entity = joints3d->getEntity(i);
 
         if (joint.needUpdateJoint || !joint.joint){
-            loadJoint3D(entity, joint);
-            joint.needUpdateJoint = false;
+            if (loadJoint3D(entity, joint)){
+                joint.needUpdateJoint = false;
+            }
         }
     }
 
