@@ -80,6 +80,11 @@ namespace Supernova{
         float solidBoxDensity;
 
         bool lockBody = true;
+
+        Vector3 linearVelocity = Vector3::ZERO;
+        Vector3 angularVelocity = Vector3::ZERO;
+        bool dirtyLinearVelocity = false;
+        bool dirtyAngularVelocity = false;
         
         BodyType type = BodyType::STATIC;
         bool newBody = true;

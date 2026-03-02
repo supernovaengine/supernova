@@ -126,8 +126,6 @@ void Body2D::load(){
     Body2DComponent& body = getComponent<Body2DComponent>();
     body.needReloadBody = true;
     body.needUpdateShapes = true;
-
-    scene->getSystem<PhysicsSystem>()->loadBody2D(entity);
 }
 
 int Body2D::createBoxShape(float width, float height){
@@ -586,57 +584,97 @@ void Body2D::setLinearVelocity(Vector2 linearVelocity){
     Body2DComponent& body = getComponent<Body2DComponent>();
     float pointsToMeterScale = getPointsToMeterScale();
 
-    checkBody(body);
-    b2Body_SetLinearVelocity(body.body, {linearVelocity.x * pointsToMeterScale, linearVelocity.y * pointsToMeterScale});
+    body.linearVelocity = linearVelocity;
+    body.dirtyLinearVelocity = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_SetLinearVelocity(body.body, {linearVelocity.x * pointsToMeterScale, linearVelocity.y * pointsToMeterScale});
+        body.dirtyLinearVelocity = false;
+    }
 }
 
 void Body2D::setAngularVelocity(float angularVelocity){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    b2Body_SetAngularVelocity(body.body, angularVelocity);
+    body.angularVelocity = angularVelocity;
+    body.dirtyAngularVelocity = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_SetAngularVelocity(body.body, angularVelocity);
+        body.dirtyAngularVelocity = false;
+    }
 }
 
 void Body2D::setLinearDamping(float linearDamping){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    b2Body_SetLinearDamping(body.body, linearDamping);
+    body.linearDamping = linearDamping;
+    body.dirtyLinearDamping = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_SetLinearDamping(body.body, linearDamping);
+        body.dirtyLinearDamping = false;
+    }
 }
 
 void Body2D::setAngularDamping(float angularDamping){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    b2Body_SetAngularDamping(body.body, angularDamping);
+    body.angularDamping = angularDamping;
+    body.dirtyAngularDamping = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_SetAngularDamping(body.body, angularDamping);
+        body.dirtyAngularDamping = false;
+    }
 }
 
 void Body2D::setEnableSleep(bool enableSleep){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    b2Body_EnableSleep(body.body, enableSleep);
+    body.enableSleep = enableSleep;
+    body.dirtyEnableSleep = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_EnableSleep(body.body, enableSleep);
+        body.dirtyEnableSleep = false;
+    }
 }
 
 void Body2D::setAwake(bool awake){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    b2Body_SetAwake(body.body, awake);
+    body.awake = awake;
+    body.dirtyAwake = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_SetAwake(body.body, awake);
+        body.dirtyAwake = false;
+    }
 }
 
 void Body2D::setFixedRotation(bool fixedRotation){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    b2Body_SetFixedRotation(body.body, fixedRotation);
+    body.fixedRotation = fixedRotation;
+    body.dirtyFixedRotation = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_SetFixedRotation(body.body, fixedRotation);
+        body.dirtyFixedRotation = false;
+    }
 }
 
 void Body2D::setBullet(bool bullet){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    b2Body_SetBullet(body.body, bullet);
+    body.bullet = bullet;
+    body.dirtyBullet = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_SetBullet(body.body, bullet);
+        body.dirtyBullet = false;
+    }
 }
 
 void Body2D::setType(BodyType type){
@@ -651,25 +689,37 @@ void Body2D::setType(BodyType type){
 void Body2D::setEnabled(bool enabled){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    if (enabled){
-        b2Body_Enable(body.body);
-    }else{
-        b2Body_Disable(body.body);
+    body.enabled = enabled;
+    body.dirtyEnabled = true;
+
+    if (b2Body_IsValid(body.body)){
+        if (enabled){
+            b2Body_Enable(body.body);
+        }else{
+            b2Body_Disable(body.body);
+        }
+        body.dirtyEnabled = false;
     }
 }
 
 void Body2D::setGravityScale(float gravityScale){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    b2Body_SetGravityScale(body.body, gravityScale);
+    body.gravityScale = gravityScale;
+    body.dirtyGravityScale = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_SetGravityScale(body.body, gravityScale);
+        body.dirtyGravityScale = false;
+    }
 }
 
 Vector2 Body2D::getLinearVelocity() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.linearVelocity;
+    }
     float pointsToMeterScale = getPointsToMeterScale();
     b2Vec2 vec = b2Body_GetLinearVelocity(body.body);
 
@@ -679,49 +729,63 @@ Vector2 Body2D::getLinearVelocity() const{
 float Body2D::getAngularVelocity() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.angularVelocity;
+    }
     return b2Body_GetAngularVelocity(body.body);
 }
 
 float Body2D::getLinearDamping() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.linearDamping;
+    }
     return b2Body_GetLinearDamping(body.body);
 }
 
 float Body2D::getAngularDamping() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.angularDamping;
+    }
     return b2Body_GetAngularDamping(body.body);
 }
 
 bool Body2D::isEnableSleep() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.enableSleep;
+    }
     return b2Body_IsSleepEnabled(body.body);
 }
 
 bool Body2D::isAwake() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.awake;
+    }
     return b2Body_IsAwake(body.body);
 }
 
 bool Body2D::isFixedRotation() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.fixedRotation;
+    }
     return b2Body_IsFixedRotation(body.body);
 }
 
 bool Body2D::isBullet() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.bullet;
+    }
     return b2Body_IsBullet(body.body);
 }
 
@@ -737,14 +801,18 @@ BodyType Body2D::getType() const{
 bool Body2D::isEnabled() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.enabled;
+    }
     return b2Body_IsEnabled(body.body);
 }
 
 float Body2D::getGravityScale() const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
+    if (!b2Body_IsValid(body.body)){
+        return body.gravityScale;
+    }
     return b2Body_GetGravityScale(body.body);
 }
 
@@ -899,8 +967,12 @@ float Body2D::getRotationalInertia() const{
 void Body2D::applyMassFromShapes(){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    checkBody(body);
-    b2Body_ApplyMassFromShapes(body.body);
+    body.applyMassFromShapes = true;
+
+    if (b2Body_IsValid(body.body)){
+        b2Body_ApplyMassFromShapes(body.body);
+        body.applyMassFromShapes = false;
+    }
 }
 
 void Body2D::applyForce(const Vector2& force, const Vector2& point, bool wake){

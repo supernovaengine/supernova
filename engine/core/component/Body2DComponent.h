@@ -59,6 +59,29 @@ namespace Supernova{
         bool needReloadBody = true;
         bool needUpdateShapes = true;
 
+        Vector2 linearVelocity = Vector2::ZERO;
+        float angularVelocity = 0.0f;
+        float linearDamping = 0.0f;
+        float angularDamping = 0.0f;
+        bool enableSleep = true;
+        bool awake = true;
+        bool fixedRotation = false;
+        bool bullet = false;
+        bool enabled = true;
+        float gravityScale = 1.0f;
+        bool applyMassFromShapes = false;
+
+        bool dirtyLinearVelocity = true;
+        bool dirtyAngularVelocity = true;
+        bool dirtyLinearDamping = true;
+        bool dirtyAngularDamping = true;
+        bool dirtyEnableSleep = true;
+        bool dirtyAwake = true;
+        bool dirtyFixedRotation = true;
+        bool dirtyBullet = true;
+        bool dirtyEnabled = true;
+        bool dirtyGravityScale = true;
+
         BodyType type = BodyType::STATIC;
         bool newBody = true;
     };

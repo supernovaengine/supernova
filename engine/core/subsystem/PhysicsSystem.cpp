@@ -267,6 +267,84 @@ bool PhysicsSystem::syncBody2DShapes(Body2DComponent& body){
     return true;
 }
 
+void PhysicsSystem::syncBody2DState(Body2DComponent& body){
+    if (!b2Body_IsValid(body.body)){
+        return;
+    }
+
+    if (body.dirtyLinearVelocity){
+        b2Body_SetLinearVelocity(body.body, {body.linearVelocity.x * pointsToMeterScale2D, body.linearVelocity.y * pointsToMeterScale2D});
+        body.dirtyLinearVelocity = false;
+    }
+
+    if (body.dirtyAngularVelocity){
+        b2Body_SetAngularVelocity(body.body, body.angularVelocity);
+        body.dirtyAngularVelocity = false;
+    }
+
+    if (body.dirtyLinearDamping){
+        b2Body_SetLinearDamping(body.body, body.linearDamping);
+        body.dirtyLinearDamping = false;
+    }
+
+    if (body.dirtyAngularDamping){
+        b2Body_SetAngularDamping(body.body, body.angularDamping);
+        body.dirtyAngularDamping = false;
+    }
+
+    if (body.dirtyEnableSleep){
+        b2Body_EnableSleep(body.body, body.enableSleep);
+        body.dirtyEnableSleep = false;
+    }
+
+    if (body.dirtyAwake){
+        b2Body_SetAwake(body.body, body.awake);
+        body.dirtyAwake = false;
+    }
+
+    if (body.dirtyFixedRotation){
+        b2Body_SetFixedRotation(body.body, body.fixedRotation);
+        body.dirtyFixedRotation = false;
+    }
+
+    if (body.dirtyBullet){
+        b2Body_SetBullet(body.body, body.bullet);
+        body.dirtyBullet = false;
+    }
+
+    if (body.dirtyEnabled){
+        if (body.enabled){
+            b2Body_Enable(body.body);
+        }else{
+            b2Body_Disable(body.body);
+        }
+        body.dirtyEnabled = false;
+    }
+
+    if (body.dirtyGravityScale){
+        b2Body_SetGravityScale(body.body, body.gravityScale);
+        body.dirtyGravityScale = false;
+    }
+}
+
+void PhysicsSystem::syncBody3DState(Body3DComponent& body){
+    if (body.body.IsInvalid()){
+        return;
+    }
+
+    JPH::BodyInterface &body_interface = world3D.GetBodyInterfaceNoLock();
+
+    if (body.dirtyLinearVelocity){
+        body_interface.SetLinearVelocity(body.body, JPH::Vec3(body.linearVelocity.x, body.linearVelocity.y, body.linearVelocity.z));
+        body.dirtyLinearVelocity = false;
+    }
+
+    if (body.dirtyAngularVelocity){
+        body_interface.SetAngularVelocity(body.body, JPH::Vec3(body.angularVelocity.x, body.angularVelocity.y, body.angularVelocity.z));
+        body.dirtyAngularVelocity = false;
+    }
+}
+
 bool PhysicsSystem::createShape3DForIndex(Entity entity, Body3DComponent& body, size_t index){
     Shape3D& shapeData = body.shapes[index];
     shapeData.shape = NULL;
@@ -661,6 +739,16 @@ bool PhysicsSystem::loadBody2D(Entity entity){
         }else{
             bodyDef.type = b2_dynamicBody;
         }
+        bodyDef.linearVelocity = {body.linearVelocity.x * pointsToMeterScale2D, body.linearVelocity.y * pointsToMeterScale2D};
+        bodyDef.angularVelocity = body.angularVelocity;
+        bodyDef.linearDamping = body.linearDamping;
+        bodyDef.angularDamping = body.angularDamping;
+        bodyDef.gravityScale = body.gravityScale;
+        bodyDef.enableSleep = body.enableSleep;
+        bodyDef.isAwake = body.awake;
+        bodyDef.fixedRotation = body.fixedRotation;
+        bodyDef.isBullet = body.bullet;
+        bodyDef.isEnabled = body.enabled;
         bodyDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         body.body = b2CreateBody(world2D, &bodyDef);
@@ -668,11 +756,33 @@ bool PhysicsSystem::loadBody2D(Entity entity){
         body.needReloadBody = false;
         body.needUpdateShapes = true;
 
-        return syncBody2DShapes(body);
+        bool loaded = syncBody2DShapes(body);
+
+        if (loaded){
+            syncBody2DState(body);
+        }
+
+        if (loaded && body.applyMassFromShapes && b2Body_IsValid(body.body)){
+            b2Body_ApplyMassFromShapes(body.body);
+            body.applyMassFromShapes = false;
+        }
+
+        return loaded;
     }
 
     if (body.needUpdateShapes){
-        return syncBody2DShapes(body);
+        bool loaded = syncBody2DShapes(body);
+
+        if (loaded){
+            syncBody2DState(body);
+        }
+
+        if (loaded && body.applyMassFromShapes && b2Body_IsValid(body.body)){
+            b2Body_ApplyMassFromShapes(body.body);
+            body.applyMassFromShapes = false;
+        }
+
+        return loaded;
     }
 
     return true;
@@ -797,9 +907,12 @@ bool PhysicsSystem::loadDistanceJoint2D(Entity entity, Joint2DComponent& joint, 
     Signature signatureB = scene->getSignature(bodyB);
 
     if (signatureA.test(scene->getComponentId<Body2DComponent>()) && signatureB.test(scene->getComponentId<Body2DComponent>())){
-
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
+
+        if (!b2Body_IsValid(myBodyA.body) || !b2Body_IsValid(myBodyB.body)){
+            return false;
+        }
 
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
@@ -834,9 +947,12 @@ bool PhysicsSystem::loadRevoluteJoint2D(Entity entity, Joint2DComponent& joint, 
     Signature signatureB = scene->getSignature(bodyB);
 
     if (signatureA.test(scene->getComponentId<Body2DComponent>()) && signatureB.test(scene->getComponentId<Body2DComponent>())){
-
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
+
+        if (!b2Body_IsValid(myBodyA.body) || !b2Body_IsValid(myBodyB.body)){
+            return false;
+        }
 
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
@@ -866,9 +982,12 @@ bool PhysicsSystem::loadPrismaticJoint2D(Entity entity, Joint2DComponent& joint,
     Signature signatureB = scene->getSignature(bodyB);
 
     if (signatureA.test(scene->getComponentId<Body2DComponent>()) && signatureB.test(scene->getComponentId<Body2DComponent>())){
-
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
+
+        if (!b2Body_IsValid(myBodyA.body) || !b2Body_IsValid(myBodyB.body)){
+            return false;
+        }
 
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
@@ -899,8 +1018,11 @@ bool PhysicsSystem::loadMouseJoint2D(Entity entity, Joint2DComponent& joint, Ent
     Signature signature = scene->getSignature(body);
 
     if (signature.test(scene->getComponentId<Body2DComponent>())){
-
         Body2DComponent myBody = scene->getComponent<Body2DComponent>(body);
+
+        if (!b2Body_IsValid(myBody.body)){
+            return false;
+        }
 
         updateBody2DPosition(signature, body, myBody);
 
@@ -928,9 +1050,12 @@ bool PhysicsSystem::loadWheelJoint2D(Entity entity, Joint2DComponent& joint, Ent
     Signature signatureB = scene->getSignature(bodyB);
 
     if (signatureA.test(scene->getComponentId<Body2DComponent>()) && signatureB.test(scene->getComponentId<Body2DComponent>())){
-
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
+
+        if (!b2Body_IsValid(myBodyA.body) || !b2Body_IsValid(myBodyB.body)){
+            return false;
+        }
 
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
@@ -962,9 +1087,12 @@ bool PhysicsSystem::loadWeldJoint2D(Entity entity, Joint2DComponent& joint, Enti
     Signature signatureB = scene->getSignature(bodyB);
 
     if (signatureA.test(scene->getComponentId<Body2DComponent>()) && signatureB.test(scene->getComponentId<Body2DComponent>())){
-
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
+
+        if (!b2Body_IsValid(myBodyA.body) || !b2Body_IsValid(myBodyB.body)){
+            return false;
+        }
 
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
@@ -994,9 +1122,12 @@ bool PhysicsSystem::loadMotorJoint2D(Entity entity, Joint2DComponent& joint, Ent
     Signature signatureB = scene->getSignature(bodyB);
 
     if (signatureA.test(scene->getComponentId<Body2DComponent>()) && signatureB.test(scene->getComponentId<Body2DComponent>())){
-
         Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
         Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
+
+        if (!b2Body_IsValid(myBodyA.body) || !b2Body_IsValid(myBodyB.body)){
+            return false;
+        }
 
         updateBody2DPosition(signatureA, bodyA, myBodyA);
         updateBody2DPosition(signatureB, bodyB, myBodyB);
@@ -1547,9 +1678,83 @@ void PhysicsSystem::update(double dt){
         }
 
         if (b2Body_IsValid(body.body)){
+            syncBody2DState(body);
+
             updateBody2DPosition(signature, entity, body);
 
             body.newBody = false;
+        }
+    }
+
+    auto joints2d = scene->getComponentArray<Joint2DComponent>();
+    for (int i = 0; i < joints2d->size(); i++){
+        Joint2DComponent& joint2d = joints2d->getComponentFromIndex(i);
+        Entity entity = joints2d->getEntity(i);
+
+        if (joint2d.needUpdateJoint){
+            bool ready = true;
+
+            if (joint2d.type == Joint2DType::MOUSE){
+                Signature signature = scene->getSignature(joint2d.bodyA);
+                if (!signature.test(scene->getComponentId<Body2DComponent>())){
+                    ready = false;
+                }else{
+                    Body2DComponent& body = scene->getComponent<Body2DComponent>(joint2d.bodyA);
+                    if (!b2Body_IsValid(body.body)){
+                        ready = false;
+                    }
+                }
+            }else{
+                Signature signatureA = scene->getSignature(joint2d.bodyA);
+                Signature signatureB = scene->getSignature(joint2d.bodyB);
+
+                if (!signatureA.test(scene->getComponentId<Body2DComponent>()) || !signatureB.test(scene->getComponentId<Body2DComponent>())){
+                    ready = false;
+                }else{
+                    Body2DComponent& bodyA = scene->getComponent<Body2DComponent>(joint2d.bodyA);
+                    Body2DComponent& bodyB = scene->getComponent<Body2DComponent>(joint2d.bodyB);
+
+                    if (!b2Body_IsValid(bodyA.body) || !b2Body_IsValid(bodyB.body)){
+                        ready = false;
+                    }
+                }
+            }
+
+            if (!ready){
+                if (!joint2d.waitingDependenciesLogged){
+                    Log::warn("Joint2D %i waiting for deferred body dependencies", entity);
+                    joint2d.waitingDependenciesLogged = true;
+                }
+                continue;
+            }
+
+            joint2d.waitingDependenciesLogged = false;
+
+            if (b2Joint_IsValid(joint2d.joint)){
+                destroyJoint2D(joint2d);
+            }
+
+            bool created = false;
+
+            if (joint2d.type == Joint2DType::DISTANCE){
+                created = loadDistanceJoint2D(entity, joint2d, joint2d.bodyA, joint2d.bodyB, joint2d.anchorA, joint2d.anchorB, joint2d.rope);
+            }else if (joint2d.type == Joint2DType::REVOLUTE){
+                created = loadRevoluteJoint2D(entity, joint2d, joint2d.bodyA, joint2d.bodyB, joint2d.anchorA);
+            }else if (joint2d.type == Joint2DType::PRISMATIC){
+                created = loadPrismaticJoint2D(entity, joint2d, joint2d.bodyA, joint2d.bodyB, joint2d.anchorA, joint2d.axis);
+            }else if (joint2d.type == Joint2DType::MOUSE){
+                created = loadMouseJoint2D(entity, joint2d, joint2d.bodyA, joint2d.target);
+            }else if (joint2d.type == Joint2DType::WHEEL){
+                created = loadWheelJoint2D(entity, joint2d, joint2d.bodyA, joint2d.bodyB, joint2d.anchorA, joint2d.axis);
+            }else if (joint2d.type == Joint2DType::WELD){
+                created = loadWeldJoint2D(entity, joint2d, joint2d.bodyA, joint2d.bodyB, joint2d.anchorA);
+            }else if (joint2d.type == Joint2DType::MOTOR){
+                created = loadMotorJoint2D(entity, joint2d, joint2d.bodyA, joint2d.bodyB);
+            }
+
+            if (created){
+                joint2d.needUpdateJoint = false;
+            }
         }
     }
 
@@ -1605,6 +1810,7 @@ void PhysicsSystem::update(double dt){
         }
 
         if (!body.body.IsInvalid()){
+            syncBody3DState(body);
             updateBody3DPosition(signature, entity, body);
 
             body.newBody = false;

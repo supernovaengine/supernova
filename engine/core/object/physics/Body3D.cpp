@@ -125,7 +125,9 @@ void Body3D::load(){
     body.needReloadBody = true;
     body.needUpdateShapes = true;
 
-    scene->getSystem<PhysicsSystem>()->loadBody3D(entity);
+    if (!scene->getSystem<PhysicsSystem>()->loadBody3D(entity)){
+        Log::warn("Body3D %u deferred load failed on immediate request", entity);
+    }
 }
 
 int Body3D::createBoxShape(float width, float height, float depth){
@@ -601,7 +603,10 @@ void Body3D::setRestitution(float restitution){
 Vector3 Body3D::getLinearVelocity() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
-    checkBody(body);
+    if (body.body.IsInvalid()){
+        return body.linearVelocity;
+    }
+
     JPH::Vec3 vec = getBodyInterface().GetLinearVelocity(body.body);
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
@@ -610,18 +615,26 @@ Vector3 Body3D::getLinearVelocity() const{
 void Body3D::setLinearVelocity(Vector3 linearVelocity){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
-    checkBody(body);
-    getBodyInterface().SetLinearVelocity(body.body, JPH::Vec3(linearVelocity.x, linearVelocity.y, linearVelocity.z));
+    body.linearVelocity = linearVelocity;
+    body.dirtyLinearVelocity = true;
+
+    if (!body.body.IsInvalid()){
+        getBodyInterface().SetLinearVelocity(body.body, JPH::Vec3(linearVelocity.x, linearVelocity.y, linearVelocity.z));
+        body.dirtyLinearVelocity = false;
+    }
 }
 
 void Body3D::setLinearVelocityClamped(Vector3 linearVelocity){
-    getJoltBodyWrite().SetLinearVelocityClamped(JPH::Vec3(linearVelocity.x, linearVelocity.y, linearVelocity.z));
+    setLinearVelocity(linearVelocity);
 }
 
 Vector3 Body3D::getAngularVelocity() const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
-    checkBody(body);
+    if (body.body.IsInvalid()){
+        return body.angularVelocity;
+    }
+
     JPH::Vec3 vec = getBodyInterface().GetAngularVelocity(body.body);
 
     return Vector3(vec.GetX(), vec.GetY(), vec.GetZ());
@@ -630,12 +643,17 @@ Vector3 Body3D::getAngularVelocity() const{
 void Body3D::setAngularVelocity(Vector3 angularVelocity){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
-    checkBody(body);
-    getBodyInterface().SetAngularVelocity(body.body, JPH::Vec3(angularVelocity.x, angularVelocity.y, angularVelocity.z));
+    body.angularVelocity = angularVelocity;
+    body.dirtyAngularVelocity = true;
+
+    if (!body.body.IsInvalid()){
+        getBodyInterface().SetAngularVelocity(body.body, JPH::Vec3(angularVelocity.x, angularVelocity.y, angularVelocity.z));
+        body.dirtyAngularVelocity = false;
+    }
 }
 
 void Body3D::setAngularVelocityClamped(Vector3 angularVelocity){
-    getJoltBodyWrite().SetAngularVelocityClamped(JPH::Vec3(angularVelocity.x, angularVelocity.y, angularVelocity.z));
+    setAngularVelocity(angularVelocity);
 }
 
 Vector3 Body3D::getPointVelocityCOM(Vector3 pointRelativeToCOM) const{
