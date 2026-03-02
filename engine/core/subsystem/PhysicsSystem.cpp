@@ -9,6 +9,10 @@
 #include "util/Box2DAux.h"
 #include "util/JoltPhysicsAux.h"
 
+#include <algorithm>
+#include <cmath>
+#include <map>
+
 
 using namespace Supernova;
 
@@ -175,6 +179,381 @@ void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Bod
     }
 }
 
+bool PhysicsSystem::syncBody2DShapes(Body2DComponent& body){
+    if (!b2Body_IsValid(body.body)){
+        return false;
+    }
+
+    for (size_t i = 0; i < body.numShapes; i++){
+        destroyShape2D(body, i);
+    }
+
+    for (size_t i = 0; i < body.numShapes; i++){
+        Shape2D& shapeData = body.shapes[i];
+
+        b2ShapeDef shapeDef = b2DefaultShapeDef();
+        shapeDef.userData = reinterpret_cast<void*>(i);
+        shapeDef.density = shapeData.density;
+        shapeDef.friction = shapeData.friction;
+        shapeDef.restitution = shapeData.restitution;
+        shapeDef.enableHitEvents = shapeData.enableHitEvents;
+        shapeDef.enableContactEvents = shapeData.contactEvents;
+        shapeDef.enablePreSolveEvents = shapeData.preSolveEvents;
+        shapeDef.enableSensorEvents = shapeData.sensorEvents;
+        shapeDef.filter.categoryBits = shapeData.categoryBits;
+        shapeDef.filter.maskBits = shapeData.maskBits;
+        shapeDef.filter.groupIndex = shapeData.groupIndex;
+
+        shapeData.shape = b2_nullShapeId;
+        shapeData.chain = b2_nullChainId;
+
+        if (shapeData.type == Shape2DType::POLYGON){
+            if (shapeData.verticesCount < 3){
+                Log::error("Cannot create polygon shape with less than 3 vertices");
+                continue;
+            }
+
+            std::vector<b2Vec2> b2vertices(shapeData.verticesCount);
+            for (size_t j = 0; j < shapeData.verticesCount; j++){
+                b2vertices[j] = {shapeData.vertices[j].x / pointsToMeterScale2D, shapeData.vertices[j].y / pointsToMeterScale2D};
+            }
+
+            b2Hull hull = b2ComputeHull(&b2vertices[0], (int)shapeData.verticesCount);
+            b2Polygon polygon = b2MakePolygon(&hull, shapeData.radius / pointsToMeterScale2D);
+            shapeData.shape = b2CreatePolygonShape(body.body, &shapeDef, &polygon);
+        }else if (shapeData.type == Shape2DType::CIRCLE){
+            b2Circle circle = {0};
+            circle.center = {shapeData.pointA.x / pointsToMeterScale2D, shapeData.pointA.y / pointsToMeterScale2D};
+            circle.radius = shapeData.radius / pointsToMeterScale2D;
+            shapeData.shape = b2CreateCircleShape(body.body, &shapeDef, &circle);
+        }else if (shapeData.type == Shape2DType::CAPSULE){
+            b2Capsule capsule = {0};
+            capsule.center1 = {shapeData.pointA.x / pointsToMeterScale2D, shapeData.pointA.y / pointsToMeterScale2D};
+            capsule.center2 = {shapeData.pointB.x / pointsToMeterScale2D, shapeData.pointB.y / pointsToMeterScale2D};
+            capsule.radius = shapeData.radius / pointsToMeterScale2D;
+            shapeData.shape = b2CreateCapsuleShape(body.body, &shapeDef, &capsule);
+        }else if (shapeData.type == Shape2DType::SEGMENT){
+            b2Segment segment = {0};
+            segment.point1 = {shapeData.pointA.x / pointsToMeterScale2D, shapeData.pointA.y / pointsToMeterScale2D};
+            segment.point2 = {shapeData.pointB.x / pointsToMeterScale2D, shapeData.pointB.y / pointsToMeterScale2D};
+            shapeData.shape = b2CreateSegmentShape(body.body, &shapeDef, &segment);
+        }else if (shapeData.type == Shape2DType::CHAIN){
+            if (shapeData.verticesCount < 2){
+                Log::error("Cannot create chain shape with less than 2 vertices");
+                continue;
+            }
+
+            std::vector<b2Vec2> b2vertices(shapeData.verticesCount);
+            for (size_t j = 0; j < shapeData.verticesCount; j++){
+                b2vertices[j] = {shapeData.vertices[j].x / pointsToMeterScale2D, shapeData.vertices[j].y / pointsToMeterScale2D};
+            }
+
+            b2ChainDef chainDef = b2DefaultChainDef();
+            chainDef.points = &b2vertices[0];
+            chainDef.count = (int)shapeData.verticesCount;
+            chainDef.isLoop = shapeData.loop;
+            chainDef.filter.categoryBits = shapeData.categoryBits;
+            chainDef.filter.maskBits = shapeData.maskBits;
+            chainDef.filter.groupIndex = shapeData.groupIndex;
+            chainDef.friction = shapeData.friction;
+            chainDef.restitution = shapeData.restitution;
+
+            shapeData.chain = b2CreateChain(body.body, &chainDef);
+        }
+    }
+
+    body.needUpdateShapes = false;
+
+    return true;
+}
+
+bool PhysicsSystem::createShape3DForIndex(Entity entity, Body3DComponent& body, size_t index){
+    Shape3D& shapeData = body.shapes[index];
+    shapeData.shape = NULL;
+
+    if (shapeData.type == Shape3DType::BOX){
+        JPH::BoxShapeSettings shape_settings(JPH::Vec3(shapeData.width / 2.0f, shapeData.height / 2.0f, shapeData.depth / 2.0f));
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (!shape_result.IsValid()) return false;
+        shapeData.shape = shape_result.Get();
+    }else if (shapeData.type == Shape3DType::SPHERE){
+        JPH::SphereShapeSettings shape_settings(shapeData.radius);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (!shape_result.IsValid()) return false;
+        shapeData.shape = shape_result.Get();
+    }else if (shapeData.type == Shape3DType::CAPSULE){
+        JPH::CapsuleShapeSettings shape_settings(shapeData.halfHeight, shapeData.radius);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (!shape_result.IsValid()) return false;
+        shapeData.shape = shape_result.Get();
+    }else if (shapeData.type == Shape3DType::TAPERED_CAPSULE){
+        JPH::TaperedCapsuleShapeSettings shape_settings(shapeData.halfHeight, shapeData.topRadius, shapeData.bottomRadius);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (!shape_result.IsValid()) return false;
+        shapeData.shape = shape_result.Get();
+    }else if (shapeData.type == Shape3DType::CYLINDER){
+        JPH::CylinderShapeSettings shape_settings(shapeData.halfHeight, shapeData.radius);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (!shape_result.IsValid()) return false;
+        shapeData.shape = shape_result.Get();
+    }else if (shapeData.type == Shape3DType::CONVEX_HULL){
+        JPH::Array<JPH::Vec3> jvertices;
+
+        if (shapeData.source == Shape3DSource::RAW_VERTICES){
+            jvertices.resize(shapeData.numVertices);
+            for (size_t i = 0; i < shapeData.numVertices; i++){
+                jvertices[i] = JPH::Vec3(shapeData.vertices[i].x, shapeData.vertices[i].y, shapeData.vertices[i].z);
+            }
+        }else if (shapeData.source == Shape3DSource::ENTITY_MESH){
+            Entity meshEntity = shapeData.sourceEntity == NULL_ENTITY ? entity : shapeData.sourceEntity;
+            MeshComponent* mesh = scene->findComponent<MeshComponent>(meshEntity);
+            Transform* transform = scene->findComponent<Transform>(meshEntity);
+            if (!mesh || !transform){
+                Log::error("Cannot create convex hull shape: mesh or transform not found for entity %u", meshEntity);
+                return false;
+            }
+
+            std::map<std::string, Buffer*> buffers;
+            if (mesh->buffer.getSize() > 0) buffers["vertices"] = &mesh->buffer;
+            for (int i = 0; i < mesh->numExternalBuffers; i++) buffers[mesh->eBuffers[i].getName()] = &mesh->eBuffers[i];
+
+            Buffer* vertexBuffer = NULL;
+            Attribute vertexAttr;
+
+            for (auto const& buf : buffers){
+                if (buf.second->getAttribute(AttributeType::POSITION)) {
+                    vertexBuffer = buf.second;
+                    vertexAttr = *buf.second->getAttribute(AttributeType::POSITION);
+                }
+            }
+
+            for (size_t i = 0; i < mesh->numSubmeshes; i++) {
+                for (auto const& attr : mesh->submeshes[i].attributes){
+                    if (attr.first == AttributeType::POSITION){
+                        vertexBuffer = buffers[attr.second.getBufferName()];
+                        vertexAttr = attr.second;
+                    }
+                }
+
+                int verticesize = int(vertexAttr.getCount());
+                for (int i = 0; i < verticesize; i++){
+                    Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i) * transform->scale;
+                    jvertices.push_back(JPH::Vec3(vertice.x, vertice.y, vertice.z));
+                }
+            }
+        }
+
+        if (jvertices.empty()){
+            Log::error("Cannot create convex hull shape without vertices for 3D Body entity: %u", entity);
+            return false;
+        }
+
+        JPH::ConvexHullShapeSettings shape_settings(jvertices);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (!shape_result.IsValid()) return false;
+        shapeData.shape = shape_result.Get();
+    }else if (shapeData.type == Shape3DType::MESH){
+        JPH::VertexList jvertices;
+        JPH::IndexedTriangleList jindices;
+
+        if (shapeData.source == Shape3DSource::RAW_MESH){
+            jvertices.resize(shapeData.numVertices);
+            for (size_t i = 0; i < shapeData.numVertices; i++){
+                jvertices[i] = JPH::Float3(shapeData.vertices[i].x, shapeData.vertices[i].y, shapeData.vertices[i].z);
+            }
+
+            int indicesize = int(shapeData.numIndices / 3);
+            jindices.resize(indicesize);
+            for (int i = 0; i < indicesize; i++){
+                for (int j = 0; j < 3; j++){
+                    jindices[i].mIdx[j] = shapeData.indices[(3 * i) + j];
+                }
+            }
+        }else if (shapeData.source == Shape3DSource::ENTITY_MESH){
+            Entity meshEntity = shapeData.sourceEntity == NULL_ENTITY ? entity : shapeData.sourceEntity;
+            MeshComponent* mesh = scene->findComponent<MeshComponent>(meshEntity);
+            Transform* transform = scene->findComponent<Transform>(meshEntity);
+            if (!mesh || !transform){
+                Log::error("Cannot create mesh shape: mesh or transform not found for entity %u", meshEntity);
+                return false;
+            }
+
+            std::map<std::string, Buffer*> buffers;
+            if (mesh->buffer.getSize() > 0) buffers["vertices"] = &mesh->buffer;
+            if (mesh->indices.getSize() > 0) buffers["indices"] = &mesh->indices;
+            for (int i = 0; i < mesh->numExternalBuffers; i++) buffers[mesh->eBuffers[i].getName()] = &mesh->eBuffers[i];
+
+            Buffer* indexBuffer = NULL;
+            Attribute indexAttr;
+            Buffer* vertexBuffer = NULL;
+            Attribute vertexAttr;
+
+            for (auto const& buf : buffers){
+                if (buf.second->getAttribute(AttributeType::INDEX)){
+                    indexBuffer = buf.second;
+                    indexAttr = *buf.second->getAttribute(AttributeType::INDEX);
+                }
+                if (buf.second->getAttribute(AttributeType::POSITION)) {
+                    vertexBuffer = buf.second;
+                    vertexAttr = *buf.second->getAttribute(AttributeType::POSITION);
+                }
+            }
+
+            for (size_t i = 0; i < mesh->numSubmeshes; i++) {
+                for (auto const& attr : mesh->submeshes[i].attributes){
+                    if (attr.first == AttributeType::INDEX){
+                        indexBuffer = buffers[attr.second.getBufferName()];
+                        indexAttr = attr.second;
+                    }
+                    if (attr.first == AttributeType::POSITION){
+                        vertexBuffer = buffers[attr.second.getBufferName()];
+                        vertexAttr = attr.second;
+                    }
+                }
+
+                int numIdxTriangles = int(indexAttr.getCount() / 3);
+                for (int i = 0; i < numIdxTriangles; i++){
+                    JPH::uint32 it[3];
+                    for (int j = 0; j < 3; j++){
+                        uint32_t indice = 0;
+                        if (indexAttr.getDataType() == AttributeDataType::UNSIGNED_INT){
+                            indice = indexBuffer->getUInt32(&indexAttr, (3 * i) + j);
+                        }else if (indexAttr.getDataType() == AttributeDataType::UNSIGNED_SHORT){
+                            indice = indexBuffer->getUInt16(&indexAttr, (3 * i) + j);
+                        }
+                        it[j] = indice;
+                    }
+                    jindices.push_back(JPH::IndexedTriangle(it[0], it[1], it[2]));
+                }
+
+                int verticesize = int(vertexAttr.getCount());
+                for (int i = 0; i < verticesize; i++){
+                    Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i) * transform->scale;
+                    jvertices.push_back(JPH::Float3(vertice.x, vertice.y, vertice.z));
+                }
+            }
+        }
+
+        if (jvertices.empty() || jindices.empty()){
+            Log::error("Cannot create mesh shape without vertices and indices for 3D Body entity: %u", entity);
+            return false;
+        }
+
+        JPH::MeshShapeSettings shape_settings(jvertices, jindices);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        if (!shape_result.IsValid()) return false;
+        shapeData.shape = shape_result.Get();
+    }else if (shapeData.type == Shape3DType::HEIGHTFIELD){
+        Entity terrainEntity = shapeData.sourceEntity == NULL_ENTITY ? entity : shapeData.sourceEntity;
+        TerrainComponent* terrain = scene->findComponent<TerrainComponent>(terrainEntity);
+        if (!terrain || !terrain->heightMapLoaded){
+            Log::error("Cannot create heightfield shape without loaded terrain heightmap");
+            return false;
+        }
+
+        TextureData& textureData = terrain->heightMap.getData();
+        unsigned int samplesSize = shapeData.samplesSize;
+        if (samplesSize == 0){
+            samplesSize = textureData.getMinNearestPowerOfTwo();
+            if (samplesSize > std::min(textureData.getOriginalWidth(), textureData.getOriginalHeight())){
+                samplesSize = samplesSize / 2;
+            }
+        }
+
+        JPH::Vec3 terrainOffset = JPH::Vec3(-terrain->terrainSize / 2.0, 0.0f, -terrain->terrainSize / 2.0);
+        JPH::Vec3 terrainScale = JPH::Vec3(terrain->terrainSize / samplesSize, terrain->maxHeight, terrain->terrainSize / samplesSize);
+
+        float* samples = new float[samplesSize * samplesSize];
+        for (unsigned int x = 0; x < samplesSize; x++){
+            for (unsigned int y = 0; y < samplesSize; y++){
+                int posX = floor(textureData.getWidth() * x / samplesSize);
+                int posY = floor(textureData.getHeight() * y / samplesSize);
+                float val = textureData.getColorComponent(posX, posY, 0) / 255.0f;
+                samples[x + (y * samplesSize)] = val;
+            }
+        }
+
+        JPH::HeightFieldShapeSettings shape_settings(samples, terrainOffset, terrainScale, samplesSize);
+        JPH::ShapeSettings::ShapeResult shape_result = shape_settings.Create();
+        delete[] samples;
+
+        if (!shape_result.IsValid()) return false;
+        shapeData.shape = shape_result.Get();
+    }
+
+    if (!shapeData.shape){
+        return false;
+    }
+
+    JPH::Shape* mutableShape = const_cast<JPH::Shape*>(shapeData.shape.GetPtr());
+    mutableShape->SetEmbedded();
+    mutableShape->SetUserData(index);
+
+    if (shapeData.shape->GetType() == JPH::EShapeType::Convex){
+        JPH::ConvexShape* convexShape = (JPH::ConvexShape*)shapeData.shape.GetPtr();
+        convexShape->SetDensity(shapeData.density);
+    }
+
+    return true;
+}
+
+bool PhysicsSystem::syncBody3DShapes(Entity entity, Body3DComponent& body){
+    if (!body.body.IsInvalid()){
+        destroyBody3D(body);
+        body.body = JPH::BodyID();
+    }
+
+    for (size_t i = 0; i < body.numShapes; i++){
+        if (!createShape3DForIndex(entity, body, i)){
+            Log::error("Cannot create runtime shape %i for 3D Body entity: %u", i, entity);
+            return false;
+        }
+    }
+
+    if (body.numShapes == 0){
+        return false;
+    }
+
+    if (body.numShapes > 1){
+        JPH::StaticCompoundShapeSettings compound_shape;
+        for (size_t i = 0; i < body.numShapes; i++){
+            JPH::Vec3 jPosition(body.shapes[i].position.x, body.shapes[i].position.y, body.shapes[i].position.z);
+            JPH::Quat jQuat(body.shapes[i].rotation.x, body.shapes[i].rotation.y, body.shapes[i].rotation.z, body.shapes[i].rotation.w);
+            compound_shape.AddShape(jPosition, jQuat, body.shapes[i].shape);
+        }
+
+        JPH::ShapeSettings::ShapeResult shape_result = compound_shape.Create();
+        if (!shape_result.IsValid()){
+            Log::error("Cannot create StaticCompoundShape for 3D Body entity: %u", entity);
+            return false;
+        }
+
+        createGenericJoltBody(entity, body, shape_result.Get());
+    }else{
+        Shape3D& shapeData = body.shapes[0];
+        if (shapeData.position != Vector3::ZERO || shapeData.rotation != Quaternion::IDENTITY){
+            JPH::Vec3 jPosition(shapeData.position.x, shapeData.position.y, shapeData.position.z);
+            JPH::Quat jQuat(shapeData.rotation.x, shapeData.rotation.y, shapeData.rotation.z, shapeData.rotation.w);
+            JPH::RotatedTranslatedShapeSettings rtShape(jPosition, jQuat, shapeData.shape);
+            JPH::ShapeSettings::ShapeResult shape_result = rtShape.Create();
+            if (!shape_result.IsValid()){
+                Log::error("Cannot create RotatedTranslatedShapeSettings for 3D Body entity: %u", entity);
+                return false;
+            }
+
+            createGenericJoltBody(entity, body, shape_result.Get());
+        }else{
+            createGenericJoltBody(entity, body, shapeData.shape);
+        }
+    }
+
+    body.needReloadBody = false;
+    body.needUpdateShapes = false;
+    body.newBody = true;
+
+    return true;
+}
+
 void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, const JPH::ShapeRefC shape){
     JPH::ObjectLayer layer = JPH::ObjectLayerPairFilterMask::sGetObjectLayer(1);
     JPH::EMotionType joltType = JPH::EMotionType::Static;
@@ -227,208 +606,6 @@ void PhysicsSystem::removeBody2D(Entity entity){
     }
 }
 
-int PhysicsSystem::createBoxShape2D(Entity entity, float width, float height){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
-
-            b2Polygon polygon = { 0 };
-            // same as shape.SetAsBox but using center on left corner
-            polygon.count = 4;
-            polygon.vertices[0] = { 0, 0 };
-            polygon.vertices[1] = { width / pointsToMeterScale2D, 0 };
-            polygon.vertices[2] = { width / pointsToMeterScale2D,  height / pointsToMeterScale2D };
-            polygon.vertices[3] = { 0,  height / pointsToMeterScale2D };
-            polygon.normals[0] = { 0.0f, -1.0f };
-            polygon.normals[1] = { 1.0f, 0.0f };
-            polygon.normals[2] = { 0.0f, 1.0f };
-            polygon.normals[3] = { -1.0f, 0.0f };
-            polygon.radius = 0.0f;
-            polygon.centroid = b2Vec2_zero;
-
-            return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createCenteredBoxShape2D(Entity entity, float width, float height, Vector2 center, float angle){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
-
-            float halfW = width / 2.0 / pointsToMeterScale2D;
-            float halfH = height / 2.0 / pointsToMeterScale2D;
-
-            b2Polygon polygon = b2MakeOffsetBox(halfW, halfH, {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D}, b2MakeRot(Angle::defaultToRad(angle)));
-
-            return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createRoundedBoxShape2D(Entity entity, float width, float height, float radius){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
-
-            float halfW = width / 2.0 / pointsToMeterScale2D;
-            float halfH = height / 2.0 / pointsToMeterScale2D;
-            float sRadius = radius / pointsToMeterScale2D;
-
-            b2Polygon polygon = b2MakeRoundedBox(halfW, halfW, sRadius);
-
-            return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createPolygonShape2D(Entity entity, std::vector<Vector2> vertices){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = Shape2DType::POLYGON;
-
-            std::vector<b2Vec2> b2vertices(vertices.size());
-            for (int i = 0; i < vertices.size(); i++){
-                b2vertices[i] = {vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D};
-            }
-            b2Hull hull = b2ComputeHull(&b2vertices[0], (int)vertices.size());
-
-            b2Polygon polygon = b2MakePolygon( &hull, 0.0f );
-
-            return loadShape2D(*body, &polygon, body->shapes[body->numShapes].type);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createCircleShape2D(Entity entity, Vector2 center, float radius){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = Shape2DType::CIRCLE;
-
-            b2Circle circle = { 0 };
-            circle.center = {center.x / pointsToMeterScale2D, center.y / pointsToMeterScale2D};
-            circle.radius = radius / pointsToMeterScale2D;
-
-            return loadShape2D(*body, &circle, body->shapes[body->numShapes].type);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createCapsuleShape2D(Entity entity, Vector2 center1, Vector2 center2, float radius){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = Shape2DType::CAPSULE;
-
-            b2Capsule capsule = { 0 };
-            capsule.center1 = {center1.x / pointsToMeterScale2D, center1.y / pointsToMeterScale2D};
-            capsule.center2 = {center2.x / pointsToMeterScale2D, center2.y / pointsToMeterScale2D};
-            capsule.radius = radius / pointsToMeterScale2D;
-
-            return loadShape2D(*body, &capsule, body->shapes[body->numShapes].type);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createSegmentShape2D(Entity entity, Vector2 point1, Vector2 point2){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = Shape2DType::SEGMENT;
-
-            b2Segment segment = { 0 };
-            segment.point1 = {point1.x / pointsToMeterScale2D, point1.y / pointsToMeterScale2D};
-            segment.point2 = {point2.x / pointsToMeterScale2D, point2.y / pointsToMeterScale2D};
-
-            return loadShape2D(*body, &segment, body->shapes[body->numShapes].type);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createChainShape2D(Entity entity, std::vector<Vector2> vertices, bool loop){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-
-            body->shapes[body->numShapes].type = Shape2DType::CHAIN;
-
-            std::vector<b2Vec2> b2vertices(vertices.size());
-            for (int i = 0; i < vertices.size(); i++){
-                b2vertices[i] = {vertices[i].x / pointsToMeterScale2D, vertices[i].y / pointsToMeterScale2D};
-            }
-
-            b2ChainDef chainDef = b2DefaultChainDef();
-            chainDef.points = &b2vertices[0];
-            chainDef.count = (int)vertices.size();
-            chainDef.isLoop = loop;
-
-            return loadShape2D(*body, &chainDef, body->shapes[body->numShapes].type);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-void PhysicsSystem::removeAllShapes2D(Entity entity){
-    Body2DComponent* body = scene->findComponent<Body2DComponent>(entity);
-
-    if (body){
-        for (int i = 0; i < body->numShapes; i++){
-            destroyShape2D(*body, i);
-        }
-        body->numShapes = 0;
-    }
-}
 
 void PhysicsSystem::createBody3D(Entity entity){
     Signature signature = scene->getSignature(entity);
@@ -446,405 +623,6 @@ void PhysicsSystem::removeBody3D(Entity entity){
         destroyBody3D(scene->getComponent<Body3DComponent>(entity));
         scene->removeComponent<Body3DComponent>(entity);
     }
-}
-
-int PhysicsSystem::createBoxShape3D(Entity entity, Vector3 position, Quaternion rotation, float width, float height, float depth){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::BOX;
-            JPH::BoxShapeSettings shape_settings(JPH::Vec3(width/2.0, height/2.0, depth/2.0));
-
-            return loadShape3D(*body, position, rotation, &shape_settings);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createSphereShape3D(Entity entity, Vector3 position, Quaternion rotation, float radius){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::SPHERE;
-            JPH::SphereShapeSettings shape_settings(radius);
-
-            return loadShape3D(*body, position, rotation, &shape_settings);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createCapsuleShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float radius){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::CAPSULE;
-            JPH::CapsuleShapeSettings shape_settings(halfHeight, radius);
-
-            return loadShape3D(*body, position, rotation, &shape_settings);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createTaperedCapsuleShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float topRadius, float bottomRadius){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::TAPERED_CAPSULE;
-            JPH::TaperedCapsuleShapeSettings shape_settings(halfHeight, topRadius, bottomRadius);
-
-            return loadShape3D(*body, position, rotation, &shape_settings);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createCylinderShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float radius){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::CYLINDER;
-            JPH::CylinderShapeSettings shape_settings(halfHeight, radius);
-
-            return loadShape3D(*body, position, rotation, &shape_settings);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createConvexHullShape3D(Entity entity, Vector3 position, Quaternion rotation, std::vector<Vector3> vertices){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::CONVEX_HULL;
-
-            JPH::Array<JPH::Vec3> jvertices;
-            jvertices.resize(vertices.size());
-            for (int i = 0; i < vertices.size(); i++){
-                jvertices[i] = JPH::Vec3(vertices[i].x, vertices[i].y, vertices[i].z);
-            }
-
-            JPH::ConvexHullShapeSettings shape_settings(jvertices);
-
-            return loadShape3D(*body, position, rotation, &shape_settings);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createConvexHullShape3D(Entity entity, MeshComponent& mesh, Transform& transform){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::CONVEX_HULL;
-
-            std::map<std::string, Buffer*> buffers;
-
-            if (mesh.buffer.getSize() > 0){
-                buffers["vertices"] = &mesh.buffer;
-            }
-            for (int i = 0; i < mesh.numExternalBuffers; i++){
-                buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
-            }
-
-            Buffer* vertexBuffer = NULL;
-            Attribute vertexAttr;
-
-            JPH::Array<JPH::Vec3> jvertices;
-
-            for (auto const& buf : buffers){
-                if (buf.second->getAttribute(AttributeType::POSITION)) {
-                    vertexBuffer = buf.second;
-                    vertexAttr = *buf.second->getAttribute(AttributeType::POSITION);
-                }
-            }
-
-            for (size_t i = 0; i < mesh.numSubmeshes; i++) {
-                for (auto const& attr : mesh.submeshes[i].attributes){
-                    if (attr.first == AttributeType::POSITION){
-                        vertexBuffer = buffers[attr.second.getBufferName()];
-                        vertexAttr = attr.second;
-                    }
-                }
-
-                if (vertexAttr.getDataType() != AttributeDataType::FLOAT){
-                    Log::error("Cannot create convex hull shape of non float position vertex for 3D Body entity: %u", entity);
-                    return -1;
-                }
-
-                int verticesize = int(vertexAttr.getCount());
-                for (int i = 0; i < verticesize; i++){
-                    Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i) * transform.scale;
-                    jvertices.push_back(JPH::Vec3(vertice.x, vertice.y, vertice.z));
-                }
-            }
-
-            if (jvertices.size() == 0){
-                Log::error("Cannot create convex hull shape without vertices for 3D Body entity: %u", entity);
-            }else{
-                JPH::ConvexHullShapeSettings shape_settings(jvertices);
-
-                return loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
-            }
-
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createMeshShape3D(Entity entity, Vector3 position, Quaternion rotation, std::vector<Vector3> vertices, std::vector<uint16_t> indices){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::MESH;
-
-            JPH::VertexList jvertices;
-            jvertices.resize(vertices.size());
-            for (int i = 0; i < vertices.size(); i++){
-                jvertices[i] = JPH::Float3(vertices[i].x, vertices[i].y, vertices[i].z);
-            }
-
-            JPH::IndexedTriangleList jindices;
-            int indicesize = int(indices.size() / 3);
-            jindices.resize(indicesize);
-            for (int i = 0; i < indicesize; i++){
-                for (int j = 0; j < 3; j++){
-                    jindices[i].mIdx[j] = indices[(3*i)+j];
-                }
-            }
-
-            JPH::MeshShapeSettings shape_settings(jvertices, jindices);
-
-            return loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return -1;
-}
-
-int PhysicsSystem::createMeshShape3D(Entity entity, MeshComponent& mesh, Transform& transform){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::MESH;
-
-            std::map<std::string, Buffer*> buffers;
-
-            if (mesh.buffer.getSize() > 0){
-                buffers["vertices"] = &mesh.buffer;
-            }
-            if (mesh.indices.getSize() > 0){
-                buffers["indices"] = &mesh.indices;
-            }
-            for (int i = 0; i < mesh.numExternalBuffers; i++){
-                buffers[mesh.eBuffers[i].getName()] = &mesh.eBuffers[i];
-            }
-
-            Buffer* indexBuffer = NULL;
-            Attribute indexAttr;
-
-            Buffer* vertexBuffer = NULL;
-            Attribute vertexAttr;
-
-            for (auto const& buf : buffers){
-                if (buf.second->getAttribute(AttributeType::INDEX)){
-                    indexBuffer = buf.second;
-                    indexAttr = *buf.second->getAttribute(AttributeType::INDEX);
-                }
-                if (buf.second->getAttribute(AttributeType::POSITION)) {
-                    vertexBuffer = buf.second;
-                    vertexAttr = *buf.second->getAttribute(AttributeType::POSITION);
-                }
-            }
-
-            for (size_t i = 0; i < mesh.numSubmeshes; i++) {
-                for (auto const& attr : mesh.submeshes[i].attributes){
-                    if (attr.first == AttributeType::INDEX){
-                        indexBuffer = buffers[attr.second.getBufferName()];
-                        indexAttr = attr.second;
-                    }
-                    if (attr.first == AttributeType::POSITION){
-                        vertexBuffer = buffers[attr.second.getBufferName()];
-                        vertexAttr = attr.second;
-                    }
-                }
-
-                if (mesh.submeshes[i].primitiveType != PrimitiveType::TRIANGLES){
-                    Log::error("Cannot create mesh shape of non triangles mesh for 3D Body entity: %u", entity);
-                    return -1;
-                }
-
-                if (vertexAttr.getDataType() != AttributeDataType::FLOAT){
-                    Log::error("Cannot create mesh shape of non float position vertex for 3D Body entity: %u", entity);
-                    return -1;
-                }
-
-                if (indexAttr.getCount() > 0){
-
-                    JPH::IndexedTriangleList jindices;
-                    JPH::VertexList jvertices;
-
-                    int numIdxTriangles = int(indexAttr.getCount() / 3);
-                    for (int i = 0; i < numIdxTriangles; i++){
-                        JPH::uint32 it[3];
-                        for (int j = 0; j < 3; j++){
-                            uint32_t indice;
-                            if (indexAttr.getDataType() == AttributeDataType::UNSIGNED_INT){
-                                indice = indexBuffer->getUInt32(&indexAttr, (3*i)+j);
-                            }else if (indexAttr.getDataType() == AttributeDataType::UNSIGNED_SHORT){
-                                indice = indexBuffer->getUInt16(&indexAttr, (3*i)+j);
-                            }
-                            it[j] = indice;
-                        }
-                        jindices.push_back(JPH::IndexedTriangle(it[0], it[1], it[2]));
-                    }
-
-                    int verticesize = int(vertexAttr.getCount());
-                    for (int i = 0; i < verticesize; i++){
-                        Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, i) * transform.scale;
-                        jvertices.push_back(JPH::Float3(vertice.x, vertice.y, vertice.z));
-                    }
-
-                    if (jindices.size() == 0){
-                        Log::error("Cannot create mesh shape without indices for 3D Body entity: %u", entity);
-                    }else if (jvertices.size() == 0){
-                        Log::error("Cannot create mesh shape without vertices for 3D Body entity: %u", entity);
-                    }else{
-                        JPH::MeshShapeSettings shape_settings(jvertices, jindices);
-
-                        if (body->numShapes < MAX_SHAPES){
-                            loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
-                        }else{
-                            Log::error("Cannot create mesh shape, need to increase MAX_SHAPES for 3D Body entity: %u", entity);
-                        }
-                    }
-
-                }else{
-
-                    JPH::TriangleList jtriangles;
-
-                    int verticesize = int(vertexAttr.getCount());
-                    int numTriangles = verticesize / 3;
-                    for (int i = 0; i < numTriangles; i++){
-                        JPH::Float3 vt[3];
-                        for (int j = 0; j < 3; j++){
-                            Vector3 vertice = vertexBuffer->getVector3(&vertexAttr, (3*i)+j) * transform.scale;
-                            vt[j] = JPH::Float3(vertice.x, vertice.y, vertice.z);
-                        }
-                        jtriangles.push_back(JPH::Triangle(vt[0], vt[1], vt[2]));
-                    }
-
-                    if (jtriangles.size() == 0){
-                        Log::error("Cannot create mesh shape without vertices for 3D Body entity: %u", entity);
-                    }else{
-                        JPH::MeshShapeSettings shape_settings(jtriangles);
-
-                        if (body->numShapes < MAX_SHAPES){
-                            loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
-                        }else{
-                            Log::error("Cannot create mesh shape, need to increase MAX_SHAPES for 3D Body entity: %u", entity);
-                        }
-                    }
-
-                }
-            }
-
-        }else{
-            Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
-        }
-    }
-
-    return (body->numShapes - 1);
-}
-
-int PhysicsSystem::createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize){
-    Body3DComponent* body = scene->findComponent<Body3DComponent>(entity);
-
-    if (!terrain.heightMapLoaded){
-        Log::error("Cannot create heightfield shape without heightmap image loaded");
-        return -1;
-    }
-
-    float logsamples = log2(samplesSize);
-    if (ceil(logsamples) != floor(logsamples)) {
-        Log::error("Cannot create terrain shape. Must insert a power of two samplesSize, not: %u", samplesSize);
-        return -1;
-    }
-
-    if (body){
-        if (body->numShapes < MAX_SHAPES){
-            body->shapes[body->numShapes].type = Shape3DType::HEIGHTFIELD;
-
-            TextureData& textureData = terrain.heightMap.getData();
-
-            if (samplesSize == 0){
-                samplesSize = textureData.getMinNearestPowerOfTwo();
-                if (samplesSize > std::min(textureData.getOriginalWidth(), textureData.getOriginalHeight())){
-                    samplesSize = samplesSize / 2;
-                }
-            }
-
-            JPH::Vec3 terrainOffset = JPH::Vec3(-terrain.terrainSize/2.0, 0.0f ,-terrain.terrainSize/2.0);
-            JPH::Vec3 terrainScale = JPH::Vec3(terrain.terrainSize/samplesSize, terrain.maxHeight, terrain.terrainSize/samplesSize);
-
-            float *samples = new float [samplesSize * samplesSize];
-
-            for (int x = 0; x < samplesSize; x++){
-                for (int y = 0; y < samplesSize; y++){
-                    TextureData& textureData = terrain.heightMap.getData();
-
-                    int posX = floor(textureData.getWidth() * x / samplesSize);
-                    int posY = floor(textureData.getHeight() * y / samplesSize);
-
-                    float val = textureData.getColorComponent(posX, posY, 0) / 255.0f;
-
-                    samples[x + (y * samplesSize)] = val;
-                }
-            }
-
-            JPH::HeightFieldShapeSettings shape_settings(samples, terrainOffset, terrainScale, samplesSize);
-
-            int shapeIndex = loadShape3D(*body, Vector3::ZERO, Quaternion::IDENTITY, &shape_settings);
-
-            delete[] samples;
-            return shapeIndex;
-        }
-    }
-
-    return -1;
 }
 
 b2WorldId PhysicsSystem::getWorld2D() const{
@@ -868,7 +646,12 @@ b2BodyId PhysicsSystem::getBody(Entity entity){
 bool PhysicsSystem::loadBody2D(Entity entity){
     Body2DComponent& body = scene->getComponent<Body2DComponent>(entity);
 
-    if (!b2Body_IsValid(body.body)){
+    if (!b2Body_IsValid(body.body) || body.needReloadBody){
+        if (b2Body_IsValid(body.body)){
+            b2DestroyBody(body.body);
+            body.body = b2_nullBodyId;
+        }
+
         b2BodyDef bodyDef = b2DefaultBodyDef();
 
         if (body.type == BodyType::STATIC){
@@ -882,11 +665,17 @@ bool PhysicsSystem::loadBody2D(Entity entity){
 
         body.body = b2CreateBody(world2D, &bodyDef);
         body.newBody = true;
+        body.needReloadBody = false;
+        body.needUpdateShapes = true;
 
-        return true;
+        return syncBody2DShapes(body);
     }
 
-    return false;
+    if (body.needUpdateShapes){
+        return syncBody2DShapes(body);
+    }
+
+    return true;
 }
 
 void PhysicsSystem::destroyBody2D(Body2DComponent& body){
@@ -907,75 +696,10 @@ void PhysicsSystem::destroyBody2D(Body2DComponent& body){
 bool PhysicsSystem::loadBody3D(Entity entity){
     Body3DComponent& body = scene->getComponent<Body3DComponent>(entity);
 
-    if (body.body.IsInvalid()){
-
-        for (int i = 0; i < body.numShapes; i++){
-            if (body.type != BodyType::STATIC){
-                if (body.shapes[i].type == Shape3DType::HEIGHTFIELD){
-                    Log::error("Heightfield body should be static for 3D Body entity: %u", entity);
-                    return false;
-                }
-                if (body.shapes[i].type == Shape3DType::MESH && !body.overrideMassProperties){
-                    Log::error("Mesh body should be static or with mass and inertia overridden for 3D Body entity: %u", entity);
-                    return false;
-                }
-            }
-        }
-
-        if (body.numShapes > 1){
-
-            JPH::StaticCompoundShapeSettings compound_shape;
-            for (int i = 0; i < body.numShapes; i++){
-                JPH::Vec3 jPosition(body.shapes[i].position.x, body.shapes[i].position.y, body.shapes[i].position.z);
-                JPH::Quat jQuat(body.shapes[i].rotation.x, body.shapes[i].rotation.y, body.shapes[i].rotation.z, body.shapes[i].rotation.w);
-
-                compound_shape.AddShape(jPosition, jQuat, body.shapes[i].shape);
-            }
-
-            JPH::ShapeSettings::ShapeResult shape_result = compound_shape.Create();
-
-            if (shape_result.IsValid()){
-                JPH::ShapeRefC shape = shape_result.Get();
-
-                createGenericJoltBody(entity, body, shape);
-            }else{
-                Log::error("Cannot create StaticCompoundShape for 3D Body entity: %u", entity);
-                return false;
-            }
-
-        }else if (body.numShapes == 1){
-
-            if (body.shapes[0].position != Vector3::ZERO || body.shapes[0].rotation != Quaternion::IDENTITY){
-
-                JPH::Vec3 jPosition(body.shapes[0].position.x, body.shapes[0].position.y, body.shapes[0].position.z);
-                JPH::Quat jQuat(body.shapes[0].rotation.x, body.shapes[0].rotation.y, body.shapes[0].rotation.z, body.shapes[0].rotation.w);
-
-                JPH::RotatedTranslatedShapeSettings rtShape(jPosition, jQuat, body.shapes[0].shape);
-
-                JPH::ShapeSettings::ShapeResult shape_result = rtShape.Create();
-
-                if (shape_result.IsValid()){
-                    JPH::ShapeRefC shape = shape_result.Get();
-
-                    createGenericJoltBody(entity, body, shape);
-                }else{
-                    Log::error("Cannot create RotatedTranslatedShapeSettings for 3D Body entity: %u", entity);
-                    return false;
-                }
-
-            }else{
-
-                createGenericJoltBody(entity, body, body.shapes[0].shape);
-            }
-
-        }else{
-            Log::error("Cannot load body without shapes, entity: %u", entity);
-            return false;
-        }
-
+    if (body.needReloadBody || body.needUpdateShapes || body.body.IsInvalid()){
+        return syncBody3DShapes(entity, body);
     }
 
-    body.newBody = true;
     return true;
 }
 
@@ -983,11 +707,13 @@ void PhysicsSystem::destroyBody3D(Body3DComponent& body){
     if (!body.body.IsInvalid()){
         JPH::BodyInterface &body_interface = world3D.GetBodyInterface();
         body_interface.RemoveBody(body.body);
+        body_interface.DestroyBody(body.body);
 
         for (int i = 0; i < body.numShapes; i++){
             destroyShape3D(body, i);
         }
-        body.numShapes = 0;
+
+        body.body = JPH::BodyID();
     }
 }
 
@@ -1816,6 +1542,10 @@ void PhysicsSystem::update(double dt){
 		Entity entity = bodies2d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
 
+        if (!b2Body_IsValid(body.body) || body.needReloadBody || body.needUpdateShapes){
+            loadBody2D(entity);
+        }
+
         if (b2Body_IsValid(body.body)){
             updateBody2DPosition(signature, entity, body);
 
@@ -1869,6 +1599,10 @@ void PhysicsSystem::update(double dt){
 		Body3DComponent& body = bodies3d->getComponentFromIndex(i);
 		Entity entity = bodies3d->getEntity(i);
 		Signature signature = scene->getSignature(entity);
+
+        if (body.body.IsInvalid() || body.needReloadBody || body.needUpdateShapes){
+            loadBody3D(entity);
+        }
 
         if (!body.body.IsInvalid()){
             updateBody3DPosition(signature, entity, body);

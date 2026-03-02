@@ -53,6 +53,10 @@ namespace Supernova{
 		void updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body);
 		void updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body);
 
+		bool syncBody2DShapes(Body2DComponent& body);
+		bool syncBody3DShapes(Entity entity, Body3DComponent& body);
+		bool createShape3DForIndex(Entity entity, Body3DComponent& body, size_t index);
+
 		void createGenericJoltBody(Entity entity, Body3DComponent& body, const JPH::ShapeRefC shape);
 
 	public:
@@ -90,30 +94,8 @@ namespace Supernova{
 		void createBody2D(Entity entity);
 		void removeBody2D(Entity entity);
 
-		int createBoxShape2D(Entity entity, float width, float height);
-		int createCenteredBoxShape2D(Entity entity, float width, float height, Vector2 center, float angle);
-		int createRoundedBoxShape2D(Entity entity, float width, float height, float radius);
-		int createPolygonShape2D(Entity entity, std::vector<Vector2> vertices);
-		int createCircleShape2D(Entity entity, Vector2 center, float radius);
-		int createCapsuleShape2D(Entity entity, Vector2 center1, Vector2 center2, float radius);
-		int createSegmentShape2D(Entity entity, Vector2 point1, Vector2 point2);
-		int createChainShape2D(Entity entity, std::vector<Vector2> vertices, bool loop);
-
-		void removeAllShapes2D(Entity entity);
-
 		void createBody3D(Entity entity);
 		void removeBody3D(Entity entity);
-
-		int createBoxShape3D(Entity entity, Vector3 position, Quaternion rotation, float width, float height, float depth);
-		int createSphereShape3D(Entity entity, Vector3 position, Quaternion rotation, float radius);
-		int createCapsuleShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float radius);
-		int createTaperedCapsuleShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float topRadius, float bottomRadius);
-		int createCylinderShape3D(Entity entity, Vector3 position, Quaternion rotation, float halfHeight, float radius);
-		int createConvexHullShape3D(Entity entity, Vector3 position, Quaternion rotation, std::vector<Vector3> vertices);
-		int createConvexHullShape3D(Entity entity, MeshComponent& mesh, Transform& transform);
-		int createMeshShape3D(Entity entity, Vector3 position, Quaternion rotation, std::vector<Vector3> vertices, std::vector<uint16_t> indices);
-		int createMeshShape3D(Entity entity, MeshComponent& mesh, Transform& transform);
-		int createHeightFieldShape3D(Entity entity, TerrainComponent& terrain, unsigned int samplesSize);
 
 		b2WorldId getWorld2D() const;
 		JPH::PhysicsSystem* getWorld3D();

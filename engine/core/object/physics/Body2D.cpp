@@ -9,6 +9,10 @@
 #include "subsystem/PhysicsSystem.h"
 #include "box2d/box2d.h"
 #include "object/physics/Contact2D.h"
+#include "util/Angle.h"
+
+#include <algorithm>
+#include <cmath>
 
 using namespace Supernova;
 
@@ -38,6 +42,20 @@ BodyType getB2ToBodyType(b2BodyType type){
 
 Vector2 getB2ToVector2(b2Vec2 vec2){
     return Vector2(vec2.x, vec2.y);
+}
+
+static int appendShape2D(Body2DComponent& body){
+    if (body.numShapes >= MAX_SHAPES){
+        Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        return -1;
+    }
+
+    size_t index = body.numShapes;
+    body.shapes[index] = Shape2D();
+    body.numShapes++;
+    body.needUpdateShapes = true;
+
+    return static_cast<int>(index);
 }
 
 Body2D::Body2D(Scene* scene, Entity entity): EntityHandle(scene, entity){
@@ -105,12 +123,24 @@ float Body2D::getPointsToMeterScale() const{
 }
 
 void Body2D::load(){
-    scene->getSystem<PhysicsSystem>()->loadBody2D(entity);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    body.needReloadBody = true;
+    body.needUpdateShapes = true;
 }
 
 int Body2D::createBoxShape(float width, float height){
-    load();
-    int index = scene->getSystem<PhysicsSystem>()->createBoxShape2D(entity, width, height);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    int index = appendShape2D(body);
+    if (index < 0) return index;
+
+    Shape2D& shape = body.shapes[index];
+    shape.type = Shape2DType::POLYGON;
+    shape.verticesCount = 4;
+    shape.vertices[0] = Vector2(0, 0);
+    shape.vertices[1] = Vector2(width, 0);
+    shape.vertices[2] = Vector2(width, height);
+    shape.vertices[3] = Vector2(0, height);
+
     return index;
 }
 
@@ -119,50 +149,132 @@ int Body2D::createCenteredBoxShape(float width, float height){
 }
 
 int Body2D::createCenteredBoxShape(float width, float height, Vector2 center, float angle){
-    load();
-    int index = scene->getSystem<PhysicsSystem>()->createCenteredBoxShape2D(entity, width, height, center, angle);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    int index = appendShape2D(body);
+    if (index < 0) return index;
+
+    Shape2D& shape = body.shapes[index];
+    shape.type = Shape2DType::POLYGON;
+    shape.verticesCount = 4;
+
+    float halfW = width / 2.0f;
+    float halfH = height / 2.0f;
+
+    Vector2 local[4] = {
+        Vector2(-halfW, -halfH),
+        Vector2(halfW, -halfH),
+        Vector2(halfW, halfH),
+        Vector2(-halfW, halfH)
+    };
+
+    float rad = Angle::defaultToRad(angle);
+    float c = cosf(rad);
+    float s = sinf(rad);
+
+    for (int i = 0; i < 4; i++){
+        float x = local[i].x;
+        float y = local[i].y;
+        shape.vertices[i] = Vector2((x * c) - (y * s), (x * s) + (y * c)) + center;
+    }
+
     return index;
 }
 
 int Body2D::createRoundedBoxShape(float width, float height, float radius){
-    load();
-    int index = scene->getSystem<PhysicsSystem>()->createRoundedBoxShape2D(entity, width, height, radius);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    int index = appendShape2D(body);
+    if (index < 0) return index;
+
+    Shape2D& shape = body.shapes[index];
+    shape.type = Shape2DType::POLYGON;
+    shape.radius = radius;
+    shape.verticesCount = 4;
+
+    float halfW = width / 2.0f;
+    float halfH = height / 2.0f;
+    shape.vertices[0] = Vector2(-halfW, -halfH);
+    shape.vertices[1] = Vector2(halfW, -halfH);
+    shape.vertices[2] = Vector2(halfW, halfH);
+    shape.vertices[3] = Vector2(-halfW, halfH);
+
     return index;
 }
 
 int Body2D::createPolygonShape(std::vector<Vector2> vertices){
-    load();
-    int index = scene->getSystem<PhysicsSystem>()->createPolygonShape2D(entity, vertices);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    int index = appendShape2D(body);
+    if (index < 0) return index;
+
+    Shape2D& shape = body.shapes[index];
+    shape.type = Shape2DType::POLYGON;
+    shape.verticesCount = std::min((size_t)MAX_SHAPE_POINTS_2D, vertices.size());
+    for (size_t i = 0; i < shape.verticesCount; i++){
+        shape.vertices[i] = vertices[i];
+    }
+
     return index;
 }
 
 int Body2D::createCircleShape(Vector2 center, float radius){
-    load();
-    int index = scene->getSystem<PhysicsSystem>()->createCircleShape2D(entity, center, radius);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    int index = appendShape2D(body);
+    if (index < 0) return index;
+
+    Shape2D& shape = body.shapes[index];
+    shape.type = Shape2DType::CIRCLE;
+    shape.pointA = center;
+    shape.radius = radius;
+
     return index;
 }
 
 int Body2D::createCapsuleShape(Vector2 center1, Vector2 center2, float radius){
-    load();
-    int index = scene->getSystem<PhysicsSystem>()->createCapsuleShape2D(entity, center1, center2, radius);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    int index = appendShape2D(body);
+    if (index < 0) return index;
+
+    Shape2D& shape = body.shapes[index];
+    shape.type = Shape2DType::CAPSULE;
+    shape.pointA = center1;
+    shape.pointB = center2;
+    shape.radius = radius;
+
     return index;
 }
 
 int Body2D::createSegmentShape(Vector2 point1, Vector2 point2){
-    load();
-    int index = scene->getSystem<PhysicsSystem>()->createSegmentShape2D(entity, point1, point2);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    int index = appendShape2D(body);
+    if (index < 0) return index;
+
+    Shape2D& shape = body.shapes[index];
+    shape.type = Shape2DType::SEGMENT;
+    shape.pointA = point1;
+    shape.pointB = point2;
+
     return index;
 }
 
 int Body2D::createChainShape(std::vector<Vector2> vertices, bool loop){
-    load();
-    int index = scene->getSystem<PhysicsSystem>()->createChainShape2D(entity, vertices, loop);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    int index = appendShape2D(body);
+    if (index < 0) return index;
+
+    Shape2D& shape = body.shapes[index];
+    shape.type = Shape2DType::CHAIN;
+    shape.loop = loop;
+    shape.verticesCount = std::min((size_t)MAX_SHAPE_POINTS_2D, vertices.size());
+    for (size_t i = 0; i < shape.verticesCount; i++){
+        shape.vertices[i] = vertices[i];
+    }
+
     return index;
 }
 
 void Body2D::removeAllShapes(){
-    load();
-    scene->getSystem<PhysicsSystem>()->removeAllShapes2D(entity);
+    Body2DComponent& body = getComponent<Body2DComponent>();
+    body.numShapes = 0;
+    body.needUpdateShapes = true;
 }
 
 std::vector<Contact2D> Body2D::getBodyContacts(){
@@ -236,7 +348,8 @@ void Body2D::setShapeDensity(size_t index, float density){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
+        body.shapes[index].density = density;
+        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
             b2Shape_SetDensity(body.shapes[index].shape, density, true);
         }else{
             Log::error("Cannot set density of chain shape %i", index);
@@ -250,9 +363,10 @@ void Body2D::setShapeFriction(size_t index, float friction){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
+        body.shapes[index].friction = friction;
+        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
             b2Shape_SetFriction(body.shapes[index].shape, friction);
-        }else{
+        }else if (b2Chain_IsValid(body.shapes[index].chain)){
             b2Chain_SetFriction(body.shapes[index].chain, friction);
         }
     }else{
@@ -264,9 +378,10 @@ void Body2D::setShapeRestitution(size_t index, float restitution){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
+        body.shapes[index].restitution = restitution;
+        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
             b2Shape_SetRestitution(body.shapes[index].shape, restitution);
-        }else{
+        }else if (b2Chain_IsValid(body.shapes[index].chain)){
             b2Chain_SetRestitution(body.shapes[index].chain, restitution);
         }
     }else{
@@ -295,7 +410,8 @@ void Body2D::setShapeEnableHitEvents(size_t index, bool hitEvents){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
+        body.shapes[index].enableHitEvents = hitEvents;
+        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
             b2Shape_EnableHitEvents(body.shapes[index].shape, hitEvents);
         }else{
             Log::error("Cannot set hit events of chain shape %i", index);
@@ -309,7 +425,8 @@ void Body2D::setShapeContactEvents(size_t index, bool contactEvents){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
+        body.shapes[index].contactEvents = contactEvents;
+        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
             b2Shape_EnableContactEvents(body.shapes[index].shape, contactEvents);
         }else{
             Log::error("Cannot set shape contact events of chain shape %i", index);
@@ -323,7 +440,8 @@ void Body2D::setShapePreSolveEvents(size_t index, bool preSolveEvent){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
+        body.shapes[index].preSolveEvents = preSolveEvent;
+        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
             b2Shape_EnablePreSolveEvents(body.shapes[index].shape, preSolveEvent);
         }else{
             Log::error("Cannot set presolve events of chain shape %i", index);
@@ -337,7 +455,8 @@ void Body2D::setShapeSensorEvents(size_t index, bool sensorEvents){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
+        body.shapes[index].sensorEvents = sensorEvents;
+        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
             b2Shape_EnableSensorEvents(body.shapes[index].shape, sensorEvents);
         }else{
             Log::error("Cannot set sensor events of chain shape %i", index);
@@ -365,11 +484,7 @@ float Body2D::getShapeDensity(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
-            return b2Shape_GetDensity(body.shapes[index].shape);
-        }else{
-            return 0;
-        }
+        return body.shapes[index].density;
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -381,12 +496,7 @@ float Body2D::getShapeFriction(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
-            return b2Shape_GetFriction(body.shapes[index].shape);
-        }else{
-            //return b2Chain_GetFriction(body.shapes[index].chain); // missing this in Box2D
-            return 0;
-        }
+        return body.shapes[index].friction;
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -398,12 +508,7 @@ float Body2D::getShapeRestitution(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].type != Shape2DType::CHAIN){
-            return b2Shape_GetRestitution(body.shapes[index].shape);
-        }else{
-            //return b2Chain_GetRestitution(body.shapes[index].chain); // missing this in Box2D
-            return 0;
-        }
+        return body.shapes[index].restitution;
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -430,12 +535,8 @@ bool Body2D::isShapeSensorEvents() const{
 bool Body2D::isShapeEnableHitEvents(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.shapes[index].type == Shape2DType::CHAIN){
-        return false;
-    }
-
     if (index >= 0 && index < body.numShapes){
-        return b2Shape_AreHitEventsEnabled(body.shapes[index].shape);
+        return body.shapes[index].enableHitEvents;
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -446,12 +547,8 @@ bool Body2D::isShapeEnableHitEvents(size_t index) const{
 bool Body2D::isShapeContactEvents(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.shapes[index].type == Shape2DType::CHAIN){
-        return false;
-    }
-
     if (index >= 0 && index < body.numShapes){
-        return b2Shape_AreContactEventsEnabled(body.shapes[index].shape);
+        return body.shapes[index].contactEvents;
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -462,12 +559,8 @@ bool Body2D::isShapeContactEvents(size_t index) const{
 bool Body2D::isShapePreSolveEvents(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.shapes[index].type == Shape2DType::CHAIN){
-        return false;
-    }
-
     if (index >= 0 && index < body.numShapes){
-        return b2Shape_ArePreSolveEventsEnabled(body.shapes[index].shape);
+        return body.shapes[index].preSolveEvents;
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -478,12 +571,8 @@ bool Body2D::isShapePreSolveEvents(size_t index) const{
 bool Body2D::isShapeSensorEvents(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (body.shapes[index].type == Shape2DType::CHAIN){
-        return false;
-    }
-
     if (index >= 0 && index < body.numShapes){
-        return b2Shape_AreSensorEventsEnabled(body.shapes[index].shape);
+        return body.shapes[index].sensorEvents;
     }else{
         Log::error("Cannot find shape %i of body", index);
     }
@@ -665,12 +754,16 @@ void Body2D::setBitsFilter(size_t shapeIndex, uint16_t categoryBits, uint16_t ma
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
-        b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
-        
-        filter.categoryBits = categoryBits;
-        filter.maskBits = maskBits;
+        body.shapes[shapeIndex].categoryBits = categoryBits;
+        body.shapes[shapeIndex].maskBits = maskBits;
 
-        b2Shape_SetFilter(body.shapes[shapeIndex].shape, filter);
+        if (b2Shape_IsValid(body.shapes[shapeIndex].shape)){
+            b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
+            filter.categoryBits = categoryBits;
+            filter.maskBits = maskBits;
+
+            b2Shape_SetFilter(body.shapes[shapeIndex].shape, filter);
+        }
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
     }
@@ -692,11 +785,14 @@ void Body2D::setCategoryBitsFilter(size_t shapeIndex, uint16_t categoryBits){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
-        b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
-        
-        filter.categoryBits = categoryBits;
-        
-        b2Shape_SetFilter(body.shapes[shapeIndex].shape, filter);
+        body.shapes[shapeIndex].categoryBits = categoryBits;
+        if (b2Shape_IsValid(body.shapes[shapeIndex].shape)){
+            b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
+
+            filter.categoryBits = categoryBits;
+
+            b2Shape_SetFilter(body.shapes[shapeIndex].shape, filter);
+        }
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
     }
@@ -706,11 +802,14 @@ void Body2D::setMaskBitsFilter(size_t shapeIndex, uint16_t maskBits){
     Body2DComponent& body = getComponent<Body2DComponent>();
     
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
-        b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
-        
-        filter.maskBits = maskBits;
-        
-        b2Shape_SetFilter(body.shapes[shapeIndex].shape, filter);
+        body.shapes[shapeIndex].maskBits = maskBits;
+        if (b2Shape_IsValid(body.shapes[shapeIndex].shape)){
+            b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
+
+            filter.maskBits = maskBits;
+
+            b2Shape_SetFilter(body.shapes[shapeIndex].shape, filter);
+        }
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
     }
@@ -720,11 +819,14 @@ void Body2D::setGroupIndexFilter(size_t shapeIndex, int16_t groupIndex){
     Body2DComponent& body = getComponent<Body2DComponent>();
     
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
-        b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
-        
-        filter.groupIndex = groupIndex;
-        
-        b2Shape_SetFilter(body.shapes[shapeIndex].shape, filter);
+        body.shapes[shapeIndex].groupIndex = groupIndex;
+        if (b2Shape_IsValid(body.shapes[shapeIndex].shape)){
+            b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
+
+            filter.groupIndex = groupIndex;
+
+            b2Shape_SetFilter(body.shapes[shapeIndex].shape, filter);
+        }
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
     }
@@ -746,7 +848,7 @@ uint16_t Body2D::getCategoryBitsFilter(size_t shapeIndex) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
-        return b2Shape_GetFilter(body.shapes[shapeIndex].shape).categoryBits;
+        return body.shapes[shapeIndex].categoryBits;
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
     }
@@ -758,7 +860,7 @@ uint16_t Body2D::getMaskBitsFilter(size_t shapeIndex) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
     
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
-        return b2Shape_GetFilter(body.shapes[shapeIndex].shape).maskBits;
+        return body.shapes[shapeIndex].maskBits;
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
     }
@@ -770,7 +872,7 @@ int16_t Body2D::getGroupIndexFilter(size_t shapeIndex) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
     
     if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
-        return b2Shape_GetFilter(body.shapes[shapeIndex].shape).groupIndex;
+        return body.shapes[shapeIndex].groupIndex;
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
     }

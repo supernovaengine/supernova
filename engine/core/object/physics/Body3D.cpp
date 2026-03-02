@@ -10,6 +10,7 @@
 #include "util/JoltPhysicsAux.h"
 
 #include <iostream>
+#include <algorithm>
 
 using namespace Supernova;
 
@@ -35,6 +36,20 @@ BodyType getJoltToBodyType(JPH::EMotionType type){
     }
 
     return BodyType::STATIC;
+}
+
+static int appendShape3D(Body3DComponent& body){
+    if (body.numShapes >= MAX_SHAPES){
+        Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+        return -1;
+    }
+
+    size_t index = body.numShapes;
+    body.shapes[index] = Shape3D();
+    body.numShapes++;
+    body.needUpdateShapes = true;
+
+    return static_cast<int>(index);
 }
 
 Body3D::Body3D(Scene* scene, Entity entity): EntityHandle(scene, entity){
@@ -106,79 +121,197 @@ Object Body3D::getAttachedObject(){
 }
 
 void Body3D::load(){
-    scene->getSystem<PhysicsSystem>()->loadBody3D(entity);
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    body.needReloadBody = true;
+    body.needUpdateShapes = true;
 }
 
 int Body3D::createBoxShape(float width, float height, float depth){
-    return scene->getSystem<PhysicsSystem>()->createBoxShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, width, height, depth);
+    return createBoxShape(Vector3::ZERO, Quaternion::IDENTITY, width, height, depth);
 }
 
 int Body3D::createBoxShape(Vector3 position, Quaternion rotation, float width, float height, float depth){
-    return scene->getSystem<PhysicsSystem>()->createBoxShape3D(entity, position, rotation, width, height, depth);
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::BOX;
+    shape.position = position;
+    shape.rotation = rotation;
+    shape.width = width;
+    shape.height = height;
+    shape.depth = depth;
+
+    return index;
 }
 
 int Body3D::createSphereShape(float radius){
-    return scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, radius);
+    return createSphereShape(Vector3::ZERO, Quaternion::IDENTITY, radius);
 }
 
 int Body3D::createSphereShape(Vector3 position, Quaternion rotation, float radius){
-    return scene->getSystem<PhysicsSystem>()->createSphereShape3D(entity, position, rotation, radius);
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::SPHERE;
+    shape.position = position;
+    shape.rotation = rotation;
+    shape.radius = radius;
+
+    return index;
 }
 
 int Body3D::createCapsuleShape(float halfHeight, float radius){
-    return scene->getSystem<PhysicsSystem>()->createCapsuleShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, halfHeight, radius);
+    return createCapsuleShape(Vector3::ZERO, Quaternion::IDENTITY, halfHeight, radius);
 }
 
 int Body3D::createCapsuleShape(Vector3 position, Quaternion rotation, float halfHeight, float radius){
-    return scene->getSystem<PhysicsSystem>()->createCapsuleShape3D(entity, position, rotation, halfHeight, radius);
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::CAPSULE;
+    shape.position = position;
+    shape.rotation = rotation;
+    shape.halfHeight = halfHeight;
+    shape.radius = radius;
+
+    return index;
 }
 
 int Body3D::createTaperedCapsuleShape(float halfHeight, float topRadius, float bottomRadius){
-    return scene->getSystem<PhysicsSystem>()->createTaperedCapsuleShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, halfHeight, topRadius, bottomRadius);
+    return createTaperedCapsuleShape(Vector3::ZERO, Quaternion::IDENTITY, halfHeight, topRadius, bottomRadius);
 }
 
 int Body3D::createTaperedCapsuleShape(Vector3 position, Quaternion rotation, float halfHeight, float topRadius, float bottomRadius){
-    return scene->getSystem<PhysicsSystem>()->createTaperedCapsuleShape3D(entity, position, rotation, halfHeight, topRadius, bottomRadius);
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::TAPERED_CAPSULE;
+    shape.position = position;
+    shape.rotation = rotation;
+    shape.halfHeight = halfHeight;
+    shape.topRadius = topRadius;
+    shape.bottomRadius = bottomRadius;
+
+    return index;
 }
 
 int Body3D::createCylinderShape(float halfHeight, float radius){
-    return scene->getSystem<PhysicsSystem>()->createCylinderShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, halfHeight, radius);
+    return createCylinderShape(Vector3::ZERO, Quaternion::IDENTITY, halfHeight, radius);
 }
 
 int Body3D::createCylinderShape(Vector3 position, Quaternion rotation, float halfHeight, float radius){
-    return scene->getSystem<PhysicsSystem>()->createCylinderShape3D(entity, position, rotation, halfHeight, radius); 
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::CYLINDER;
+    shape.position = position;
+    shape.rotation = rotation;
+    shape.halfHeight = halfHeight;
+    shape.radius = radius;
+
+    return index;
 }
 
 int Body3D::createConvexHullShape(){
-    return scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, getComponent<MeshComponent>(), getComponent<Transform>());
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::CONVEX_HULL;
+    shape.source = Shape3DSource::ENTITY_MESH;
+    shape.sourceEntity = entity;
+
+    return index;
 }
 
 int Body3D::createConvexHullShape(std::vector<Vector3> vertices){
-    return scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, vertices);
+    return createConvexHullShape(Vector3::ZERO, Quaternion::IDENTITY, vertices);
 }
 
 int Body3D::createConvexHullShape(Vector3 position, Quaternion rotation, std::vector<Vector3> vertices){
-    return scene->getSystem<PhysicsSystem>()->createConvexHullShape3D(entity, position, rotation, vertices);
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::CONVEX_HULL;
+    shape.position = position;
+    shape.rotation = rotation;
+    shape.source = Shape3DSource::RAW_VERTICES;
+    shape.numVertices = std::min((size_t)MAX_SHAPE_VERTICES_3D, vertices.size());
+    for (size_t i = 0; i < shape.numVertices; i++){
+        shape.vertices[i] = vertices[i];
+    }
+
+    return index;
 }
 
 int Body3D::createMeshShape(){
-    return scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, getComponent<MeshComponent>(), getComponent<Transform>());
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::MESH;
+    shape.source = Shape3DSource::ENTITY_MESH;
+    shape.sourceEntity = entity;
+
+    return index;
 }
 
 int Body3D::createMeshShape(std::vector<Vector3> vertices, std::vector<uint16_t> indices){
-    return scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, Vector3::ZERO, Quaternion::IDENTITY, vertices, indices);
+    return createMeshShape(Vector3::ZERO, Quaternion::IDENTITY, vertices, indices);
 }
 
 int Body3D::createMeshShape(Vector3 position, Quaternion rotation, std::vector<Vector3> vertices, std::vector<uint16_t> indices){
-    return scene->getSystem<PhysicsSystem>()->createMeshShape3D(entity, position, rotation, vertices, indices);
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::MESH;
+    shape.position = position;
+    shape.rotation = rotation;
+    shape.source = Shape3DSource::RAW_MESH;
+    shape.numVertices = std::min((size_t)MAX_SHAPE_VERTICES_3D, vertices.size());
+    for (size_t i = 0; i < shape.numVertices; i++){
+        shape.vertices[i] = vertices[i];
+    }
+    shape.numIndices = std::min((size_t)MAX_SHAPE_INDICES_3D, indices.size());
+    for (size_t i = 0; i < shape.numIndices; i++){
+        shape.indices[i] = indices[i];
+    }
+
+    return index;
 }
 
 int Body3D::createHeightFieldShape(){
-    return scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), 0);
+    return createHeightFieldShape(0);
 }
 
 int Body3D::createHeightFieldShape(unsigned int samplesSize){
-    return scene->getSystem<PhysicsSystem>()->createHeightFieldShape3D(entity, getComponent<TerrainComponent>(), samplesSize);
+    Body3DComponent& body = getComponent<Body3DComponent>();
+    int index = appendShape3D(body);
+    if (index < 0) return index;
+
+    Shape3D& shape = body.shapes[index];
+    shape.type = Shape3DType::HEIGHTFIELD;
+    shape.source = Shape3DSource::ENTITY_HEIGHTFIELD;
+    shape.sourceEntity = entity;
+    shape.samplesSize = samplesSize;
+
+    return index;
 }
 
 size_t Body3D::getNumShapes() const{
@@ -206,7 +339,8 @@ void Body3D::setShapeDensity(size_t index, float density){
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].shape->GetType() == JPH::EShapeType::Convex){
+        body.shapes[index].density = density;
+        if (body.shapes[index].shape && body.shapes[index].shape->GetType() == JPH::EShapeType::Convex){
             JPH::ConvexShape* convexShape = (JPH::ConvexShape*)body.shapes[index].shape.GetPtr();
             convexShape->SetDensity(density);
         }else{
@@ -225,12 +359,7 @@ float Body3D::getShapeDensity(size_t index) const{
     Body3DComponent& body = getComponent<Body3DComponent>();
 
     if (index >= 0 && index < body.numShapes){
-        if (body.shapes[index].shape->GetType() == JPH::EShapeType::Convex){
-            const JPH::ConvexShape* convexShape = (const JPH::ConvexShape*)body.shapes[index].shape.GetPtr();
-            return convexShape->GetDensity();
-        }else{
-            Log::warn("The shape %i does not have density", index);
-        }
+        return body.shapes[index].density;
     }else{
         Log::error("Cannot find shape %i of body", index);
     }

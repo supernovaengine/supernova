@@ -166,30 +166,8 @@ void LuaBinding::registerECSClasses(lua_State *L){
         .addFunction("createBody2D", &PhysicsSystem::createBody2D)
         .addFunction("removeBody2D", &PhysicsSystem::removeBody2D)
 
-        .addFunction("createBoxShape2D", &PhysicsSystem::createBoxShape2D)
-        .addFunction("createCenteredBoxShape2D", &PhysicsSystem::createCenteredBoxShape2D)
-        .addFunction("createRoundedBoxShape2D", &PhysicsSystem::createRoundedBoxShape2D)
-        .addFunction("createPolygonShape2D", &PhysicsSystem::createPolygonShape2D)
-        .addFunction("createCircleShape2D", &PhysicsSystem::createCircleShape2D)
-        .addFunction("createCapsuleShape2D", &PhysicsSystem::createCapsuleShape2D)
-        .addFunction("createSegmentShape2D", &PhysicsSystem::createSegmentShape2D)
-        .addFunction("createChainShape2D", &PhysicsSystem::createChainShape2D)
-        .addFunction("removeAllShapes2D", &PhysicsSystem::removeAllShapes2D)
-
         .addFunction("createBody3D", &PhysicsSystem::createBody3D)
         .addFunction("removeBody3D", &PhysicsSystem::removeBody3D)
-        .addFunction("createBoxShape3D", &PhysicsSystem::createBoxShape3D)
-        .addFunction("createSphereShape3D", &PhysicsSystem::createSphereShape3D)
-        .addFunction("createCapsuleShape3D", &PhysicsSystem::createCapsuleShape3D)
-        .addFunction("createTaperedCapsuleShape3D", &PhysicsSystem::createTaperedCapsuleShape3D)
-        .addFunction("createCylinderShape3D", &PhysicsSystem::createCylinderShape3D)
-        .addFunction("createConvexHullShape3D", 
-            luabridge::overload<Entity, Vector3, Quaternion, std::vector<Vector3>>(&PhysicsSystem::createConvexHullShape3D),
-            luabridge::overload<Entity, MeshComponent&, Transform&>(&PhysicsSystem::createConvexHullShape3D))
-        .addFunction("createMeshShape3D", 
-            luabridge::overload<Entity, Vector3, Quaternion, std::vector<Vector3>, std::vector<uint16_t>>(&PhysicsSystem::createMeshShape3D),
-            luabridge::overload<Entity, MeshComponent&, Transform&>(&PhysicsSystem::createMeshShape3D))
-        .addFunction("createHeightFieldShape3D", &PhysicsSystem::createHeightFieldShape3D)
 
         .addFunction("loadBody2D", &PhysicsSystem::loadBody2D)
         .addFunction("destroyBody2D", &PhysicsSystem::destroyBody2D)
