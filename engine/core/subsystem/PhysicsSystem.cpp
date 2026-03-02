@@ -1334,6 +1334,24 @@ bool PhysicsSystem::loadPrismaticJoint3D(Joint3DComponent& joint, Entity bodyA, 
         updateBody3DPosition(signatureA, bodyA, myBodyA);
         updateBody3DPosition(signatureB, bodyB, myBodyB);
 
+        if (limitsMax < limitsMin){
+            std::swap(limitsMin, limitsMax);
+        }
+
+        if (std::fabs(limitsMax - limitsMin) < 1.0e-6f){
+            Log::warn("Prismatic 3D joint with equal limits is unsupported by Jolt SliderConstraint. Using fixed joint instead.");
+            return loadFixedJoint3D(joint, bodyA, bodyB);
+        }
+
+        float axisLengthSq = sliderAxis.x * sliderAxis.x + sliderAxis.y * sliderAxis.y + sliderAxis.z * sliderAxis.z;
+        if (axisLengthSq < 1.0e-6f){
+            Log::warn("Prismatic 3D joint axis is zero. Using default axis (1, 0, 0).");
+            sliderAxis = Vector3(1.0f, 0.0f, 0.0f);
+        }else{
+            float invLength = 1.0f / std::sqrt(axisLengthSq);
+            sliderAxis = Vector3(sliderAxis.x * invLength, sliderAxis.y * invLength, sliderAxis.z * invLength);
+        }
+
         JPH::SliderConstraintSettings settings;
         settings.mAutoDetectPoint = true;
         settings.SetSliderAxis(JPH::Vec3(sliderAxis.x, sliderAxis.y, sliderAxis.z));
