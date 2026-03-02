@@ -45,13 +45,20 @@ void Joint3D::setFixedJoint(Entity bodyA, Entity bodyB){
     joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadFixedJoint3D(joint, bodyA, bodyB);
 }
 
+void Joint3D::setDistanceJoint(Entity bodyA, Entity bodyB){
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.autoAnchors = true;
+
+    setDistanceJoint(bodyA, bodyB, Vector3::ZERO, Vector3::ZERO);
+}
+
 void Joint3D::setDistanceJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchorOnBodyA, Vector3 worldAnchorOnBodyB){
     Joint3DComponent& joint = getComponent<Joint3DComponent>();
     joint.bodyA = bodyA;
     joint.bodyB = bodyB;
     joint.anchorA = worldAnchorOnBodyA;
     joint.anchorB = worldAnchorOnBodyB;
-    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadDistanceJoint3D(joint, bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB);
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadDistanceJoint3D(joint, bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB, joint.autoAnchors);
 }
 
 void Joint3D::setPointJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchor){

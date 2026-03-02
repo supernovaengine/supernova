@@ -1083,7 +1083,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .beginClass<Joint3D>("Joint3D")
         .addConstructor <void (Scene*), void (Scene*, Entity)> ()
         .addFunction("setFixedJoint", &Joint3D::setFixedJoint)
-        .addFunction("setDistanceJoint", &Joint3D::setDistanceJoint)
+        .addFunction("setDistanceJoint",
+            luabridge::overload<Entity, Entity>(&Joint3D::setDistanceJoint),
+            luabridge::overload<Entity, Entity, Vector3, Vector3>(&Joint3D::setDistanceJoint))
         .addFunction("setPointJoint", &Joint3D::setPointJoint)
         .addFunction("setHingeJoint", &Joint3D::setHingeJoint)
         .addFunction("setConeJoint", &Joint3D::setConeJoint)

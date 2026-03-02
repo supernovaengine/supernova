@@ -65,6 +65,7 @@ namespace Supernova{
 
         Vector3 pathPosition = Vector3::ZERO;
         bool isLooping = false;
+        bool autoAnchors = true;
 
         bool needUpdateJoint = true;
     };

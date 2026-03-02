@@ -248,7 +248,7 @@ bool PhysicsSystem::loadJoint3D(Entity entity, Joint3DComponent& joint){
         case Joint3DType::FIXED:
             return loadFixedJoint3D(joint, joint.bodyA, joint.bodyB);
         case Joint3DType::DISTANCE:
-            return loadDistanceJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.anchorB);
+            return loadDistanceJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.anchorB, joint.autoAnchors);
         case Joint3DType::POINT:
             return loadPointJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchor);
         case Joint3DType::HINGE:
@@ -1160,7 +1160,7 @@ bool PhysicsSystem::loadFixedJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
     return true;
 }
 
-bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchorA, Vector3 anchorB){
+bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 anchorA, Vector3 anchorB, bool autoAnchors){
     Signature signatureA = scene->getSignature(bodyA);
     Signature signatureB = scene->getSignature(bodyB);
 
@@ -1172,12 +1172,6 @@ bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, E
         updateBody3DPosition(signatureA, bodyA, myBodyA);
         updateBody3DPosition(signatureB, bodyB, myBodyB);
 
-        JPH::DistanceConstraintSettings settings;
-        settings.mPoint1 = JPH::Vec3(anchorA.x, anchorA.y, anchorA.z);
-        settings.mPoint2 = JPH::Vec3(anchorB.x, anchorB.y, anchorB.z);
-        //settings.mMinDistance = 4.0f;
-        //settings.mMaxDistance = 8.0f;
-
         const JPH::BodyLockInterface& bodyLockInterface = lock3DBodies? static_cast<const JPH::BodyLockInterface &>(world3D.GetBodyLockInterface()) : static_cast<const JPH::BodyLockInterface &>(world3D.GetBodyLockInterfaceNoLock());
         JPH::BodyID bodies[2] = {myBodyA.body, myBodyB.body};
         JPH::BodyLockMultiWrite lock(bodyLockInterface, bodies, 2);
@@ -1188,6 +1182,22 @@ bool PhysicsSystem::loadDistanceJoint3D(Joint3DComponent& joint, Entity bodyA, E
             Log::error("Cannot create distance 3D joint, bodyA or bodyB is invalid");
             return false;
         }
+
+        if (autoAnchors){
+            JPH::RVec3 bodyPositionA = lockBodyA->GetPosition();
+            anchorA = Vector3((float)bodyPositionA.GetX(), (float)bodyPositionA.GetY(), (float)bodyPositionA.GetZ());
+        }
+
+        if (autoAnchors){
+            JPH::RVec3 bodyPositionB = lockBodyB->GetPosition();
+            anchorB = Vector3((float)bodyPositionB.GetX(), (float)bodyPositionB.GetY(), (float)bodyPositionB.GetZ());
+        }
+
+        JPH::DistanceConstraintSettings settings;
+        settings.mPoint1 = JPH::RVec3(anchorA.x, anchorA.y, anchorA.z);
+        settings.mPoint2 = JPH::RVec3(anchorB.x, anchorB.y, anchorB.z);
+        //settings.mMinDistance = 4.0f;
+        //settings.mMaxDistance = 8.0f;
 
         joint.joint = settings.Create(*lockBodyA, *lockBodyB);
 
