@@ -39,51 +39,126 @@ JPH::TwoBodyConstraint* Joint3D::getJoltJoint() const{
 }
 
 void Joint3D::setFixedJoint(Entity bodyA, Entity bodyB){
-    scene->getSystem<PhysicsSystem>()->loadFixedJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadFixedJoint3D(joint, bodyA, bodyB);
 }
 
 void Joint3D::setDistanceJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchorOnBodyA, Vector3 worldAnchorOnBodyB){
-    scene->getSystem<PhysicsSystem>()->loadDistanceJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchorA = worldAnchorOnBodyA;
+    joint.anchorB = worldAnchorOnBodyB;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadDistanceJoint3D(joint, bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB);
 }
 
 void Joint3D::setPointJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchor){
-    scene->getSystem<PhysicsSystem>()->loadPointJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchor);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchor = worldAnchor;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadPointJoint3D(joint, bodyA, bodyB, worldAnchor);
 }
 
 void Joint3D::setHingeJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchor, Vector3 axis, Vector3 normal){
-    scene->getSystem<PhysicsSystem>()->loadHingeJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchor, axis, normal);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchor = worldAnchor;
+    joint.axis = axis;
+    joint.normal = normal;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadHingeJoint3D(joint, bodyA, bodyB, worldAnchor, axis, normal);
 }
 
 void Joint3D::setConeJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchor, Vector3 twistAxis){
-    scene->getSystem<PhysicsSystem>()->loadConeJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchor, twistAxis);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchor = worldAnchor;
+    joint.twistAxis = twistAxis;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadConeJoint3D(joint, bodyA, bodyB, worldAnchor, twistAxis);
 }
 
 void Joint3D::setPrismaticJoint(Entity bodyA, Entity bodyB, Vector3 sliderAxis, float limitsMin, float limitsMax){
-    scene->getSystem<PhysicsSystem>()->loadPrismaticJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, sliderAxis, limitsMin, limitsMax);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.axis = sliderAxis;
+    joint.limitsMin = limitsMin;
+    joint.limitsMax = limitsMax;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadPrismaticJoint3D(joint, bodyA, bodyB, sliderAxis, limitsMin, limitsMax);
 }
 
 void Joint3D::setSwingTwistJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchor, Vector3 twistAxis, Vector3 planeAxis, float normalHalfConeAngle, float planeHalfConeAngle, float twistMinAngle, float twistMaxAngle){
-    scene->getSystem<PhysicsSystem>()->loadSwingTwistJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchor, twistAxis, planeAxis, normalHalfConeAngle, planeHalfConeAngle, twistMinAngle, twistMaxAngle);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchor = worldAnchor;
+    joint.twistAxis = twistAxis;
+    joint.planeAxis = planeAxis;
+    joint.normalHalfConeAngle = normalHalfConeAngle;
+    joint.planeHalfConeAngle = planeHalfConeAngle;
+    joint.twistMinAngle = twistMinAngle;
+    joint.twistMaxAngle = twistMaxAngle;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadSwingTwistJoint3D(joint, bodyA, bodyB, worldAnchor, twistAxis, planeAxis, normalHalfConeAngle, planeHalfConeAngle, twistMinAngle, twistMaxAngle);
 }
 
 void Joint3D::setSixDOFJoint(Entity bodyA, Entity bodyB, Vector3 worldAnchorOnBodyA, Vector3 worldAnchorOnBodyB, Vector3 axisX, Vector3 axisY){
-    scene->getSystem<PhysicsSystem>()->loadSixDOFJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB, axisX, axisY);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.anchorA = worldAnchorOnBodyA;
+    joint.anchorB = worldAnchorOnBodyB;
+    joint.axisX = axisX;
+    joint.axisY = axisY;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadSixDOFJoint3D(joint, bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB, axisX, axisY);
 }
 
 void Joint3D::setPathJoint(Entity bodyA, Entity bodyB, std::vector<Vector3> positions, std::vector<Vector3> tangents, std::vector<Vector3> normals, Vector3 pathPosition, bool isLooping){
-    scene->getSystem<PhysicsSystem>()->loadPathJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, positions, tangents, normals, pathPosition, isLooping);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.pathPosition = pathPosition;
+    joint.isLooping = isLooping;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadPathJoint3D(joint, bodyA, bodyB, positions, tangents, normals, pathPosition, isLooping);
 }
 
 void Joint3D::setGearJoint(Entity bodyA, Entity bodyB, Entity hingeA, Entity hingeB, int numTeethGearA, int numTeethGearB){
-    scene->getSystem<PhysicsSystem>()->loadGearJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, hingeA, hingeB, numTeethGearA, numTeethGearB);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.hingeA = hingeA;
+    joint.hingeB = hingeB;
+    joint.numTeethGearA = numTeethGearA;
+    joint.numTeethGearB = numTeethGearB;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadGearJoint3D(joint, bodyA, bodyB, hingeA, hingeB, numTeethGearA, numTeethGearB);
 }
 
 void Joint3D::setRackAndPinionJoint(Entity bodyA, Entity bodyB, Entity hinge, Entity slider, int numTeethRack, int numTeethGear, int rackLength){
-    scene->getSystem<PhysicsSystem>()->loadRackAndPinionJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, hinge, slider, numTeethRack, numTeethGear, rackLength);
+    Joint3DComponent& joint = getComponent<Joint3DComponent>();
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
+    joint.hinge = hinge;
+    joint.slider = slider;
+    joint.numTeethRack = numTeethRack;
+    joint.numTeethGear = numTeethGear;
+    joint.rackLength = rackLength;
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadRackAndPinionJoint3D(joint, bodyA, bodyB, hinge, slider, numTeethRack, numTeethGear, rackLength);
 }
 
 void Joint3D::setPulleyJoint(Joint3DComponent& joint, Entity bodyA, Entity bodyB, Vector3 worldAnchorOnBodyA, Vector3 worldAnchorOnBodyB, Vector3 fixedPointA, Vector3 fixedPointB){
-    scene->getSystem<PhysicsSystem>()->loadPulleyJoint3D(getComponent<Joint3DComponent>(), bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB, fixedPointA, fixedPointB);
+    (void)joint;
+
+    Joint3DComponent& myJoint = getComponent<Joint3DComponent>();
+    myJoint.bodyA = bodyA;
+    myJoint.bodyB = bodyB;
+    myJoint.anchorA = worldAnchorOnBodyA;
+    myJoint.anchorB = worldAnchorOnBodyB;
+    myJoint.fixedPointA = fixedPointA;
+    myJoint.fixedPointB = fixedPointB;
+    myJoint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadPulleyJoint3D(myJoint, bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB, fixedPointA, fixedPointB);
 }
 
 Joint3DType Joint3D::getType(){

@@ -22,8 +22,19 @@ namespace Supernova{
     };
 
     struct SUPERNOVA_API Joint2DComponent{
-        b2JointId joint;
+        b2JointId joint = b2_nullJointId;
         Joint2DType type = Joint2DType::DISTANCE;
+
+        Entity bodyA = NULL_ENTITY;
+        Entity bodyB = NULL_ENTITY;
+
+        Vector2 anchorA = Vector2::ZERO;
+        Vector2 anchorB = Vector2::ZERO;
+        Vector2 axis = Vector2::ZERO;
+        Vector2 target = Vector2::ZERO;
+
+        bool rope = false;
+        bool needUpdateJoint = true;
     };
 
 }

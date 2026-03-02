@@ -52,6 +52,8 @@ namespace Supernova{
 
 		void updateBody2DPosition(Signature signature, Entity entity, Body2DComponent& body);
 		void updateBody3DPosition(Signature signature, Entity entity, Body3DComponent& body);
+		bool loadJoint2D(Entity entity, Joint2DComponent& joint);
+		bool loadJoint3D(Entity entity, Joint3DComponent& joint);
 
 		bool syncBody2DShapes(Body2DComponent& body);
 		bool syncBody3DShapes(Entity entity, Body3DComponent& body);

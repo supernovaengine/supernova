@@ -179,6 +179,82 @@ void PhysicsSystem::updateBody3DPosition(Signature signature, Entity entity, Bod
     }
 }
 
+bool PhysicsSystem::loadJoint2D(Entity entity, Joint2DComponent& joint){
+    if (b2Joint_IsValid(joint.joint)){
+        destroyJoint2D(joint);
+    }
+
+    if (joint.bodyA == NULL_ENTITY){
+        return false;
+    }
+
+    switch (joint.type){
+        case Joint2DType::DISTANCE:
+            if (joint.bodyB == NULL_ENTITY) return false;
+            return loadDistanceJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.anchorB, joint.rope);
+        case Joint2DType::REVOLUTE:
+            if (joint.bodyB == NULL_ENTITY) return false;
+            return loadRevoluteJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA);
+        case Joint2DType::PRISMATIC:
+            if (joint.bodyB == NULL_ENTITY) return false;
+            return loadPrismaticJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.axis);
+        case Joint2DType::MOUSE:
+            return loadMouseJoint2D(entity, joint, joint.bodyA, joint.target);
+        case Joint2DType::WHEEL:
+            if (joint.bodyB == NULL_ENTITY) return false;
+            return loadWheelJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.axis);
+        case Joint2DType::WELD:
+            if (joint.bodyB == NULL_ENTITY) return false;
+            return loadWeldJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA);
+        case Joint2DType::MOTOR:
+            if (joint.bodyB == NULL_ENTITY) return false;
+            return loadMotorJoint2D(entity, joint, joint.bodyA, joint.bodyB);
+        default:
+            return false;
+    }
+}
+
+bool PhysicsSystem::loadJoint3D(Entity entity, Joint3DComponent& joint){
+    if (joint.joint){
+        destroyJoint3D(joint);
+    }
+
+    if (joint.bodyA == NULL_ENTITY || joint.bodyB == NULL_ENTITY){
+        return false;
+    }
+
+    switch (joint.type){
+        case Joint3DType::FIXED:
+            return loadFixedJoint3D(joint, joint.bodyA, joint.bodyB);
+        case Joint3DType::DISTANCE:
+            return loadDistanceJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.anchorB);
+        case Joint3DType::POINT:
+            return loadPointJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchor);
+        case Joint3DType::HINGE:
+            return loadHingeJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchor, joint.axis, joint.normal);
+        case Joint3DType::CONE:
+            return loadConeJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchor, joint.twistAxis);
+        case Joint3DType::PRISMATIC:
+            return loadPrismaticJoint3D(joint, joint.bodyA, joint.bodyB, joint.axis, joint.limitsMin, joint.limitsMax);
+        case Joint3DType::SWINGTWIST:
+            return loadSwingTwistJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchor, joint.twistAxis, joint.planeAxis, joint.normalHalfConeAngle, joint.planeHalfConeAngle, joint.twistMinAngle, joint.twistMaxAngle);
+        case Joint3DType::SIXDOF:
+            return loadSixDOFJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.anchorB, joint.axisX, joint.axisY);
+        case Joint3DType::PATH:
+            return loadPathJoint3D(joint, joint.bodyA, joint.bodyB, {}, {}, {}, joint.pathPosition, joint.isLooping);
+        case Joint3DType::GEAR:
+            if (joint.hingeA == NULL_ENTITY || joint.hingeB == NULL_ENTITY) return false;
+            return loadGearJoint3D(joint, joint.bodyA, joint.bodyB, joint.hingeA, joint.hingeB, joint.numTeethGearA, joint.numTeethGearB);
+        case Joint3DType::RACKANDPINON:
+            if (joint.hinge == NULL_ENTITY || joint.slider == NULL_ENTITY) return false;
+            return loadRackAndPinionJoint3D(joint, joint.bodyA, joint.bodyB, joint.hinge, joint.slider, joint.numTeethRack, joint.numTeethGear, joint.rackLength);
+        case Joint3DType::PULLEY:
+            return loadPulleyJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.anchorB, joint.fixedPointA, joint.fixedPointB);
+        default:
+            return false;
+    }
+}
+
 bool PhysicsSystem::syncBody2DShapes(Body2DComponent& body){
     if (!b2Body_IsValid(body.body)){
         return false;
@@ -1552,6 +1628,16 @@ void PhysicsSystem::update(double dt){
             body.newBody = false;
         }
     }
+    auto joints2d = scene->getComponentArray<Joint2DComponent>();
+    for (int i = 0; i < joints2d->size(); i++){
+        Joint2DComponent& joint = joints2d->getComponentFromIndex(i);
+        Entity entity = joints2d->getEntity(i);
+
+        if (joint.needUpdateJoint || !b2Joint_IsValid(joint.joint)){
+            loadJoint2D(entity, joint);
+            joint.needUpdateJoint = false;
+        }
+    }
 
     if (bodies2d->size() > 0){
         int32_t subSteps = 4;
@@ -1608,6 +1694,16 @@ void PhysicsSystem::update(double dt){
             updateBody3DPosition(signature, entity, body);
 
             body.newBody = false;
+        }
+    }
+    auto joints3d = scene->getComponentArray<Joint3DComponent>();
+    for (int i = 0; i < joints3d->size(); i++){
+        Joint3DComponent& joint = joints3d->getComponentFromIndex(i);
+        Entity entity = joints3d->getEntity(i);
+
+        if (joint.needUpdateJoint || !joint.joint){
+            loadJoint3D(entity, joint);
+            joint.needUpdateJoint = false;
         }
     }
 
