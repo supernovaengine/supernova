@@ -126,6 +126,8 @@ void Body2D::load(){
     Body2DComponent& body = getComponent<Body2DComponent>();
     body.needReloadBody = true;
     body.needUpdateShapes = true;
+
+    scene->getSystem<PhysicsSystem>()->loadBody2D(entity);
 }
 
 int Body2D::createBoxShape(float width, float height){
@@ -349,10 +351,10 @@ void Body2D::setShapeDensity(size_t index, float density){
 
     if (index >= 0 && index < body.numShapes){
         body.shapes[index].density = density;
-        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
-            b2Shape_SetDensity(body.shapes[index].shape, density, true);
-        }else{
+        if (body.shapes[index].type == Shape2DType::CHAIN){
             Log::error("Cannot set density of chain shape %i", index);
+        }else if (b2Shape_IsValid(body.shapes[index].shape)){
+            b2Shape_SetDensity(body.shapes[index].shape, density, true);
         }
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -411,10 +413,10 @@ void Body2D::setShapeEnableHitEvents(size_t index, bool hitEvents){
 
     if (index >= 0 && index < body.numShapes){
         body.shapes[index].enableHitEvents = hitEvents;
-        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
-            b2Shape_EnableHitEvents(body.shapes[index].shape, hitEvents);
-        }else{
+        if (body.shapes[index].type == Shape2DType::CHAIN){
             Log::error("Cannot set hit events of chain shape %i", index);
+        }else if (b2Shape_IsValid(body.shapes[index].shape)){
+            b2Shape_EnableHitEvents(body.shapes[index].shape, hitEvents);
         }
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -426,10 +428,10 @@ void Body2D::setShapeContactEvents(size_t index, bool contactEvents){
 
     if (index >= 0 && index < body.numShapes){
         body.shapes[index].contactEvents = contactEvents;
-        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
-            b2Shape_EnableContactEvents(body.shapes[index].shape, contactEvents);
-        }else{
+        if (body.shapes[index].type == Shape2DType::CHAIN){
             Log::error("Cannot set shape contact events of chain shape %i", index);
+        }else if (b2Shape_IsValid(body.shapes[index].shape)){
+            b2Shape_EnableContactEvents(body.shapes[index].shape, contactEvents);
         }
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -441,10 +443,10 @@ void Body2D::setShapePreSolveEvents(size_t index, bool preSolveEvent){
 
     if (index >= 0 && index < body.numShapes){
         body.shapes[index].preSolveEvents = preSolveEvent;
-        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
-            b2Shape_EnablePreSolveEvents(body.shapes[index].shape, preSolveEvent);
-        }else{
+        if (body.shapes[index].type == Shape2DType::CHAIN){
             Log::error("Cannot set presolve events of chain shape %i", index);
+        }else if (b2Shape_IsValid(body.shapes[index].shape)){
+            b2Shape_EnablePreSolveEvents(body.shapes[index].shape, preSolveEvent);
         }
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -456,10 +458,10 @@ void Body2D::setShapeSensorEvents(size_t index, bool sensorEvents){
 
     if (index >= 0 && index < body.numShapes){
         body.shapes[index].sensorEvents = sensorEvents;
-        if (body.shapes[index].type != Shape2DType::CHAIN && b2Shape_IsValid(body.shapes[index].shape)){
-            b2Shape_EnableSensorEvents(body.shapes[index].shape, sensorEvents);
-        }else{
+        if (body.shapes[index].type == Shape2DType::CHAIN){
             Log::error("Cannot set sensor events of chain shape %i", index);
+        }else if (b2Shape_IsValid(body.shapes[index].shape)){
+            b2Shape_EnableSensorEvents(body.shapes[index].shape, sensorEvents);
         }
     }else{
         Log::error("Cannot find shape %i of body", index);

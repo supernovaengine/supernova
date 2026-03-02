@@ -124,6 +124,8 @@ void Body3D::load(){
     Body3DComponent& body = getComponent<Body3DComponent>();
     body.needReloadBody = true;
     body.needUpdateShapes = true;
+
+    scene->getSystem<PhysicsSystem>()->loadBody3D(entity);
 }
 
 int Body3D::createBoxShape(float width, float height, float depth){
