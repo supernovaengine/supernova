@@ -191,7 +191,7 @@ bool PhysicsSystem::loadJoint2D(Entity entity, Joint2DComponent& joint){
     switch (joint.type){
         case Joint2DType::DISTANCE:
             if (joint.bodyB == NULL_ENTITY) return false;
-            return loadDistanceJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.anchorB, joint.rope);
+            return loadDistanceJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.anchorB, joint.autoAnchors, joint.rope);
         case Joint2DType::REVOLUTE:
             if (joint.bodyB == NULL_ENTITY) return false;
             return loadRevoluteJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA);
@@ -199,7 +199,8 @@ bool PhysicsSystem::loadJoint2D(Entity entity, Joint2DComponent& joint){
             if (joint.bodyB == NULL_ENTITY) return false;
             return loadPrismaticJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.axis);
         case Joint2DType::MOUSE:
-            return loadMouseJoint2D(entity, joint, joint.bodyA, joint.target);
+            if (joint.bodyB == NULL_ENTITY) return false;
+            return loadMouseJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.target);
         case Joint2DType::WHEEL:
             if (joint.bodyB == NULL_ENTITY) return false;
             return loadWheelJoint2D(entity, joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.axis);
@@ -990,7 +991,7 @@ void PhysicsSystem::destroyShape3D(Body3DComponent& body, size_t index){
     }
 }
 
-bool PhysicsSystem::loadDistanceJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB, bool rope){
+bool PhysicsSystem::loadDistanceJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 anchorA, Vector2 anchorB, bool autoAnchors, bool rope){
     Signature signatureA = scene->getSignature(bodyA);
     Signature signatureB = scene->getSignature(bodyB);
 
@@ -1004,6 +1005,16 @@ bool PhysicsSystem::loadDistanceJoint2D(Entity entity, Joint2DComponent& joint, 
 
         b2Vec2 worldPivotA = {anchorA.x / pointsToMeterScale2D, anchorA.y / pointsToMeterScale2D};
         b2Vec2 worldPivotB = {anchorB.x / pointsToMeterScale2D, anchorB.y / pointsToMeterScale2D};
+
+        const bool isZeroAnchorA = (anchorA == Vector2::ZERO);
+        const bool isZeroAnchorB = (anchorB == Vector2::ZERO);
+        if (autoAnchors){
+            worldPivotA = b2Body_GetPosition(myBodyA.body);
+            worldPivotB = b2Body_GetPosition(myBodyB.body);
+        }else if (isZeroAnchorA && isZeroAnchorB){
+            Log::error("Cannot create distance 2D joint: Auto Anchors is disabled and both anchors are zero");
+            return false;
+        }
 
         b2DistanceJointDef jointDef = b2DefaultDistanceJointDef();
         jointDef.bodyIdA = myBodyA.body;
@@ -1093,24 +1104,52 @@ bool PhysicsSystem::loadPrismaticJoint2D(Entity entity, Joint2DComponent& joint,
     return true;
 }
 
-bool PhysicsSystem::loadMouseJoint2D(Entity entity, Joint2DComponent& joint, Entity body, Vector2 target){
-    Signature signature = scene->getSignature(body);
+bool PhysicsSystem::loadMouseJoint2D(Entity entity, Joint2DComponent& joint, Entity bodyA, Entity bodyB, Vector2 target){
+    Signature signatureA = scene->getSignature(bodyA);
+    Signature signatureB = scene->getSignature(bodyB);
 
-    if (signature.test(scene->getComponentId<Body2DComponent>())){
+    if (signatureA.test(scene->getComponentId<Body2DComponent>()) && signatureB.test(scene->getComponentId<Body2DComponent>())){
 
-        Body2DComponent myBody = scene->getComponent<Body2DComponent>(body);
+        if (!loadBody2D(bodyA) || !loadBody2D(bodyB)){
+            Log::error("Cannot create mouse 2D joint, bodyA or bodyB could not be loaded");
+            return false;
+        }
 
-        updateBody2DPosition(signature, body, myBody);
+        Body2DComponent myBodyA = scene->getComponent<Body2DComponent>(bodyA);
+        Body2DComponent myBodyB = scene->getComponent<Body2DComponent>(bodyB);
+
+        if (myBodyA.type != BodyType::DYNAMIC){
+            Log::error("Cannot create mouse 2D joint, bodyA must be dynamic");
+            return false;
+        }
+
+        if (bodyA == bodyB){
+            Log::error("Cannot create mouse 2D joint with the same bodyA and bodyB");
+            return false;
+        }
+
+        updateBody2DPosition(signatureA, bodyA, myBodyA);
+        updateBody2DPosition(signatureB, bodyB, myBodyB);
+
+        if (!b2Body_IsValid(myBodyA.body) || !b2Body_IsValid(myBodyB.body)){
+            Log::error("Cannot create mouse 2D joint, bodyA or bodyB has no valid physics body");
+            return false;
+        }
 
         b2Vec2 worldTarget = {target.x / pointsToMeterScale2D, target.y / pointsToMeterScale2D};
 
         b2MouseJointDef jointDef = b2DefaultMouseJointDef();
-        jointDef.bodyIdA = myBody.body;
-        jointDef.bodyIdB = myBody.body;
+        jointDef.bodyIdA = myBodyB.body;
+        jointDef.bodyIdB = myBodyA.body;
         jointDef.target = worldTarget;
+        jointDef.maxForce = std::max(10.0f, 1000.0f * b2Body_GetMass(myBodyA.body));
         jointDef.userData = reinterpret_cast<void*>((uint64_t)entity);
 
         joint.joint = b2CreateMouseJoint(world2D, &jointDef);
+        if (!b2Joint_IsValid(joint.joint)){
+            Log::error("Cannot create mouse 2D joint");
+            return false;
+        }
         joint.type = Joint2DType::MOUSE;
 
     }else{

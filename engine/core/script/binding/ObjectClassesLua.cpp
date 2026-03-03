@@ -962,7 +962,9 @@ void LuaBinding::registerObjectClasses(lua_State *L){
     luabridge::getGlobalNamespace(L)
         .beginClass<Joint2D>("Joint2D")
         .addConstructor <void (Scene*), void (Scene*, Entity)> ()
-        .addFunction("setDistanceJoint", &Joint2D::setDistanceJoint)
+        .addFunction("setDistanceJoint",
+            luabridge::overload<Entity, Entity>(&Joint2D::setDistanceJoint),
+            luabridge::overload<Entity, Entity, Vector2, Vector2, bool>(&Joint2D::setDistanceJoint))
         .addFunction("setRevoluteJoint", &Joint2D::setRevoluteJoint)
         .addFunction("setPrismaticJoint", &Joint2D::setPrismaticJoint)
         //.addFunction("setPulleyJoint", &Joint2D::setPulleyJoint)

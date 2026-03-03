@@ -38,14 +38,22 @@ b2JointId Joint2D::getBox2DJoint() const{
     return joint.joint;
 }
 
+void Joint2D::setDistanceJoint(Entity bodyA, Entity bodyB){
+    Joint2DComponent& joint = getComponent<Joint2DComponent>();
+    joint.autoAnchors = true;
+
+    setDistanceJoint(bodyA, bodyB, Vector2::ZERO, Vector2::ZERO, false);
+}
+
 void Joint2D::setDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB, bool rope){
     Joint2DComponent& joint = getComponent<Joint2DComponent>();
     joint.bodyA = bodyA;
     joint.bodyB = bodyB;
     joint.anchorA = worldAnchorOnBodyA;
     joint.anchorB = worldAnchorOnBodyB;
+    joint.autoAnchors = false;
     joint.rope = rope;
-    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadDistanceJoint2D(entity, joint, bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB, rope);
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadDistanceJoint2D(entity, joint, bodyA, bodyB, worldAnchorOnBodyA, worldAnchorOnBodyB, false, rope);
 }
 
 void Joint2D::setRevoluteJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor){
@@ -65,11 +73,12 @@ void Joint2D::setPrismaticJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor,
     joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadPrismaticJoint2D(entity, joint, bodyA, bodyB, worldAnchor, worldAxis);
 }
 
-void Joint2D::setMouseJoint(Entity body, Vector2 target){
+void Joint2D::setMouseJoint(Entity bodyA, Entity bodyB, Vector2 target){
     Joint2DComponent& joint = getComponent<Joint2DComponent>();
-    joint.bodyA = body;
+    joint.bodyA = bodyA;
+    joint.bodyB = bodyB;
     joint.target = target;
-    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadMouseJoint2D(entity, joint, body, target);
+    joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadMouseJoint2D(entity, joint, bodyA, bodyB, target);
 }
 
 void Joint2D::setWheelJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor, Vector2 worldAxis){

@@ -33,6 +33,7 @@ namespace Supernova{
         Vector2 axis = Vector2::ZERO;
         Vector2 target = Vector2::ZERO;
 
+        bool autoAnchors = true;
         bool rope = false;
         bool needUpdateJoint = true;
     };

@@ -20,12 +20,13 @@ namespace Supernova{
 
         b2JointId getBox2DJoint() const;
 
+        void setDistanceJoint(Entity bodyA, Entity bodyB);
         void setDistanceJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB, bool rope);
         void setRevoluteJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor);
         void setPrismaticJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor, Vector2 worldAxis);
         //void setPulleyJoint(Entity bodyA, Entity bodyB, Vector2 groundAnchorA, Vector2 groundAnchorB, Vector2 worldAnchorOnBodyA, Vector2 worldAnchorOnBodyB, Vector2 worldAxis, float ratio);
         //void setGearJoint(Entity bodyA, Entity bodyB, Entity revoluteJoint, Entity prismaticJoint, float ratio);
-        void setMouseJoint(Entity body, Vector2 target);
+        void setMouseJoint(Entity bodyA, Entity bodyB, Vector2 target);
         void setWheelJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor, Vector2 worldAxis);
         void setWeldJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor);
         //void setFrictionJoint(Entity bodyA, Entity bodyB, Vector2 worldAnchor);
