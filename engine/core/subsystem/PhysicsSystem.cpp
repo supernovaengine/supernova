@@ -400,24 +400,44 @@ bool PhysicsSystem::syncBody2DShapes(Body2DComponent& body){
             b2Polygon polygon = b2MakePolygon(&hull, std::max(0.0f, shapeData.radius / pointsToMeterScale2D));
             shapeData.shape = b2CreatePolygonShape(body.body, &shapeDef, &polygon);
         }else if (shapeData.type == Shape2DType::CIRCLE){
+            if (shapeData.radius <= 0.0f){
+                Log::error("Cannot create circle shape %zu: radius must be > 0", i);
+                continue;
+            }
+
             b2Circle circle = {0};
             circle.center = {shapeData.pointA.x / pointsToMeterScale2D, shapeData.pointA.y / pointsToMeterScale2D};
             circle.radius = shapeData.radius / pointsToMeterScale2D;
             shapeData.shape = b2CreateCircleShape(body.body, &shapeDef, &circle);
         }else if (shapeData.type == Shape2DType::CAPSULE){
+            if (shapeData.radius <= 0.0f){
+                Log::error("Cannot create capsule shape %zu: radius must be > 0", i);
+                continue;
+            }
+
+            if (shapeData.pointA == shapeData.pointB){
+                Log::error("Cannot create capsule shape %zu: pointA and pointB are equal", i);
+                continue;
+            }
+
             b2Capsule capsule = {0};
             capsule.center1 = {shapeData.pointA.x / pointsToMeterScale2D, shapeData.pointA.y / pointsToMeterScale2D};
             capsule.center2 = {shapeData.pointB.x / pointsToMeterScale2D, shapeData.pointB.y / pointsToMeterScale2D};
             capsule.radius = shapeData.radius / pointsToMeterScale2D;
             shapeData.shape = b2CreateCapsuleShape(body.body, &shapeDef, &capsule);
         }else if (shapeData.type == Shape2DType::SEGMENT){
+            if (shapeData.pointA == shapeData.pointB){
+                Log::error("Cannot create segment shape %zu: pointA and pointB are equal", i);
+                continue;
+            }
+
             b2Segment segment = {0};
             segment.point1 = {shapeData.pointA.x / pointsToMeterScale2D, shapeData.pointA.y / pointsToMeterScale2D};
             segment.point2 = {shapeData.pointB.x / pointsToMeterScale2D, shapeData.pointB.y / pointsToMeterScale2D};
             shapeData.shape = b2CreateSegmentShape(body.body, &shapeDef, &segment);
         }else if (shapeData.type == Shape2DType::CHAIN){
-            if (shapeData.verticesCount < 2){
-                Log::error("Cannot create chain shape with less than 2 vertices");
+            if (shapeData.verticesCount < 4){
+                Log::error("Cannot create chain shape %zu: Box2D requires at least 4 vertices", i);
                 continue;
             }
 
