@@ -261,8 +261,57 @@ bool PhysicsSystem::loadJoint3D(Entity entity, Joint3DComponent& joint){
             return loadSwingTwistJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchor, joint.twistAxis, joint.planeAxis, joint.normalHalfConeAngle, joint.planeHalfConeAngle, joint.twistMinAngle, joint.twistMaxAngle);
         case Joint3DType::SIXDOF:
             return loadSixDOFJoint3D(joint, joint.bodyA, joint.bodyB, joint.anchorA, joint.anchorB, joint.axisX, joint.axisY);
-        case Joint3DType::PATH:
-            return loadPathJoint3D(joint, joint.bodyA, joint.bodyB, {}, {}, {}, joint.pathPosition, joint.isLooping);
+        case Joint3DType::PATH: {
+            if (joint.pathPoints.size() < 2){
+                Log::error("Cannot create path 3D joint, need at least 2 path points");
+                return false;
+            }
+
+            std::vector<Vector3> tangents;
+            std::vector<Vector3> normals;
+            tangents.reserve(joint.pathPoints.size());
+            normals.reserve(joint.pathPoints.size());
+
+            for (size_t i = 0; i < joint.pathPoints.size(); i++){
+                size_t prev = (i == 0) ? (joint.isLooping ? joint.pathPoints.size() - 1 : 0) : i - 1;
+                size_t next = (i + 1 >= joint.pathPoints.size()) ? (joint.isLooping ? 0 : joint.pathPoints.size() - 1) : i + 1;
+
+                Vector3 tangent(
+                    joint.pathPoints[next].x - joint.pathPoints[prev].x,
+                    joint.pathPoints[next].y - joint.pathPoints[prev].y,
+                    joint.pathPoints[next].z - joint.pathPoints[prev].z
+                );
+
+                float tangentLengthSq = tangent.x * tangent.x + tangent.y * tangent.y + tangent.z * tangent.z;
+                if (tangentLengthSq < 1.0e-6f){
+                    tangent = Vector3(1.0f, 0.0f, 0.0f);
+                }else{
+                    float invTangentLength = 1.0f / std::sqrt(tangentLengthSq);
+                    tangent = Vector3(tangent.x * invTangentLength, tangent.y * invTangentLength, tangent.z * invTangentLength);
+                }
+
+                Vector3 normal = (std::fabs(tangent.y) < 0.999f) ? Vector3(0.0f, 1.0f, 0.0f) : Vector3(0.0f, 0.0f, 1.0f);
+                float tangentDotNormal = tangent.x * normal.x + tangent.y * normal.y + tangent.z * normal.z;
+                normal = Vector3(
+                    normal.x - tangent.x * tangentDotNormal,
+                    normal.y - tangent.y * tangentDotNormal,
+                    normal.z - tangent.z * tangentDotNormal
+                );
+
+                float normalLengthSq = normal.x * normal.x + normal.y * normal.y + normal.z * normal.z;
+                if (normalLengthSq < 1.0e-6f){
+                    normal = Vector3(0.0f, 0.0f, 1.0f);
+                }else{
+                    float invNormalLength = 1.0f / std::sqrt(normalLengthSq);
+                    normal = Vector3(normal.x * invNormalLength, normal.y * invNormalLength, normal.z * invNormalLength);
+                }
+
+                tangents.push_back(tangent);
+                normals.push_back(normal);
+            }
+
+            return loadPathJoint3D(joint, joint.bodyA, joint.bodyB, joint.pathPoints, tangents, normals, joint.pathPosition, joint.isLooping);
+        }
         case Joint3DType::GEAR:
             if (joint.hingeA == NULL_ENTITY || joint.hingeB == NULL_ENTITY) return false;
             return loadGearJoint3D(joint, joint.bodyA, joint.bodyB, joint.hingeA, joint.hingeB, joint.numTeethGearA, joint.numTeethGearB);
@@ -1263,6 +1312,37 @@ bool PhysicsSystem::loadHingeJoint3D(Joint3DComponent& joint, Entity bodyA, Enti
         updateBody3DPosition(signatureA, bodyA, myBodyA);
         updateBody3DPosition(signatureB, bodyB, myBodyB);
 
+        float axisLengthSq = axis.x * axis.x + axis.y * axis.y + axis.z * axis.z;
+        if (axisLengthSq < 1.0e-6f){
+            Log::warn("Hinge 3D joint axis is zero. Using default axis (1, 0, 0).");
+            axis = Vector3(1.0f, 0.0f, 0.0f);
+        }else{
+            float invLength = 1.0f / std::sqrt(axisLengthSq);
+            axis = Vector3(axis.x * invLength, axis.y * invLength, axis.z * invLength);
+        }
+
+        float normalLengthSq = normal.x * normal.x + normal.y * normal.y + normal.z * normal.z;
+        if (normalLengthSq < 1.0e-6f){
+            Log::warn("Hinge 3D joint normal is zero. Using default normal.");
+            normal = (std::fabs(axis.y) < 0.999f) ? Vector3(0.0f, 1.0f, 0.0f) : Vector3(0.0f, 0.0f, 1.0f);
+        }
+
+        float axisDotNormal = axis.x * normal.x + axis.y * normal.y + axis.z * normal.z;
+        normal = Vector3(normal.x - axis.x * axisDotNormal, normal.y - axis.y * axisDotNormal, normal.z - axis.z * axisDotNormal);
+        normalLengthSq = normal.x * normal.x + normal.y * normal.y + normal.z * normal.z;
+
+        if (normalLengthSq < 1.0e-6f){
+            normal = Vector3(-axis.z, 0.0f, axis.x);
+            normalLengthSq = normal.x * normal.x + normal.y * normal.y + normal.z * normal.z;
+        }
+
+        if (normalLengthSq < 1.0e-6f){
+            normal = Vector3(0.0f, 0.0f, 1.0f);
+        }else{
+            float invNormalLength = 1.0f / std::sqrt(normalLengthSq);
+            normal = Vector3(normal.x * invNormalLength, normal.y * invNormalLength, normal.z * invNormalLength);
+        }
+
         JPH::HingeConstraintSettings settings;
         settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
         settings.mHingeAxis1 = settings.mHingeAxis2 = JPH::Vec3(axis.x, axis.y, axis.z);
@@ -1303,6 +1383,15 @@ bool PhysicsSystem::loadConeJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
 
         updateBody3DPosition(signatureA, bodyA, myBodyA);
         updateBody3DPosition(signatureB, bodyB, myBodyB);
+
+        float axisLengthSq = twistAxis.x * twistAxis.x + twistAxis.y * twistAxis.y + twistAxis.z * twistAxis.z;
+        if (axisLengthSq < 1.0e-6f){
+            Log::warn("Cone 3D joint twist axis is zero. Using default axis (1, 0, 0).");
+            twistAxis = Vector3(1.0f, 0.0f, 0.0f);
+        }else{
+            float invLength = 1.0f / std::sqrt(axisLengthSq);
+            twistAxis = Vector3(twistAxis.x * invLength, twistAxis.y * invLength, twistAxis.z * invLength);
+        }
 
         JPH::ConeConstraintSettings settings;
         settings.mPoint1 = settings.mPoint2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
@@ -1404,6 +1493,41 @@ bool PhysicsSystem::loadSwingTwistJoint3D(Joint3DComponent& joint, Entity bodyA,
         updateBody3DPosition(signatureA, bodyA, myBodyA);
         updateBody3DPosition(signatureB, bodyB, myBodyB);
 
+        float twistAxisLengthSq = twistAxis.x * twistAxis.x + twistAxis.y * twistAxis.y + twistAxis.z * twistAxis.z;
+        if (twistAxisLengthSq < 1.0e-6f){
+            Log::warn("SwingTwist 3D joint twist axis is zero. Using default axis (1, 0, 0).");
+            twistAxis = Vector3(1.0f, 0.0f, 0.0f);
+        }else{
+            float invLength = 1.0f / std::sqrt(twistAxisLengthSq);
+            twistAxis = Vector3(twistAxis.x * invLength, twistAxis.y * invLength, twistAxis.z * invLength);
+        }
+
+        float planeAxisLengthSq = planeAxis.x * planeAxis.x + planeAxis.y * planeAxis.y + planeAxis.z * planeAxis.z;
+        if (planeAxisLengthSq < 1.0e-6f){
+            Log::warn("SwingTwist 3D joint plane axis is zero. Using default axis.");
+            planeAxis = (std::fabs(twistAxis.y) < 0.999f) ? Vector3(0.0f, 1.0f, 0.0f) : Vector3(0.0f, 0.0f, 1.0f);
+        }
+
+        float twistDotPlane = twistAxis.x * planeAxis.x + twistAxis.y * planeAxis.y + twistAxis.z * planeAxis.z;
+        planeAxis = Vector3(
+            planeAxis.x - twistAxis.x * twistDotPlane,
+            planeAxis.y - twistAxis.y * twistDotPlane,
+            planeAxis.z - twistAxis.z * twistDotPlane
+        );
+
+        planeAxisLengthSq = planeAxis.x * planeAxis.x + planeAxis.y * planeAxis.y + planeAxis.z * planeAxis.z;
+        if (planeAxisLengthSq < 1.0e-6f){
+            planeAxis = Vector3(-twistAxis.z, 0.0f, twistAxis.x);
+            planeAxisLengthSq = planeAxis.x * planeAxis.x + planeAxis.y * planeAxis.y + planeAxis.z * planeAxis.z;
+        }
+
+        if (planeAxisLengthSq < 1.0e-6f){
+            planeAxis = Vector3(0.0f, 0.0f, 1.0f);
+        }else{
+            float invPlaneLength = 1.0f / std::sqrt(planeAxisLengthSq);
+            planeAxis = Vector3(planeAxis.x * invPlaneLength, planeAxis.y * invPlaneLength, planeAxis.z * invPlaneLength);
+        }
+
         JPH::SwingTwistConstraintSettings settings;
         settings.mPosition1 = settings.mPosition2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
         settings.mTwistAxis1 = settings.mTwistAxis2 = JPH::Vec3(twistAxis.x, twistAxis.y, twistAxis.z);
@@ -1449,6 +1573,41 @@ bool PhysicsSystem::loadSixDOFJoint3D(Joint3DComponent& joint, Entity bodyA, Ent
         updateBody3DPosition(signatureA, bodyA, myBodyA);
         updateBody3DPosition(signatureB, bodyB, myBodyB);
 
+        float axisXLengthSq = axisX.x * axisX.x + axisX.y * axisX.y + axisX.z * axisX.z;
+        if (axisXLengthSq < 1.0e-6f){
+            Log::warn("SixDOF 3D joint axisX is zero. Using default axis (1, 0, 0).");
+            axisX = Vector3(1.0f, 0.0f, 0.0f);
+        }else{
+            float invLength = 1.0f / std::sqrt(axisXLengthSq);
+            axisX = Vector3(axisX.x * invLength, axisX.y * invLength, axisX.z * invLength);
+        }
+
+        float axisYLengthSq = axisY.x * axisY.x + axisY.y * axisY.y + axisY.z * axisY.z;
+        if (axisYLengthSq < 1.0e-6f){
+            Log::warn("SixDOF 3D joint axisY is zero. Using default axis.");
+            axisY = (std::fabs(axisX.y) < 0.999f) ? Vector3(0.0f, 1.0f, 0.0f) : Vector3(0.0f, 0.0f, 1.0f);
+        }
+
+        float axisDot = axisX.x * axisY.x + axisX.y * axisY.y + axisX.z * axisY.z;
+        axisY = Vector3(
+            axisY.x - axisX.x * axisDot,
+            axisY.y - axisX.y * axisDot,
+            axisY.z - axisX.z * axisDot
+        );
+
+        axisYLengthSq = axisY.x * axisY.x + axisY.y * axisY.y + axisY.z * axisY.z;
+        if (axisYLengthSq < 1.0e-6f){
+            axisY = Vector3(-axisX.z, 0.0f, axisX.x);
+            axisYLengthSq = axisY.x * axisY.x + axisY.y * axisY.y + axisY.z * axisY.z;
+        }
+
+        if (axisYLengthSq < 1.0e-6f){
+            axisY = Vector3(0.0f, 0.0f, 1.0f);
+        }else{
+            float invAxisYLength = 1.0f / std::sqrt(axisYLengthSq);
+            axisY = Vector3(axisY.x * invAxisYLength, axisY.y * invAxisYLength, axisY.z * invAxisYLength);
+        }
+
         JPH::SixDOFConstraintSettings settings;
         settings.mPosition1 = JPH::Vec3(anchorA.x, anchorA.y, anchorA.z);
         settings.mPosition2 = JPH::Vec3(anchorB.x, anchorB.y, anchorB.z);
@@ -1493,7 +1652,7 @@ bool PhysicsSystem::loadPathJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
 
         JPH::Ref<JPH::PathConstraintPathHermite> path = new JPH::PathConstraintPathHermite;
 
-        if (positions.size() != normals.size() != tangents.size()){
+        if (positions.size() != normals.size() || positions.size() != tangents.size()){
             Log::error("Cannot create joint, positions size is different from normals and tangents");
             return false;
         }

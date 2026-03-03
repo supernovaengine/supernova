@@ -127,6 +127,7 @@ void Joint3D::setPathJoint(Entity bodyA, Entity bodyB, std::vector<Vector3> posi
     Joint3DComponent& joint = getComponent<Joint3DComponent>();
     joint.bodyA = bodyA;
     joint.bodyB = bodyB;
+    joint.pathPoints = positions;
     joint.pathPosition = pathPosition;
     joint.isLooping = isLooping;
     joint.needUpdateJoint = !scene->getSystem<PhysicsSystem>()->loadPathJoint3D(joint, bodyA, bodyB, positions, tangents, normals, pathPosition, isLooping);

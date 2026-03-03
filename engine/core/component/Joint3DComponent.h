@@ -63,6 +63,7 @@ namespace Supernova{
         int numTeethGear = 20;
         int rackLength = 100;
 
+        std::vector<Vector3> pathPoints;
         Vector3 pathPosition = Vector3::ZERO;
         bool isLooping = false;
         bool autoAnchors = true;
