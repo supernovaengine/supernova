@@ -354,18 +354,50 @@ bool PhysicsSystem::syncBody2DShapes(Body2DComponent& body){
         shapeData.chain = b2_nullChainId;
 
         if (shapeData.type == Shape2DType::POLYGON){
-            if (shapeData.verticesCount < 3){
-                Log::error("Cannot create polygon shape with less than 3 vertices");
-                continue;
+            std::vector<b2Vec2> b2vertices;
+
+            if (shapeData.verticesCount >= 3){
+                b2vertices.resize(shapeData.verticesCount);
+                for (size_t j = 0; j < shapeData.verticesCount; j++){
+                    b2vertices[j] = {shapeData.vertices[j].x / pointsToMeterScale2D, shapeData.vertices[j].y / pointsToMeterScale2D};
+                }
+            }else{
+                const Vector2 minPt(std::min(shapeData.pointA.x, shapeData.pointB.x), std::min(shapeData.pointA.y, shapeData.pointB.y));
+                const Vector2 maxPt(std::max(shapeData.pointA.x, shapeData.pointB.x), std::max(shapeData.pointA.y, shapeData.pointB.y));
+
+                if (minPt == maxPt){
+                    Log::error("Cannot create polygon shape %zu: less than 3 vertices and invalid pointA/pointB fallback", i);
+                    continue;
+                }
+
+                b2vertices.resize(4);
+                b2vertices[0] = {minPt.x / pointsToMeterScale2D, minPt.y / pointsToMeterScale2D};
+                b2vertices[1] = {maxPt.x / pointsToMeterScale2D, minPt.y / pointsToMeterScale2D};
+                b2vertices[2] = {maxPt.x / pointsToMeterScale2D, maxPt.y / pointsToMeterScale2D};
+                b2vertices[3] = {minPt.x / pointsToMeterScale2D, maxPt.y / pointsToMeterScale2D};
             }
 
-            std::vector<b2Vec2> b2vertices(shapeData.verticesCount);
-            for (size_t j = 0; j < shapeData.verticesCount; j++){
-                b2vertices[j] = {shapeData.vertices[j].x / pointsToMeterScale2D, shapeData.vertices[j].y / pointsToMeterScale2D};
+            b2Hull hull = b2ComputeHull(&b2vertices[0], (int)b2vertices.size());
+            if (!b2ValidateHull(&hull)){
+                const Vector2 minPt(std::min(shapeData.pointA.x, shapeData.pointB.x), std::min(shapeData.pointA.y, shapeData.pointB.y));
+                const Vector2 maxPt(std::max(shapeData.pointA.x, shapeData.pointB.x), std::max(shapeData.pointA.y, shapeData.pointB.y));
+
+                if (minPt != maxPt){
+                    b2vertices.resize(4);
+                    b2vertices[0] = {minPt.x / pointsToMeterScale2D, minPt.y / pointsToMeterScale2D};
+                    b2vertices[1] = {maxPt.x / pointsToMeterScale2D, minPt.y / pointsToMeterScale2D};
+                    b2vertices[2] = {maxPt.x / pointsToMeterScale2D, maxPt.y / pointsToMeterScale2D};
+                    b2vertices[3] = {minPt.x / pointsToMeterScale2D, maxPt.y / pointsToMeterScale2D};
+                    hull = b2ComputeHull(&b2vertices[0], (int)b2vertices.size());
+                }
+
+                if (!b2ValidateHull(&hull)){
+                    Log::error("Cannot create polygon shape %zu: invalid hull", i);
+                    continue;
+                }
             }
 
-            b2Hull hull = b2ComputeHull(&b2vertices[0], (int)shapeData.verticesCount);
-            b2Polygon polygon = b2MakePolygon(&hull, shapeData.radius / pointsToMeterScale2D);
+            b2Polygon polygon = b2MakePolygon(&hull, std::max(0.0f, shapeData.radius / pointsToMeterScale2D));
             shapeData.shape = b2CreatePolygonShape(body.body, &shapeDef, &polygon);
         }else if (shapeData.type == Shape2DType::CIRCLE){
             b2Circle circle = {0};
