@@ -496,6 +496,14 @@ bool PhysicsSystem::createShape3DForIndex(Entity entity, Body3DComponent& body, 
         if (!shape_result.IsValid()) return false;
         shapeData.shape = shape_result.Get();
     }else if (shapeData.type == Shape3DType::CONVEX_HULL){
+        if (shapeData.source == Shape3DSource::NONE){
+            shapeData.source = Shape3DSource::ENTITY_MESH;
+            if (shapeData.sourceEntity == NULL_ENTITY){
+                shapeData.sourceEntity = entity;
+            }
+            Log::warn("Body3D entity %u has CONVEX_HULL with Source=None. Falling back to Entity Mesh source.", entity);
+        }
+
         JPH::Array<JPH::Vec3> jvertices;
 
         if (shapeData.source == Shape3DSource::RAW_VERTICES){
@@ -552,6 +560,14 @@ bool PhysicsSystem::createShape3DForIndex(Entity entity, Body3DComponent& body, 
         if (!shape_result.IsValid()) return false;
         shapeData.shape = shape_result.Get();
     }else if (shapeData.type == Shape3DType::MESH){
+        if (shapeData.source == Shape3DSource::NONE){
+            shapeData.source = Shape3DSource::ENTITY_MESH;
+            if (shapeData.sourceEntity == NULL_ENTITY){
+                shapeData.sourceEntity = entity;
+            }
+            Log::warn("Body3D entity %u has MESH with Source=None. Falling back to Entity Mesh source.", entity);
+        }
+
         JPH::VertexList jvertices;
         JPH::IndexedTriangleList jindices;
 
@@ -643,6 +659,14 @@ bool PhysicsSystem::createShape3DForIndex(Entity entity, Body3DComponent& body, 
         if (!shape_result.IsValid()) return false;
         shapeData.shape = shape_result.Get();
     }else if (shapeData.type == Shape3DType::HEIGHTFIELD){
+        if (shapeData.source == Shape3DSource::NONE){
+            shapeData.source = Shape3DSource::ENTITY_HEIGHTFIELD;
+            if (shapeData.sourceEntity == NULL_ENTITY){
+                shapeData.sourceEntity = entity;
+            }
+            Log::warn("Body3D entity %u has HEIGHTFIELD with Source=None. Falling back to Entity Heightfield source.", entity);
+        }
+
         Entity terrainEntity = shapeData.sourceEntity == NULL_ENTITY ? entity : shapeData.sourceEntity;
         TerrainComponent* terrain = scene->findComponent<TerrainComponent>(terrainEntity);
         if (!terrain || !terrain->heightMapLoaded){
@@ -765,6 +789,15 @@ void PhysicsSystem::createGenericJoltBody(Entity entity, Body3DComponent& body, 
         layer = JPH::ObjectLayerPairFilterMask::sGetObjectLayer(1);
         joltType = JPH::EMotionType::Kinematic;
         activation = JPH::EActivation::Activate;
+    }
+
+    if (joltType != JPH::EMotionType::Static && shape && shape->MustBeStatic()){
+        Log::warn("Body3D entity %u uses a static-only shape (Mesh/HeightField/Plane/...) and cannot be %s. Forcing body type to Static.",
+                  entity,
+                  body.type == BodyType::DYNAMIC ? "Dynamic" : "Kinematic");
+        body.type = BodyType::STATIC;
+        joltType = JPH::EMotionType::Static;
+        activation = JPH::EActivation::DontActivate;
     }
 
     JPH::BodyCreationSettings settings(shape, JPH::Vec3(0.0, 0.0, 0.0), JPH::Quat::sIdentity(), joltType, layer);
