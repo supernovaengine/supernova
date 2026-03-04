@@ -143,11 +143,29 @@ namespace Supernova{
 		virtual void OnContactRemoved(const JPH::SubShapeIDPair &inSubShapePair) override{
 			JPH::BodyInterface &body_interface = physicsSystem->getWorld3D()->GetBodyInterfaceNoLock();
 
-			Entity entity1 = body_interface.GetUserData(inSubShapePair.GetBody1ID());
-			Entity entity2 = body_interface.GetUserData(inSubShapePair.GetBody2ID());
+			const JPH::BodyID body1Id = inSubShapePair.GetBody1ID();
+			const JPH::BodyID body2Id = inSubShapePair.GetBody2ID();
 
-			size_t shapeIndex1 = body_interface.GetShape(inSubShapePair.GetBody1ID())->GetSubShapeUserData(inSubShapePair.GetSubShapeID1());
-			size_t shapeIndex2 = body_interface.GetShape(inSubShapePair.GetBody2ID())->GetSubShapeUserData(inSubShapePair.GetSubShapeID2());
+			if (body1Id.IsInvalid() || body2Id.IsInvalid()){
+				return;
+			}
+
+			if (!body_interface.IsAdded(body1Id) || !body_interface.IsAdded(body2Id)){
+				return;
+			}
+
+			auto shape1 = body_interface.GetShape(body1Id);
+			auto shape2 = body_interface.GetShape(body2Id);
+
+			if (!shape1 || !shape2){
+				return;
+			}
+
+			Entity entity1 = body_interface.GetUserData(body1Id);
+			Entity entity2 = body_interface.GetUserData(body2Id);
+
+			size_t shapeIndex1 = shape1->GetSubShapeUserData(inSubShapePair.GetSubShapeID1());
+			size_t shapeIndex2 = shape2->GetSubShapeUserData(inSubShapePair.GetSubShapeID2());
 
 			physicsSystem->onContactRemoved3D(Body3D(scene, entity1), Body3D(scene, entity2), (unsigned long)shapeIndex1, (unsigned long)shapeIndex2);
 		}
