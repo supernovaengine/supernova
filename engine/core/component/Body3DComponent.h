@@ -50,7 +50,7 @@ namespace Supernova{
         float height = 1.0f;
         float depth = 1.0f;
 
-        float radius = 0.5f;
+        float radius = 1.0f;
         float halfHeight = 0.5f;
         float topRadius = 0.5f;
         float bottomRadius = 0.5f;
