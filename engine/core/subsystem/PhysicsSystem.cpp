@@ -1116,6 +1116,11 @@ bool PhysicsSystem::loadPrismaticJoint2D(Entity entity, Joint2DComponent& joint,
         updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 worldPivot = {anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D};
+        float axisLengthSq = axis.x * axis.x + axis.y * axis.y;
+        if (axisLengthSq < 1.0e-6f){
+            Log::warn("Prismatic 2D joint axis is zero. Using default axis (1, 0).");
+            axis = Vector2(1.0f, 0.0f);
+        }
         b2Vec2 worldAxis = {axis.x, axis.y};
 
         b2PrismaticJointDef jointDef = b2DefaultPrismaticJointDef();
@@ -1206,6 +1211,11 @@ bool PhysicsSystem::loadWheelJoint2D(Entity entity, Joint2DComponent& joint, Ent
         updateBody2DPosition(signatureB, bodyB, myBodyB);
 
         b2Vec2 worldPivot = {anchor.x / pointsToMeterScale2D, anchor.y / pointsToMeterScale2D};
+        float axisLengthSq = axis.x * axis.x + axis.y * axis.y;
+        if (axisLengthSq < 1.0e-6f){
+            Log::warn("Wheel 2D joint axis is zero. Using default axis (1, 0).");
+            axis = Vector2(1.0f, 0.0f);
+        }
         b2Vec2 worldAxis = {axis.x, axis.y};
 
         b2WheelJointDef jointDef = b2DefaultWheelJointDef();
@@ -1561,6 +1571,21 @@ bool PhysicsSystem::loadPrismaticJoint3D(Joint3DComponent& joint, Entity bodyA, 
             std::swap(limitsMin, limitsMax);
         }
 
+        // Jolt's slider starts at position 0 and requires 0 to be inside [min, max].
+        // Older scenes may serialize absolute-only positive/negative ranges (e.g. [1.8, 27.4]),
+        // so normalize them to a valid interval while preserving range size.
+        if (limitsMin > 0.0f){
+            float offset = limitsMin;
+            limitsMin -= offset;
+            limitsMax -= offset;
+            Log::warn("Prismatic 3D joint limits did not include 0. Normalized range to [{0}, {1}]", limitsMin, limitsMax);
+        }else if (limitsMax < 0.0f){
+            float offset = limitsMax;
+            limitsMin -= offset;
+            limitsMax -= offset;
+            Log::warn("Prismatic 3D joint limits did not include 0. Normalized range to [{0}, {1}]", limitsMin, limitsMax);
+        }
+
         if (std::fabs(limitsMax - limitsMin) < 1.0e-6f){
             Log::warn("Prismatic 3D joint with equal limits is unsupported by Jolt SliderConstraint. Using fixed joint instead.");
             return loadFixedJoint3D(joint, bodyA, bodyB);
@@ -1651,6 +1676,15 @@ bool PhysicsSystem::loadSwingTwistJoint3D(Joint3DComponent& joint, Entity bodyA,
             float invPlaneLength = 1.0f / std::sqrt(planeAxisLengthSq);
             planeAxis = Vector3(planeAxis.x * invPlaneLength, planeAxis.y * invPlaneLength, planeAxis.z * invPlaneLength);
         }
+
+        if (twistMaxAngle < twistMinAngle){
+            std::swap(twistMinAngle, twistMaxAngle);
+        }
+
+        constexpr float kMinConeAngle = 0.0f;
+        constexpr float kMaxConeAngle = 179.9f;
+        normalHalfConeAngle = std::clamp(normalHalfConeAngle, kMinConeAngle, kMaxConeAngle);
+        planeHalfConeAngle = std::clamp(planeHalfConeAngle, kMinConeAngle, kMaxConeAngle);
 
         JPH::SwingTwistConstraintSettings settings;
         settings.mPosition1 = settings.mPosition2 = JPH::Vec3(anchor.x, anchor.y, anchor.z);
@@ -1858,6 +1892,12 @@ bool PhysicsSystem::loadGearJoint3D(Joint3DComponent& joint, Entity bodyA, Entit
             JPH::HingeConstraintSettings* hingeSetA = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHingeA.joint)->GetConstraintSettings().GetPtr();
             JPH::HingeConstraintSettings* hingeSetB = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHingeB.joint)->GetConstraintSettings().GetPtr();
 
+            if (numTeethGearA <= 0 || numTeethGearB <= 0){
+                Log::warn("Gear 3D joint received non-positive teeth count. Clamping to at least 1.");
+                numTeethGearA = std::max(1, numTeethGearA);
+                numTeethGearB = std::max(1, numTeethGearB);
+            }
+
             JPH::GearConstraintSettings settings;
             settings.mHingeAxis1 = hingeSetA->mHingeAxis1;
             settings.mHingeAxis2 = hingeSetB->mHingeAxis1;
@@ -1924,6 +1964,13 @@ bool PhysicsSystem::loadRackAndPinionJoint3D(Joint3DComponent& joint, Entity bod
 
             JPH::HingeConstraintSettings* hingeSetA = (JPH::HingeConstraintSettings*)((JPH::HingeConstraint*)myHinge.joint)->GetConstraintSettings().GetPtr();
             JPH::SliderConstraintSettings* sliderSetB = (JPH::SliderConstraintSettings*)((JPH::SliderConstraint*)mySlider.joint)->GetConstraintSettings().GetPtr();
+
+            if (numTeethRack <= 0 || numTeethGear <= 0 || rackLength <= 0){
+                Log::warn("RackAndPinion 3D joint received non-positive ratio inputs. Clamping to at least 1.");
+                numTeethRack = std::max(1, numTeethRack);
+                numTeethGear = std::max(1, numTeethGear);
+                rackLength = std::max(1, rackLength);
+            }
 
             JPH::RackAndPinionConstraintSettings settings;
             settings.mHingeAxis = hingeSetA->mHingeAxis1;
