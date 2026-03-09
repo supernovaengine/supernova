@@ -28,6 +28,23 @@ MeshSystem::~MeshSystem(){
 }
 
 bool MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera){
+    // Check texture loading state BEFORE clearing the buffer to avoid leaving
+    // the mesh with an empty vertex buffer when the texture is still loading.
+    Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
+
+    unsigned int texWidth = 0;
+    unsigned int texHeight = 0;
+
+    if (!mainTexture.empty()){
+        TextureLoadResult texResult = mainTexture.load();
+        if (texResult.state == ResourceLoadState::Finished){
+            texWidth = mainTexture.getWidth();
+            texHeight = mainTexture.getHeight();
+        }else if (texResult.state == ResourceLoadState::Loading){
+            return false;
+        }
+    }
+
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
     mesh.submeshes[0].textureShadow = true;
@@ -43,21 +60,6 @@ bool MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
     mesh.buffer.setUsage(BufferUsage::DYNAMIC);
 
     Attribute* attVertex = mesh.buffer.getAttribute(AttributeType::POSITION);
-
-    Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
-
-    unsigned int texWidth = 0;
-    unsigned int texHeight = 0;
-
-    if (!mainTexture.empty()){
-        TextureLoadResult texResult = mainTexture.load();
-        if (texResult.state == ResourceLoadState::Finished){
-            texWidth = mainTexture.getWidth();
-            texHeight = mainTexture.getHeight();
-        }else if (texResult.state == ResourceLoadState::Loading){
-            return false;
-        }
-    }
 
     if (texWidth == 0 || texHeight == 0){
         texWidth = sprite.width;
@@ -217,6 +219,35 @@ bool MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
 }
 
 bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
+    // Pre-check all tile textures BEFORE clearing the buffer to avoid leaving
+    // the mesh with an empty vertex buffer when textures are still loading.
+    unsigned int preReserveTiles = tilemap.reserveTiles;
+    for (int i = 0; i < (int)tilemap.tiles.size(); i++){
+        if (tilemap.tiles[i].width == 0 && tilemap.tiles[i].height == 0 && preReserveTiles == 0){
+            continue;
+        }
+        if (!tilemap.tilesRect.validIndex(tilemap.tiles[i].rectId)){
+            continue;
+        }
+        if (preReserveTiles > 0){
+            preReserveTiles--;
+        }
+        TileRectData& rectData = tilemap.tilesRect[tilemap.tiles[i].rectId];
+        Texture& texture = mesh.submeshes[rectData.submeshId].material.baseColorTexture;
+        Texture& mainTexture = mesh.submeshes[0].material.baseColorTexture;
+        if (!texture.empty()){
+            TextureLoadResult texResult = texture.load();
+            if (texResult.state == ResourceLoadState::Loading){
+                return false;
+            }
+        }else if (!mainTexture.empty()){
+            TextureLoadResult texResult = mainTexture.load();
+            if (texResult.state == ResourceLoadState::Loading){
+                return false;
+            }
+        }
+    }
+
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
 
@@ -278,8 +309,6 @@ bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
                 tileRect = normalizeTileRect(tileRect, texture.getWidth(), texture.getHeight());
                 texWidth = texture.getWidth();
                 texHeight = texture.getHeight();
-            }else if (texResult.state == ResourceLoadState::Loading){
-                return false;
             }
         }else if (!mainTexture.empty()){
             TextureLoadResult texResult = mainTexture.load();
@@ -287,8 +316,6 @@ bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
                 tileRect = normalizeTileRect(tileRect, mainTexture.getWidth(), mainTexture.getHeight());
                 texWidth = mainTexture.getWidth();
                 texHeight = mainTexture.getHeight();
-            }else if (texResult.state == ResourceLoadState::Loading){
-                return false;
             }
         }
 
@@ -966,6 +993,17 @@ void MeshSystem::createTerrainNode(TerrainComponent& terrain, float x, float y, 
 }
 
 bool MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
+    // Check heightmap loading state BEFORE clearing buffers to avoid leaving
+    // the mesh with empty data when the heightmap is still loading.
+    terrain.heightMap.setReleaseDataAfterLoad(false);
+
+    if (!terrain.heightMap.empty()){
+        TextureLoadResult texResult = terrain.heightMap.load();
+        if (texResult.state == ResourceLoadState::Loading){
+            return false;
+        }
+    }
+
     for (int s = 0; s < 2; s++){
         terrain.nodesbuffer[s].clear();
         terrain.nodesbuffer[s].addAttribute(AttributeType::TERRAINNODEPOSITION, 2, true);
@@ -982,15 +1020,6 @@ bool MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
     mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
 
     mesh.indices.clear();
-
-    terrain.heightMap.setReleaseDataAfterLoad(false);
-
-    if (!terrain.heightMap.empty()){
-        TextureLoadResult texResult = terrain.heightMap.load();
-        if (texResult.state == ResourceLoadState::Loading){
-            return false;
-        }
-    }
 
     size_t idealSize = getTerrainGridArraySize(terrain.rootGridSize, terrain.levels);
     terrain.nodes.resize(idealSize);
