@@ -37,6 +37,7 @@ namespace Supernova{
         std::vector<PointData> points;
         std::vector<PointRenderData> renderPoints; //must be sorted
 
+        unsigned int numFramesRect = 0;
         HybridArray<SpriteFrameData, MAX_SPRITE_FRAMES> framesRect;
 
         unsigned int maxPoints = 100;

@@ -222,11 +222,11 @@ bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     // Pre-check all tile textures BEFORE clearing the buffer to avoid leaving
     // the mesh with an empty vertex buffer when textures are still loading.
     unsigned int preReserveTiles = tilemap.reserveTiles;
-    for (int i = 0; i < (int)tilemap.tiles.size(); i++){
+    for (int i = 0; i < (int)tilemap.numTiles; i++){
         if (tilemap.tiles[i].width == 0 && tilemap.tiles[i].height == 0 && preReserveTiles == 0){
             continue;
         }
-        if (!tilemap.tilesRect.validIndex(tilemap.tiles[i].rectId)){
+        if (tilemap.tiles[i].rectId < 0 || (unsigned int)tilemap.tiles[i].rectId >= tilemap.numTilesRect){
             continue;
         }
         if (preReserveTiles > 0){
@@ -268,13 +268,13 @@ bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     unsigned int numTiles = 0;
     unsigned int reserveTiles = tilemap.reserveTiles;
 
-    for (int i = 0; i < (int)tilemap.tiles.size(); i++){
+    for (int i = 0; i < (int)tilemap.numTiles; i++){
 
         if (tilemap.tiles[i].width == 0 && tilemap.tiles[i].height == 0 && reserveTiles == 0){
             continue;
         }
 
-        if (!tilemap.tilesRect.validIndex(tilemap.tiles[i].rectId)){
+        if (tilemap.tiles[i].rectId < 0 || (unsigned int)tilemap.tiles[i].rectId >= tilemap.numTilesRect){
             continue;
         }
 

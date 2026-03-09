@@ -36,6 +36,7 @@ namespace Supernova{
         unsigned int reserveTiles = 10;
         unsigned int numTiles = 0;
         
+        unsigned int numTilesRect = 0;
         HybridArray<TileRectData, MAX_TILEMAP_TILESRECT> tilesRect;
         HybridArray<TileData, MAX_TILEMAP_TILES> tiles;
 

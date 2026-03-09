@@ -179,9 +179,9 @@ void ActionSystem::animationDestroy(AnimationComponent& animcomp){
 
 void ActionSystem::setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
     if (sprite.framesRect.validIndex(spriteanim.frameIndex)){
-        SpriteFrameData frameData = sprite.framesRect[spriteanim.frames[spriteanim.frameIndex]];
-        if (frameData.active)
-            mesh.submeshes[0].textureRect = frameData.rect;
+        int frameId = spriteanim.frames[spriteanim.frameIndex];
+        if (frameId >= 0 && (unsigned int)frameId < sprite.numFramesRect)
+            mesh.submeshes[0].textureRect = sprite.framesRect[frameId].rect;
     }
 }
 
@@ -354,7 +354,7 @@ Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, SpriteCom
     if (frames.size() > 0){
         int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
 
-        if (sprite.framesRect.validIndex(id) && sprite.framesRect[id].active){
+        if (sprite.framesRect.validIndex(id) && (unsigned int)id < sprite.numFramesRect){
             return sprite.framesRect[id].rect;
         }
     }
@@ -366,7 +366,7 @@ Rect ActionSystem::getSpriteInitializerValue(std::vector<int>& frames, PointsCom
     if (frames.size() > 0){
         int id = frames[int(frames.size()*rand()/(RAND_MAX + 1.0))];
 
-        if (points.framesRect.validIndex(id) && points.framesRect[id].active){
+        if (points.framesRect.validIndex(id) && (unsigned int)id < points.numFramesRect){
             return points.framesRect[id].rect;
         }
     }
@@ -469,7 +469,7 @@ Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames
     if (frames.size() > 0){
         int id = frames[(int)(frames.size() * value)];
 
-        if (sprite.framesRect.validIndex(id) && sprite.framesRect[id].active){
+        if (sprite.framesRect.validIndex(id) && (unsigned int)id < sprite.numFramesRect){
             return sprite.framesRect[id].rect;
         }
     }
@@ -481,7 +481,7 @@ Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames
     if (frames.size() > 0){
         int id = frames[(int)(frames.size() * value)];
 
-        if (points.framesRect.validIndex(id) && points.framesRect[id].active){
+        if (points.framesRect.validIndex(id) && (unsigned int)id < points.numFramesRect){
             return points.framesRect[id].rect;
         }
     }

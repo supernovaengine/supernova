@@ -32,6 +32,7 @@ namespace Supernova{
 
         float textureScaleFactor = 0.0;
 
+        unsigned int numFramesRect = 0;
         HybridArray<SpriteFrameData, MAX_SPRITE_FRAMES> framesRect;
 
         PivotPreset pivotPreset = PivotPreset::BOTTOM_LEFT;

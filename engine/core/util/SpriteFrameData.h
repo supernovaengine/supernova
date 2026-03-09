@@ -10,7 +10,6 @@
 namespace Supernova{
 
     struct SpriteFrameData{
-        bool active = false;
         std::string name;
         Rect rect;
     };

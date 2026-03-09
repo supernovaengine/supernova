@@ -250,8 +250,11 @@ void Points::setTexture(Framebuffer* framebuffer){
 
 void Points::addSpriteFrame(int id, const std::string& name, Rect rect){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
-    if (id >= 0 && id < MAX_SPRITE_FRAMES){
-        pointscomp.framesRect[id] = {true, name, rect};
+    if (id >= 0 && pointscomp.framesRect.validIndex(id)){
+        pointscomp.framesRect[id] = {name, rect};
+        if ((unsigned int)(id + 1) > pointscomp.numFramesRect){
+            pointscomp.numFramesRect = id + 1;
+        }
         if (!pointscomp.hasTextureRect){
             pointscomp.hasTextureRect = true;
             pointscomp.needReload = true;
@@ -264,10 +267,7 @@ void Points::addSpriteFrame(int id, const std::string& name, Rect rect){
 void Points::addSpriteFrame(const std::string& name, float x, float y, float width, float height){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
 
-    int id = 0;
-    while ( (pointscomp.framesRect[id].active = true) && (id < MAX_SPRITE_FRAMES) ) {
-        id++;
-    }
+    int id = (int)pointscomp.numFramesRect;
 
     if (id < MAX_SPRITE_FRAMES){
         addSpriteFrame(id, name, Rect(x, y, width, height));
@@ -286,37 +286,26 @@ void Points::addSpriteFrame(Rect rect){
 
 void Points::removeSpriteFrame(int id){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
-    pointscomp.framesRect[id].active = false;
-
-    bool hasActive = false;
-    for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
-        if (pointscomp.framesRect[id].active){
-            hasActive = true;
+    if (id >= 0 && (unsigned int)id < pointscomp.numFramesRect){
+        for (unsigned int i = id; i + 1 < pointscomp.numFramesRect; i++){
+            pointscomp.framesRect[i] = pointscomp.framesRect[i + 1];
         }
-    }
-    if (!hasActive && pointscomp.hasTextureRect){
-        pointscomp.hasTextureRect = false;
-        pointscomp.needReload = true;
+        pointscomp.numFramesRect--;
+        pointscomp.framesRect[pointscomp.numFramesRect] = SpriteFrameData{};
+
+        if (pointscomp.numFramesRect == 0 && pointscomp.hasTextureRect){
+            pointscomp.hasTextureRect = false;
+            pointscomp.needReload = true;
+        }
     }
 }
 
 void Points::removeSpriteFrame(const std::string& name){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
 
-    for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
+    for (int id = (int)pointscomp.numFramesRect - 1; id >= 0; id--){
         if (pointscomp.framesRect[id].name == name){
-            pointscomp.framesRect[id].active = false;
+            removeSpriteFrame(id);
         }
-    }
-
-    bool hasActive = false;
-    for (int id = 0; id < MAX_SPRITE_FRAMES; id++){
-        if (pointscomp.framesRect[id].active){
-            hasActive = true;
-        }
-    }
-    if (!hasActive && pointscomp.hasTextureRect){
-        pointscomp.hasTextureRect = false;
-        pointscomp.needReload = true;
     }
 }

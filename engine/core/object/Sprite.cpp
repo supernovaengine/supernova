@@ -149,8 +149,11 @@ PivotPreset Sprite::getPivotPreset() const{
 
 void Sprite::addFrame(int id, const std::string& name, Rect rect){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-    if (spritecomp.framesRect.validIndex(id)){
-        spritecomp.framesRect[id] = {true, name, rect};
+    if (id >= 0 && spritecomp.framesRect.validIndex(id)){
+        spritecomp.framesRect[id] = {name, rect};
+        if ((unsigned int)(id + 1) > spritecomp.numFramesRect){
+            spritecomp.numFramesRect = id + 1;
+        }
     }else{
         Log::error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
     }
@@ -159,10 +162,7 @@ void Sprite::addFrame(int id, const std::string& name, Rect rect){
 void Sprite::addFrame(const std::string& name, float x, float y, float width, float height){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
-    int id = 0;
-    while ( (spritecomp.framesRect[id].active == true) && (id < (int)spritecomp.framesRect.size()) ) {
-        id++;
-    }
+    int id = (int)spritecomp.numFramesRect;
 
     if (id < (int)spritecomp.framesRect.size()){
         addFrame(id, name, Rect(x, y, width, height));
@@ -181,27 +181,29 @@ void Sprite::addFrame(Rect rect){
 
 void Sprite::removeFrame(int id){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-    spritecomp.framesRect[id].active = false;
+    if (id >= 0 && (unsigned int)id < spritecomp.numFramesRect){
+        for (unsigned int i = id; i + 1 < spritecomp.numFramesRect; i++){
+            spritecomp.framesRect[i] = spritecomp.framesRect[i + 1];
+        }
+        spritecomp.numFramesRect--;
+        spritecomp.framesRect[spritecomp.numFramesRect] = SpriteFrameData{};
+    }
 }
 
 void Sprite::removeFrame(const std::string& name){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
 
-    for (int id = 0; id < (int)spritecomp.framesRect.size(); id++){
+    for (int id = (int)spritecomp.numFramesRect - 1; id >= 0; id--){
         if (spritecomp.framesRect[id].name == name){
-            spritecomp.framesRect[id].active = false;
+            removeFrame(id);
         }
     }
 }
 
 void Sprite::setFrame(int id){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-    if (spritecomp.framesRect.validIndex(id)){
-        if (spritecomp.framesRect[id].active){
-            setTextureRect(spritecomp.framesRect[id].rect);
-        }else{
-            Log::error("Cannot use non active sprite frame: %i", id);
-        }
+    if (id >= 0 && (unsigned int)id < spritecomp.numFramesRect){
+        setTextureRect(spritecomp.framesRect[id].rect);
     }else{
         Log::error("Cannot use invalid sprite frame: %i", id);
     }
@@ -209,8 +211,8 @@ void Sprite::setFrame(int id){
 
 void Sprite::setFrame(const std::string& name){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-    for (int id = 0; id < (int)spritecomp.framesRect.size(); id++) {
-        if (spritecomp.framesRect[id].active && spritecomp.framesRect[id].name == name){
+    for (unsigned int id = 0; id < spritecomp.numFramesRect; id++) {
+        if (spritecomp.framesRect[id].name == name){
             setTextureRect(spritecomp.framesRect[id].rect);
             return;
         }
@@ -258,8 +260,8 @@ void Sprite::startAnimation(const std::string& name, int interval, bool loop){
     std::vector<int> frames;
     std::vector<int> framesTime;
 
-    for (int id = 0; id < (int)spritecomp.framesRect.size(); id ++){
-        if (spritecomp.framesRect[id].active && spritecomp.framesRect[id].name.find(name) != std::string::npos){
+    for (unsigned int id = 0; id < spritecomp.numFramesRect; id++){
+        if (spritecomp.framesRect[id].name.find(name) != std::string::npos){
             frames.push_back(id);
             framesTime.push_back(interval);
         }
