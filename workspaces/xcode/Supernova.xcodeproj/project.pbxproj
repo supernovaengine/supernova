@@ -13,6 +13,7 @@
 		1789660C2F1D764600E89E52 /* ShaderDataSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */; };
 		1789660D2F1D764600E89E52 /* ShaderDataSerializer.h in Headers */ = {isa = PBXBuildFile; fileRef = 1789660A2F1D764600E89E52 /* ShaderDataSerializer.h */; };
 		1789660E2F1D764600E89E52 /* ShaderDataSerializer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */; };
+		17A4DD6D2F5E4F8800C1BFC6 /* HybridArray.h in Headers */ = {isa = PBXBuildFile; fileRef = 17A4DD6C2F5E4F8800C1BFC6 /* HybridArray.h */; };
 		71033D662BD1A7D200D81FB5 /* ScrollbarComponent.h in Headers */ = {isa = PBXBuildFile; fileRef = 71033D652BD1A7D200D81FB5 /* ScrollbarComponent.h */; };
 		71033D692BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */; };
 		71033D6A2BD1A7F100D81FB5 /* Scrollbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */; };
@@ -1279,6 +1280,7 @@
 		177264182F4E711E00646D8E /* SceneManager.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = SceneManager.cpp; sourceTree = "<group>"; };
 		1789660A2F1D764600E89E52 /* ShaderDataSerializer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ShaderDataSerializer.h; sourceTree = "<group>"; };
 		1789660B2F1D764600E89E52 /* ShaderDataSerializer.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ShaderDataSerializer.cpp; sourceTree = "<group>"; };
+		17A4DD6C2F5E4F8800C1BFC6 /* HybridArray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HybridArray.h; sourceTree = "<group>"; };
 		71033D652BD1A7D200D81FB5 /* ScrollbarComponent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScrollbarComponent.h; sourceTree = "<group>"; };
 		71033D672BD1A7F000D81FB5 /* Scrollbar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Scrollbar.cpp; sourceTree = "<group>"; };
 		71033D682BD1A7F000D81FB5 /* Scrollbar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Scrollbar.h; sourceTree = "<group>"; };
@@ -3321,6 +3323,7 @@
 				71AD5E742EAECC69004951AB /* CrashGuard.h */,
 				71ABBD28277A3210001CE3AF /* DefaultFont.h */,
 				71BE620D25B1DB37006D6E02 /* FunctionSubscribe.h */,
+				17A4DD6C2F5E4F8800C1BFC6 /* HybridArray.h */,
 				7105CAA62AD61BD5007C91BA /* JoltPhysicsAux.h */,
 				71451BF2270CA3EA00712643 /* SpriteFrameData.h */,
 				71ABBD27277A3210001CE3AF /* STBText.h */,
@@ -4283,6 +4286,7 @@
 				7128D10225C2354A00965B51 /* SystemRender.h in Headers */,
 				715253542CD057C400D294D8 /* Sphere.h in Headers */,
 				71E544FE284D5BB700C68FAB /* Animation.h in Headers */,
+				17A4DD6D2F5E4F8800C1BFC6 /* HybridArray.h in Headers */,
 				713E581527BA9D1300376680 /* PolygonComponent.h in Headers */,
 				7157764E2B050C230049C970 /* FontPool.h in Headers */,
 				710506B0297F4483002DD23C /* Shape.h in Headers */,
