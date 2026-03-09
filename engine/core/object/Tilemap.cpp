@@ -28,7 +28,7 @@ bool Tilemap::createTilemap(){
 int Tilemap::findRectByString(const std::string& name){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    for (int i = 0; i < MAX_TILEMAP_TILESRECT; i++){
+    for (int i = 0; i < (int)tilemap.tilesRect.size(); i++){
         if (tilemap.tilesRect[i].name == name){
             return i;
         }
@@ -40,7 +40,7 @@ int Tilemap::findRectByString(const std::string& name){
 int Tilemap::findTileByString(const std::string& name){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    for (int i = 0; i < MAX_TILEMAP_TILES; i++){
+    for (int i = 0; i < (int)tilemap.tiles.size(); i++){
         if (tilemap.tiles[i].name == name){
             return i;
         }
@@ -75,12 +75,12 @@ void Tilemap::addRect(int id, const std::string& name, const std::string& textur
         return;
     }
 
-    if (id >= MAX_TILEMAP_TILESRECT){
+    if (!tilemap.tilesRect.validIndex(id)){
         Log::error("Cannot add rect with id %i, increase MAX_TILEMAP_TILESRECT to bigger than %i", id, id);
         return;
     }
 
-    if (mesh.numSubmeshes >= MAX_SUBMESHES){
+    if (mesh.numSubmeshes >= mesh.submeshes.size()){
         Log::error("Cannot add submesh for rect id %i, increase MAX_SUBMESHES to bigger than %i", id, mesh.numSubmeshes);
         return;
     }
@@ -120,7 +120,7 @@ void Tilemap::addRect(const std::string& name, float x, float y, float width, fl
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
     int id = 0;
-    for (int i = 0; i < MAX_TILEMAP_TILESRECT; i++){
+    for (int i = 0; i < (int)tilemap.tilesRect.size(); i++){
         if (tilemap.tilesRect[i].submeshId < 0 && tilemap.tilesRect[i].name.empty()){
             id = i;
             break;
@@ -140,7 +140,7 @@ void Tilemap::addRect(Rect rect){
 void Tilemap::removeRect(int id){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    if (id >= 0 && id < MAX_TILEMAP_TILESRECT){
+    if (tilemap.tilesRect.validIndex(id)){
         tilemap.tilesRect[id] = {0};
     }else{
         Log::error("Error removing rect with id %i", id);
@@ -156,7 +156,7 @@ void Tilemap::removeRect(const std::string& name){
 void Tilemap::clearRects(){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    for (int i = 0; i < MAX_TILEMAP_TILESRECT; i++){
+    for (int i = 0; i < (int)tilemap.tilesRect.size(); i++){
         tilemap.tilesRect[i].submeshId = -1;
         tilemap.tilesRect[i].name.clear();
     }
@@ -165,7 +165,7 @@ void Tilemap::clearRects(){
 TileRectData& Tilemap::getRect(int id){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    if (id >= 0 && id < MAX_TILEMAP_TILESRECT){
+    if (tilemap.tilesRect.validIndex(id)){
         return tilemap.tilesRect[id];
     }else{
         throw std::out_of_range("error getting rect tilemap");
@@ -183,7 +183,7 @@ TileRectData& Tilemap::getRect(const std::string& name){
 void Tilemap::addTile(int id, const std::string& name, int rectId, Vector2 position, float width, float height){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    if (id >= 0 && id < MAX_TILEMAP_TILES){
+    if (tilemap.tiles.validIndex(id)){
         tilemap.tiles[id] = {name, rectId, position, width, height};
     }else{
         Log::error("Error adding tile with id %i", id);
@@ -196,7 +196,7 @@ void Tilemap::addTile(const std::string& name, int rectId, Vector2 position, flo
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
     int id = 0;
-    for (int i = 0; i < MAX_TILEMAP_TILES; i++){
+    for (int i = 0; i < (int)tilemap.tiles.size(); i++){
         if (tilemap.tiles[i].width == 0 && tilemap.tiles[i].height == 0 && tilemap.tiles[i].name.empty()){
             id = i;
             break;
@@ -220,7 +220,7 @@ void Tilemap::addTile(const std::string& rectString, Vector2 position, float wid
 void Tilemap::removeTile(int id){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    if (id >= 0 && id < MAX_TILEMAP_TILES){
+    if (tilemap.tiles.validIndex(id)){
         tilemap.tiles[id] = {};
     }else{
         Log::error("Error removing tile with id %i", id);
@@ -238,7 +238,7 @@ void Tilemap::removeTile(const std::string& name){
 void Tilemap::clearTiles(){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    for (int i = 0; i < MAX_TILEMAP_TILES; i++){
+    for (int i = 0; i < (int)tilemap.tiles.size(); i++){
         tilemap.tiles[i].width = 0;
         tilemap.tiles[i].height = 0;
         tilemap.tiles[i].name.clear();
@@ -248,7 +248,7 @@ void Tilemap::clearTiles(){
 TileData& Tilemap::getTile(int id){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    if (id >= 0 && id < MAX_TILEMAP_TILES){
+    if (tilemap.tiles.validIndex(id)){
         return tilemap.tiles[id];
     }else{
         throw std::out_of_range("error getting tile");

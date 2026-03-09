@@ -5,7 +5,8 @@
 #ifndef TILEMAP_COMPONENT_H
 #define TILEMAP_COMPONENT_H
 
-
+#include "util/HybridArray.h"
+#include "Engine.h"
 
 namespace Supernova{
 
@@ -35,8 +36,8 @@ namespace Supernova{
         unsigned int reserveTiles = 10;
         unsigned int numTiles = 0;
         
-        TileRectData tilesRect[MAX_TILEMAP_TILESRECT];
-        TileData tiles[MAX_TILEMAP_TILES];
+        HybridArray<TileRectData, MAX_TILEMAP_TILESRECT> tilesRect;
+        HybridArray<TileData, MAX_TILEMAP_TILES> tiles;
 
         bool needUpdateTilemap = true;
     };

@@ -20,6 +20,14 @@ struct HybridArray {
         return values.size();
     }
 
+    T* data() {
+        return values.data();
+    }
+
+    const T* data() const {
+        return values.data();
+    }
+
     bool validIndex(int index) const {
         return index >= 0;
     }
@@ -40,6 +48,14 @@ struct HybridArray {
 
     std::size_t size() const {
         return Size;
+    }
+
+    T* data() {
+        return values;
+    }
+
+    const T* data() const {
+        return values;
     }
 
     bool validIndex(int index) const {

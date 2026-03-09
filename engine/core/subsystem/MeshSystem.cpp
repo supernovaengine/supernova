@@ -237,13 +237,13 @@ bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     unsigned int numTiles = 0;
     unsigned int reserveTiles = tilemap.reserveTiles;
 
-    for (int i = 0; i < MAX_TILEMAP_TILES; i++){
+    for (int i = 0; i < (int)tilemap.tiles.size(); i++){
 
         if (tilemap.tiles[i].width == 0 && tilemap.tiles[i].height == 0 && reserveTiles == 0){
             continue;
         }
 
-        if (tilemap.tiles[i].rectId < 0 || tilemap.tiles[i].rectId >= MAX_TILEMAP_TILESRECT){
+        if (!tilemap.tilesRect.validIndex(tilemap.tiles[i].rectId)){
             continue;
         }
 
@@ -546,7 +546,7 @@ bool MeshSystem::loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, ModelC
         mesh.eBuffers[mesh.numExternalBuffers].setRenderAttributes(false);
 
         mesh.numExternalBuffers++;
-        if (mesh.numExternalBuffers > MAX_EXTERNAL_BUFFERS){
+        if (mesh.numExternalBuffers > mesh.eBuffers.size()){
             Log::error("External buffer limit reached for GLTF model");
         }
 
@@ -1761,9 +1761,9 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
 
     }
 
-    if (mesh.numSubmeshes > MAX_SUBMESHES){
+    if (mesh.numSubmeshes > mesh.submeshes.size()){
         Log::error("Model %s has more submeshes then MAX_SUBMESHES. Please increase MAX_SUBMESHES", filename.c_str());
-        mesh.numSubmeshes = MAX_SUBMESHES;
+        mesh.numSubmeshes = mesh.submeshes.size();
     }
 
     for (size_t i = 0; i < mesh.numSubmeshes; i++) {
@@ -2320,7 +2320,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
     }
     //END DEBUG
 */
-    std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
+    std::reverse(mesh.submeshes.data(), mesh.submeshes.data() + mesh.numSubmeshes);
 
     calculateMeshAABB(mesh);
 
@@ -2405,9 +2405,9 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string& filename, bool asyncL
 
     }
 
-    if (mesh.numSubmeshes > MAX_SUBMESHES){
+    if (mesh.numSubmeshes > mesh.submeshes.size()){
         Log::error("Model %s has more submeshes then MAX_SUBMESHES. Please increase MAX_SUBMESHES", filename.c_str());
-        mesh.numSubmeshes = MAX_SUBMESHES;
+        mesh.numSubmeshes = mesh.submeshes.size();
     }
 
     if (asyncLoad) {
@@ -2550,7 +2550,7 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string& filename, bool asyncL
         mesh.indices.setRenderAttributes(false);
     }
 
-    std::reverse(mesh.submeshes, mesh.submeshes + mesh.numSubmeshes);
+    std::reverse(mesh.submeshes.data(), mesh.submeshes.data() + mesh.numSubmeshes);
 
     calculateMeshAABB(mesh);
 
