@@ -7,16 +7,10 @@
 
 #include "Engine.h"
 #include "ecs/Entity.h"
+#include "util/HybridArray.h"
 
 #include "Jolt/Jolt.h"
 #include "Jolt/Physics/Body/Body.h"
-
-#ifndef MAX_SHAPES
-#define MAX_SHAPES 10
-#endif
-
-#define MAX_SHAPE_VERTICES_3D 256
-#define MAX_SHAPE_INDICES_3D 768
 
 namespace Supernova{
 
@@ -60,8 +54,8 @@ namespace Supernova{
         Entity sourceEntity = NULL_ENTITY;
         unsigned int samplesSize = 0;
 
-        Vector3 vertices[MAX_SHAPE_VERTICES_3D];
-        uint16_t indices[MAX_SHAPE_INDICES_3D];
+        HybridArray<Vector3, MAX_SHAPE_VERTICES_3D> vertices;
+        HybridArray<uint16_t, MAX_SHAPE_INDICES_3D> indices;
         uint16_t numVertices = 0;
         uint16_t numIndices = 0;
     };
@@ -69,7 +63,7 @@ namespace Supernova{
     struct Body3DComponent{
         JPH::BodyID body;
 
-        Shape3D shapes[MAX_SHAPES];
+        HybridArray<Shape3D, MAX_SHAPES> shapes;
         size_t numShapes = 0;
 
         bool needReloadBody = true;

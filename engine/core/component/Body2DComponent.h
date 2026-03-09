@@ -7,10 +7,8 @@
 
 #include "Engine.h"
 #include "math/Vector2.h"
+#include "util/HybridArray.h"
 #include "box2d/box2d.h"
-
-#define MAX_SHAPES 10
-#define MAX_SHAPE_POINTS_2D 16
 
 namespace Supernova{
 
@@ -32,7 +30,7 @@ namespace Supernova{
         Vector2 pointB = Vector2::ZERO;
         float radius = 0.0f;
 
-        Vector2 vertices[MAX_SHAPE_POINTS_2D];
+        HybridArray<Vector2, MAX_SHAPE_POINTS_2D> vertices;
         uint8_t verticesCount = 0;
         bool loop = false;
 
@@ -53,7 +51,7 @@ namespace Supernova{
     struct Body2DComponent{
         b2BodyId body = b2_nullBodyId;
 
-        Shape2D shapes[MAX_SHAPES];
+        HybridArray<Shape2D, MAX_SHAPES> shapes;
         size_t numShapes = 0;
 
         bool needReloadBody = true;

@@ -39,8 +39,8 @@ BodyType getJoltToBodyType(JPH::EMotionType type){
 }
 
 static int appendShape3D(Body3DComponent& body){
-    if (body.numShapes >= MAX_SHAPES){
-        Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+    if (!body.shapes.validIndex(body.numShapes)){
+        Log::error("Cannot add more shapes in this body");
         return -1;
     }
 
@@ -251,8 +251,13 @@ int Body3D::createConvexHullShape(Vector3 position, Quaternion rotation, std::ve
     shape.position = position;
     shape.rotation = rotation;
     shape.source = Shape3DSource::RAW_VERTICES;
-    shape.numVertices = std::min((size_t)MAX_SHAPE_VERTICES_3D, vertices.size());
+    shape.numVertices = vertices.size();
     for (size_t i = 0; i < shape.numVertices; i++){
+        if (!shape.vertices.validIndex(i)){
+            Log::warn("Convex hull vertices truncated from %zu to %zu", shape.numVertices, i);
+            shape.numVertices = i;
+            break;
+        }
         shape.vertices[i] = vertices[i];
     }
 
@@ -286,12 +291,22 @@ int Body3D::createMeshShape(Vector3 position, Quaternion rotation, std::vector<V
     shape.position = position;
     shape.rotation = rotation;
     shape.source = Shape3DSource::RAW_MESH;
-    shape.numVertices = std::min((size_t)MAX_SHAPE_VERTICES_3D, vertices.size());
+    shape.numVertices = vertices.size();
     for (size_t i = 0; i < shape.numVertices; i++){
+        if (!shape.vertices.validIndex(i)){
+            Log::warn("Mesh shape vertices truncated from %zu to %zu", shape.numVertices, i);
+            shape.numVertices = i;
+            break;
+        }
         shape.vertices[i] = vertices[i];
     }
-    shape.numIndices = std::min((size_t)MAX_SHAPE_INDICES_3D, indices.size());
+    shape.numIndices = indices.size();
     for (size_t i = 0; i < shape.numIndices; i++){
+        if (!shape.indices.validIndex(i)){
+            Log::warn("Mesh shape indices truncated from %zu to %zu", shape.numIndices, i);
+            shape.numIndices = i;
+            break;
+        }
         shape.indices[i] = indices[i];
     }
 

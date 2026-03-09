@@ -45,8 +45,8 @@ Vector2 getB2ToVector2(b2Vec2 vec2){
 }
 
 static int appendShape2D(Body2DComponent& body){
-    if (body.numShapes >= MAX_SHAPES){
-        Log::error("Cannot add more shapes in this body, please increase value MAX_SHAPES");
+    if (!body.shapes.validIndex(body.numShapes)){
+        Log::error("Cannot add more shapes in this body");
         return -1;
     }
 
@@ -93,7 +93,7 @@ b2BodyId Body2D::getBox2DBody() const{
 b2ShapeId Body2D::getBox2DShape(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >= 0 && index < MAX_SHAPES){
+    if (body.shapes.validIndex(index)){
         return body.shapes[index].shape;
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -105,7 +105,7 @@ b2ShapeId Body2D::getBox2DShape(size_t index) const{
 b2ChainId Body2D::getBox2DChain(size_t index) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (index >= 0 && index < MAX_SHAPES){
+    if (body.shapes.validIndex(index)){
         return body.shapes[index].chain;
     }else{
         Log::error("Cannot find shape %i of body", index);
@@ -209,8 +209,13 @@ int Body2D::createPolygonShape(std::vector<Vector2> vertices){
 
     Shape2D& shape = body.shapes[index];
     shape.type = Shape2DType::POLYGON;
-    shape.verticesCount = std::min((size_t)MAX_SHAPE_POINTS_2D, vertices.size());
+    shape.verticesCount = vertices.size();
     for (size_t i = 0; i < shape.verticesCount; i++){
+        if (!shape.vertices.validIndex(i)){
+            Log::warn("Polygon shape vertices truncated from %zu to %zu", shape.verticesCount, i);
+            shape.verticesCount = i;
+            break;
+        }
         shape.vertices[i] = vertices[i];
     }
 
@@ -265,8 +270,13 @@ int Body2D::createChainShape(std::vector<Vector2> vertices, bool loop){
     Shape2D& shape = body.shapes[index];
     shape.type = Shape2DType::CHAIN;
     shape.loop = loop;
-    shape.verticesCount = std::min((size_t)MAX_SHAPE_POINTS_2D, vertices.size());
+    shape.verticesCount = vertices.size();
     for (size_t i = 0; i < shape.verticesCount; i++){
+        if (!shape.vertices.validIndex(i)){
+            Log::warn("Chain shape vertices truncated from %zu to %zu", shape.verticesCount, i);
+            shape.verticesCount = i;
+            break;
+        }
         shape.vertices[i] = vertices[i];
     }
 
@@ -755,7 +765,7 @@ void Body2D::setBitsFilter(uint16_t categoryBits, uint16_t maskBits){
 void Body2D::setBitsFilter(size_t shapeIndex, uint16_t categoryBits, uint16_t maskBits){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+    if (body.shapes.validIndex(shapeIndex)){
         body.shapes[shapeIndex].categoryBits = categoryBits;
         body.shapes[shapeIndex].maskBits = maskBits;
 
@@ -786,7 +796,7 @@ void Body2D::setGroupIndexFilter(int16_t groupIndex){
 void Body2D::setCategoryBitsFilter(size_t shapeIndex, uint16_t categoryBits){
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+    if (body.shapes.validIndex(shapeIndex)){
         body.shapes[shapeIndex].categoryBits = categoryBits;
         if (b2Shape_IsValid(body.shapes[shapeIndex].shape)){
             b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
@@ -803,7 +813,7 @@ void Body2D::setCategoryBitsFilter(size_t shapeIndex, uint16_t categoryBits){
 void Body2D::setMaskBitsFilter(size_t shapeIndex, uint16_t maskBits){
     Body2DComponent& body = getComponent<Body2DComponent>();
     
-    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+    if (body.shapes.validIndex(shapeIndex)){
         body.shapes[shapeIndex].maskBits = maskBits;
         if (b2Shape_IsValid(body.shapes[shapeIndex].shape)){
             b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
@@ -820,7 +830,7 @@ void Body2D::setMaskBitsFilter(size_t shapeIndex, uint16_t maskBits){
 void Body2D::setGroupIndexFilter(size_t shapeIndex, int16_t groupIndex){
     Body2DComponent& body = getComponent<Body2DComponent>();
     
-    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+    if (body.shapes.validIndex(shapeIndex)){
         body.shapes[shapeIndex].groupIndex = groupIndex;
         if (b2Shape_IsValid(body.shapes[shapeIndex].shape)){
             b2Filter filter = b2Shape_GetFilter(body.shapes[shapeIndex].shape);
@@ -849,7 +859,7 @@ int16_t Body2D::getGroupIndexFilter() const{
 uint16_t Body2D::getCategoryBitsFilter(size_t shapeIndex) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
 
-    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+    if (body.shapes.validIndex(shapeIndex)){
         return body.shapes[shapeIndex].categoryBits;
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
@@ -861,7 +871,7 @@ uint16_t Body2D::getCategoryBitsFilter(size_t shapeIndex) const{
 uint16_t Body2D::getMaskBitsFilter(size_t shapeIndex) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
     
-    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+    if (body.shapes.validIndex(shapeIndex)){
         return body.shapes[shapeIndex].maskBits;
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
@@ -873,7 +883,7 @@ uint16_t Body2D::getMaskBitsFilter(size_t shapeIndex) const{
 int16_t Body2D::getGroupIndexFilter(size_t shapeIndex) const{
     Body2DComponent& body = getComponent<Body2DComponent>();
     
-    if (shapeIndex >= 0 && shapeIndex < MAX_SHAPES){
+    if (body.shapes.validIndex(shapeIndex)){
         return body.shapes[shapeIndex].groupIndex;
     }else{
         Log::error("Cannot find shape %i of body", shapeIndex);
