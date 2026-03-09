@@ -10,7 +10,7 @@
 using namespace Supernova;
 
 Button::Button(Scene* scene): Image(scene){
-    addComponent<ButtonComponent>({});
+    addComponent<ButtonComponent>();
 }
 
 Button::Button(Scene* scene, Entity entity): Image(scene, entity){

@@ -10,7 +10,7 @@
 using namespace Supernova;
 
 TextEdit::TextEdit(Scene* scene): Image(scene){
-    addComponent<TextEditComponent>({});
+    addComponent<TextEditComponent>();
 }
 
 TextEdit::TextEdit(Scene* scene, Entity entity): Image(scene, entity){

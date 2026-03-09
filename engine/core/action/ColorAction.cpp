@@ -8,7 +8,7 @@
 using namespace Supernova;
 
 ColorAction::ColorAction(Scene* scene): TimedAction(scene){
-    addComponent<ColorActionComponent>({});
+    addComponent<ColorActionComponent>();
 }
 
 void ColorAction::setAction(Vector3 startColor, Vector3 endColor, float duration, bool loop){

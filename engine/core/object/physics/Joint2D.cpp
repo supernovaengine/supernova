@@ -11,7 +11,7 @@
 using namespace Supernova;
 
 Joint2D::Joint2D(Scene* scene): EntityHandle(scene){
-    addComponent<Joint2DComponent>({});
+    addComponent<Joint2DComponent>();
 }
 
 Joint2D::Joint2D(Scene* scene, Entity entity): EntityHandle(scene, entity){

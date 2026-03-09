@@ -78,8 +78,8 @@ Entity Scene::getCamera() const{
 
 Entity Scene::createDefaultCamera(){
     defaultCamera = createSystemEntity();
-    addComponent<CameraComponent>(defaultCamera, {});
-    addComponent<Transform>(defaultCamera, {});
+    addComponent<CameraComponent>(defaultCamera);
+    addComponent<Transform>(defaultCamera);
 
     CameraComponent& camera = getComponent<CameraComponent>(defaultCamera);
     camera.type = CameraType::CAMERA_UI;

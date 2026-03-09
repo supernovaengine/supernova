@@ -8,7 +8,7 @@
 using namespace Supernova;
 
 Lines::Lines(Scene* scene): Object(scene){
-    addComponent<LinesComponent>({});
+    addComponent<LinesComponent>();
 }
 
 Lines::Lines(Scene* scene, Entity entity): Object(scene, entity){

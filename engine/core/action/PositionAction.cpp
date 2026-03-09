@@ -7,7 +7,7 @@
 using namespace Supernova;
 
 PositionAction::PositionAction(Scene* scene): TimedAction(scene){
-    addComponent<PositionActionComponent>({});
+    addComponent<PositionActionComponent>();
 }
 
 void PositionAction::setAction(Vector3 startPosition, Vector3 endPosition, float duration, bool loop){

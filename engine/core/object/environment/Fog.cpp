@@ -8,7 +8,7 @@
 using namespace Supernova;
 
 Fog::Fog(Scene* scene): EntityHandle(scene){
-    addComponent<FogComponent>({});
+    addComponent<FogComponent>();
 }
 
 Fog::Fog(Scene* scene, Entity entity): EntityHandle(scene, entity){

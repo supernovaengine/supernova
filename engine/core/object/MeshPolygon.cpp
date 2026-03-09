@@ -12,7 +12,7 @@
 using namespace Supernova;
 
 MeshPolygon::MeshPolygon(Scene* scene): Mesh(scene){
-    addComponent<MeshPolygonComponent>({});
+    addComponent<MeshPolygonComponent>();
 
     MeshComponent& mesh = getComponent<MeshComponent>();
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLE_STRIP;

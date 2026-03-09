@@ -10,13 +10,13 @@
 using namespace Supernova;
 
 ScaleTracks::ScaleTracks(Scene* scene): Action(scene){
-    addComponent<KeyframeTracksComponent>({});
-    addComponent<ScaleTracksComponent>({});
+    addComponent<KeyframeTracksComponent>();
+    addComponent<ScaleTracksComponent>();
 }
 
 ScaleTracks::ScaleTracks(Scene* scene, std::vector<float> times, std::vector<Vector3> values): Action(scene){
-    addComponent<KeyframeTracksComponent>({});
-    addComponent<ScaleTracksComponent>({});
+    addComponent<KeyframeTracksComponent>();
+    addComponent<ScaleTracksComponent>();
 
     KeyframeTracksComponent& keyframe = getComponent<KeyframeTracksComponent>();
 

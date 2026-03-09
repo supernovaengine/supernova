@@ -12,7 +12,7 @@
 using namespace Supernova;
 
 Light::Light(Scene* scene): Object(scene){
-    addComponent<LightComponent>({});
+    addComponent<LightComponent>();
 }
 
 Light::Light(Scene* scene, Entity entity): Object(scene, entity){

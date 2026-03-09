@@ -11,7 +11,7 @@
 using namespace Supernova;
 
 Camera::Camera(Scene* scene): Object(scene){
-    addComponent<CameraComponent>({});
+    addComponent<CameraComponent>();
 
     CameraComponent& cameraComponent = getComponent<CameraComponent>();
     applyPerspectiveDefaults(cameraComponent);

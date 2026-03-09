@@ -8,7 +8,7 @@
 using namespace Supernova;
 
 Tilemap::Tilemap(Scene* scene): Mesh(scene){
-    addComponent<TilemapComponent>({});
+    addComponent<TilemapComponent>();
 }
 
 Tilemap::Tilemap(Scene* scene, Entity entity): Mesh(scene, entity){

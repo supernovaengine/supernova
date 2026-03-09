@@ -11,7 +11,7 @@
 using namespace Supernova;
 
 Joint3D::Joint3D(Scene* scene): EntityHandle(scene){
-    addComponent<Joint3DComponent>({});
+    addComponent<Joint3DComponent>();
 }
 
 Joint3D::Joint3D(Scene* scene, Entity entity): EntityHandle(scene, entity){

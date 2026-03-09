@@ -8,7 +8,7 @@
 using namespace Supernova;
 
 SkyBox::SkyBox(Scene* scene): EntityHandle(scene){
-    addComponent<SkyComponent>({});
+    addComponent<SkyComponent>();
 }
 
 SkyBox::SkyBox(Scene* scene, Entity entity): EntityHandle(scene, entity){

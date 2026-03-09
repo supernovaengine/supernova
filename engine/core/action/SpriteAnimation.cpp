@@ -7,7 +7,7 @@
 using namespace Supernova;
 
 SpriteAnimation::SpriteAnimation(Scene* scene): Action(scene){
-    addComponent<SpriteAnimationComponent>({});
+    addComponent<SpriteAnimationComponent>();
 }
 
 void SpriteAnimation::setAnimation(std::vector<int> frames, std::vector<int> framesTime, bool loop){

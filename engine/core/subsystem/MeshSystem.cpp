@@ -698,8 +698,8 @@ Entity MeshSystem::generateSketetalStructure(Entity entity, ModelComponent& mode
     Entity bone;
 
     bone = scene->createEntity();
-    scene->addComponent<Transform>(bone, {});
-    scene->addComponent<BoneComponent>(bone, {});
+    scene->addComponent<Transform>(bone);
+    scene->addComponent<BoneComponent>(bone);
 
     Transform& bonetransform = scene->getComponent<Transform>(bone);
     BoneComponent& bonecomp = scene->getComponent<BoneComponent>(bone);
@@ -2166,8 +2166,8 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
         Entity anim;
 
         anim = scene->createEntity();
-        scene->addComponent<ActionComponent>(anim, {});
-        scene->addComponent<AnimationComponent>(anim, {});
+    scene->addComponent<ActionComponent>(anim);
+    scene->addComponent<AnimationComponent>(anim);
 
         AnimationComponent& animcomp = scene->getComponent<AnimationComponent>(anim);
 
@@ -2206,8 +2206,8 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
 
                 track = scene->createEntity();
 
-                scene->addComponent<ActionComponent>(track, {});
-                scene->addComponent<KeyframeTracksComponent>(track, {});
+                scene->addComponent<ActionComponent>(track);
+                scene->addComponent<KeyframeTracksComponent>(track);
 
                 ActionComponent& actiontrack = scene->getComponent<ActionComponent>(track);
                 KeyframeTracksComponent& keyframe = scene->getComponent<KeyframeTracksComponent>(track);
@@ -2215,7 +2215,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
                 bool foundTrack = false;
                 if (channel.target_path.compare("translation") == 0) {
                     foundTrack = true;
-                    scene->addComponent<TranslateTracksComponent>(track, {});
+                    scene->addComponent<TranslateTracksComponent>(track);
                     TranslateTracksComponent& translatetracks = scene->getComponent<TranslateTracksComponent>(track);
                     for (int c = 0; c < accessorIn.count; c++) {
                         Vector3 positionAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
@@ -2226,7 +2226,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
                 }
                 if (channel.target_path.compare("rotation") == 0) {
                     foundTrack = true;
-                    scene->addComponent<RotateTracksComponent>(track, {});
+                    scene->addComponent<RotateTracksComponent>(track);
                     RotateTracksComponent& rotatetracks = scene->getComponent<RotateTracksComponent>(track);
                     for (int c = 0; c < accessorIn.count; c++) {
                         Quaternion rotationAc(values[(4 * c) + 3], values[4 * c], values[(4 * c) + 1], values[(4 * c) + 2]);
@@ -2237,7 +2237,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
                 }
                 if (channel.target_path.compare("scale") == 0) {
                     foundTrack = true;
-                    scene->addComponent<ScaleTracksComponent>(track, {});
+                    scene->addComponent<ScaleTracksComponent>(track);
                     ScaleTracksComponent& scaletracks = scene->getComponent<ScaleTracksComponent>(track);
                     for (int c = 0; c < accessorIn.count; c++) {
                         Vector3 scaleAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
@@ -2248,7 +2248,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
                 }
                 if (channel.target_path.compare("weights") == 0) {
                     foundTrack = true;
-                    scene->addComponent<MorphTracksComponent>(track, {});
+                    scene->addComponent<MorphTracksComponent>(track);
                     MorphTracksComponent& morphtracks = scene->getComponent<MorphTracksComponent>(track);
                     int morphNum = accessorOut.count / accessorIn.count;
                     for (int c = 0; c < accessorIn.count; c++) {
@@ -2569,7 +2569,7 @@ void MeshSystem::createInstancedMesh(Entity entity){
     Signature signature = scene->getSignature(entity);
 
     if (!signature.test(scene->getComponentId<InstancedMeshComponent>())){
-        scene->addComponent<InstancedMeshComponent>(entity, {});
+        scene->addComponent<InstancedMeshComponent>(entity);
 
         InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(entity);
 

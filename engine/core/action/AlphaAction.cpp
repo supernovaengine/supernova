@@ -7,7 +7,7 @@
 using namespace Supernova;
 
 AlphaAction::AlphaAction(Scene* scene): TimedAction(scene){
-    addComponent<AlphaActionComponent>({});
+    addComponent<AlphaActionComponent>();
 }
 
 void AlphaAction::setAction(float startAlpha, float endAlpha, float duration, bool loop){

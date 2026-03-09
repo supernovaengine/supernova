@@ -9,7 +9,7 @@
 using namespace Supernova;
 
 Audio::Audio(Scene* scene): Object(scene){
-    addComponent<AudioComponent>({});
+    addComponent<AudioComponent>();
 }
 
 Audio::Audio(Scene* scene, Entity entity): Object(scene, entity){

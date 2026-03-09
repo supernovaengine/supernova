@@ -10,7 +10,7 @@
 using namespace Supernova;
 
 Container::Container(Scene* scene): UILayout(scene){
-    addComponent<UIContainerComponent>({});
+    addComponent<UIContainerComponent>();
 }
 
 Container::Container(Scene* scene, Entity entity): UILayout(scene, entity){

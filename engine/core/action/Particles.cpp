@@ -7,7 +7,7 @@
 using namespace Supernova;
 
 Particles::Particles(Scene* scene): Action(scene){
-    addComponent<ParticlesComponent>({});
+    addComponent<ParticlesComponent>();
 }
 
 Particles::~Particles(){

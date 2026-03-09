@@ -9,7 +9,7 @@
 using namespace Supernova;
 
 Animation::Animation(Scene* scene): Action(scene){
-    addComponent<AnimationComponent>({});
+    addComponent<AnimationComponent>();
 }
 
 Animation::Animation(Scene* scene, Entity entity): Action(scene, entity){

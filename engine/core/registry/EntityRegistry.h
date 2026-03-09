@@ -122,6 +122,11 @@ namespace Supernova {
         }
 
         template<typename T>
+        void addComponent(Entity entity){
+            addComponent<T>(entity, T{});
+        }
+
+        template<typename T>
         void addComponent(Entity entity, T component){
             componentManager.addComponent<T>(entity, component);
             auto signature = entityManager.getSignature(entity);

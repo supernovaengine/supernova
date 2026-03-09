@@ -7,7 +7,7 @@
 using namespace Supernova;
 
 ScaleAction::ScaleAction(Scene* scene): TimedAction(scene){
-    addComponent<ScaleActionComponent>({});
+    addComponent<ScaleActionComponent>();
 }
 
 void ScaleAction::setAction(Vector3 startScale, Vector3 endScale, float duration, bool loop){

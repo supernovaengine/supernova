@@ -7,7 +7,7 @@
 using namespace Supernova;
 
 TimedAction::TimedAction(Scene* scene): Action(scene){
-    addComponent<TimedActionComponent>({});
+    addComponent<TimedActionComponent>();
 }
 
 void TimedAction::setAction(float duration, bool loop){

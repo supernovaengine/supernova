@@ -11,7 +11,7 @@
 using namespace Supernova;
 
 Terrain::Terrain(Scene* scene): Mesh(scene){
-    addComponent<TerrainComponent>({});
+    addComponent<TerrainComponent>();
 }
 
 Terrain::Terrain(Scene* scene, Entity entity): Mesh(scene, entity){

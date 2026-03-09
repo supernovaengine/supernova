@@ -10,7 +10,7 @@
 using namespace Supernova;
 
 Panel::Panel(Scene* scene): Image(scene){
-    addComponent<PanelComponent>({});
+    addComponent<PanelComponent>();
 }
 
 Panel::Panel(Scene* scene, Entity entity): Image(scene, entity){

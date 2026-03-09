@@ -12,8 +12,8 @@
 using namespace Supernova;
 
 Text::Text(Scene* scene): UILayout(scene){
-    addComponent<UIComponent>({});
-    addComponent<TextComponent>({});
+    addComponent<UIComponent>();
+    addComponent<TextComponent>();
 }
 
 Text::Text(Scene* scene, Entity entity): UILayout(scene, entity){

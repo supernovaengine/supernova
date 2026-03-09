@@ -11,8 +11,8 @@
 using namespace Supernova;
 
 Image::Image(Scene* scene): UILayout(scene){
-    addComponent<UIComponent>({});
-    addComponent<ImageComponent>({});
+    addComponent<UIComponent>();
+    addComponent<ImageComponent>();
 }
 
 Image::Image(Scene* scene, Entity entity): UILayout(scene, entity){

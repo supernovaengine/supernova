@@ -20,7 +20,7 @@
 using namespace Supernova;
 
 Model::Model(Scene* scene): Mesh(scene){
-    addComponent<ModelComponent>({});
+    addComponent<ModelComponent>();
 }
 
 Model::Model(Scene* scene, Entity entity): Mesh(scene, entity){

@@ -7,7 +7,7 @@
 using namespace Supernova;
 
 RotationAction::RotationAction(Scene* scene): TimedAction(scene){
-    addComponent<RotationActionComponent>({});
+    addComponent<RotationActionComponent>();
 }
 
 void RotationAction::setAction(Quaternion startRotation, Quaternion endRotation, float duration, bool loop){

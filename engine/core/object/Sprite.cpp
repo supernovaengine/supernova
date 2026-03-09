@@ -11,7 +11,7 @@
 using namespace Supernova;
 
 Sprite::Sprite(Scene* scene): Mesh(scene){
-    addComponent<SpriteComponent>({});
+    addComponent<SpriteComponent>();
     animation = NULL;
 }
 

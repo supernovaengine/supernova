@@ -10,7 +10,7 @@
 using namespace Supernova;
 
 Object::Object(Scene* scene): EntityHandle(scene){
-    addComponent<Transform>({});
+    addComponent<Transform>();
 }
 
 Object::Object(Scene* scene, Entity entity): EntityHandle(scene, entity){

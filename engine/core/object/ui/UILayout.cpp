@@ -9,7 +9,7 @@
 using namespace Supernova;
 
 UILayout::UILayout(Scene* scene): Object(scene){
-    addComponent<UILayoutComponent>({});
+    addComponent<UILayoutComponent>();
 }
 
 UILayout::UILayout(Scene* scene, Entity entity): Object(scene, entity){

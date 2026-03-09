@@ -12,8 +12,8 @@
 using namespace Supernova;
 
 Polygon::Polygon(Scene* scene): UILayout(scene){
-    addComponent<UIComponent>({});
-    addComponent<PolygonComponent>({});
+    addComponent<UIComponent>();
+    addComponent<PolygonComponent>();
 }
 
 Polygon::Polygon(Scene* scene, Entity entity): UILayout(scene, entity){

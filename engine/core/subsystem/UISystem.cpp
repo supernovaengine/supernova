@@ -337,10 +337,10 @@ void UISystem::createButtonObjects(Entity entity, ButtonComponent& button){
     if (button.label == NULL_ENTITY){
         button.label = scene->createEntity();
 
-        scene->addComponent<Transform>(button.label, {});
-        scene->addComponent<UILayoutComponent>(button.label, {});
-        scene->addComponent<UIComponent>(button.label, {});
-        scene->addComponent<TextComponent>(button.label, {});
+        scene->addComponent<Transform>(button.label);
+        scene->addComponent<UILayoutComponent>(button.label);
+        scene->addComponent<UIComponent>(button.label);
+        scene->addComponent<TextComponent>(button.label);
 
         scene->addEntityChild(entity, button.label, false);
 
@@ -358,10 +358,10 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
     if (panel.headerimage == NULL_ENTITY){
         panel.headerimage = scene->createEntity();
 
-        scene->addComponent<Transform>(panel.headerimage, {});
-        scene->addComponent<UILayoutComponent>(panel.headerimage, {});
-        scene->addComponent<UIComponent>(panel.headerimage, {});
-        scene->addComponent<ImageComponent>(panel.headerimage, {});
+        scene->addComponent<Transform>(panel.headerimage);
+        scene->addComponent<UILayoutComponent>(panel.headerimage);
+        scene->addComponent<UIComponent>(panel.headerimage);
+        scene->addComponent<ImageComponent>(panel.headerimage);
 
         scene->addEntityChild(entity, panel.headerimage, false);
 
@@ -381,9 +381,9 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
     if (panel.headercontainer == NULL_ENTITY){
         panel.headercontainer = scene->createEntity();
 
-        scene->addComponent<Transform>(panel.headercontainer, {});
-        scene->addComponent<UILayoutComponent>(panel.headercontainer, {});
-        scene->addComponent<UIContainerComponent>(panel.headercontainer, {});
+        scene->addComponent<Transform>(panel.headercontainer);
+        scene->addComponent<UILayoutComponent>(panel.headercontainer);
+        scene->addComponent<UIContainerComponent>(panel.headercontainer);
 
         scene->addEntityChild(panel.headerimage, panel.headercontainer, false);
 
@@ -399,10 +399,10 @@ void UISystem::createPanelObjects(Entity entity, PanelComponent& panel){
     if (panel.headertext == NULL_ENTITY){
         panel.headertext = scene->createEntity();
 
-        scene->addComponent<Transform>(panel.headertext, {});
-        scene->addComponent<UILayoutComponent>(panel.headertext, {});
-        scene->addComponent<UIComponent>(panel.headertext, {});
-        scene->addComponent<TextComponent>(panel.headertext, {});
+        scene->addComponent<Transform>(panel.headertext);
+        scene->addComponent<UILayoutComponent>(panel.headertext);
+        scene->addComponent<UIComponent>(panel.headertext);
+        scene->addComponent<TextComponent>(panel.headertext);
 
         scene->addEntityChild(panel.headercontainer, panel.headertext, false);
 
@@ -421,10 +421,10 @@ void UISystem::createScrollbarObjects(Entity entity, ScrollbarComponent& scrollb
     if (scrollbar.bar == NULL_ENTITY){
         scrollbar.bar = scene->createEntity();
 
-        scene->addComponent<Transform>(scrollbar.bar, {});
-        scene->addComponent<UILayoutComponent>(scrollbar.bar, {});
-        scene->addComponent<UIComponent>(scrollbar.bar, {});
-        scene->addComponent<ImageComponent>(scrollbar.bar, {});
+        scene->addComponent<Transform>(scrollbar.bar);
+        scene->addComponent<UILayoutComponent>(scrollbar.bar);
+        scene->addComponent<UIComponent>(scrollbar.bar);
+        scene->addComponent<ImageComponent>(scrollbar.bar);
 
         scene->addEntityChild(entity, scrollbar.bar, false);
 
@@ -438,10 +438,10 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
     if (textedit.text == NULL_ENTITY){
         textedit.text = scene->createEntity();
 
-        scene->addComponent<Transform>(textedit.text, {});
-        scene->addComponent<UILayoutComponent>(textedit.text, {});
-        scene->addComponent<UIComponent>(textedit.text, {});
-        scene->addComponent<TextComponent>(textedit.text, {});
+        scene->addComponent<Transform>(textedit.text);
+        scene->addComponent<UILayoutComponent>(textedit.text);
+        scene->addComponent<UIComponent>(textedit.text);
+        scene->addComponent<TextComponent>(textedit.text);
 
         scene->addEntityChild(entity, textedit.text, false);
 
@@ -454,10 +454,10 @@ void UISystem::createTextEditObjects(Entity entity, TextEditComponent& textedit)
     if (textedit.cursor == NULL_ENTITY){
         textedit.cursor = scene->createEntity();
 
-        scene->addComponent<Transform>(textedit.cursor, {});
-        scene->addComponent<UILayoutComponent>(textedit.cursor, {});
-        scene->addComponent<UIComponent>(textedit.cursor, {});
-        scene->addComponent<PolygonComponent>(textedit.cursor, {});
+        scene->addComponent<Transform>(textedit.cursor);
+        scene->addComponent<UILayoutComponent>(textedit.cursor);
+        scene->addComponent<UIComponent>(textedit.cursor);
+        scene->addComponent<PolygonComponent>(textedit.cursor);
 
         scene->addEntityChild(entity, textedit.cursor, false);
 

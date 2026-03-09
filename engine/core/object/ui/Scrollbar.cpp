@@ -9,7 +9,7 @@
 using namespace Supernova;
 
 Scrollbar::Scrollbar(Scene* scene): Image(scene){
-    addComponent<ScrollbarComponent>({});
+    addComponent<ScrollbarComponent>();
 }
 
 Scrollbar::Scrollbar(Scene* scene, Entity entity): Image(scene, entity){

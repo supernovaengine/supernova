@@ -7,7 +7,7 @@
 using namespace Supernova;
 
 Action::Action(Scene* scene): EntityHandle(scene){
-    addComponent<ActionComponent>({});
+    addComponent<ActionComponent>();
 }
 
 Action::Action(Scene* scene, Entity entity): EntityHandle(scene, entity){

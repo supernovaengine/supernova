@@ -824,7 +824,7 @@ void PhysicsSystem::createBody2D(Entity entity){
     Signature signature = scene->getSignature(entity);
 
     if (!signature.test(scene->getComponentId<Body2DComponent>())){
-        scene->addComponent<Body2DComponent>(entity, {});
+        scene->addComponent<Body2DComponent>(entity);
         //loadBody2D(entity);
     }
 }
@@ -843,7 +843,7 @@ void PhysicsSystem::createBody3D(Entity entity){
     Signature signature = scene->getSignature(entity);
 
     if (!signature.test(scene->getComponentId<Body3DComponent>())){
-        scene->addComponent<Body3DComponent>(entity, {});
+        scene->addComponent<Body3DComponent>(entity);
         //loadBody3D(entity);
     }
 }
