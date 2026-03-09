@@ -12,9 +12,7 @@ namespace Supernova {
 template <typename T, std::size_t Size>
 struct HybridArray {
 #ifdef SUPERNOVA_EDITOR
-    std::vector<T> values;
-
-    HybridArray() : values(Size) {}
+    std::vector<T> values = std::vector<T>(Size);
 
     std::size_t size() const {
         return values.size();
