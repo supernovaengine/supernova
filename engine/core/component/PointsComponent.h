@@ -6,6 +6,8 @@
 #define POINTS_COMPONENT_H
 
 #include "util/SpriteFrameData.h"
+#include "util/HybridArray.h"
+#include "Engine.h"
 
 namespace Supernova{
 
@@ -35,7 +37,7 @@ namespace Supernova{
         std::vector<PointData> points;
         std::vector<PointRenderData> renderPoints; //must be sorted
 
-        SpriteFrameData framesRect[MAX_SPRITE_FRAMES];
+        HybridArray<SpriteFrameData, MAX_SPRITE_FRAMES> framesRect;
 
         unsigned int maxPoints = 100;
         unsigned int numVisible = 0;

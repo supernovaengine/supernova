@@ -6,6 +6,7 @@
 #define SPRITE_COMPONENT_H
 
 #include "util/SpriteFrameData.h"
+#include "util/HybridArray.h"
 #include "Engine.h"
 
 namespace Supernova{
@@ -31,7 +32,7 @@ namespace Supernova{
 
         float textureScaleFactor = 0.0;
 
-        SpriteFrameData framesRect[MAX_SPRITE_FRAMES];
+        HybridArray<SpriteFrameData, MAX_SPRITE_FRAMES> framesRect;
 
         PivotPreset pivotPreset = PivotPreset::BOTTOM_LEFT;
 
