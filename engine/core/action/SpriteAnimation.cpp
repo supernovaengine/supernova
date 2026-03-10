@@ -19,12 +19,22 @@ void SpriteAnimation::setAnimation(std::vector<int> frames, std::vector<int> fra
     SpriteAnimationComponent& spriteanim = getComponent<SpriteAnimationComponent>();
 
     spriteanim.framesTimeSize = framesTime.size();
-    for (int i = 0; i < framesTime.size(); i++){
+    for (int i = 0; i < (int)framesTime.size(); i++){
+        if (!spriteanim.framesTime.validIndex(i)){
+            Log::warn("Sprite animation framesTime truncated from %zu to %d", framesTime.size(), i);
+            spriteanim.framesTimeSize = i;
+            break;
+        }
         spriteanim.framesTime[i] = framesTime[i];
     }
 
     spriteanim.framesSize = frames.size();
-    for (int i = 0; i < frames.size(); i++){
+    for (int i = 0; i < (int)frames.size(); i++){
+        if (!spriteanim.frames.validIndex(i)){
+            Log::warn("Sprite animation frames truncated from %zu to %d", frames.size(), i);
+            spriteanim.framesSize = i;
+            break;
+        }
         spriteanim.frames[i] = frames[i];
     }
 

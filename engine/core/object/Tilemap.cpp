@@ -76,12 +76,12 @@ void Tilemap::addRect(int id, const std::string& name, const std::string& textur
     }
 
     if (!tilemap.tilesRect.validIndex(id)){
-        Log::error("Cannot add rect with id %i, increase MAX_TILEMAP_TILESRECT to bigger than %i", id, id);
+        Log::error("Cannot add rect with id %i, max valid id is %i", id, tilemap.tilesRect.size() - 1);
         return;
     }
 
     if (mesh.numSubmeshes >= mesh.submeshes.size()){
-        Log::error("Cannot add submesh for rect id %i, increase MAX_SUBMESHES to bigger than %i", id, mesh.numSubmeshes);
+        Log::error("Cannot add submesh for rect id %i, max submeshes is %i", id, mesh.submeshes.size());
         return;
     }
 

@@ -6,6 +6,7 @@
 #define SPRITEANIMATION_COMPONENT_H
 
 #include "Engine.h"
+#include "util/HybridArray.h"
 
 namespace Supernova{
 
@@ -15,10 +16,10 @@ namespace Supernova{
         bool loop = true;
 
         unsigned int framesTimeSize;
-        int framesTime[MAX_SPRITE_FRAMES];
+        HybridArray<int, MAX_SPRITE_FRAMES> framesTime;
 
         unsigned int framesSize;
-        int frames[MAX_SPRITE_FRAMES];
+        HybridArray<int, MAX_SPRITE_FRAMES> frames;
 
         int frameIndex;
         int frameTimeIndex;

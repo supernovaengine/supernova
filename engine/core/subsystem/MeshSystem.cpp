@@ -1791,7 +1791,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
     }
 
     if (mesh.numSubmeshes > mesh.submeshes.size()){
-        Log::error("Model %s has more submeshes then MAX_SUBMESHES. Please increase MAX_SUBMESHES", filename.c_str());
+        Log::error("Model %s has more submeshes than the maximum allowed (%i)", filename.c_str(), mesh.submeshes.size());
         mesh.numSubmeshes = mesh.submeshes.size();
     }
 
@@ -2435,7 +2435,7 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string& filename, bool asyncL
     }
 
     if (mesh.numSubmeshes > mesh.submeshes.size()){
-        Log::error("Model %s has more submeshes then MAX_SUBMESHES. Please increase MAX_SUBMESHES", filename.c_str());
+        Log::error("Model %s has more submeshes than the maximum allowed (%i)", filename.c_str(), mesh.submeshes.size());
         mesh.numSubmeshes = mesh.submeshes.size();
     }
 
