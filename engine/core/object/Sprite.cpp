@@ -149,13 +149,13 @@ PivotPreset Sprite::getPivotPreset() const{
 
 void Sprite::addFrame(int id, const std::string& name, Rect rect){
     SpriteComponent& spritecomp = getComponent<SpriteComponent>();
-    if (id >= 0 && spritecomp.framesRect.validIndex(id)){
+    if (spritecomp.framesRect.validIndex(id)){
         spritecomp.framesRect[id] = {name, rect};
         if ((unsigned int)(id + 1) > spritecomp.numFramesRect){
             spritecomp.numFramesRect = id + 1;
         }
     }else{
-        Log::error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
+        Log::error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), spritecomp.framesRect.size());
     }
 }
 
@@ -164,10 +164,10 @@ void Sprite::addFrame(const std::string& name, float x, float y, float width, fl
 
     int id = (int)spritecomp.numFramesRect;
 
-    if (id < (int)spritecomp.framesRect.size()){
+    if (spritecomp.framesRect.validIndex(id)){
         addFrame(id, name, Rect(x, y, width, height));
     }else{
-        Log::error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), MAX_SPRITE_FRAMES);
+        Log::error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), spritecomp.framesRect.size());
     }
 }
 

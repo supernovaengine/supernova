@@ -250,7 +250,7 @@ void Points::setTexture(Framebuffer* framebuffer){
 
 void Points::addSpriteFrame(int id, const std::string& name, Rect rect){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
-    if (id >= 0 && pointscomp.framesRect.validIndex(id)){
+    if (pointscomp.framesRect.validIndex(id)){
         pointscomp.framesRect[id] = {name, rect};
         if ((unsigned int)(id + 1) > pointscomp.numFramesRect){
             pointscomp.numFramesRect = id + 1;
@@ -260,7 +260,7 @@ void Points::addSpriteFrame(int id, const std::string& name, Rect rect){
             pointscomp.needReload = true;
         }
     }else{
-        Log::error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), MAX_SPRITE_FRAMES);
+        Log::error("Cannot set frame id %s less than 0 or greater than %i", name.c_str(), pointscomp.framesRect.size());
     }
 }
 
@@ -269,10 +269,10 @@ void Points::addSpriteFrame(const std::string& name, float x, float y, float wid
 
     int id = (int)pointscomp.numFramesRect;
 
-    if (id < MAX_SPRITE_FRAMES){
+    if (pointscomp.framesRect.validIndex(id)){
         addSpriteFrame(id, name, Rect(x, y, width, height));
     }else{
-        Log::error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), MAX_SPRITE_FRAMES);
+        Log::error("Cannot set frame %s. Sprite frames reached limit of %i", name.c_str(), pointscomp.framesRect.size());
     }
 }
 
