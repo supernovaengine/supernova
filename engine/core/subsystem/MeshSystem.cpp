@@ -365,8 +365,10 @@ bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     for (int i = 0; i < mesh.numSubmeshes; i++){
         addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);
 
-        mesh.indices.setValues(mesh.indices.getCount(), mesh.indices.getAttribute(AttributeType::INDEX), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
-        mesh.indices.setRenderAttributes(false);
+        if (indexMap[i].size() > 0){
+            mesh.indices.setValues(mesh.indices.getCount(), mesh.indices.getAttribute(AttributeType::INDEX), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
+            mesh.indices.setRenderAttributes(false);
+        }
 
         //TODO: necessary?
         //if (indexMap[i].size() == 0) {
@@ -379,13 +381,13 @@ bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     calculateMeshAABB(mesh);
 
     if (mesh.loaded){
-        if (tilemap.numTiles < numTiles){
+        if (tilemap.renderedTiles < numTiles){
             mesh.needReload = true;
         }else{
             mesh.needUpdateBuffer = true; // buffer is not immutable
         }
     }
-    tilemap.numTiles = numTiles;
+    tilemap.renderedTiles = numTiles;
 
     return true;
 }
@@ -2575,8 +2577,10 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string& filename, bool asyncL
     for (size_t i = 0; i < mesh.numSubmeshes; i++) {
         addSubmeshAttribute(mesh.submeshes[i], "indices", AttributeType::INDEX, 1, AttributeDataType::UNSIGNED_SHORT, indexMap[i].size(), mesh.indices.getCount() * sizeof(uint16_t), false);
 
-        mesh.indices.setValues(mesh.indices.getCount(),  mesh.indices.getAttribute(AttributeType::INDEX), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
-        mesh.indices.setRenderAttributes(false);
+        if (indexMap[i].size() > 0){
+            mesh.indices.setValues(mesh.indices.getCount(),  mesh.indices.getAttribute(AttributeType::INDEX), indexMap[i].size(), (char*)&indexMap[i].front(), sizeof(uint16_t));
+            mesh.indices.setRenderAttributes(false);
+        }
     }
 
     std::reverse(mesh.submeshes.data(), mesh.submeshes.data() + mesh.numSubmeshes);

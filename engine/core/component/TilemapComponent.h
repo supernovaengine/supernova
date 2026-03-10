@@ -34,11 +34,13 @@ namespace Supernova{
         float textureScaleFactor = 0.0;
 
         unsigned int reserveTiles = 10;
-        unsigned int numTiles = 0;
+        unsigned int renderedTiles = 0;
         
-        unsigned int numTilesRect = 0;
         HybridArray<TileRectData, MAX_TILEMAP_TILESRECT> tilesRect;
+        unsigned int numTilesRect = 0;
+
         HybridArray<TileData, MAX_TILEMAP_TILES> tiles;
+        unsigned int numTiles = 0;
 
         bool needUpdateTilemap = true;
     };
