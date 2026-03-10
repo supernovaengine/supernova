@@ -137,7 +137,7 @@ int Body2D::createBoxShape(float width, float height){
 
     Shape2D& shape = body.shapes[index];
     shape.type = Shape2DType::POLYGON;
-    shape.verticesCount = 4;
+    shape.numVertices = 4;
     shape.vertices[0] = Vector2(0, 0);
     shape.vertices[1] = Vector2(width, 0);
     shape.vertices[2] = Vector2(width, height);
@@ -157,7 +157,7 @@ int Body2D::createCenteredBoxShape(float width, float height, Vector2 center, fl
 
     Shape2D& shape = body.shapes[index];
     shape.type = Shape2DType::POLYGON;
-    shape.verticesCount = 4;
+    shape.numVertices = 4;
 
     float halfW = width / 2.0f;
     float halfH = height / 2.0f;
@@ -190,7 +190,7 @@ int Body2D::createRoundedBoxShape(float width, float height, float radius){
     Shape2D& shape = body.shapes[index];
     shape.type = Shape2DType::POLYGON;
     shape.radius = radius;
-    shape.verticesCount = 4;
+    shape.numVertices = 4;
 
     float halfW = width / 2.0f;
     float halfH = height / 2.0f;
@@ -209,11 +209,11 @@ int Body2D::createPolygonShape(std::vector<Vector2> vertices){
 
     Shape2D& shape = body.shapes[index];
     shape.type = Shape2DType::POLYGON;
-    shape.verticesCount = vertices.size();
-    for (size_t i = 0; i < shape.verticesCount; i++){
+    shape.numVertices = vertices.size();
+    for (size_t i = 0; i < shape.numVertices; i++){
         if (!shape.vertices.validIndex(i)){
-            Log::warn("Polygon shape vertices truncated from %zu to %zu", shape.verticesCount, i);
-            shape.verticesCount = i;
+            Log::warn("Polygon shape vertices truncated from %zu to %zu", shape.numVertices, i);
+            shape.numVertices = i;
             break;
         }
         shape.vertices[i] = vertices[i];
@@ -270,11 +270,11 @@ int Body2D::createChainShape(std::vector<Vector2> vertices, bool loop){
     Shape2D& shape = body.shapes[index];
     shape.type = Shape2DType::CHAIN;
     shape.loop = loop;
-    shape.verticesCount = vertices.size();
-    for (size_t i = 0; i < shape.verticesCount; i++){
+    shape.numVertices = vertices.size();
+    for (size_t i = 0; i < shape.numVertices; i++){
         if (!shape.vertices.validIndex(i)){
-            Log::warn("Chain shape vertices truncated from %zu to %zu", shape.verticesCount, i);
-            shape.verticesCount = i;
+            Log::warn("Chain shape vertices truncated from %zu to %zu", shape.numVertices, i);
+            shape.numVertices = i;
             break;
         }
         shape.vertices[i] = vertices[i];

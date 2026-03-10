@@ -31,7 +31,7 @@ namespace Supernova{
         float radius = 0.0f;
 
         HybridArray<Vector2, MAX_SHAPE_POINTS_2D> vertices;
-        uint8_t verticesCount = 0;
+        uint8_t numVertices = 0;
         bool loop = false;
 
         float density = 1.0f;

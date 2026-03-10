@@ -357,9 +357,9 @@ bool PhysicsSystem::syncBody2DShapes(Body2DComponent& body){
         if (shapeData.type == Shape2DType::POLYGON){
             std::vector<b2Vec2> b2vertices;
 
-            if (shapeData.verticesCount >= 3){
-                b2vertices.resize(shapeData.verticesCount);
-                for (size_t j = 0; j < shapeData.verticesCount; j++){
+            if (shapeData.numVertices >= 3){
+                b2vertices.resize(shapeData.numVertices);
+                for (size_t j = 0; j < shapeData.numVertices; j++){
                     b2vertices[j] = {shapeData.vertices[j].x / pointsToMeterScale2D, shapeData.vertices[j].y / pointsToMeterScale2D};
                 }
             }else{
@@ -437,19 +437,19 @@ bool PhysicsSystem::syncBody2DShapes(Body2DComponent& body){
             segment.point2 = {shapeData.pointB.x / pointsToMeterScale2D, shapeData.pointB.y / pointsToMeterScale2D};
             shapeData.shape = b2CreateSegmentShape(body.body, &shapeDef, &segment);
         }else if (shapeData.type == Shape2DType::CHAIN){
-            if (shapeData.verticesCount < 4){
+            if (shapeData.numVertices < 4){
                 Log::error("Cannot create chain shape %zu: Box2D requires at least 4 vertices", i);
                 continue;
             }
 
-            std::vector<b2Vec2> b2vertices(shapeData.verticesCount);
-            for (size_t j = 0; j < shapeData.verticesCount; j++){
+            std::vector<b2Vec2> b2vertices(shapeData.numVertices);
+            for (size_t j = 0; j < shapeData.numVertices; j++){
                 b2vertices[j] = {shapeData.vertices[j].x / pointsToMeterScale2D, shapeData.vertices[j].y / pointsToMeterScale2D};
             }
 
             b2ChainDef chainDef = b2DefaultChainDef();
             chainDef.points = &b2vertices[0];
-            chainDef.count = (int)shapeData.verticesCount;
+            chainDef.count = (int)shapeData.numVertices;
             chainDef.isLoop = shapeData.loop;
             chainDef.filter.categoryBits = shapeData.categoryBits;
             chainDef.filter.maskBits = shapeData.maskBits;

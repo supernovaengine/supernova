@@ -55,8 +55,8 @@ namespace Supernova{
         unsigned int samplesSize = 0;
 
         HybridArray<Vector3, MAX_SHAPE_VERTICES_3D> vertices;
-        HybridArray<uint16_t, MAX_SHAPE_INDICES_3D> indices;
         uint16_t numVertices = 0;
+        HybridArray<uint16_t, MAX_SHAPE_INDICES_3D> indices;
         uint16_t numIndices = 0;
     };
 
