@@ -72,8 +72,6 @@ namespace Supernova{
         bool overrideMassProperties = false;
         Vector3 solidBoxSize;
         float solidBoxDensity;
-
-        bool lockBody = true;
         
         BodyType type = BodyType::STATIC;
         bool newBody = true;
