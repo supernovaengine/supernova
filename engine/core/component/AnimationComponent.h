@@ -13,6 +13,7 @@ namespace Supernova{
         float startTime = 0;
         float duration = 0;
         Entity action = NULL_ENTITY;
+        uint32_t track = 0; // Used for editor timeline organization
     };
 
     struct SUPERNOVA_API AnimationComponent{
