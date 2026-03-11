@@ -178,10 +178,31 @@ void ActionSystem::animationDestroy(AnimationComponent& animcomp){
 }
 
 void ActionSystem::setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
-    if (sprite.framesRect.validIndex(spriteanim.frameIndex)){
-        int frameId = spriteanim.frames[spriteanim.frameIndex];
-        if (frameId >= 0 && (unsigned int)frameId < sprite.numFramesRect)
-            mesh.submeshes[0].textureRect = sprite.framesRect[frameId].rect;
+    if (mesh.numSubmeshes <= 0 || !spriteanim.frames.validIndex(spriteanim.frameIndex)) {
+        return;
+    }
+
+    int frameId = spriteanim.frames[spriteanim.frameIndex];
+    if (frameId < 0 || (unsigned int)frameId >= sprite.numFramesRect) {
+        return;
+    }
+
+    const Rect& frameRect = sprite.framesRect[frameId].rect;
+
+    if (!frameRect.isNormalized()) {
+        Texture& texture = mesh.submeshes[0].material.baseColorTexture;
+        if (texture.getWidth() > 0 && texture.getHeight() > 0) {
+            mesh.submeshes[0].textureRect = Rect(
+                frameRect.getX() / (float)texture.getWidth(),
+                frameRect.getY() / (float)texture.getHeight(),
+                frameRect.getWidth() / (float)texture.getWidth(),
+                frameRect.getHeight() / (float)texture.getHeight()
+            );
+        } else {
+            mesh.submeshes[0].textureRect = frameRect;
+        }
+    } else {
+        mesh.submeshes[0].textureRect = frameRect;
     }
 }
 

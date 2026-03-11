@@ -156,14 +156,14 @@ bool Rect::contains(Vector2 point){
     return false;
 }
 
-bool Rect::isNormalized(){
+bool Rect::isNormalized() const{
     if ((x >= 0 && x <= 1) && (y >= 0 && y <= 1) && (width >= 0 && width <= 1) && (height >= 0 && height <= 1)){
         return true;
     }
     return false;
 }
 
-bool Rect::isZero(){
+bool Rect::isZero() const{
     if ((x == 0) && (y == 0) && (width == 0) && (height == 0)) {
         return true;
     }

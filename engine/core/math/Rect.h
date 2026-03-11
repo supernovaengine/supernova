@@ -53,8 +53,8 @@ namespace Supernova {
 
         bool contains(Vector2 point);
 
-        bool isNormalized();
-        bool isZero();
+        bool isNormalized() const;
+        bool isZero() const;
     };
         
 }
