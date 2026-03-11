@@ -15,16 +15,16 @@ namespace Supernova{
 
         bool loop = true;
 
-        unsigned int framesTimeSize;
+        unsigned int framesTimeSize = 0;
         HybridArray<int, MAX_SPRITE_FRAMES> framesTime;
 
-        unsigned int framesSize;
+        unsigned int framesSize = 0;
         HybridArray<int, MAX_SPRITE_FRAMES> frames;
 
-        int frameIndex;
-        int frameTimeIndex;
+        int frameIndex = 0;
+        int frameTimeIndex = 0;
 
-        unsigned int spriteFrameCount;
+        unsigned int spriteFrameCount = 0;
     };
     
 }

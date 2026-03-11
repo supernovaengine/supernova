@@ -207,6 +207,10 @@ void ActionSystem::setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sp
 }
 
 void ActionSystem::spriteActionStart(MeshComponent& mesh, SpriteComponent& sprite, SpriteAnimationComponent& spriteanim){
+    spriteanim.frameIndex = 0;
+    spriteanim.frameTimeIndex = 0;
+    spriteanim.spriteFrameCount = 0;
+
     setSpriteTextureRect(mesh, sprite, spriteanim);
 }
 

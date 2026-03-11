@@ -39,6 +39,9 @@ void SpriteAnimation::setAnimation(std::vector<int> frames, std::vector<int> fra
     }
 
     spriteanim.loop = loop;
+    spriteanim.frameIndex = 0;
+    spriteanim.frameTimeIndex = 0;
+    spriteanim.spriteFrameCount = 0;
 }
 
 void SpriteAnimation::setAnimation(int startFrame, int endFrame, int interval, bool loop){
