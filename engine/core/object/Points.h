@@ -59,6 +59,12 @@ namespace Supernova{
         void setTexture(const std::string& path);
         void setTexture(const std::string& id, TextureData data);
         void setTexture(Framebuffer* framebuffer);
+
+        void setTransparent(bool transparent);
+        bool isTransparent() const;
+
+        void setAutoTransparency(bool autoTransparency);
+        bool isAutoTransparency() const;
     };
 }
 

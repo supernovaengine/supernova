@@ -349,6 +349,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addProperty("castShadows", &Mesh::isCastShadows, &Mesh::setCastShadows)
         .addProperty("receiveShadows", &Mesh::isReceiveShadows, &Mesh::setReceiveShadows)
         .addProperty("shadowsBillboard", &Mesh::isShadowsBillboard, &Mesh::setShadowsBillboard)
+        .addProperty("transparent", &Mesh::isTransparent, &Mesh::setTransparent)
+        .addProperty("autoTransparency", &Mesh::isAutoTransparency, &Mesh::setAutoTransparency)
         .addFunction("createInstancedMesh", &Mesh::createInstancedMesh)
         .addFunction("removeInstancedMesh", &Mesh::removeInstancedMesh)
         .addFunction("hasInstancedMesh", &Mesh::hasInstancedMesh)
@@ -536,6 +538,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
             luabridge::overload<const std::string&>(&Points::setTexture),
             luabridge::overload<const std::string&,TextureData>(&Points::setTexture),
             luabridge::overload<Framebuffer*>(&Points::setTexture))
+        .addProperty("transparent", &Points::isTransparent, &Points::setTransparent)
+        .addProperty("autoTransparency", &Points::isAutoTransparency, &Points::setAutoTransparency)
         .endClass();
 
     luabridge::getGlobalNamespace(L)

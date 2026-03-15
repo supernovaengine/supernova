@@ -78,6 +78,12 @@ namespace Supernova{
         void setShadowsBillboard(bool shadowsBillboard);
         bool isShadowsBillboard() const;
 
+        void setTransparent(bool transparent);
+        bool isTransparent() const;
+
+        void setAutoTransparency(bool autoTransparency);
+        bool isAutoTransparency() const;
+
         void createInstancedMesh();
         void removeInstancedMesh();
         bool hasInstancedMesh() const;

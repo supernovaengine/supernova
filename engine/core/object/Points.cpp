@@ -248,6 +248,30 @@ void Points::setTexture(Framebuffer* framebuffer){
     pointscomp.needUpdateTexture = true;
 }
 
+void Points::setTransparent(bool transparent){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+
+    pointscomp.transparent = transparent;
+}
+
+bool Points::isTransparent() const{
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+
+    return pointscomp.transparent;
+}
+
+void Points::setAutoTransparency(bool autoTransparency){
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+
+    pointscomp.autoTransparency = autoTransparency;
+}
+
+bool Points::isAutoTransparency() const{
+    PointsComponent& pointscomp = getComponent<PointsComponent>();
+
+    return pointscomp.autoTransparency;
+}
+
 void Points::addSpriteFrame(int id, const std::string& name, Rect rect){
     PointsComponent& pointscomp = getComponent<PointsComponent>();
     if (pointscomp.framesRect.validIndex(id)){

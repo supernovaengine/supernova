@@ -290,6 +290,30 @@ bool Mesh::isShadowsBillboard() const{
     return mesh.shadowsBillboard;
 }
 
+void Mesh::setTransparent(bool transparent){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.transparent = transparent;
+}
+
+bool Mesh::isTransparent() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.transparent;
+}
+
+void Mesh::setAutoTransparency(bool autoTransparency){
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    mesh.autoTransparency = autoTransparency;
+}
+
+bool Mesh::isAutoTransparency() const{
+    MeshComponent& mesh = getComponent<MeshComponent>();
+
+    return mesh.autoTransparency;
+}
+
 
 void Mesh::createInstancedMesh(){
     scene->getSystem<MeshSystem>()->createInstancedMesh(entity);
