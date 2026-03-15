@@ -49,6 +49,7 @@ EntityRegistry::EntityRegistry() {
     registerComponent<Body3DComponent>();
     registerComponent<Joint3DComponent>();
     registerComponent<InstancedMeshComponent>();
+    registerComponent<BundleComponent>();
 }
 
 EntityRegistry::EntityRegistry(EntityPool defaultPool) : EntityRegistry() {

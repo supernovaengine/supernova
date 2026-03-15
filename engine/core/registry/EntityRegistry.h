@@ -52,6 +52,7 @@
 #include "component/Body3DComponent.h"
 #include "component/Joint3DComponent.h"
 #include "component/InstancedMeshComponent.h"
+#include "component/BundleComponent.h"
 
 namespace Supernova {
 
