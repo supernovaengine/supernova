@@ -170,7 +170,6 @@ namespace Supernova {
         static bool callMouseInTouchEvent;
         static bool callTouchInMouseEvent;
         static bool useDegrees;
-        static bool automaticTransparency;
 
         static bool allowEventsOutCanvas;
 
@@ -244,9 +243,6 @@ namespace Supernova {
         
         static void setUseDegrees(bool useDegrees);
         static bool isUseDegrees();
-
-        static void setAutomaticTransparency(bool automaticTransparency);
-        static bool isAutomaticTransparency();
 
         static void setAllowEventsOutCanvas(bool allowEventsOutCanvas);
         static bool isAllowEventsOutCanvas();

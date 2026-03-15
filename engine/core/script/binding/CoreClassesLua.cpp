@@ -200,7 +200,6 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticProperty("callTouchInMouseEvent", &Engine::isCallTouchInMouseEvent, &Engine::setCallTouchInMouseEvent)
         .addStaticFunction("setCallTouchInMouseEvent", &Engine::setCallTouchInMouseEvent)
         .addStaticProperty("useDegrees", &Engine::isUseDegrees, &Engine::setUseDegrees)
-        .addStaticProperty("automaticTransparency", &Engine::isAutomaticTransparency, &Engine::setAutomaticTransparency)
         .addStaticProperty("allowEventsOutCanvas", &Engine::isAllowEventsOutCanvas, &Engine::setAllowEventsOutCanvas)
         .addStaticProperty("ignoreEventsHandledByUI", &Engine::isIgnoreEventsHandledByUI, &Engine::setIgnoreEventsHandledByUI)
         .addStaticFunction("isUIEventReceived", &Engine::isUIEventReceived)

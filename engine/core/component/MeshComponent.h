@@ -105,6 +105,7 @@ namespace Supernova{
         bool shadowsBillboard = true;
 
         bool transparent = false;
+        bool autoTransparency = true;
 
         CullingMode cullingMode = CullingMode::BACK;
         WindingOrder windingOrder = WindingOrder::CCW;

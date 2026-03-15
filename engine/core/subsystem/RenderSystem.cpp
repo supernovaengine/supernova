@@ -805,7 +805,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         mesh.submeshes[i].needUpdateTexture = false;
         mesh.submeshes[i].needUpdateDepthTexture = false;
 
-        if (Engine::isAutomaticTransparency() && !mesh.transparent){
+        if (mesh.autoTransparency && !mesh.transparent){
             if (mesh.submeshes[i].material.baseColorTexture.isTransparent() || mesh.submeshes[i].material.baseColorFactor.w != 1.0){
                 mesh.transparent = true;
             }
@@ -1422,7 +1422,7 @@ bool RenderSystem::loadPoints(Entity entity, PointsComponent& points, uint8_t pi
 
     render.beginLoad(PrimitiveType::POINTS);
 
-    if (Engine::isAutomaticTransparency() && !points.transparent){
+    if (points.autoTransparency && !points.transparent){
         if (points.texture.isTransparent()){ // Particle color is not tested here
             points.transparent = true;
         }

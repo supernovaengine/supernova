@@ -17,7 +17,6 @@
 #endif
 #include "Log.h"
 #include "Texture.h"
-#include "Engine.h"
 
 using namespace Supernova;
 
@@ -133,9 +132,7 @@ bool TextureData::loadTexture(Data* filedata) {
     originalWidth = width;
     originalHeight = height;
 
-    if (Engine::isAutomaticTransparency()){
-        transparent = hasAlpha();
-    }
+    transparent = hasAlpha();
     
     return true;
 }

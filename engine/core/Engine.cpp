@@ -44,7 +44,6 @@ TextureStrategy Engine::textureStrategy = TextureStrategy::RESIZE;
 bool Engine::callMouseInTouchEvent = false;
 bool Engine::callTouchInMouseEvent = false;
 bool Engine::useDegrees = true;
-bool Engine::automaticTransparency = true;
 bool Engine::allowEventsOutCanvas = false;
 bool Engine::ignoreEventsHandledByUI = true;
 bool Engine::fixedTimeSceneUpdate = true;
@@ -319,14 +318,6 @@ void Engine::setUseDegrees(bool useDegrees){
 
 bool Engine::isUseDegrees(){
     return Engine::useDegrees;
-}
-
-void Engine::setAutomaticTransparency(bool automaticTransparency){
-    Engine::automaticTransparency = automaticTransparency;
-}
-
-bool Engine::isAutomaticTransparency(){
-    return automaticTransparency;
 }
 
 void Engine::setAllowEventsOutCanvas(bool allowEventsOutCanvas){
