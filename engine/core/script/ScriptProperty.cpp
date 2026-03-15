@@ -122,9 +122,12 @@ namespace Supernova {
                     }
                     break;
                 case ScriptPropertyType::EntityPointer:
-                    // EntityPointer sync is handled separately by the editor
-                    lua_pop(L, 1); // Pop instance table
-                    return;
+                    if (std::holds_alternative<Entity>(value)) {
+                        lua_pushinteger(L, static_cast<lua_Integer>(std::get<Entity>(value)));
+                    } else {
+                        lua_pushnil(L);
+                    }
+                    break;
             }
 
             lua_setfield(L, -2, name.c_str()); // instance[name] = value
@@ -159,7 +162,7 @@ namespace Supernova {
                     value = *static_cast<Vector4*>(memberPtr);
                     break;
                 case ScriptPropertyType::EntityPointer:
-                    // Intentionally no-op. EntityRef is resolved by editor
+                    // Intentionally no-op for runtime member sync
                     break;
             }
         } else if (luaRef != 0 && !name.empty()) {
@@ -224,7 +227,11 @@ namespace Supernova {
                     }
                     break;
                 case ScriptPropertyType::EntityPointer:
-                    // EntityPointer sync is handled separately by the editor
+                    if (lua_isinteger(L, -1)) {
+                        value = static_cast<Entity>(lua_tointeger(L, -1));
+                    } else if (lua_isnumber(L, -1)) {
+                        value = static_cast<Entity>(lua_tonumber(L, -1));
+                    }
                     break;
             }
 

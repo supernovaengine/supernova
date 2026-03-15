@@ -37,32 +37,6 @@ namespace Supernova {
         EntityPointer
     };
 
-    enum class EntityRefKind {
-        None,
-        LocalEntity,    // Resolved by sceneId + local entity id
-        SharedEntity    // Resolved by shared group path + registry entity id
-    };
-
-    struct SUPERNOVA_API EntityLocator {
-        EntityRefKind kind = EntityRefKind::None;
-        Entity scopedEntity = NULL_ENTITY;
-
-        // Scene-local addressing
-        uint32_t sceneId = 0;
-
-        // Shared-group addressing
-        std::string sharedPath;
-    };
-
-    struct SUPERNOVA_API EntityRef {
-        // Runtime resolution (valid during play/edit once resolved)
-        Entity entity = NULL_ENTITY;
-        Scene* scene = nullptr;
-
-        // Editor locator (persistent, used to resolve 'entity' and 'scene')
-        EntityLocator locator;
-    };
-
     using ScriptPropertyValue = std::variant<
         std::monostate,  // For empty/uninitialized state
         bool,
@@ -72,7 +46,7 @@ namespace Supernova {
         Vector2,
         Vector3,
         Vector4,
-        EntityRef
+        Entity
     >;
 
     struct SUPERNOVA_API ScriptProperty {

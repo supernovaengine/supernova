@@ -509,7 +509,7 @@ void LuaBinding::initializeLuaScripts(Scene* scene) {
             lua_pushinteger(L, static_cast<lua_Integer>(entity));
             lua_setfield(L, -2, "entity");
 
-            // Set script properties (skip EntityPointer for now)
+            // Set script properties (skip EntityPointer for now — resolved in PASS 2)
             for (auto& prop : scriptEntry.properties) {
                 if (prop.type == ScriptPropertyType::EntityPointer) {
                     lua_pushnil(L);
@@ -546,7 +546,7 @@ void LuaBinding::initializeLuaScripts(Scene* scene) {
         }
     }
 
-    // PASS 2: Resolve EntityRef properties
+    // PASS 2: Resolve Entity pointer properties
     for (size_t i = 0; i < scriptsArray->size(); i++) {
         ScriptComponent& scriptComp = scriptsArray->getComponentFromIndex(i);
 
@@ -559,17 +559,17 @@ void LuaBinding::initializeLuaScripts(Scene* scene) {
             for (auto& prop : scriptEntry.properties) {
                 if (prop.type != ScriptPropertyType::EntityPointer) continue;
 
-                if (!std::holds_alternative<EntityRef>(prop.value)) {
+                if (!std::holds_alternative<Entity>(prop.value)) {
                     lua_pushnil(L);
                     lua_setfield(L, -2, prop.name.c_str());
                     continue;
                 }
 
-                EntityRef& entityRef = std::get<EntityRef>(prop.value);
+                Entity targetEntity = std::get<Entity>(prop.value);
                 bool foundScript = false;
 
-                if (entityRef.entity != NULL_ENTITY && entityRef.scene) {
-                    ScriptComponent* targetScriptComp = entityRef.scene->findComponent<ScriptComponent>(entityRef.entity);
+                if (targetEntity != NULL_ENTITY) {
+                    ScriptComponent* targetScriptComp = scene->findComponent<ScriptComponent>(targetEntity);
                     if (targetScriptComp) {
                         if (!prop.ptrTypeName.empty()) {
                             for (auto& targetScript : targetScriptComp->scripts) {
@@ -583,7 +583,7 @@ void LuaBinding::initializeLuaScripts(Scene* scene) {
                                 }
                             }
                             if (!foundScript)
-                                foundScript = pushEntityHandleByType(L, entityRef.scene, entityRef.entity, prop.ptrTypeName);
+                                foundScript = pushEntityHandleByType(L, scene, targetEntity, prop.ptrTypeName);
                         } else {
                             for (auto& targetScript : targetScriptComp->scripts) {
                                 if (targetScript.type == ScriptType::SCRIPT_LUA &&
@@ -595,10 +595,10 @@ void LuaBinding::initializeLuaScripts(Scene* scene) {
                                 }
                             }
                             if (!foundScript)
-                                foundScript = pushEntityHandleByType(L, entityRef.scene, entityRef.entity, prop.ptrTypeName);
+                                foundScript = pushEntityHandleByType(L, scene, targetEntity, prop.ptrTypeName);
                         }
                     } else {
-                        foundScript = pushEntityHandleByType(L, entityRef.scene, entityRef.entity, prop.ptrTypeName);
+                        foundScript = pushEntityHandleByType(L, scene, targetEntity, prop.ptrTypeName);
                     }
                 }
 
