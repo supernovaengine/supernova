@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2026 Eduardo Doria.
 //
 
 #ifndef texturedata_h
@@ -54,6 +54,7 @@ namespace Supernova {
         bool hasAlpha();
 
         void resizePowerOfTwo();
+        void resizeToSquare();
         void fitPowerOfTwo();
 
         void resize(int newWidth, int newHeight);

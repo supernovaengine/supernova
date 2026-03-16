@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2026 Eduardo Doria.
 //
 
 #ifndef RESIZE_WITH_STB
@@ -358,6 +358,13 @@ void TextureData::crop(int xOffset, int yOffset, int newWidth, int newHeight){
 
 void TextureData::resizePowerOfTwo(){
     resize(getNearestPowerOfTwo(width), getNearestPowerOfTwo(height));
+}
+
+void TextureData::resizeToSquare(){
+    if (width != height){
+        int side = std::max(width, height);
+        resize(side, side);
+    }
 }
 
 void TextureData::resize(int newWidth, int newHeight){

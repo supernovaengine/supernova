@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2026 Eduardo Doria.
 //
 
 #ifndef TEXTUREDATAPOOL_H
@@ -46,6 +46,7 @@ namespace Supernova{
 
         static std::array<TextureData,6> loadTextureInternal(const std::string& id, const std::array<std::string, 6>& paths, size_t numFaces);
         static std::string getTextureDisplayName(const std::string& path);
+        static std::string validateTextureFaces(std::array<TextureData,6>& data, size_t numFaces);
 
     public:
         static std::shared_ptr<std::array<TextureData,6>> get(const std::string& id);

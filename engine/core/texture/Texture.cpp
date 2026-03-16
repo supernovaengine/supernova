@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2026 Eduardo Doria.
 //
 
 #include "Texture.h"
@@ -352,6 +352,8 @@ TextureLoadResult Texture::load() {
         result = TextureDataPool::loadFromFile(id, aPaths, numFaces);
         if (result && result.data) {
             data = result.data;
+            needLoad = false;
+        } else if (result.state == ResourceLoadState::Failed) {
             needLoad = false;
         }
         return result;

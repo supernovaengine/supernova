@@ -1,5 +1,5 @@
 //
-// (c) 2024 Eduardo Doria.
+// (c) 2026 Eduardo Doria.
 //
 
 #include "TextureDataPool.h"
@@ -162,7 +162,15 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
     if (numFaces == 6 && isSingleFileCube) {
         if (!TextureData::loadCubeMapFromSingleFile(paths[0].c_str(), data)){
             ResourceProgress::failBuild(std::hash<std::string>{}(id));
+            Log::error("Failed to load cube texture from file: %s", paths[0].c_str());
             throw std::runtime_error("Failed to load cube texture from file: " + paths[0]);
+        }
+
+        std::string validationError = validateTextureFaces(data, numFaces);
+        if (!validationError.empty()) {
+            ResourceProgress::failBuild(std::hash<std::string>{}(id));
+            Log::error("%s in cubemap: %s", validationError.c_str(), paths[0].c_str());
+            throw std::runtime_error(validationError + " in cubemap: " + paths[0]);
         }
 
         if (asyncLoading) {
@@ -179,6 +187,7 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
     for (size_t f = 0; f < numFaces; f++) {
         if (paths[f].empty()) {
             ResourceProgress::failBuild(std::hash<std::string>{}(id));
+            Log::error("Texture is missing texture for face %zu", f);
             throw std::runtime_error("Texture is missing texture for face " + std::to_string(f));
         }
 
@@ -186,8 +195,10 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
         if (!success) {
             ResourceProgress::failBuild(std::hash<std::string>{}(id));
             if (numFaces == 1){
+                Log::error("Failed to load texture from file: %s", paths[f].c_str());
                 throw std::runtime_error("Failed to load texture from file: " + paths[f]);
             }else{
+                Log::error("Failed to load texture face %zu from file: %s", f, paths[f].c_str());
                 throw std::runtime_error("Failed to load texture face " + std::to_string(f) + " from file: " + paths[f]);
             }
         }
@@ -197,6 +208,11 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
             data[f].fitPowerOfTwo();
         } else if (Engine::getTextureStrategy() == TextureStrategy::RESIZE) {
             data[f].resizePowerOfTwo();
+        }
+
+        // Cubemap faces must be square; resize to the larger dimension if needed
+        if (numFaces == 6) {
+            data[f].resizeToSquare();
         }
 
         if (asyncLoading) {
@@ -220,6 +236,13 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
         }
     }
 
+    std::string validationError = validateTextureFaces(data, numFaces);
+    if (!validationError.empty()) {
+        ResourceProgress::failBuild(std::hash<std::string>{}(id));
+        Log::error("%s", validationError.c_str());
+        throw std::runtime_error(validationError);
+    }
+
     if (asyncLoading) {
         if (shutdownRequested.load()) {
             throw std::runtime_error("Shutdown requested");
@@ -234,6 +257,55 @@ std::array<TextureData,6> TextureDataPool::loadTextureInternal(const std::string
 std::string TextureDataPool::getTextureDisplayName(const std::string& path) {
     std::filesystem::path filePath(path);
     return filePath.filename().string();
+}
+
+std::string TextureDataPool::validateTextureFaces(std::array<TextureData,6>& data, size_t numFaces) {
+    if (numFaces != 6) {
+        return "";
+    }
+
+    const int expectedWidth = data[0].getWidth();
+    const int expectedHeight = data[0].getHeight();
+    const int expectedChannels = data[0].getChannels();
+    const ColorFormat expectedFormat = data[0].getColorFormat();
+
+    if (expectedWidth <= 0 || expectedHeight <= 0) {
+        return "Invalid cubemap face 0: empty texture data";
+    }
+
+    if (expectedWidth != expectedHeight) {
+        return "Invalid cubemap face 0: cubemap faces must be square, got "
+            + std::to_string(expectedWidth) + "x" + std::to_string(expectedHeight);
+    }
+
+    for (size_t f = 1; f < numFaces; f++) {
+        const int width = data[f].getWidth();
+        const int height = data[f].getHeight();
+
+        if (width <= 0 || height <= 0) {
+            return "Invalid cubemap face " + std::to_string(f) + ": empty texture data";
+        }
+
+        if (width != height) {
+            return "Invalid cubemap face " + std::to_string(f)
+                + ": cubemap faces must be square, got "
+                + std::to_string(width) + "x" + std::to_string(height);
+        }
+
+        if (width != expectedWidth || height != expectedHeight) {
+            return "Invalid cubemap face " + std::to_string(f)
+                + ": all cubemap faces must share the same dimensions, expected "
+                + std::to_string(expectedWidth) + "x" + std::to_string(expectedHeight)
+                + ", got " + std::to_string(width) + "x" + std::to_string(height);
+        }
+
+        if (data[f].getChannels() != expectedChannels || data[f].getColorFormat() != expectedFormat) {
+            return "Invalid cubemap face " + std::to_string(f)
+                + ": all cubemap faces must share the same pixel format";
+        }
+    }
+
+    return "";
 }
 
 void TextureDataPool::setAsyncLoading(bool enable){
