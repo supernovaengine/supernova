@@ -191,6 +191,9 @@ void ActionSystem::setSpriteTextureRect(MeshComponent& mesh, SpriteComponent& sp
 
     if (!frameRect.isNormalized()) {
         Texture& texture = mesh.submeshes[0].material.baseColorTexture;
+        if (!texture.empty() && texture.getWidth() == 0 && texture.getHeight() == 0) {
+            texture.load();
+        }
         if (texture.getWidth() > 0 && texture.getHeight() > 0) {
             mesh.submeshes[0].textureRect = Rect(
                 frameRect.getX() / (float)texture.getWidth(),
