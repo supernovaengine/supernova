@@ -11,6 +11,7 @@
 #include "Log.h"
 #include "Scene.h"
 #include "SceneManager.h"
+#include "BundleManager.h"
 #include "System.h"
 
 #include "action/Action.h"
