@@ -64,8 +64,6 @@ set(SUPERNOVA_SRCS
     core/Input.cpp
     core/Log.cpp
     core/Scene.cpp
-    core/SceneManager.cpp
-    core/BundleManager.cpp
     core/System.cpp
     core/action/Action.cpp
     core/action/AlphaAction.cpp
@@ -89,6 +87,8 @@ set(SUPERNOVA_SRCS
     core/io/Data.cpp
     core/io/File.cpp
     core/io/FileData.cpp
+    core/manager/BundleManager.cpp
+    core/manager/SceneManager.cpp
     core/io/UserSettings.cpp
     core/math/AABB.cpp
     core/math/Matrix3.cpp

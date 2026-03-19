@@ -13,6 +13,7 @@
 #include "Log.h"
 #include "Scene.h"
 #include "SceneManager.h"
+#include "BundleManager.h"
 #include "Log.h"
 #include "Input.h"
 #include "System.h"
@@ -261,6 +262,21 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addStaticProperty("currentSceneId", &SceneManager::getCurrentSceneId)
         .addStaticProperty("currentSceneName", &SceneManager::getCurrentSceneName)
         .addStaticFunction("clearAll", &SceneManager::clearAll)
+        .endClass();
+
+    luabridge::getGlobalNamespace(L)
+        .beginClass<BundleManager>("BundleManager")
+        .addStaticFunction("createBundle",
+            luabridge::overload<const std::string&, Scene*>(&BundleManager::createBundle),
+            luabridge::overload<uint32_t, Scene*>(&BundleManager::createBundle),
+            luabridge::overload<const std::string&, Scene*, Entity>(&BundleManager::createBundle),
+            luabridge::overload<uint32_t, Scene*, Entity>(&BundleManager::createBundle))
+        .addStaticFunction("destroyBundle", &BundleManager::destroyBundle)
+        .addStaticFunction("getBundleId", &BundleManager::getBundleId)
+        .addStaticFunction("getBundleName", &BundleManager::getBundleName)
+        .addStaticFunction("getBundleNames", &BundleManager::getBundleNames)
+        .addStaticProperty("bundleCount", &BundleManager::getBundleCount)
+        .addStaticFunction("clearAll", &BundleManager::clearAll)
         .endClass();
 
     luabridge::getGlobalNamespace(L)
