@@ -2761,6 +2761,31 @@ bool MeshSystem::createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent&
     return true;
 }
 
+bool MeshSystem::createOrUpdateModel(Entity entity, ModelComponent& model, MeshComponent& mesh){
+    if (model.needUpdateModel){
+        if (!model.filename.empty()){
+            std::string ext = FileData::getFilePathExtension(model.filename);
+            bool ret = false;
+            if (ext == "obj"){
+                ret = loadOBJ(entity, model.filename);
+            }else{
+                ret = loadGLTF(entity, model.filename);
+            }
+
+            if (ret){
+                mesh.needReload = true;
+                model.needUpdateModel = false;
+            }else{
+                return false;
+            }
+        }else{
+            model.needUpdateModel = false;
+        }
+    }
+
+    return true;
+}
+
 void MeshSystem::load(){
     update(0);
 }
@@ -2830,9 +2855,23 @@ void MeshSystem::update(double dt){
         }
     }
 
+    auto models = scene->getComponentArray<ModelComponent>();
+    for (int i = 0; i < models->size(); i++){
+        ModelComponent& model = models->getComponentFromIndex(i);
+
+        Entity entity = models->getEntity(i);
+        Signature signature = scene->getSignature(entity);
+
+        if (signature.test(scene->getComponentId<MeshComponent>())){
+            MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+            createOrUpdateModel(entity, model, mesh);
+        }
+    }
+
     auto meshes = scene->getComponentArray<MeshComponent>();
     for (int i = 0; i < meshes->size(); i++){
-		MeshComponent& mesh = meshes->getComponentFromIndex(i);
+        MeshComponent& mesh = meshes->getComponentFromIndex(i);
 
         if (mesh.aabb == AABB::ZERO){
             calculateMeshAABB(mesh);
@@ -2850,8 +2889,8 @@ void MeshSystem::onComponentAdded(Entity entity, ComponentId componentId) {
 }
 
 void MeshSystem::onComponentRemoved(Entity entity, ComponentId componentId) {
-	if (componentId == scene->getComponentId<ModelComponent>()) {
-		ModelComponent& model = scene->getComponent<ModelComponent>(entity);
-		destroyModel(model);
-	}
+    if (componentId == scene->getComponentId<ModelComponent>()) {
+        ModelComponent& model = scene->getComponent<ModelComponent>(entity);
+        destroyModel(model);
+    }
 }

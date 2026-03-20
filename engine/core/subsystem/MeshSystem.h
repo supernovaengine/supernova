@@ -80,6 +80,7 @@ namespace Supernova{
 		bool createOrUpdateTerrain(TerrainComponent& terrain, MeshComponent& mesh);
 		bool createOrUpdateMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
 		bool createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent& mesh);
+		bool createOrUpdateModel(Entity entity, ModelComponent& model, MeshComponent& mesh);
 
 		void calculateMeshAABB(MeshComponent& mesh);
 

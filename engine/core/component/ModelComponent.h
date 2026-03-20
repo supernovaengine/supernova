@@ -8,6 +8,7 @@
 #include "buffer/ExternalBuffer.h"
 #include <vector>
 #include <map>
+#include <string>
 
 namespace tinygltf {class Model;}
 
@@ -26,6 +27,10 @@ namespace Supernova{
         std::map<std::string, int> morphNameMapping;
 
         std::vector<Entity> animations;
+
+        std::string filename;
+
+        bool needUpdateModel = true;
     };
 
 }
