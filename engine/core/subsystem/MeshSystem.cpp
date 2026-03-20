@@ -2205,6 +2205,9 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
         animcomp.name = animation.name;
         animcomp.ownedActions = true;
 
+        std::string animName = animation.name.empty() ? "Animation " + std::to_string(i) : animation.name;
+        scene->setEntityName(anim, animName);
+
         model.animations.push_back(anim);
 
         for (size_t j = 0; j < animation.channels.size(); j++) {
@@ -2236,6 +2239,15 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
                 Entity track;
 
                 track = scene->createEntity();
+
+                std::string trackName = animName + " " + channel.target_path;
+                if (channel.target_node >= 0 && channel.target_node < model.gltfModel->nodes.size()) {
+                    std::string nodeName = model.gltfModel->nodes[channel.target_node].name;
+                    if (!nodeName.empty()) {
+                        trackName = nodeName + " " + channel.target_path;
+                    }
+                }
+                scene->setEntityName(track, trackName);
 
                 scene->addComponent<ActionComponent>(track);
                 scene->addComponent<KeyframeTracksComponent>(track);
