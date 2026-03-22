@@ -788,13 +788,6 @@ TextureWrap MeshSystem::convertWrap(int wrap){
     return TextureWrap::REPEAT;
 }
 
-void MeshSystem::clearAnimations(ModelComponent& model){
-    for (int i = 0; i < model.animations.size(); i++){
-        scene->destroyEntity(model.animations[i]);
-    }
-    model.animations.clear();
-}
-
 void MeshSystem::calculateMeshAABB(MeshComponent& mesh){
     std::map<std::string, Buffer*> buffers;
 
@@ -1679,7 +1672,7 @@ void MeshSystem::createTorus(MeshComponent& mesh, float radius, float ringRadius
         mesh.needReload = true;
 }
 
-bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool asyncLoad){
+bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool asyncLoad, bool skipEntities){
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
     ModelComponent& model = scene->getComponent<ModelComponent>(entity);
     Transform& transform = scene->getComponent<Transform>(entity);
@@ -2174,159 +2167,165 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string& filename, bool async
             }
         }
 
-        model.bonesNameMapping.clear();
-        model.bonesIdMapping.clear();
+        if (!skipEntities) {
+            model.bonesNameMapping.clear();
+            model.bonesIdMapping.clear();
 
-        model.skeleton = generateSketetalStructure(entity, model, skeletonRoot, skinIndex);
+            model.skeleton = generateSketetalStructure(entity, model, skeletonRoot, skinIndex);
 
-        if (model.skeleton != NULL_ENTITY) {
-            if (skin.joints.size() > MAX_BONES){
-                Log::error("Cannot create skinning bigger than %i", MAX_BONES);
-                if (asyncLoad) {
-                    ResourceProgress::failBuild(buildId);
+            if (model.skeleton != NULL_ENTITY) {
+                if (skin.joints.size() > MAX_BONES){
+                    Log::error("Cannot create skinning bigger than %i", MAX_BONES);
+                    if (asyncLoad) {
+                        ResourceProgress::failBuild(buildId);
+                    }
+                    return false;
                 }
-                return false;
+                scene->addEntityChild(entity, model.skeleton, false);
             }
-            scene->addEntityChild(entity, model.skeleton, false);
         }
     }
 
-    for (size_t i = 0; i < model.gltfModel->animations.size(); i++) {
-        const tinygltf::Animation &animation = model.gltfModel->animations[i];
+    if (!skipEntities) {
+        model.animations.clear();
 
-        Entity anim;
+        for (size_t i = 0; i < model.gltfModel->animations.size(); i++) {
+            const tinygltf::Animation &animation = model.gltfModel->animations[i];
 
-        anim = scene->createEntity();
-    scene->addComponent<ActionComponent>(anim);
-    scene->addComponent<AnimationComponent>(anim);
+            Entity anim;
 
-        AnimationComponent& animcomp = scene->getComponent<AnimationComponent>(anim);
+            anim = scene->createEntity();
+            scene->addComponent<ActionComponent>(anim);
+            scene->addComponent<AnimationComponent>(anim);
 
-        animcomp.name = animation.name;
-        animcomp.ownedActions = true;
+            AnimationComponent& animcomp = scene->getComponent<AnimationComponent>(anim);
 
-        std::string animName = animation.name.empty() ? "Animation " + std::to_string(i) : animation.name;
-        scene->setEntityName(anim, animName);
+            animcomp.name = animation.name;
+            animcomp.ownedActions = true;
 
-        model.animations.push_back(anim);
+            std::string animName = animation.name.empty() ? "Animation " + std::to_string(i) : animation.name;
+            scene->setEntityName(anim, animName);
 
-        for (size_t j = 0; j < animation.channels.size(); j++) {
+            model.animations.push_back(anim);
 
-            const tinygltf::AnimationChannel &channel = animation.channels[j];
-            const tinygltf::AnimationSampler &sampler = animation.samplers[channel.sampler];
+            for (size_t j = 0; j < animation.channels.size(); j++) {
 
-            tinygltf::Accessor accessorIn = model.gltfModel->accessors[sampler.input];
-            tinygltf::BufferView bufferViewIn = model.gltfModel->bufferViews[accessorIn.bufferView];
+                const tinygltf::AnimationChannel &channel = animation.channels[j];
+                const tinygltf::AnimationSampler &sampler = animation.samplers[channel.sampler];
 
-            tinygltf::Accessor accessorOut = model.gltfModel->accessors[sampler.output];
-            tinygltf::BufferView bufferViewOut = model.gltfModel->bufferViews[accessorOut.bufferView];
+                tinygltf::Accessor accessorIn = model.gltfModel->accessors[sampler.input];
+                tinygltf::BufferView bufferViewIn = model.gltfModel->bufferViews[accessorIn.bufferView];
 
-            //TODO: Implement rotation and weights non float
-            if (accessorOut.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT) {
+                tinygltf::Accessor accessorOut = model.gltfModel->accessors[sampler.output];
+                tinygltf::BufferView bufferViewOut = model.gltfModel->bufferViews[accessorOut.bufferView];
 
-                if (accessorIn.count != accessorOut.count) {
-                    Log::error("Incorrect frame size in animation: %s, sampler: %i",
-                               animation.name.c_str(), channel.sampler);
-                }
+                //TODO: Implement rotation and weights non float
+                if (accessorOut.componentType == TINYGLTF_COMPONENT_TYPE_FLOAT) {
 
-                float *timeValues = (float *) (&model.gltfModel->buffers[bufferViewIn.buffer].data.at(0) +
-                                               bufferViewIn.byteOffset + accessorIn.byteOffset);
-                float *values = (float *) (&model.gltfModel->buffers[bufferViewOut.buffer].data.at(0) +
-                                           bufferViewOut.byteOffset + accessorOut.byteOffset);
-
-                float duration = timeValues[accessorIn.count - 1];
-
-                Entity track;
-
-                track = scene->createEntity();
-
-                std::string trackName = animName + " " + channel.target_path;
-                if (channel.target_node >= 0 && channel.target_node < model.gltfModel->nodes.size()) {
-                    std::string nodeName = model.gltfModel->nodes[channel.target_node].name;
-                    if (!nodeName.empty()) {
-                        trackName = nodeName + " " + channel.target_path;
+                    if (accessorIn.count != accessorOut.count) {
+                        Log::error("Incorrect frame size in animation: %s, sampler: %i",
+                                animation.name.c_str(), channel.sampler);
                     }
-                }
-                scene->setEntityName(track, trackName);
 
-                scene->addComponent<ActionComponent>(track);
-                scene->addComponent<KeyframeTracksComponent>(track);
+                    float *timeValues = (float *) (&model.gltfModel->buffers[bufferViewIn.buffer].data.at(0) +
+                                                bufferViewIn.byteOffset + accessorIn.byteOffset);
+                    float *values = (float *) (&model.gltfModel->buffers[bufferViewOut.buffer].data.at(0) +
+                                            bufferViewOut.byteOffset + accessorOut.byteOffset);
 
-                ActionComponent& actiontrack = scene->getComponent<ActionComponent>(track);
-                KeyframeTracksComponent& keyframe = scene->getComponent<KeyframeTracksComponent>(track);
+                    float duration = timeValues[accessorIn.count - 1];
 
-                bool foundTrack = false;
-                if (channel.target_path.compare("translation") == 0) {
-                    foundTrack = true;
-                    scene->addComponent<TranslateTracksComponent>(track);
-                    TranslateTracksComponent& translatetracks = scene->getComponent<TranslateTracksComponent>(track);
-                    for (int c = 0; c < accessorIn.count; c++) {
-                        Vector3 positionAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
+                    Entity track;
 
-                        keyframe.times.push_back(timeValues[c]);
-                        translatetracks.values.push_back(positionAc);
-                    }
-                }
-                if (channel.target_path.compare("rotation") == 0) {
-                    foundTrack = true;
-                    scene->addComponent<RotateTracksComponent>(track);
-                    RotateTracksComponent& rotatetracks = scene->getComponent<RotateTracksComponent>(track);
-                    for (int c = 0; c < accessorIn.count; c++) {
-                        Quaternion rotationAc(values[(4 * c) + 3], values[4 * c], values[(4 * c) + 1], values[(4 * c) + 2]);
+                    track = scene->createEntity();
 
-                        keyframe.times.push_back(timeValues[c]);
-                        rotatetracks.values.push_back(rotationAc);
-                    }
-                }
-                if (channel.target_path.compare("scale") == 0) {
-                    foundTrack = true;
-                    scene->addComponent<ScaleTracksComponent>(track);
-                    ScaleTracksComponent& scaletracks = scene->getComponent<ScaleTracksComponent>(track);
-                    for (int c = 0; c < accessorIn.count; c++) {
-                        Vector3 scaleAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
-
-                        keyframe.times.push_back(timeValues[c]);
-                        scaletracks.values.push_back(scaleAc);
-                    }
-                }
-                if (channel.target_path.compare("weights") == 0) {
-                    foundTrack = true;
-                    scene->addComponent<MorphTracksComponent>(track);
-                    MorphTracksComponent& morphtracks = scene->getComponent<MorphTracksComponent>(track);
-                    int morphNum = accessorOut.count / accessorIn.count;
-                    for (int c = 0; c < accessorIn.count; c++) {
-                        std::vector<float> weightsAc;
-                        for (int m = 0; m < morphNum; m++) {
-                            weightsAc.push_back(values[(morphNum * c) + m]);
+                    std::string trackName = animName + " " + channel.target_path;
+                    if (channel.target_node >= 0 && channel.target_node < model.gltfModel->nodes.size()) {
+                        std::string nodeName = model.gltfModel->nodes[channel.target_node].name;
+                        if (!nodeName.empty()) {
+                            trackName = nodeName + " " + channel.target_path;
                         }
-
-                        keyframe.times.push_back(timeValues[c]);
-                        morphtracks.values.push_back(weightsAc);
                     }
-                }
+                    scene->setEntityName(track, trackName);
 
-                if (foundTrack) {
-                    if (model.bonesIdMapping.count(channel.target_node)) {
-                        actiontrack.target = model.bonesIdMapping[channel.target_node];
-                    } else {
-                        actiontrack.target = entity;
+                    scene->addComponent<ActionComponent>(track);
+                    scene->addComponent<KeyframeTracksComponent>(track);
+
+                    ActionComponent& actiontrack = scene->getComponent<ActionComponent>(track);
+                    KeyframeTracksComponent& keyframe = scene->getComponent<KeyframeTracksComponent>(track);
+
+                    bool foundTrack = false;
+                    if (channel.target_path.compare("translation") == 0) {
+                        foundTrack = true;
+                        scene->addComponent<TranslateTracksComponent>(track);
+                        TranslateTracksComponent& translatetracks = scene->getComponent<TranslateTracksComponent>(track);
+                        for (int c = 0; c < accessorIn.count; c++) {
+                            Vector3 positionAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
+
+                            keyframe.times.push_back(timeValues[c]);
+                            translatetracks.values.push_back(positionAc);
+                        }
                     }
-                    animcomp.actions.push_back({0, duration, track});
+                    if (channel.target_path.compare("rotation") == 0) {
+                        foundTrack = true;
+                        scene->addComponent<RotateTracksComponent>(track);
+                        RotateTracksComponent& rotatetracks = scene->getComponent<RotateTracksComponent>(track);
+                        for (int c = 0; c < accessorIn.count; c++) {
+                            Quaternion rotationAc(values[(4 * c) + 3], values[4 * c], values[(4 * c) + 1], values[(4 * c) + 2]);
+
+                            keyframe.times.push_back(timeValues[c]);
+                            rotatetracks.values.push_back(rotationAc);
+                        }
+                    }
+                    if (channel.target_path.compare("scale") == 0) {
+                        foundTrack = true;
+                        scene->addComponent<ScaleTracksComponent>(track);
+                        ScaleTracksComponent& scaletracks = scene->getComponent<ScaleTracksComponent>(track);
+                        for (int c = 0; c < accessorIn.count; c++) {
+                            Vector3 scaleAc(values[3 * c], values[(3 * c) + 1], values[(3 * c) + 2]);
+
+                            keyframe.times.push_back(timeValues[c]);
+                            scaletracks.values.push_back(scaleAc);
+                        }
+                    }
+                    if (channel.target_path.compare("weights") == 0) {
+                        foundTrack = true;
+                        scene->addComponent<MorphTracksComponent>(track);
+                        MorphTracksComponent& morphtracks = scene->getComponent<MorphTracksComponent>(track);
+                        int morphNum = accessorOut.count / accessorIn.count;
+                        for (int c = 0; c < accessorIn.count; c++) {
+                            std::vector<float> weightsAc;
+                            for (int m = 0; m < morphNum; m++) {
+                                weightsAc.push_back(values[(morphNum * c) + m]);
+                            }
+
+                            keyframe.times.push_back(timeValues[c]);
+                            morphtracks.values.push_back(weightsAc);
+                        }
+                    }
+
+                    if (foundTrack) {
+                        if (model.bonesIdMapping.count(channel.target_node)) {
+                            actiontrack.target = model.bonesIdMapping[channel.target_node];
+                        } else {
+                            actiontrack.target = entity;
+                        }
+                        animcomp.actions.push_back({0, duration, track});
+                    }else{
+                        scene->destroyEntity(track);
+                    }
+
                 }else{
-                    scene->destroyEntity(track);
+                    Log::error("Cannot load animation: %s, channel %i: no float elements", animation.name.c_str(), j);
                 }
-
-            }else{
-                Log::error("Cannot load animation: %s, channel %i: no float elements", animation.name.c_str(), j);
             }
+
+            // need to get here because other actions were created
+            ActionComponent& anim_actioncomp = scene->getComponent<ActionComponent>(anim);
+
+            anim_actioncomp.target = entity;
+
         }
-
-        // need to get here because other actions were created
-        ActionComponent& anim_actioncomp = scene->getComponent<ActionComponent>(anim);
-
-        anim_actioncomp.target = entity;
-
-    }
+    } // !skipEntities
 
     if (asyncLoad) {
         ResourceProgress::updateProgress(buildId, 0.95f); // Animations processed
@@ -2666,13 +2665,10 @@ void MeshSystem::destroyModel(ModelComponent& model){
         model.gltfModel = NULL;
     }
 
-    for (auto const& bone : model.bonesIdMapping){
-        scene->destroyEntity(bone.second);
-    }
     model.bonesIdMapping.clear();
     model.bonesNameMapping.clear();
 
-    clearAnimations(model);
+    model.animations.clear();
 
     model.morphNameMapping.clear();
 
@@ -2765,11 +2761,12 @@ bool MeshSystem::createOrUpdateModel(Entity entity, ModelComponent& model, MeshC
     if (model.needUpdateModel){
         if (!model.filename.empty()){
             std::string ext = FileData::getFilePathExtension(model.filename);
+            bool skipEntities = !model.bonesIdMapping.empty() || !model.animations.empty();
             bool ret = false;
             if (ext == "obj"){
                 ret = loadOBJ(entity, model.filename);
             }else{
-                ret = loadGLTF(entity, model.filename);
+                ret = loadGLTF(entity, model.filename, false, skipEntities);
             }
 
             if (ret){
