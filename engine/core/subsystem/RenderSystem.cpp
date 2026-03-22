@@ -3063,13 +3063,15 @@ void RenderSystem::update(double dt){
                 BoneComponent& bone = scene->getComponent<BoneComponent>(entity);
 
                 if (bone.model != NULL_ENTITY){
-                    ModelComponent& model = scene->getComponent<ModelComponent>(bone.model);
-                    MeshComponent& mesh = scene->getComponent<MeshComponent>(bone.model);
+                    ModelComponent* model = scene->findComponent<ModelComponent>(bone.model);
+                    MeshComponent* mesh = scene->findComponent<MeshComponent>(bone.model);
 
-                    Matrix4 skinning = model.inverseDerivedTransform * transform.modelMatrix * bone.offsetMatrix;
+                    if (model && mesh) {
+                        Matrix4 skinning = model->inverseDerivedTransform * transform.modelMatrix * bone.offsetMatrix;
 
-                    if (bone.index >= 0 && bone.index < MAX_BONES)
-                        mesh.bonesMatrix[bone.index] = skinning;
+                        if (bone.index >= 0 && bone.index < MAX_BONES)
+                            mesh->bonesMatrix[bone.index] = skinning;
+                    }
                 }
             }
 
