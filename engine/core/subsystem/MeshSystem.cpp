@@ -51,10 +51,10 @@ bool MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, Came
     mesh.submeshes[0].faceCulling = false;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clear();
-	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     mesh.buffer.setUsage(BufferUsage::DYNAMIC);
@@ -164,10 +164,10 @@ bool MeshSystem::createMeshPolygon(MeshPolygonComponent& polygon, MeshComponent&
     mesh.submeshes[0].faceCulling = false;
     mesh.numSubmeshes = 1;
 
-	mesh.buffer.clear();
-	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     for (int i = 0; i < polygon.points.size(); i++){
@@ -251,10 +251,10 @@ bool MeshSystem::createTilemap(TilemapComponent& tilemap, MeshComponent& mesh){
     mesh.submeshes[0].primitiveType = PrimitiveType::TRIANGLES;
     mesh.submeshes[0].hasTextureRect = true;
 
-	mesh.buffer.clear();
-	mesh.buffer.addAttribute(AttributeType::POSITION, 3);
-	mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
-	mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
+    mesh.buffer.clear();
+    mesh.buffer.addAttribute(AttributeType::POSITION, 3);
+    mesh.buffer.addAttribute(AttributeType::TEXCOORD1, 2);
+    mesh.buffer.addAttribute(AttributeType::NORMAL, 3);
     mesh.buffer.addAttribute(AttributeType::COLOR, 4);
 
     mesh.buffer.setUsage(BufferUsage::DYNAMIC);
@@ -2623,17 +2623,17 @@ void MeshSystem::createInstancedMesh(Entity entity){
                 mesh.needReload = true;
         }
 
-		instmesh.buffer.clear();
-		instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL1, 4, 0, true);
-		instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL2, 4, 4 * sizeof(float), true);
-		instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL3, 4, 8 * sizeof(float), true);
-		instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL4, 4, 12 * sizeof(float), true);
-		instmesh.buffer.addAttribute(AttributeType::INSTANCECOLOR, 4, 16 * sizeof(float), true);
-		instmesh.buffer.addAttribute(AttributeType::INSTANCETEXTURERECT, 4, 20 * sizeof(float), true);
-		instmesh.buffer.setStride(24 * sizeof(float));
-		instmesh.buffer.setRenderAttributes(true);
-		instmesh.buffer.setInstanceBuffer(true);
-		instmesh.buffer.setUsage(BufferUsage::STREAM);
+        instmesh.buffer.clear();
+        instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL1, 4, 0, true);
+        instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL2, 4, 4 * sizeof(float), true);
+        instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL3, 4, 8 * sizeof(float), true);
+        instmesh.buffer.addAttribute(AttributeType::INSTANCEMATRIXCOL4, 4, 12 * sizeof(float), true);
+        instmesh.buffer.addAttribute(AttributeType::INSTANCECOLOR, 4, 16 * sizeof(float), true);
+        instmesh.buffer.addAttribute(AttributeType::INSTANCETEXTURERECT, 4, 20 * sizeof(float), true);
+        instmesh.buffer.setStride(24 * sizeof(float));
+        instmesh.buffer.setRenderAttributes(true);
+        instmesh.buffer.setInstanceBuffer(true);
+        instmesh.buffer.setUsage(BufferUsage::STREAM);
     }
 }
 
@@ -2798,7 +2798,7 @@ void MeshSystem::update(double dt){
 
     auto sprites = scene->getComponentArray<SpriteComponent>();
     for (int i = 0; i < sprites->size(); i++){
-		SpriteComponent& sprite = sprites->getComponentFromIndex(i);
+        SpriteComponent& sprite = sprites->getComponentFromIndex(i);
 
         Entity entity = sprites->getEntity(i);
         Signature signature = scene->getSignature(entity);
@@ -2812,7 +2812,7 @@ void MeshSystem::update(double dt){
 
     auto tilemaps = scene->getComponentArray<TilemapComponent>();
     for (int i = 0; i < tilemaps->size(); i++){
-		TilemapComponent& tilemap = tilemaps->getComponentFromIndex(i);
+        TilemapComponent& tilemap = tilemaps->getComponentFromIndex(i);
 
         Entity entity = tilemaps->getEntity(i);
         Signature signature = scene->getSignature(entity);
@@ -2826,7 +2826,7 @@ void MeshSystem::update(double dt){
 
     auto polygons = scene->getComponentArray<MeshPolygonComponent>();
     for (int i = 0; i < polygons->size(); i++){
-		MeshPolygonComponent& polygon = polygons->getComponentFromIndex(i);
+        MeshPolygonComponent& polygon = polygons->getComponentFromIndex(i);
 
         Entity entity = polygons->getEntity(i);
         Signature signature = scene->getSignature(entity);
@@ -2840,7 +2840,7 @@ void MeshSystem::update(double dt){
 
     auto terrains = scene->getComponentArray<TerrainComponent>();
     for (int i = 0; i < terrains->size(); i++){
-		TerrainComponent& terrain = terrains->getComponentFromIndex(i);
+        TerrainComponent& terrain = terrains->getComponentFromIndex(i);
 
         Entity entity = terrains->getEntity(i);
         Signature signature = scene->getSignature(entity);
