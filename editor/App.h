@@ -25,6 +25,7 @@
 #include "window/dialog/ProjectSaveDialog.h"
 #include "window/dialog/SceneSaveDialog.h"
 #include "window/dialog/ExportWindow.h"
+#include "window/dialog/EditorSettingsWindow.h"
 #include "window/dialog/ProjectSettingsWindow.h"
 #include "window/dialog/BundlesWindow.h"
 #include "window/dialog/ScenesWindow.h"
@@ -129,6 +130,7 @@ namespace doriax::editor{
         ProjectSaveDialog projectSaveDialog;
         SceneSaveDialog sceneSaveDialog;
         ExportWindow exportWindow;
+        EditorSettingsWindow editorSettingsWindow;
         ProjectSettingsWindow projectSettingsWindow;
         BundlesWindow bundlesWindow;
         ScenesWindow scenesWindow;
@@ -279,4 +281,3 @@ namespace doriax::editor{
     };
 
 }
-

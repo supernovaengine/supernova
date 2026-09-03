@@ -83,6 +83,7 @@ std::string AppSettings::lastCMakeCxxCompiler;
 std::string AppSettings::lastCMakeGenerator;
 std::string AppSettings::emsdkPath;
 std::string AppSettings::cmakePath;
+unsigned int AppSettings::editorCMakeBuildJobs = 0;
 int AppSettings::windowWidth = 1280;
 int AppSettings::windowHeight = 720;
 bool AppSettings::isMaximized = false;
@@ -173,6 +174,9 @@ bool AppSettings::loadSettings() {
         // Load cmake executable override
         if (settingsData["cmake"] && settingsData["cmake"]["path"]) {
             cmakePath = settingsData["cmake"]["path"].as<std::string>();
+        }
+        if (settingsData["cmake"] && settingsData["cmake"]["build_jobs"]) {
+            editorCMakeBuildJobs = settingsData["cmake"]["build_jobs"].as<unsigned int>();
         }
 
         // Load recent projects
@@ -328,9 +332,14 @@ bool AppSettings::saveSettings() {
         }
 
         // cmake executable override
-        if (!cmakePath.empty()) {
+        if (!cmakePath.empty() || editorCMakeBuildJobs != 0) {
             YAML::Node cmakeNode;
-            cmakeNode["path"] = cmakePath;
+            if (!cmakePath.empty()) {
+                cmakeNode["path"] = cmakePath;
+            }
+            if (editorCMakeBuildJobs != 0) {
+                cmakeNode["build_jobs"] = editorCMakeBuildJobs;
+            }
             settingsData["cmake"] = cmakeNode;
         } else {
             settingsData.remove("cmake");
@@ -456,6 +465,15 @@ std::string AppSettings::getCMakePath() {
 
 void AppSettings::setCMakePath(const std::string& path) {
     cmakePath = path;
+    saveSettings();
+}
+
+unsigned int AppSettings::getEditorCMakeBuildJobs() {
+    return editorCMakeBuildJobs;
+}
+
+void AppSettings::setEditorCMakeBuildJobs(unsigned int jobs) {
+    editorCMakeBuildJobs = jobs;
     saveSettings();
 }
 

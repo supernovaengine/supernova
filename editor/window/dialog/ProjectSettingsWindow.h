@@ -8,6 +8,7 @@
 
 #include <string>
 #include <filesystem>
+#include <set>
 #include <unordered_map>
 
 namespace doriax::editor {
@@ -52,6 +53,21 @@ namespace doriax::editor {
         int m_cmakeBuildJobs = 0;
         std::string m_cmakeBuildJobsTooltip;
         bool m_packNativeResources = false;
+        char m_androidApplicationNameBuffer[256] = {0};
+        char m_androidPackageNameBuffer[256] = {0};
+        char m_androidVersionNameBuffer[64] = {0};
+        int m_androidVersionCode = 1;
+        int m_androidMinSdk = 21;
+        int m_androidTargetSdk = 33;
+        int m_androidOrientationIndex = 0;
+        bool m_androidAbiArmeabiV7a = true;
+        bool m_androidAbiArm64V8a = true;
+        bool m_androidAbiX86 = true;
+        bool m_androidAbiX86_64 = true;
+        std::set<std::string> m_androidPermissions;
+        bool m_androidAllowBackup = true;
+        bool m_androidFullscreen = true;
+        bool m_androidKeepScreenOn = false;
 
         void drawSettings();
         void drawGeneralSettings();
@@ -60,6 +76,7 @@ namespace doriax::editor {
         Texture* findThumbnail(const std::string& path);
         void drawDirectoriesSettings();
         void drawBuildSettings();
+        void drawAndroidSettings();
         void drawCMakeSetting();
         void refreshCMakeStatus();
         void applySettings();

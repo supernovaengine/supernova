@@ -24,6 +24,80 @@
 
 using namespace doriax;
 
+namespace {
+    YAML::Node encodeExportShaderKeys(const std::vector<ShaderKey>& shaderKeys, bool configured) {
+        if (!configured) {
+            return YAML::Node();
+        }
+
+        YAML::Node node(YAML::NodeType::Sequence);
+        for (ShaderKey key : shaderKeys) {
+            node.push_back(key);
+        }
+        return node;
+    }
+
+    std::vector<ShaderKey> decodeExportShaderKeys(const YAML::Node& node) {
+        std::vector<ShaderKey> shaderKeys;
+        if (!node || !node.IsSequence()) {
+            return shaderKeys;
+        }
+
+        for (const auto& keyNode : node) {
+            shaderKeys.push_back(ShaderPool::normalizeKey(keyNode.as<uint64_t>()));
+        }
+        return shaderKeys;
+    }
+
+    YAML::Node encodeExportBackendSet(const std::set<ShaderBackend>& backends, bool configured) {
+        if (!configured) {
+            return YAML::Node();
+        }
+
+        YAML::Node node(YAML::NodeType::Sequence);
+        for (ShaderBackend backend : backends) {
+            node.push_back(ShaderPool::getShaderBackendCliToken(backend));
+        }
+        return node;
+    }
+
+    std::set<ShaderBackend> decodeExportBackendSet(const YAML::Node& node) {
+        std::set<ShaderBackend> backends;
+        if (!node || !node.IsSequence()) {
+            return backends;
+        }
+
+        for (const auto& backendNode : node) {
+            ShaderBackend backend;
+            if (ShaderPool::parseShaderBackend(backendNode.as<std::string>(), backend)) {
+                backends.insert(backend);
+            }
+        }
+        return backends;
+    }
+
+    std::string androidOrientationToString(editor::AndroidOrientation orientation) {
+        switch (orientation) {
+            case editor::AndroidOrientation::Portrait: return "portrait";
+            case editor::AndroidOrientation::Landscape: return "landscape";
+            case editor::AndroidOrientation::SensorPortrait: return "sensorPortrait";
+            case editor::AndroidOrientation::SensorLandscape: return "sensorLandscape";
+            case editor::AndroidOrientation::FullSensor: return "fullSensor";
+            case editor::AndroidOrientation::Unspecified:
+            default: return "unspecified";
+        }
+    }
+
+    editor::AndroidOrientation stringToAndroidOrientation(const std::string& value) {
+        if (value == "portrait") return editor::AndroidOrientation::Portrait;
+        if (value == "landscape") return editor::AndroidOrientation::Landscape;
+        if (value == "sensorPortrait") return editor::AndroidOrientation::SensorPortrait;
+        if (value == "sensorLandscape") return editor::AndroidOrientation::SensorLandscape;
+        if (value == "fullSensor") return editor::AndroidOrientation::FullSensor;
+        return editor::AndroidOrientation::Unspecified;
+    }
+}
+
 std::string editor::Stream::makeEmbeddedTextureId(){
     static uint64_t embeddedTextureCounter = 1;
     return "__stream_embedded_texture_" + std::to_string(embeddedTextureCounter++);
@@ -1569,6 +1643,95 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         root["packNativeResources"] = project->shouldPackNativeResources();
     }
 
+    {
+        YAML::Node exportNode;
+
+        const SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
+        YAML::Node sourceCodeNode;
+        if (!sourceCode.targetDir.empty()) {
+            sourceCodeNode["targetDir"] = sourceCode.targetDir.generic_string();
+        }
+        YAML::Node sourceCodeShaders = encodeExportShaderKeys(sourceCode.shaderKeys, sourceCode.shaderKeysConfigured);
+        if (sourceCodeShaders.IsDefined()) {
+            sourceCodeNode["shaders"] = sourceCodeShaders;
+        }
+        YAML::Node sourceCodeBackends = encodeExportBackendSet(sourceCode.graphicBackends, sourceCode.graphicBackendsConfigured);
+        if (sourceCodeBackends.IsDefined()) {
+            sourceCodeNode["graphicBackends"] = sourceCodeBackends;
+        }
+        if (sourceCodeNode.IsDefined()) {
+            exportNode["sourceCode"] = sourceCodeNode;
+        }
+
+        const DesktopExportSettings& desktop = project->getDesktopExportSettings();
+        YAML::Node desktopNode;
+        if (!desktop.targetDir.empty()) {
+            desktopNode["targetDir"] = desktop.targetDir.generic_string();
+        }
+        if (desktop.graphicBackendConfigured) {
+            desktopNode["graphicBackend"] = ShaderPool::getShaderBackendCliToken(desktop.graphicBackend);
+        }
+        YAML::Node desktopShaders = encodeExportShaderKeys(desktop.shaderKeys, desktop.shaderKeysConfigured);
+        if (desktopShaders.IsDefined()) {
+            desktopNode["shaders"] = desktopShaders;
+        }
+        if (desktopNode.IsDefined()) {
+            exportNode["desktop"] = desktopNode;
+        }
+
+        const WebExportSettings& web = project->getWebExportSettings();
+        YAML::Node webNode;
+        if (!web.targetDir.empty()) {
+            webNode["targetDir"] = web.targetDir.generic_string();
+        }
+        if (!web.emsdkPath.empty()) {
+            webNode["emsdkPath"] = web.emsdkPath;
+        }
+        YAML::Node webShaders = encodeExportShaderKeys(web.shaderKeys, web.shaderKeysConfigured);
+        if (webShaders.IsDefined()) {
+            webNode["shaders"] = webShaders;
+        }
+        if (webNode.IsDefined()) {
+            exportNode["web"] = webNode;
+        }
+
+        if (exportNode.IsDefined()) {
+            root["export"] = exportNode;
+        }
+    }
+
+    {
+        const AndroidProjectSettings& android = project->getAndroidProjectSettings();
+        YAML::Node androidNode;
+        if (!android.applicationName.empty()) {
+            androidNode["applicationName"] = android.applicationName;
+        }
+        androidNode["packageName"] = android.packageName;
+        androidNode["versionCode"] = android.versionCode;
+        androidNode["versionName"] = android.versionName;
+        androidNode["minSdk"] = android.minSdk;
+        androidNode["targetSdk"] = android.targetSdk;
+        androidNode["orientation"] = androidOrientationToString(android.orientation);
+
+        YAML::Node abiNode;
+        abiNode["armeabi-v7a"] = android.abiArmeabiV7a;
+        abiNode["arm64-v8a"] = android.abiArm64V8a;
+        abiNode["x86"] = android.abiX86;
+        abiNode["x86_64"] = android.abiX86_64;
+        androidNode["architectures"] = abiNode;
+
+        YAML::Node permissionsNode(YAML::NodeType::Sequence);
+        for (const std::string& permission : android.permissions) {
+            permissionsNode.push_back(permission);
+        }
+        androidNode["permissions"] = permissionsNode;
+
+        androidNode["allowBackup"] = android.allowBackup;
+        androidNode["fullscreen"] = android.fullscreen;
+        androidNode["keepScreenOn"] = android.keepScreenOn;
+        root["android"] = androidNode;
+    }
+
     if (project->getStartSceneId() != NULL_PROJECT_SCENE) {
         root["startSceneId"] = project->getStartSceneId();
     }
@@ -1757,6 +1920,97 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
     }
     if (node["packNativeResources"].IsDefined()) {
         project->setPackNativeResources(node["packNativeResources"].as<bool>());
+    }
+
+    if (node["export"] && node["export"].IsMap()) {
+        const YAML::Node& exportNode = node["export"];
+
+        if (exportNode["sourceCode"] && exportNode["sourceCode"].IsMap()) {
+            const YAML::Node& sourceCodeNode = exportNode["sourceCode"];
+            SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
+            if (sourceCodeNode["targetDir"]) {
+                sourceCode.targetDir = sourceCodeNode["targetDir"].as<std::string>();
+            }
+            if (sourceCodeNode["shaders"]) {
+                sourceCode.shaderKeys = decodeExportShaderKeys(sourceCodeNode["shaders"]);
+                sourceCode.shaderKeysConfigured = true;
+            }
+            if (sourceCodeNode["graphicBackends"]) {
+                sourceCode.graphicBackends = decodeExportBackendSet(sourceCodeNode["graphicBackends"]);
+                sourceCode.graphicBackendsConfigured = true;
+            }
+        }
+
+        if (exportNode["desktop"] && exportNode["desktop"].IsMap()) {
+            const YAML::Node& desktopNode = exportNode["desktop"];
+            DesktopExportSettings& desktop = project->getDesktopExportSettings();
+            if (desktopNode["targetDir"]) {
+                desktop.targetDir = desktopNode["targetDir"].as<std::string>();
+            }
+            if (desktopNode["graphicBackend"]) {
+                ShaderBackend backend;
+                if (ShaderPool::parseShaderBackend(desktopNode["graphicBackend"].as<std::string>(), backend)) {
+                    desktop.graphicBackend = backend;
+                    desktop.graphicBackendConfigured = true;
+                }
+            }
+            if (desktopNode["shaders"]) {
+                desktop.shaderKeys = decodeExportShaderKeys(desktopNode["shaders"]);
+                desktop.shaderKeysConfigured = true;
+            }
+        }
+
+        if (exportNode["web"] && exportNode["web"].IsMap()) {
+            const YAML::Node& webNode = exportNode["web"];
+            WebExportSettings& web = project->getWebExportSettings();
+            if (webNode["targetDir"]) {
+                web.targetDir = webNode["targetDir"].as<std::string>();
+            }
+            if (webNode["emsdkPath"]) {
+                web.emsdkPath = webNode["emsdkPath"].as<std::string>();
+            }
+            if (webNode["shaders"]) {
+                web.shaderKeys = decodeExportShaderKeys(webNode["shaders"]);
+                web.shaderKeysConfigured = true;
+            }
+        }
+    }
+
+    if (node["android"] && node["android"].IsMap()) {
+        const YAML::Node& androidNode = node["android"];
+        AndroidProjectSettings& android = project->getAndroidProjectSettings();
+
+        if (androidNode["applicationName"]) android.applicationName = androidNode["applicationName"].as<std::string>();
+        if (androidNode["packageName"]) android.packageName = androidNode["packageName"].as<std::string>();
+        if (androidNode["versionCode"]) android.versionCode = std::max(1u, androidNode["versionCode"].as<unsigned int>());
+        if (androidNode["versionName"]) android.versionName = androidNode["versionName"].as<std::string>();
+        if (androidNode["minSdk"]) android.minSdk = std::max(1u, androidNode["minSdk"].as<unsigned int>());
+        if (androidNode["targetSdk"]) android.targetSdk = std::max(android.minSdk, androidNode["targetSdk"].as<unsigned int>());
+        if (androidNode["orientation"]) android.orientation = stringToAndroidOrientation(androidNode["orientation"].as<std::string>());
+
+        if (androidNode["architectures"] && androidNode["architectures"].IsMap()) {
+            const YAML::Node& abiNode = androidNode["architectures"];
+            if (abiNode["armeabi-v7a"].IsDefined()) android.abiArmeabiV7a = abiNode["armeabi-v7a"].as<bool>();
+            if (abiNode["arm64-v8a"].IsDefined()) android.abiArm64V8a = abiNode["arm64-v8a"].as<bool>();
+            if (abiNode["x86"].IsDefined()) android.abiX86 = abiNode["x86"].as<bool>();
+            if (abiNode["x86_64"].IsDefined()) android.abiX86_64 = abiNode["x86_64"].as<bool>();
+        }
+
+        if (androidNode["permissions"] && androidNode["permissions"].IsSequence()) {
+            android.permissions.clear();
+            for (const auto& permissionNode : androidNode["permissions"]) {
+                android.permissions.insert(permissionNode.as<std::string>());
+            }
+        } else if (androidNode["permissions"] && androidNode["permissions"].IsMap()) {
+            const YAML::Node& permissionsNode = androidNode["permissions"];
+            if (permissionsNode["internet"].IsDefined() && permissionsNode["internet"].as<bool>()) android.permissions.insert("internet");
+            if (permissionsNode["vibrate"].IsDefined() && permissionsNode["vibrate"].as<bool>()) android.permissions.insert("vibrate");
+            if (permissionsNode["wakeLock"].IsDefined() && permissionsNode["wakeLock"].as<bool>()) android.permissions.insert("wake_lock");
+        }
+
+        if (androidNode["allowBackup"].IsDefined()) android.allowBackup = androidNode["allowBackup"].as<bool>();
+        if (androidNode["fullscreen"].IsDefined()) android.fullscreen = androidNode["fullscreen"].as<bool>();
+        if (androidNode["keepScreenOn"].IsDefined()) android.keepScreenOn = androidNode["keepScreenOn"].as<bool>();
     }
 
     if (node["startSceneId"]) {

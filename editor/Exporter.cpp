@@ -133,6 +133,127 @@ namespace {
         data.resize(static_cast<size_t>(size));
         return data.empty() || static_cast<bool>(in.read(reinterpret_cast<char*>(data.data()), size));
     }
+
+    void replaceAll(std::string& value, const std::string& from, const std::string& to) {
+        if (from.empty()) return;
+
+        size_t pos = 0;
+        while ((pos = value.find(from, pos)) != std::string::npos) {
+            value.replace(pos, from.size(), to);
+            pos += to.size();
+        }
+    }
+
+    std::string escapeGradleString(const std::string& value) {
+        std::string out;
+        out.reserve(value.size());
+        for (char c : value) {
+            if (c == '\\' || c == '"') {
+                out += '\\';
+                out += c;
+            } else if (c == '\n') {
+                out += "\\n";
+            } else if (c == '\r') {
+                out += "\\r";
+            } else if (c == '\t') {
+                out += "\\t";
+            } else {
+                out += c;
+            }
+        }
+        return out;
+    }
+
+    std::string escapeXmlAttribute(const std::string& value) {
+        std::string out;
+        out.reserve(value.size());
+        for (char c : value) {
+            switch (c) {
+                case '&': out += "&amp;"; break;
+                case '<': out += "&lt;"; break;
+                case '>': out += "&gt;"; break;
+                case '"': out += "&quot;"; break;
+                case '\'': out += "&apos;"; break;
+                default: out += c; break;
+            }
+        }
+        return out;
+    }
+
+    std::string androidOrientationManifestValue(editor::AndroidOrientation orientation) {
+        switch (orientation) {
+            case editor::AndroidOrientation::Portrait: return "portrait";
+            case editor::AndroidOrientation::Landscape: return "landscape";
+            case editor::AndroidOrientation::SensorPortrait: return "sensorPortrait";
+            case editor::AndroidOrientation::SensorLandscape: return "sensorLandscape";
+            case editor::AndroidOrientation::FullSensor: return "fullSensor";
+            case editor::AndroidOrientation::Unspecified:
+            default: return "";
+        }
+    }
+
+    const char* androidPermissionManifestName(const std::string& key) {
+        struct PermissionMap {
+            const char* key;
+            const char* manifestName;
+        };
+        static const PermissionMap permissions[] = {
+            { "internet", "INTERNET" },
+            { "access_network_state", "ACCESS_NETWORK_STATE" },
+            { "access_wifi_state", "ACCESS_WIFI_STATE" },
+            { "change_network_state", "CHANGE_NETWORK_STATE" },
+            { "change_wifi_state", "CHANGE_WIFI_STATE" },
+            { "vibrate", "VIBRATE" },
+            { "wake_lock", "WAKE_LOCK" },
+            { "post_notifications", "POST_NOTIFICATIONS" },
+            { "camera", "CAMERA" },
+            { "record_audio", "RECORD_AUDIO" },
+            { "access_coarse_location", "ACCESS_COARSE_LOCATION" },
+            { "access_fine_location", "ACCESS_FINE_LOCATION" },
+            { "access_location_extra_commands", "ACCESS_LOCATION_EXTRA_COMMANDS" },
+            { "access_media_location", "ACCESS_MEDIA_LOCATION" },
+            { "read_external_storage", "READ_EXTERNAL_STORAGE" },
+            { "write_external_storage", "WRITE_EXTERNAL_STORAGE" },
+            { "manage_external_storage", "MANAGE_EXTERNAL_STORAGE" },
+            { "read_media_audio", "READ_MEDIA_AUDIO" },
+            { "read_media_images", "READ_MEDIA_IMAGES" },
+            { "read_media_video", "READ_MEDIA_VIDEO" },
+            { "read_media_visual_user_selected", "READ_MEDIA_VISUAL_USER_SELECTED" },
+            { "bluetooth", "BLUETOOTH" },
+            { "bluetooth_admin", "BLUETOOTH_ADMIN" },
+            { "bluetooth_connect", "BLUETOOTH_CONNECT" },
+            { "bluetooth_scan", "BLUETOOTH_SCAN" },
+            { "nfc", "NFC" },
+            { "transmit_ir", "TRANSMIT_IR" },
+            { "use_biometric", "USE_BIOMETRIC" },
+            { "use_fingerprint", "USE_FINGERPRINT" },
+            { "read_contacts", "READ_CONTACTS" },
+            { "write_contacts", "WRITE_CONTACTS" },
+            { "get_accounts", "GET_ACCOUNTS" },
+            { "read_calendar", "READ_CALENDAR" },
+            { "write_calendar", "WRITE_CALENDAR" },
+            { "read_call_log", "READ_CALL_LOG" },
+            { "write_call_log", "WRITE_CALL_LOG" },
+            { "read_phone_state", "READ_PHONE_STATE" },
+            { "call_phone", "CALL_PHONE" },
+            { "read_sms", "READ_SMS" },
+            { "write_sms", "WRITE_SMS" },
+            { "send_sms", "SEND_SMS" },
+            { "receive_sms", "RECEIVE_SMS" },
+            { "receive_mms", "RECEIVE_MMS" },
+            { "receive_wap_push", "RECEIVE_WAP_PUSH" },
+            { "receive_boot_completed", "RECEIVE_BOOT_COMPLETED" },
+            { "kill_background_processes", "KILL_BACKGROUND_PROCESSES" },
+            { "modify_audio_settings", "MODIFY_AUDIO_SETTINGS" },
+            { "set_wallpaper", "SET_WALLPAPER" },
+            { "set_wallpaper_hints", "SET_WALLPAPER_HINTS" },
+            { "write_settings", "WRITE_SETTINGS" },
+        };
+        for (const PermissionMap& permission : permissions) {
+            if (key == permission.key) return permission.manifestName;
+        }
+        return nullptr;
+    }
 }
 
 editor::Exporter::Exporter() {
@@ -1695,6 +1816,7 @@ bool editor::Exporter::copyEngine() {
     if (!copyDir("renders", true)) return false;
     //if (!copyDir("tools")) return false;
     if (!copyDir("workspaces", true)) return false;
+    if (!writeAndroidProjectSettings()) return false;
 
     // The SDK "shaders" dir holds only stub headers (getBase64Shader returning
     // "") under the exact names buildAndSaveShaders generates into. Copy them
@@ -1892,6 +2014,140 @@ std::string editor::Exporter::buildSceneMaxValuesDefinitions() const {
     out += indent + define("MAX_EXTERNAL_BUFFERS", agg.maxExternalBuffers, MAX_EXTERNAL_BUFFERS);
     out += indent + define("MAX_BONES", agg.maxBones, MAX_BONES);
     return out;
+}
+
+bool editor::Exporter::writeAndroidProjectSettings() {
+    const AndroidProjectSettings& android = project->getAndroidProjectSettings();
+    if (!android.abiArmeabiV7a && !android.abiArm64V8a && !android.abiX86 && !android.abiX86_64) {
+        setError("Android export needs at least one selected architecture");
+        return false;
+    }
+
+    auto readText = [&](const fs::path& path, std::string& out) -> bool {
+        std::ifstream ifs(path, std::ios::in | std::ios::binary);
+        if (!ifs) {
+            setError("Failed to read Android export file: " + path.string());
+            return false;
+        }
+        out.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+        return true;
+    };
+
+    const fs::path androidAppDir = config.targetDir / "workspaces" / "androidstudio" / "app";
+    const fs::path buildGradlePath = androidAppDir / "build.gradle";
+    const fs::path manifestPath = androidAppDir / "src" / "main" / "AndroidManifest.xml";
+    const fs::path stringsPath = androidAppDir / "src" / "main" / "res" / "values" / "strings.xml";
+    const fs::path stylesPath = androidAppDir / "src" / "main" / "res" / "values" / "styles.xml";
+    const fs::path mainActivityPath = config.targetDir / "platform" / "android" / "java" / "org" / "doriaxengine" / "doriax" / "MainActivity.java";
+
+    const std::string appName = android.applicationName.empty()
+        ? (project->getName().empty() ? "Doriax" : project->getName())
+        : android.applicationName;
+
+    std::string gradle;
+    if (!readText(buildGradlePath, gradle)) return false;
+
+    replaceAll(gradle, "compileSdk 33", "compileSdk " + std::to_string(android.targetSdk));
+    replaceAll(gradle, "applicationId \"com.yourcompany.project\"", "applicationId \"" + escapeGradleString(android.packageName) + "\"");
+    replaceAll(gradle, "minSdkVersion 21", "minSdkVersion " + std::to_string(android.minSdk));
+    replaceAll(gradle, "targetSdkVersion 33", "targetSdkVersion " + std::to_string(android.targetSdk));
+    replaceAll(gradle, "versionCode 1", "versionCode " + std::to_string(android.versionCode));
+    replaceAll(gradle, "versionName \"1.0\"", "versionName \"" + escapeGradleString(android.versionName) + "\"");
+
+    std::vector<std::string> abis;
+    if (android.abiArm64V8a) abis.push_back("\"arm64-v8a\"");
+    if (android.abiX86) abis.push_back("\"x86\"");
+    if (android.abiArmeabiV7a) abis.push_back("\"armeabi-v7a\"");
+    if (android.abiX86_64) abis.push_back("\"x86_64\"");
+    std::string abiLine = "                abiFilters ";
+    for (size_t i = 0; i < abis.size(); i++) {
+        if (i > 0) abiLine += ", ";
+        abiLine += abis[i];
+    }
+    replaceAll(gradle,
+        "                abiFilters \"arm64-v8a\"\n"
+        "                abiFilters \"x86\"\n"
+        "                abiFilters \"armeabi-v7a\"\n"
+        "                abiFilters \"x86_64\"",
+        abiLine);
+    FileUtils::writeIfChanged(buildGradlePath, gradle);
+
+    std::string manifest;
+    manifest += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+    manifest += "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\">\n\n";
+    bool wrotePermission = false;
+    for (const std::string& permission : android.permissions) {
+        const char* manifestName = androidPermissionManifestName(permission);
+        if (!manifestName) continue;
+        manifest += "    <uses-permission android:name=\"android.permission.";
+        manifest += manifestName;
+        manifest += "\" />\n";
+        wrotePermission = true;
+    }
+    if (wrotePermission) manifest += "\n";
+    manifest += "    <application\n";
+    manifest += std::string("        android:allowBackup=\"") + (android.allowBackup ? "true" : "false") + "\"\n";
+    manifest += "        android:icon=\"@mipmap/ic_launcher\"\n";
+    manifest += "        android:label=\"@string/app_name\">\n\n";
+    manifest += "        <meta-data\n";
+    manifest += "            android:name=\"com.google.android.gms.ads.APPLICATION_ID\"\n";
+    manifest += "            android:value=\"ca-app-pub-3940256099942544~3347511713\"/>\n\n";
+    manifest += "        <activity android:name=\".MainActivity\"\n";
+    manifest += "            android:label=\"@string/app_name\"\n";
+    manifest += "            android:configChanges=\"orientation|keyboardHidden|keyboard|screenSize\"\n";
+    manifest += "            android:theme=\"@style/AppTheme\"\n";
+    const std::string orientation = androidOrientationManifestValue(android.orientation);
+    if (!orientation.empty()) {
+        manifest += "            android:screenOrientation=\"" + orientation + "\"\n";
+    }
+    manifest += "            android:exported=\"true\">\n";
+    manifest += "            <meta-data android:name=\"android.app.lib_name\" android:value=\"doriax-android\" />\n";
+    manifest += "            <intent-filter>\n";
+    manifest += "                <action android:name=\"android.intent.action.MAIN\" />\n";
+    manifest += "                <category android:name=\"android.intent.category.LAUNCHER\" />\n";
+    manifest += "            </intent-filter>\n";
+    manifest += "        </activity>\n";
+    manifest += "    </application>\n\n";
+    manifest += "    <uses-feature android:glEsVersion=\"0x00030000\" android:required=\"true\" />\n\n";
+    manifest += "</manifest>";
+    FileUtils::writeIfChanged(manifestPath, manifest);
+
+    std::string strings;
+    strings += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n";
+    strings += "<resources>\n";
+    strings += "    <string name=\"app_name\">" + escapeXmlAttribute(appName) + "</string>\n";
+    strings += "</resources>";
+    FileUtils::writeIfChanged(stringsPath, strings);
+
+    std::string styles;
+    styles += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n";
+    styles += "<resources xmlns:android=\"http://schemas.android.com/apk/res/android\">\n";
+    styles += "    <style name=\"AppTheme\" parent=\"Theme.AppCompat.Light.NoActionBar\">\n";
+    styles += std::string("        <item name=\"android:windowFullscreen\">") + (android.fullscreen ? "true" : "false") + "</item>\n";
+    styles += "    </style>\n";
+    styles += "</resources>";
+    FileUtils::writeIfChanged(stylesPath, styles);
+
+    std::string activity;
+    if (!readText(mainActivityPath, activity)) return false;
+    if (!android.fullscreen) {
+        replaceAll(activity,
+            "\t\t// When true, the app will fit inside any system UI windows.\n"
+            "\t\t// When false, we render behind any system UI windows.\n"
+            "\t\tWindowCompat.setDecorFitsSystemWindows(getWindow(), false);\n"
+            "\t\thideSystemUI();",
+            "\t\t// When true, the app will fit inside any system UI windows.\n"
+            "\t\t// When false, we render behind any system UI windows.\n"
+            "\t\tWindowCompat.setDecorFitsSystemWindows(getWindow(), true);");
+        replaceAll(activity, "\t\thideSystemUI();\n", "");
+    }
+    const std::string superOnCreate = "\t\tsuper.onCreate(savedInstanceState);";
+    if (android.keepScreenOn && activity.find("FLAG_KEEP_SCREEN_ON") == std::string::npos) {
+        replaceAll(activity, superOnCreate, "\t\tgetWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);\n\n" + superOnCreate);
+    }
+    FileUtils::writeIfChanged(mainActivityPath, activity);
+
+    return true;
 }
 
 bool editor::Exporter::writeAppIcon() {

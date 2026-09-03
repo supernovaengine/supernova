@@ -142,6 +142,53 @@ namespace doriax::editor{
         bool flattenPickOnStroke = true;
     };
 
+    struct ExportTargetSettings {
+        std::filesystem::path targetDir;
+        std::vector<ShaderKey> shaderKeys;
+        bool shaderKeysConfigured = false;
+    };
+
+    struct SourceCodeExportSettings : ExportTargetSettings {
+        std::set<ShaderBackend> graphicBackends;
+        bool graphicBackendsConfigured = false;
+    };
+
+    struct DesktopExportSettings : ExportTargetSettings {
+        ShaderBackend graphicBackend = ShaderBackend::GLCore;
+        bool graphicBackendConfigured = false;
+    };
+
+    struct WebExportSettings : ExportTargetSettings {
+        std::string emsdkPath;
+    };
+
+    enum class AndroidOrientation {
+        Unspecified,
+        Portrait,
+        Landscape,
+        SensorPortrait,
+        SensorLandscape,
+        FullSensor
+    };
+
+    struct AndroidProjectSettings {
+        std::string applicationName;
+        std::string packageName = "com.yourcompany.project";
+        unsigned int versionCode = 1;
+        std::string versionName = "1.0";
+        unsigned int minSdk = 21;
+        unsigned int targetSdk = 33;
+        AndroidOrientation orientation = AndroidOrientation::Unspecified;
+        bool abiArmeabiV7a = true;
+        bool abiArm64V8a = true;
+        bool abiX86 = true;
+        bool abiX86_64 = true;
+        std::set<std::string> permissions;
+        bool allowBackup = true;
+        bool fullscreen = true;
+        bool keepScreenOn = false;
+    };
+
     using SharedMoveRecovery = std::map<std::string, SharedMoveRecoveryEntry>;
 
     struct ComponentRecoveryEntry {
@@ -180,6 +227,10 @@ namespace doriax::editor{
         // write it from the UI thread.
         std::atomic<unsigned int> cmakeBuildJobs{0};
         bool packNativeResources;
+        SourceCodeExportSettings sourceCodeExportSettings;
+        DesktopExportSettings desktopExportSettings;
+        WebExportSettings webExportSettings;
+        AndroidProjectSettings androidProjectSettings;
         CommandHistory projectHistory;
 
         uint32_t startSceneId;
@@ -417,6 +468,15 @@ namespace doriax::editor{
         unsigned int getCMakeBuildJobs() const;
         void setPackNativeResources(bool enabled);
         bool shouldPackNativeResources() const;
+
+        SourceCodeExportSettings& getSourceCodeExportSettings();
+        const SourceCodeExportSettings& getSourceCodeExportSettings() const;
+        DesktopExportSettings& getDesktopExportSettings();
+        const DesktopExportSettings& getDesktopExportSettings() const;
+        WebExportSettings& getWebExportSettings();
+        const WebExportSettings& getWebExportSettings() const;
+        AndroidProjectSettings& getAndroidProjectSettings();
+        const AndroidProjectSettings& getAndroidProjectSettings() const;
 
         uint32_t getStartSceneId() const;
         void setStartSceneId(uint32_t sceneId);

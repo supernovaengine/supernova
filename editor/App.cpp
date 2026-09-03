@@ -168,6 +168,7 @@ enum class AppMenuCommand : uint32_t {
     Save,
     SaveAll,
     ExportProject,
+    EditorSettings,
     Exit,
     Undo,
     Redo,
@@ -328,6 +329,7 @@ editor::PlatformMenuModel editor::App::buildMenuModel(){
         menuCommand(AppMenuCommand::SaveAll, "Save All", canSaveAll),
         menuSeparator(),
         menuCommand(AppMenuCommand::ExportProject, "Export Project..."),
+        menuCommand(AppMenuCommand::EditorSettings, "Editor Settings..."),
         menuSeparator(),
         menuCommand(AppMenuCommand::Exit, "Exit")
     }));
@@ -538,6 +540,9 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
             break;
         case AppMenuCommand::ProjectSettings:
             projectSettingsWindow.open(&project);
+            break;
+        case AppMenuCommand::EditorSettings:
+            editorSettingsWindow.open();
             break;
         case AppMenuCommand::ProjectScenes:
             if (!project.isAnyScenePlaying())
@@ -1533,6 +1538,7 @@ void editor::App::show(){
     sceneSaveDialog.show();
     projectSaveDialog.show();
     exportWindow.show();
+    editorSettingsWindow.show();
     projectSettingsWindow.show();
     bundlesWindow.show();
     scenesWindow.show();

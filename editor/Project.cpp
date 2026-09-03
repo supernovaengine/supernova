@@ -2295,6 +2295,38 @@ bool editor::Project::shouldPackNativeResources() const{
     return packNativeResources;
 }
 
+editor::SourceCodeExportSettings& editor::Project::getSourceCodeExportSettings(){
+    return sourceCodeExportSettings;
+}
+
+const editor::SourceCodeExportSettings& editor::Project::getSourceCodeExportSettings() const{
+    return sourceCodeExportSettings;
+}
+
+editor::DesktopExportSettings& editor::Project::getDesktopExportSettings(){
+    return desktopExportSettings;
+}
+
+const editor::DesktopExportSettings& editor::Project::getDesktopExportSettings() const{
+    return desktopExportSettings;
+}
+
+editor::WebExportSettings& editor::Project::getWebExportSettings(){
+    return webExportSettings;
+}
+
+const editor::WebExportSettings& editor::Project::getWebExportSettings() const{
+    return webExportSettings;
+}
+
+editor::AndroidProjectSettings& editor::Project::getAndroidProjectSettings(){
+    return androidProjectSettings;
+}
+
+const editor::AndroidProjectSettings& editor::Project::getAndroidProjectSettings() const{
+    return androidProjectSettings;
+}
+
 uint32_t editor::Project::getStartSceneId() const{
     return startSceneId;
 }
@@ -3457,6 +3489,10 @@ void editor::Project::resetConfigs() {
     cmakeGenerator = "";
     cmakeBuildJobs = defaultCMakeBuildJobs;
     packNativeResources = defaultPackNativeResources;
+    sourceCodeExportSettings = {};
+    desktopExportSettings = {};
+    webExportSettings = {};
+    androidProjectSettings = {};
     selectedScene = NULL_PROJECT_SCENE;
     selectedSceneForProperties = NULL_PROJECT_SCENE;
     nextSceneId = 0;
@@ -3824,6 +3860,9 @@ bool editor::Project::createTempProject(std::string projectName, bool deleteIfEx
             if (!cc.empty() || !cxx.empty() || !gen.empty()) {
                 setCMakeKit(cc, cxx, gen);
             }
+        }
+        if (AppSettings::getEditorCMakeBuildJobs() != 0) {
+            setCMakeBuildJobs(AppSettings::getEditorCMakeBuildJobs());
         }
 
         if (deleteIfExists && fs::exists(projectPath)) {

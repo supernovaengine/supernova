@@ -138,6 +138,7 @@ namespace doriax::editor {
         bool copyLua();
         bool copyCppScripts();
         bool copyEngine();
+        bool writeAndroidProjectSettings();
         bool writeAppIcon();
         bool buildAndSaveShaders();
 

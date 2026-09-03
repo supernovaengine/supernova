@@ -560,6 +560,7 @@ set(DORIAX_EDITOR_SOURCES
     ${EDITOR_DIR}/window/dialog/ShaderForkDialog.cpp
     ${EDITOR_DIR}/window/dialog/TextureSlicerToolDialog.cpp
     ${EDITOR_DIR}/window/dialog/ExportWindow.cpp
+    ${EDITOR_DIR}/window/dialog/EditorSettingsWindow.cpp
     ${EDITOR_DIR}/window/dialog/ProjectSettingsWindow.cpp
     ${EDITOR_DIR}/window/dialog/BundlesWindow.cpp
     ${EDITOR_DIR}/window/dialog/ScenesWindow.cpp

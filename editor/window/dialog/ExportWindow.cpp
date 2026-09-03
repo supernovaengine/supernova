@@ -74,13 +74,15 @@ void ExportWindow::open(Project* project) {
         }
     }
     m_selectedShaderIndex = -1;
+    m_shaderKeysConfigured = false;
     m_addShaderOpen = false;
-    m_emsdkOverride = AppSettings::getEmsdkPath();
+    m_emsdkOverride.clear();
     m_emsdkInfo = EmsdkInfo();
     m_missingBuildTools.clear();
     m_graphicBackendIndex = 0;
+    m_sourceBackendsConfigured = false;
+    m_desktopBackendConfigured = false;
 
-    populateShaderList();
     populateBackendList();
 }
 
@@ -121,6 +123,39 @@ void ExportWindow::populateShaderList() {
     });
 }
 
+void ExportWindow::populateShaderListFromKeys(const std::vector<ShaderKey>& shaderKeys) {
+    m_shaderEntries.clear();
+
+    for (ShaderKey key : shaderKeys) {
+        ShaderKey normalizedKey = ShaderPool::normalizeKey(key);
+
+        ShaderEntry entry;
+        entry.key = normalizedKey;
+        entry.type = ShaderPool::getShaderTypeFromKey(normalizedKey);
+        entry.properties = ShaderPool::getPropertiesFromKey(normalizedKey);
+        uint16_t customId = ShaderPool::getCustomIdFromKey(normalizedKey);
+        entry.displayName = Exporter::getShaderDisplayName(entry.type, entry.properties, customId);
+        m_shaderEntries.push_back(entry);
+    }
+
+    std::sort(m_shaderEntries.begin(), m_shaderEntries.end(), [](const ShaderEntry& a, const ShaderEntry& b) {
+        if (a.type != b.type) return (int)a.type < (int)b.type;
+        return a.properties < b.properties;
+    });
+}
+
+void ExportWindow::loadShaderListFromSettings(const ExportTargetSettings& settings) {
+    // Empty saved list should not hide the useful default shader list. It can
+    // happen when only the export path was saved before shaders were collected.
+    if (settings.shaderKeysConfigured && !settings.shaderKeys.empty()) {
+        m_shaderKeysConfigured = true;
+        populateShaderListFromKeys(settings.shaderKeys);
+    } else {
+        m_shaderKeysConfigured = false;
+        populateShaderList();
+    }
+}
+
 void ExportWindow::populateBackendList() {
     m_backendEntries.clear();
 
@@ -139,6 +174,7 @@ void ExportWindow::refreshEmsdkStatus() {
 
 void ExportWindow::selectMode(ExportMode mode) {
     m_mode = mode;
+    loadSettingsFromProject();
     // Both probes spawn processes, so run them once here rather than per-frame.
     if (mode == ExportMode::Desktop) {
         m_missingBuildTools = Generator::checkBuildTools();
@@ -146,6 +182,103 @@ void ExportWindow::selectMode(ExportMode mode) {
         refreshEmsdkStatus();
     }
     m_step = Step::Settings;
+}
+
+void ExportWindow::loadSettingsFromProject() {
+    if (!m_project) return;
+
+    m_targetDir.clear();
+    m_targetDirBuffer[0] = '\0';
+    m_selectedShaderIndex = -1;
+    m_shaderKeysConfigured = false;
+    m_sourceBackendsConfigured = false;
+    m_desktopBackendConfigured = false;
+
+    if (m_mode == ExportMode::SourceCode) {
+        const SourceCodeExportSettings& settings = m_project->getSourceCodeExportSettings();
+        m_targetDir = settings.targetDir;
+        loadShaderListFromSettings(settings);
+
+        populateBackendList();
+        m_sourceBackendsConfigured = settings.graphicBackendsConfigured;
+        if (settings.graphicBackendsConfigured) {
+            for (auto& entry : m_backendEntries) {
+                entry.selected = settings.graphicBackends.count(entry.backend) > 0;
+            }
+        }
+    } else if (m_mode == ExportMode::Desktop) {
+        const DesktopExportSettings& settings = m_project->getDesktopExportSettings();
+        m_targetDir = settings.targetDir;
+        loadShaderListFromSettings(settings);
+
+        m_graphicBackendIndex = 0;
+        m_desktopBackendConfigured = settings.graphicBackendConfigured;
+        if (settings.graphicBackendConfigured) {
+            for (int i = 0; i < desktopGraphicBackendCount; ++i) {
+                if (desktopGraphicBackends[i] == settings.graphicBackend) {
+                    m_graphicBackendIndex = i;
+                    break;
+                }
+            }
+        }
+    } else if (m_mode == ExportMode::Web) {
+        const WebExportSettings& settings = m_project->getWebExportSettings();
+        m_targetDir = settings.targetDir;
+        m_emsdkOverride = settings.emsdkPath.empty() ? AppSettings::getEmsdkPath() : settings.emsdkPath;
+        loadShaderListFromSettings(settings);
+    }
+
+    if (!m_targetDir.empty()) {
+        std::string targetDirString = m_targetDir.string();
+        strncpy(m_targetDirBuffer, targetDirString.c_str(), sizeof(m_targetDirBuffer) - 1);
+        m_targetDirBuffer[sizeof(m_targetDirBuffer) - 1] = '\0';
+    }
+}
+
+void ExportWindow::saveCurrentSettingsToProject(bool saveProjectFile) {
+    if (!m_project) return;
+
+    std::vector<ShaderKey> shaderKeys;
+    shaderKeys.reserve(m_shaderEntries.size());
+    for (const auto& entry : m_shaderEntries) {
+        shaderKeys.push_back(entry.key);
+    }
+
+    if (m_mode == ExportMode::SourceCode) {
+        SourceCodeExportSettings& settings = m_project->getSourceCodeExportSettings();
+        settings.targetDir = m_targetDir;
+        settings.shaderKeys = shaderKeys;
+        settings.shaderKeysConfigured = m_shaderKeysConfigured;
+        settings.graphicBackends.clear();
+        for (const auto& entry : m_backendEntries) {
+            if (entry.selected) {
+                settings.graphicBackends.insert(entry.backend);
+            }
+        }
+        settings.graphicBackendsConfigured = m_sourceBackendsConfigured;
+    } else if (m_mode == ExportMode::Desktop) {
+        DesktopExportSettings& settings = m_project->getDesktopExportSettings();
+        settings.targetDir = m_targetDir;
+        settings.shaderKeys = shaderKeys;
+        settings.shaderKeysConfigured = m_shaderKeysConfigured;
+
+        const int backendIndex =
+            (m_graphicBackendIndex >= 0 && m_graphicBackendIndex < desktopGraphicBackendCount)
+                ? m_graphicBackendIndex
+                : 0;
+        settings.graphicBackend = desktopGraphicBackends[backendIndex];
+        settings.graphicBackendConfigured = m_desktopBackendConfigured;
+    } else if (m_mode == ExportMode::Web) {
+        WebExportSettings& settings = m_project->getWebExportSettings();
+        settings.targetDir = m_targetDir;
+        settings.emsdkPath = m_emsdkOverride;
+        settings.shaderKeys = shaderKeys;
+        settings.shaderKeysConfigured = m_shaderKeysConfigured;
+    }
+
+    if (saveProjectFile) {
+        m_project->saveProjectFile();
+    }
 }
 
 void ExportWindow::show() {
@@ -310,6 +443,7 @@ void ExportWindow::drawOutputDirRow(const char* label) {
                 m_targetDir = selectedPath;
                 strncpy(m_targetDirBuffer, selectedPath.c_str(), sizeof(m_targetDirBuffer) - 1);
                 m_targetDirBuffer[sizeof(m_targetDirBuffer) - 1] = '\0';
+                saveCurrentSettingsToProject();
             }
         }
     }
@@ -375,6 +509,8 @@ void ExportWindow::drawGraphicBackendRow() {
             const bool selected = (m_graphicBackendIndex == i);
             if (ImGui::Selectable(ShaderPool::getShaderBackendName(desktopGraphicBackends[i]).c_str(), selected)) {
                 m_graphicBackendIndex = i;
+                m_desktopBackendConfigured = true;
+                saveCurrentSettingsToProject();
             }
             if (selected) {
                 ImGui::SetItemDefaultFocus();
@@ -450,7 +586,7 @@ void ExportWindow::drawEmsdkRow() {
             std::string selectedPath = FileDialogs::openFileDialog(homeDirPath, FILE_DIALOG_ALL, true);
             if (!selectedPath.empty()) {
                 m_emsdkOverride = selectedPath;
-                AppSettings::setEmsdkPath(m_emsdkOverride);
+                saveCurrentSettingsToProject();
                 refreshEmsdkStatus();
             }
         }
@@ -459,7 +595,7 @@ void ExportWindow::drawEmsdkRow() {
         ImGui::BeginDisabled(m_emsdkOverride.empty());
         if (ImGui::Button("Auto##emsdk")) {
             m_emsdkOverride.clear();
-            AppSettings::setEmsdkPath(m_emsdkOverride);
+            saveCurrentSettingsToProject();
             refreshEmsdkStatus();
         }
         ImGui::EndDisabled();
@@ -485,6 +621,8 @@ void ExportWindow::drawShaderSection() {
     if (ImGui::Button(deleteLabel)) {
         m_shaderEntries.erase(m_shaderEntries.begin() + m_selectedShaderIndex);
         m_selectedShaderIndex = -1;
+        m_shaderKeysConfigured = true;
+        saveCurrentSettingsToProject();
     }
     ImGui::EndDisabled();
 
@@ -517,7 +655,10 @@ void ExportWindow::drawBackendSection() {
         for (auto& entry : m_backendEntries) {
             ImGui::TableNextColumn();
             std::string checkboxId = "##backend_" + entry.name;
-            ImGui::Checkbox((entry.name + checkboxId).c_str(), &entry.selected);
+            if (ImGui::Checkbox((entry.name + checkboxId).c_str(), &entry.selected)) {
+                m_sourceBackendsConfigured = true;
+                saveCurrentSettingsToProject();
+            }
             ImGui::SetItemTooltip("%s", ShaderPool::getShaderLangStr(entry.backend).c_str());
         }
         ImGui::EndTable();
@@ -754,7 +895,15 @@ void ExportWindow::startConfiguredExport(bool overwriteTarget) {
         exportConfig.selectedShaderKeys.insert(entry.key);
     }
 
+    m_shaderKeysConfigured = true;
+    if (m_mode == ExportMode::SourceCode) {
+        m_sourceBackendsConfigured = true;
+    } else if (m_mode == ExportMode::Desktop) {
+        m_desktopBackendConfigured = true;
+    }
+
     m_step = Step::Progress;
+    saveCurrentSettingsToProject();
     m_exporter.startExport(m_project, exportConfig);
 }
 
@@ -872,6 +1021,8 @@ void ExportWindow::drawAddShaderDialog() {
                 return a.properties < b.properties;
             });
 
+            m_shaderKeysConfigured = true;
+            saveCurrentSettingsToProject();
             m_addShaderOpen = false;
             ImGui::CloseCurrentPopup();
         }

@@ -26,6 +26,77 @@ static const char* windowModeNames[] = { "Windowed", "Maximized", "Fullscreen" }
 static const WindowMode windowModeValues[] = { WindowMode::WINDOWED, WindowMode::MAXIMIZED, WindowMode::FULLSCREEN };
 static const int windowModeCount = sizeof(windowModeValues) / sizeof(windowModeValues[0]);
 
+static const char* androidOrientationNames[] = { "Unspecified", "Portrait", "Landscape", "Sensor Portrait", "Sensor Landscape", "Full Sensor" };
+static const AndroidOrientation androidOrientationValues[] = {
+    AndroidOrientation::Unspecified,
+    AndroidOrientation::Portrait,
+    AndroidOrientation::Landscape,
+    AndroidOrientation::SensorPortrait,
+    AndroidOrientation::SensorLandscape,
+    AndroidOrientation::FullSensor
+};
+static const int androidOrientationCount = sizeof(androidOrientationValues) / sizeof(androidOrientationValues[0]);
+
+struct AndroidPermissionInfo {
+    const char* key;
+    const char* manifestName;
+};
+
+static const AndroidPermissionInfo androidPermissionInfos[] = {
+    { "internet", "INTERNET" },
+    { "access_network_state", "ACCESS_NETWORK_STATE" },
+    { "access_wifi_state", "ACCESS_WIFI_STATE" },
+    { "change_network_state", "CHANGE_NETWORK_STATE" },
+    { "change_wifi_state", "CHANGE_WIFI_STATE" },
+    { "vibrate", "VIBRATE" },
+    { "wake_lock", "WAKE_LOCK" },
+    { "post_notifications", "POST_NOTIFICATIONS" },
+    { "camera", "CAMERA" },
+    { "record_audio", "RECORD_AUDIO" },
+    { "access_coarse_location", "ACCESS_COARSE_LOCATION" },
+    { "access_fine_location", "ACCESS_FINE_LOCATION" },
+    { "access_location_extra_commands", "ACCESS_LOCATION_EXTRA_COMMANDS" },
+    { "access_media_location", "ACCESS_MEDIA_LOCATION" },
+    { "read_external_storage", "READ_EXTERNAL_STORAGE" },
+    { "write_external_storage", "WRITE_EXTERNAL_STORAGE" },
+    { "manage_external_storage", "MANAGE_EXTERNAL_STORAGE" },
+    { "read_media_audio", "READ_MEDIA_AUDIO" },
+    { "read_media_images", "READ_MEDIA_IMAGES" },
+    { "read_media_video", "READ_MEDIA_VIDEO" },
+    { "read_media_visual_user_selected", "READ_MEDIA_VISUAL_USER_SELECTED" },
+    { "bluetooth", "BLUETOOTH" },
+    { "bluetooth_admin", "BLUETOOTH_ADMIN" },
+    { "bluetooth_connect", "BLUETOOTH_CONNECT" },
+    { "bluetooth_scan", "BLUETOOTH_SCAN" },
+    { "nfc", "NFC" },
+    { "transmit_ir", "TRANSMIT_IR" },
+    { "use_biometric", "USE_BIOMETRIC" },
+    { "use_fingerprint", "USE_FINGERPRINT" },
+    { "read_contacts", "READ_CONTACTS" },
+    { "write_contacts", "WRITE_CONTACTS" },
+    { "get_accounts", "GET_ACCOUNTS" },
+    { "read_calendar", "READ_CALENDAR" },
+    { "write_calendar", "WRITE_CALENDAR" },
+    { "read_call_log", "READ_CALL_LOG" },
+    { "write_call_log", "WRITE_CALL_LOG" },
+    { "read_phone_state", "READ_PHONE_STATE" },
+    { "call_phone", "CALL_PHONE" },
+    { "read_sms", "READ_SMS" },
+    { "write_sms", "WRITE_SMS" },
+    { "send_sms", "SEND_SMS" },
+    { "receive_sms", "RECEIVE_SMS" },
+    { "receive_mms", "RECEIVE_MMS" },
+    { "receive_wap_push", "RECEIVE_WAP_PUSH" },
+    { "receive_boot_completed", "RECEIVE_BOOT_COMPLETED" },
+    { "kill_background_processes", "KILL_BACKGROUND_PROCESSES" },
+    { "modify_audio_settings", "MODIFY_AUDIO_SETTINGS" },
+    { "set_wallpaper", "SET_WALLPAPER" },
+    { "set_wallpaper_hints", "SET_WALLPAPER_HINTS" },
+    { "write_settings", "WRITE_SETTINGS" },
+};
+
+static const int androidPermissionCount = sizeof(androidPermissionInfos) / sizeof(androidPermissionInfos[0]);
+
 static constexpr float dialogWidth = 600.0f;
 static constexpr float dialogHeight = 480.0f;
 static constexpr float settingsLabelWidth = 160.0f;
@@ -50,6 +121,13 @@ static int findTextureStrategyIndex(TextureStrategy strategy) {
 static int findWindowModeIndex(WindowMode mode) {
     for (int i = 0; i < windowModeCount; i++) {
         if (windowModeValues[i] == mode) return i;
+    }
+    return 0;
+}
+
+static int findAndroidOrientationIndex(AndroidOrientation orientation) {
+    for (int i = 0; i < androidOrientationCount; i++) {
+        if (androidOrientationValues[i] == orientation) return i;
     }
     return 0;
 }
@@ -461,6 +539,23 @@ void ProjectSettingsWindow::open(Project* project) {
     m_luaDir = project->getLuaDir();
     m_scriptDirs = project->getScriptDirs();
 
+    const AndroidProjectSettings& android = project->getAndroidProjectSettings();
+    snprintf(m_androidApplicationNameBuffer, sizeof(m_androidApplicationNameBuffer), "%s", android.applicationName.c_str());
+    snprintf(m_androidPackageNameBuffer, sizeof(m_androidPackageNameBuffer), "%s", android.packageName.c_str());
+    snprintf(m_androidVersionNameBuffer, sizeof(m_androidVersionNameBuffer), "%s", android.versionName.c_str());
+    m_androidVersionCode = static_cast<int>(android.versionCode);
+    m_androidMinSdk = static_cast<int>(android.minSdk);
+    m_androidTargetSdk = static_cast<int>(android.targetSdk);
+    m_androidOrientationIndex = findAndroidOrientationIndex(android.orientation);
+    m_androidAbiArmeabiV7a = android.abiArmeabiV7a;
+    m_androidAbiArm64V8a = android.abiArm64V8a;
+    m_androidAbiX86 = android.abiX86;
+    m_androidAbiX86_64 = android.abiX86_64;
+    m_androidPermissions = android.permissions;
+    m_androidAllowBackup = android.allowBackup;
+    m_androidFullscreen = android.fullscreen;
+    m_androidKeepScreenOn = android.keepScreenOn;
+
     m_startSceneId = project->getStartSceneId();
     const SceneProject* startScene = project->getScene(m_startSceneId);
     if (!startScene || startScene->filepath.empty()) {
@@ -563,6 +658,11 @@ void ProjectSettingsWindow::drawSettings() {
 
         if (ImGui::BeginTabItem("Build")) {
             drawBuildSettings();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Android")) {
+            drawAndroidSettings();
             ImGui::EndTabItem();
         }
 
@@ -894,6 +994,106 @@ void ProjectSettingsWindow::drawBuildSettings() {
     });
 }
 
+void ProjectSettingsWindow::drawAndroidSettings() {
+    drawSettingsPanel("##AndroidSettingsPanel", [this]() {
+        AndroidProjectSettings defaults;
+
+        beginSettingsRow("App Name", "Android launcher label. Empty means project name.");
+        std::string appNameHint = m_project->getName().empty() ? "Doriax" : m_project->getName();
+        ImGui::SetNextItemWidth(-1);
+        ImGui::InputTextWithHint("##AndroidAppName", appNameHint.c_str(), m_androidApplicationNameBuffer, sizeof(m_androidApplicationNameBuffer));
+
+        if (beginSettingsRow("Package Name", "Android applicationId, for example com.company.game.", strcmp(m_androidPackageNameBuffer, defaults.packageName.c_str()) != 0)) {
+            snprintf(m_androidPackageNameBuffer, sizeof(m_androidPackageNameBuffer), "%s", defaults.packageName.c_str());
+        }
+        ImGui::SetNextItemWidth(-1);
+        ImGui::InputText("##AndroidPackageName", m_androidPackageNameBuffer, sizeof(m_androidPackageNameBuffer));
+
+        drawIntSetting("Version Code", "##AndroidVersionCode", m_androidVersionCode, static_cast<int>(defaults.versionCode), 1,
+            "Integer version used by Android and stores. Increase it for every release.");
+
+        if (beginSettingsRow("Version Name", "Visible version string, for example 1.0.3.", strcmp(m_androidVersionNameBuffer, defaults.versionName.c_str()) != 0)) {
+            snprintf(m_androidVersionNameBuffer, sizeof(m_androidVersionNameBuffer), "%s", defaults.versionName.c_str());
+        }
+        ImGui::SetNextItemWidth(-1);
+        ImGui::InputText("##AndroidVersionName", m_androidVersionNameBuffer, sizeof(m_androidVersionNameBuffer));
+
+        drawIntSetting("Min SDK", "##AndroidMinSdk", m_androidMinSdk, static_cast<int>(defaults.minSdk), 1,
+            "Lowest Android API level the exported project supports.");
+        drawIntSetting("Target SDK", "##AndroidTargetSdk", m_androidTargetSdk, static_cast<int>(defaults.targetSdk), 1,
+            "Android API level the app declares as its target.");
+        m_androidTargetSdk = std::max(m_androidTargetSdk, m_androidMinSdk);
+
+        drawComboSetting("Orientation", "##AndroidOrientation", androidOrientationNames, androidOrientationCount,
+            m_androidOrientationIndex, findAndroidOrientationIndex(defaults.orientation),
+            "Screen orientation requested by the Android activity.");
+
+        if (beginSettingsRow("Architectures", "Native CPU architectures included in the APK.", false)) {
+        }
+        ImGui::Checkbox("armeabi-v7a", &m_androidAbiArmeabiV7a);
+        ImGui::Checkbox("arm64-v8a", &m_androidAbiArm64V8a);
+        ImGui::Checkbox("x86", &m_androidAbiX86);
+        ImGui::Checkbox("x86_64", &m_androidAbiX86_64);
+        if (!m_androidAbiArmeabiV7a && !m_androidAbiArm64V8a && !m_androidAbiX86 && !m_androidAbiX86_64) {
+            ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Select at least one architecture.");
+        }
+
+        beginSettingsRow("Permissions", "Android permissions written to AndroidManifest.xml. Some permissions still require runtime approval in your Android code.");
+        if (ImGui::SmallButton("None##AndroidPermissionsNone")) {
+            m_androidPermissions.clear();
+        }
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Game Defaults##AndroidPermissionsGameDefaults")) {
+            m_androidPermissions.clear();
+            m_androidPermissions.insert("internet");
+            m_androidPermissions.insert("access_network_state");
+            m_androidPermissions.insert("vibrate");
+        }
+
+        ImGui::BeginChild("##AndroidPermissionsList", ImVec2(0, Theme::dpi(170.0f)), ImGuiChildFlags_Borders);
+        for (int i = 0; i < androidPermissionCount; i++) {
+            const AndroidPermissionInfo& permission = androidPermissionInfos[i];
+            bool enabled = m_androidPermissions.count(permission.key) > 0;
+            std::string label = std::string(permission.manifestName) + "##AndroidPermission_" + permission.key;
+            if (ImGui::Checkbox(label.c_str(), &enabled)) {
+                if (enabled) {
+                    m_androidPermissions.insert(permission.key);
+                } else {
+                    m_androidPermissions.erase(permission.key);
+                }
+            }
+        }
+        ImGui::EndChild();
+
+        beginSettingsRow("Application Options", "Android application/activity behavior.");
+
+        if (ImGui::Checkbox("Allow Backup", &m_androidAllowBackup)) {
+        }
+        ImGui::SetItemTooltip("Maps to android:allowBackup.");
+
+        if (ImGui::Checkbox("Keep Screen On", &m_androidKeepScreenOn)) {
+        }
+        ImGui::SetItemTooltip("Adds FLAG_KEEP_SCREEN_ON to the Android activity.");
+
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Restore##AndroidApplicationOptions")) {
+            m_androidAllowBackup = defaults.allowBackup;
+            m_androidKeepScreenOn = defaults.keepScreenOn;
+        }
+
+        beginSettingsRow("Screen Options", "Android screen/window behavior.");
+
+        if (ImGui::Checkbox("Fullscreen", &m_androidFullscreen)) {
+        }
+        ImGui::SetItemTooltip("Uses the fullscreen Android theme and hides system bars in MainActivity.");
+
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Restore##AndroidScreenOptions")) {
+            m_androidFullscreen = defaults.fullscreen;
+        }
+    });
+}
+
 void ProjectSettingsWindow::applySettings() {
     // The edit buffer truncates long names. Only write back when the value
     // changed, since setName also rebuilds libName and the window title.
@@ -920,6 +1120,29 @@ void ProjectSettingsWindow::applySettings() {
     // Moves the referenced files in and rewrites every reference to the new roots
     m_project->changeAssetRoots(m_assetsDir, m_luaDir);
     m_project->setScriptDirs(m_scriptDirs);
+
+    AndroidProjectSettings& android = m_project->getAndroidProjectSettings();
+    android.applicationName = m_androidApplicationNameBuffer;
+    android.packageName = m_androidPackageNameBuffer;
+    if (android.packageName.empty()) {
+        android.packageName = AndroidProjectSettings{}.packageName;
+    }
+    android.versionCode = static_cast<unsigned int>(std::max(1, m_androidVersionCode));
+    android.versionName = m_androidVersionNameBuffer;
+    if (android.versionName.empty()) {
+        android.versionName = AndroidProjectSettings{}.versionName;
+    }
+    android.minSdk = static_cast<unsigned int>(std::max(1, m_androidMinSdk));
+    android.targetSdk = static_cast<unsigned int>(std::max(m_androidMinSdk, m_androidTargetSdk));
+    android.orientation = androidOrientationValues[std::clamp(m_androidOrientationIndex, 0, androidOrientationCount - 1)];
+    android.abiArmeabiV7a = m_androidAbiArmeabiV7a;
+    android.abiArm64V8a = m_androidAbiArm64V8a;
+    android.abiX86 = m_androidAbiX86;
+    android.abiX86_64 = m_androidAbiX86_64;
+    android.permissions = m_androidPermissions;
+    android.allowBackup = m_androidAllowBackup;
+    android.fullscreen = m_androidFullscreen;
+    android.keepScreenOn = m_androidKeepScreenOn;
 
     const SceneProject* startScene = m_project->getScene(m_startSceneId);
     if (startScene && !startScene->filepath.empty()) {
