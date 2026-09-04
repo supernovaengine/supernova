@@ -254,6 +254,30 @@ namespace {
         }
         return nullptr;
     }
+
+    fs::path resolveAndroidProjectFile(editor::Project* project, const fs::path& path) {
+        if (path.empty() || path.is_absolute()) return path;
+        return project->getProjectPath() / path;
+    }
+
+    bool copyAndroidResourceFile(editor::Project* project, const fs::path& sourcePath, const fs::path& targetPath, std::string& error) {
+        if (sourcePath.empty()) return true;
+
+        std::error_code ec;
+        fs::create_directories(targetPath.parent_path(), ec);
+        if (ec) {
+            error = "Failed to create Android resource directory: " + ec.message();
+            return false;
+        }
+
+        fs::path source = resolveAndroidProjectFile(project, sourcePath);
+        fs::copy_file(source, targetPath, fs::copy_options::overwrite_existing, ec);
+        if (ec) {
+            error = "Failed to copy Android icon " + source.string() + ": " + ec.message();
+            return false;
+        }
+        return true;
+    }
 }
 
 editor::Exporter::Exporter() {
@@ -2038,6 +2062,8 @@ bool editor::Exporter::writeAndroidProjectSettings() {
     const fs::path manifestPath = androidAppDir / "src" / "main" / "AndroidManifest.xml";
     const fs::path stringsPath = androidAppDir / "src" / "main" / "res" / "values" / "strings.xml";
     const fs::path stylesPath = androidAppDir / "src" / "main" / "res" / "values" / "styles.xml";
+    const fs::path drawableDir = androidAppDir / "src" / "main" / "res" / "drawable";
+    const fs::path adaptiveIconDir = androidAppDir / "src" / "main" / "res" / "mipmap-anydpi-v26";
     const fs::path mainActivityPath = config.targetDir / "platform" / "android" / "java" / "org" / "doriaxengine" / "doriax" / "MainActivity.java";
 
     const std::string appName = android.applicationName.empty()
@@ -2072,6 +2098,40 @@ bool editor::Exporter::writeAndroidProjectSettings() {
         abiLine);
     FileUtils::writeIfChanged(buildGradlePath, gradle);
 
+    const bool hasLauncherIcon = !android.launcherIcon.empty();
+    const bool hasAdaptiveIcon = !android.adaptiveIconForeground.empty() && !android.adaptiveIconBackground.empty();
+    std::string iconReference = "@mipmap/ic_launcher";
+
+    if (hasLauncherIcon) {
+        std::string copyError;
+        if (!copyAndroidResourceFile(project, android.launcherIcon, drawableDir / "ic_launcher.png", copyError)) {
+            setError(copyError);
+            return false;
+        }
+        iconReference = "@drawable/ic_launcher";
+    }
+
+    if (hasAdaptiveIcon) {
+        std::string copyError;
+        if (!copyAndroidResourceFile(project, android.adaptiveIconForeground, drawableDir / "ic_launcher_foreground.png", copyError)) {
+            setError(copyError);
+            return false;
+        }
+        if (!copyAndroidResourceFile(project, android.adaptiveIconBackground, drawableDir / "ic_launcher_background.png", copyError)) {
+            setError(copyError);
+            return false;
+        }
+
+        std::string adaptiveIcon;
+        adaptiveIcon += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+        adaptiveIcon += "<adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\">\n";
+        adaptiveIcon += "    <background android:drawable=\"@drawable/ic_launcher_background\" />\n";
+        adaptiveIcon += "    <foreground android:drawable=\"@drawable/ic_launcher_foreground\" />\n";
+        adaptiveIcon += "</adaptive-icon>\n";
+        FileUtils::writeIfChanged(adaptiveIconDir / "ic_launcher.xml", adaptiveIcon);
+        iconReference = "@mipmap/ic_launcher";
+    }
+
     std::string manifest;
     manifest += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
     manifest += "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\">\n\n";
@@ -2087,7 +2147,7 @@ bool editor::Exporter::writeAndroidProjectSettings() {
     if (wrotePermission) manifest += "\n";
     manifest += "    <application\n";
     manifest += std::string("        android:allowBackup=\"") + (android.allowBackup ? "true" : "false") + "\"\n";
-    manifest += "        android:icon=\"@mipmap/ic_launcher\"\n";
+    manifest += "        android:icon=\"" + iconReference + "\"\n";
     manifest += "        android:label=\"@string/app_name\">\n\n";
     manifest += "        <meta-data\n";
     manifest += "            android:name=\"com.google.android.gms.ads.APPLICATION_ID\"\n";

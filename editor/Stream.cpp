@@ -1709,6 +1709,15 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         androidNode["packageName"] = android.packageName;
         androidNode["versionCode"] = android.versionCode;
         androidNode["versionName"] = android.versionName;
+        if (!android.launcherIcon.empty()) {
+            androidNode["launcherIcon"] = android.launcherIcon.string();
+        }
+        if (!android.adaptiveIconForeground.empty()) {
+            androidNode["adaptiveIconForeground"] = android.adaptiveIconForeground.string();
+        }
+        if (!android.adaptiveIconBackground.empty()) {
+            androidNode["adaptiveIconBackground"] = android.adaptiveIconBackground.string();
+        }
         androidNode["minSdk"] = android.minSdk;
         androidNode["targetSdk"] = android.targetSdk;
         androidNode["orientation"] = androidOrientationToString(android.orientation);
@@ -1984,6 +1993,9 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         if (androidNode["packageName"]) android.packageName = androidNode["packageName"].as<std::string>();
         if (androidNode["versionCode"]) android.versionCode = std::max(1u, androidNode["versionCode"].as<unsigned int>());
         if (androidNode["versionName"]) android.versionName = androidNode["versionName"].as<std::string>();
+        if (androidNode["launcherIcon"]) android.launcherIcon = androidNode["launcherIcon"].as<std::string>();
+        if (androidNode["adaptiveIconForeground"]) android.adaptiveIconForeground = androidNode["adaptiveIconForeground"].as<std::string>();
+        if (androidNode["adaptiveIconBackground"]) android.adaptiveIconBackground = androidNode["adaptiveIconBackground"].as<std::string>();
         if (androidNode["minSdk"]) android.minSdk = std::max(1u, androidNode["minSdk"].as<unsigned int>());
         if (androidNode["targetSdk"]) android.targetSdk = std::max(android.minSdk, androidNode["targetSdk"].as<unsigned int>());
         if (androidNode["orientation"]) android.orientation = stringToAndroidOrientation(androidNode["orientation"].as<std::string>());

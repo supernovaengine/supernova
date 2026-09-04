@@ -176,6 +176,9 @@ namespace doriax::editor{
         std::string packageName = "com.yourcompany.project";
         unsigned int versionCode = 1;
         std::string versionName = "1.0";
+        std::filesystem::path launcherIcon;
+        std::filesystem::path adaptiveIconForeground;
+        std::filesystem::path adaptiveIconBackground;
         unsigned int minSdk = 21;
         unsigned int targetSdk = 33;
         AndroidOrientation orientation = AndroidOrientation::Unspecified;

@@ -56,6 +56,9 @@ namespace doriax::editor {
         char m_androidApplicationNameBuffer[256] = {0};
         char m_androidPackageNameBuffer[256] = {0};
         char m_androidVersionNameBuffer[64] = {0};
+        fs::path m_androidLauncherIcon;
+        fs::path m_androidAdaptiveIconForeground;
+        fs::path m_androidAdaptiveIconBackground;
         int m_androidVersionCode = 1;
         int m_androidMinSdk = 21;
         int m_androidTargetSdk = 33;
@@ -75,7 +78,6 @@ namespace doriax::editor {
         void drawWindowSettings();
         Texture* findThumbnail(const std::string& path);
         void drawDirectoriesSettings();
-        void drawBuildSettings();
         void drawAndroidSettings();
         void drawCMakeSetting();
         void refreshCMakeStatus();

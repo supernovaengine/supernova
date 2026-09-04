@@ -334,6 +334,48 @@ static void drawScriptDirsSetting(Project* project, std::vector<fs::path>& direc
     }
 }
 
+static void drawImagePathSetting(
+    Project* project,
+    const char* label,
+    const char* tooltip,
+    const char* pathId,
+    const char* browseId,
+    const char* clearId,
+    fs::path& imagePath
+) {
+    beginSettingsRow(label, tooltip);
+
+    const ImGuiStyle& style = ImGui::GetStyle();
+    float browseWidth = ImGui::CalcTextSize("Browse").x + style.FramePadding.x * 2.0f;
+    float clearWidth = ImGui::CalcTextSize("Clear").x + style.FramePadding.x * 2.0f;
+    float pathWidth = std::max(1.0f, ImGui::GetContentRegionAvail().x - browseWidth - clearWidth - style.ItemSpacing.x * 2.0f);
+
+    fs::path displayPath = imagePath.empty() ? fs::path("<None>") : imagePath;
+    Widgets::pathDisplay(pathId, displayPath, Vector2(pathWidth, ImGui::GetFrameHeight()));
+
+    ImGui::SameLine();
+    if (ImGui::Button(browseId)) {
+        std::string defaultPath = project ? project->getProjectPath().string() : std::string();
+        std::string selectedPath = FileDialogs::openFileDialog(defaultPath, FILE_DIALOG_IMAGE, false);
+        if (!selectedPath.empty()) {
+            std::error_code ec;
+            fs::path relPath = project ? fs::relative(fs::path(selectedPath), project->getProjectPath(), ec) : fs::path();
+            if (!project || ec || relPath.empty() || relPath.string().rfind("..", 0) == 0) {
+                imagePath = fs::path(selectedPath);
+            } else {
+                imagePath = relPath;
+            }
+        }
+    }
+
+    ImGui::SameLine();
+    ImGui::BeginDisabled(imagePath.empty());
+    if (ImGui::Button(clearId)) {
+        imagePath.clear();
+    }
+    ImGui::EndDisabled();
+}
+
 static void showDisabledItemTooltip(const std::string& text) {
     if (!ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) return;
 
@@ -543,6 +585,9 @@ void ProjectSettingsWindow::open(Project* project) {
     snprintf(m_androidApplicationNameBuffer, sizeof(m_androidApplicationNameBuffer), "%s", android.applicationName.c_str());
     snprintf(m_androidPackageNameBuffer, sizeof(m_androidPackageNameBuffer), "%s", android.packageName.c_str());
     snprintf(m_androidVersionNameBuffer, sizeof(m_androidVersionNameBuffer), "%s", android.versionName.c_str());
+    m_androidLauncherIcon = android.launcherIcon;
+    m_androidAdaptiveIconForeground = android.adaptiveIconForeground;
+    m_androidAdaptiveIconBackground = android.adaptiveIconBackground;
     m_androidVersionCode = static_cast<int>(android.versionCode);
     m_androidMinSdk = static_cast<int>(android.minSdk);
     m_androidTargetSdk = static_cast<int>(android.targetSdk);
@@ -653,11 +698,6 @@ void ProjectSettingsWindow::drawSettings() {
 
         if (ImGui::BeginTabItem("Directories")) {
             drawDirectoriesSettings();
-            ImGui::EndTabItem();
-        }
-
-        if (ImGui::BeginTabItem("Build")) {
-            drawBuildSettings();
             ImGui::EndTabItem();
         }
 
@@ -839,6 +879,14 @@ void ProjectSettingsWindow::drawWindowSettings() {
 
 void ProjectSettingsWindow::drawDirectoriesSettings() {
     drawSettingsPanel("##DirectoriesSettingsPanel", [this]() {
+        if (beginSettingsRow("Native Resource Pack",
+                "Experimental. Packs exported assets and Lua files into game.pak for Desktop and Android source exports. "
+                "Packed resources are read through Data; direct File handles cannot open them.",
+                m_packNativeResources != Project::defaultPackNativeResources)) {
+            m_packNativeResources = Project::defaultPackNativeResources;
+        }
+        ImGui::Checkbox("##PackNativeResources", &m_packNativeResources);
+
         drawDirectorySetting(
             m_project, "Assets Directory", nullptr, "##AssetsPath", "Browse##assets",
             m_assetsDir, fs::path(Project::defaultAssetsDir)
@@ -933,67 +981,6 @@ void ProjectSettingsWindow::drawCMakeSetting() {
     }
 }
 
-void ProjectSettingsWindow::drawBuildSettings() {
-    drawSettingsPanel("##BuildSettingsPanel", [this]() {
-        drawCMakeSetting();
-
-        // Index 0 is the "Default" kit, nothing forced on CMake
-        if (beginSettingsRow("Compiler", m_cmakeKitIndex != 0)) {
-            m_cmakeKitIndex = 0;
-        }
-
-        if (m_cmakeKitIndex < 0 || m_cmakeKitIndex > static_cast<int>(m_availableKits.size())) {
-            m_cmakeKitIndex = 0;
-        }
-
-        const char* currentLabel = m_cmakeKitIndex == 0
-            ? "Default"
-            : m_availableKits[m_cmakeKitIndex - 1].displayName.c_str();
-
-        ImGui::SetNextItemWidth(-1);
-        if (ImGui::BeginCombo("##CMakeKit", currentLabel)) {
-            bool selected = m_cmakeKitIndex == 0;
-            if (ImGui::Selectable("Default", selected)) m_cmakeKitIndex = 0;
-            if (selected) ImGui::SetItemDefaultFocus();
-
-            for (size_t i = 0; i < m_availableKits.size(); i++) {
-                const auto& kit = m_availableKits[i];
-                if (!kit.available) {
-                    ImGui::BeginDisabled();
-                    ImGui::Selectable((kit.displayName + "  (unavailable)").c_str(), false);
-                    ImGui::EndDisabled();
-                    showDisabledItemTooltip(kit.unavailableReason);
-                    continue;
-                }
-
-                selected = m_cmakeKitIndex == static_cast<int>(i + 1);
-                if (ImGui::Selectable(kit.displayName.c_str(), selected)) {
-                    m_cmakeKitIndex = static_cast<int>(i + 1);
-                }
-                if (selected) ImGui::SetItemDefaultFocus();
-            }
-            ImGui::EndCombo();
-        }
-
-        if (m_cmakeKitIndex > 0) {
-            const auto& kit = m_availableKits[m_cmakeKitIndex - 1];
-            if (!kit.cCompiler.empty() || !kit.cxxCompiler.empty()) {
-                ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
-                ImGui::TextWrapped("C: %s\nCXX: %s", kit.cCompiler.c_str(), kit.cxxCompiler.c_str());
-                ImGui::PopStyleColor();
-            }
-        }
-
-        drawIntSetting("Parallel Jobs", "##CMakeBuildJobs", m_cmakeBuildJobs, (int)Project::defaultCMakeBuildJobs, 0, m_cmakeBuildJobsTooltip.c_str());
-
-        if (beginSettingsRow("Native Resource Pack", m_packNativeResources != Project::defaultPackNativeResources)) {
-            m_packNativeResources = Project::defaultPackNativeResources;
-        }
-        ImGui::Checkbox("##PackNativeResources", &m_packNativeResources);
-        endSettingsRow("Experimental. Packs exported assets and Lua files into resources.pak for Desktop and Android source exports. Packed resources are read into memory, so the File API cannot open them.");
-    });
-}
-
 void ProjectSettingsWindow::drawAndroidSettings() {
     drawSettingsPanel("##AndroidSettingsPanel", [this]() {
         AndroidProjectSettings defaults;
@@ -1017,6 +1004,16 @@ void ProjectSettingsWindow::drawAndroidSettings() {
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##AndroidVersionName", m_androidVersionNameBuffer, sizeof(m_androidVersionNameBuffer));
+
+        beginSettingsRow("Launcher Icons", "Android launcher icon resources. If adaptive foreground and background are set, the export creates an adaptive icon. Otherwise Launcher Icon is used.");
+        ImGui::TextWrapped("PNG recommended. Adaptive icon requires foreground and background images.");
+
+        drawImagePathSetting(m_project, "Launcher Icon", "Fallback launcher icon. Square PNG recommended.", "##AndroidLauncherIconPath",
+            "Browse##androidlaunchericon", "Clear##androidlaunchericon", m_androidLauncherIcon);
+        drawImagePathSetting(m_project, "Adaptive Foreground", "Adaptive icon foreground image.", "##AndroidAdaptiveIconForegroundPath",
+            "Browse##androidadaptiveforeground", "Clear##androidadaptiveforeground", m_androidAdaptiveIconForeground);
+        drawImagePathSetting(m_project, "Adaptive Background", "Adaptive icon background image.", "##AndroidAdaptiveIconBackgroundPath",
+            "Browse##androidadaptivebackground", "Clear##androidadaptivebackground", m_androidAdaptiveIconBackground);
 
         drawIntSetting("Min SDK", "##AndroidMinSdk", m_androidMinSdk, static_cast<int>(defaults.minSdk), 1,
             "Lowest Android API level the exported project supports.");
@@ -1132,6 +1129,9 @@ void ProjectSettingsWindow::applySettings() {
     if (android.versionName.empty()) {
         android.versionName = AndroidProjectSettings{}.versionName;
     }
+    android.launcherIcon = m_androidLauncherIcon;
+    android.adaptiveIconForeground = m_androidAdaptiveIconForeground;
+    android.adaptiveIconBackground = m_androidAdaptiveIconBackground;
     android.minSdk = static_cast<unsigned int>(std::max(1, m_androidMinSdk));
     android.targetSdk = static_cast<unsigned int>(std::max(m_androidMinSdk, m_androidTargetSdk));
     android.orientation = androidOrientationValues[std::clamp(m_androidOrientationIndex, 0, androidOrientationCount - 1)];
