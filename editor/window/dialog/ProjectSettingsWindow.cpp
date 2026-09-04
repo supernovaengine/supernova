@@ -189,6 +189,10 @@ static bool isDottedVersionValid(const std::string& value) {
     return parts == 4 && consumedAll;
 }
 
+static bool hasAndroidAbiSelection(bool armeabiV7a, bool arm64V8a, bool x86, bool x86_64) {
+    return armeabiV7a || arm64V8a || x86 || x86_64;
+}
+
 template <typename DrawContents>
 static void drawSettingsPanel(const char* panelId, DrawContents drawContents) {
     const ImGuiStyle& style = ImGui::GetStyle();
@@ -839,10 +843,17 @@ void ProjectSettingsWindow::drawSettings() {
     float buttonX = style.WindowPadding.x + std::max(0.0f, (footerWidth - buttonsWidth) * 0.5f);
     ImGui::SetCursorPos(ImVec2(buttonX, footerY));
 
+    const bool canSave = hasAndroidAbiSelection(m_androidAbiArmeabiV7a, m_androidAbiArm64V8a, m_androidAbiX86, m_androidAbiX86_64);
+
+    ImGui::BeginDisabled(!canSave);
     if (ImGui::Button("OK", ImVec2(buttonWidth, 0))) {
         applySettings();
         m_isOpen = false;
         ImGui::CloseCurrentPopup();
+    }
+    ImGui::EndDisabled();
+    if (!canSave && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
+        ImGui::SetTooltip("Select at least one Android architecture.");
     }
 
     ImGui::SameLine();
@@ -1314,9 +1325,8 @@ void ProjectSettingsWindow::drawAndroidSettings() {
         ImGui::Checkbox("arm64-v8a", &m_androidAbiArm64V8a);
         ImGui::Checkbox("x86", &m_androidAbiX86);
         ImGui::Checkbox("x86_64", &m_androidAbiX86_64);
-        if (!m_androidAbiArmeabiV7a && !m_androidAbiArm64V8a && !m_androidAbiX86 && !m_androidAbiX86_64) {
+        if (!hasAndroidAbiSelection(m_androidAbiArmeabiV7a, m_androidAbiArm64V8a, m_androidAbiX86, m_androidAbiX86_64)) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Select at least one architecture.");
-            m_androidAbiArm64V8a = true;
         }
 
         beginSettingsRow("Permissions", "Android permissions written to AndroidManifest.xml. Some permissions still require runtime approval in your Android code.");
@@ -1486,9 +1496,6 @@ void ProjectSettingsWindow::applySettings() {
     android.abiArm64V8a = m_androidAbiArm64V8a;
     android.abiX86 = m_androidAbiX86;
     android.abiX86_64 = m_androidAbiX86_64;
-    if (!android.abiArmeabiV7a && !android.abiArm64V8a && !android.abiX86 && !android.abiX86_64) {
-        android.abiArm64V8a = true;
-    }
     android.permissions = m_androidPermissions;
     android.allowBackup = m_androidAllowBackup;
     android.fullscreen = m_androidFullscreen;

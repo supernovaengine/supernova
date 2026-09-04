@@ -2119,9 +2119,6 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
             if (abiNode["x86"].IsDefined()) android.abiX86 = abiNode["x86"].as<bool>();
             if (abiNode["x86_64"].IsDefined()) android.abiX86_64 = abiNode["x86_64"].as<bool>();
         }
-        if (!android.abiArmeabiV7a && !android.abiArm64V8a && !android.abiX86 && !android.abiX86_64) {
-            android.abiArm64V8a = true;
-        }
 
         if (androidNode["permissions"] && androidNode["permissions"].IsSequence()) {
             android.permissions.clear();
