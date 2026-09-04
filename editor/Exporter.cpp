@@ -18,6 +18,7 @@
 #include "stb_image_write.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cstdint>
 #include <cstdlib>
@@ -255,7 +256,7 @@ namespace {
         return nullptr;
     }
 
-    fs::path resolveAndroidProjectFile(editor::Project* project, const fs::path& path) {
+    fs::path resolveProjectFile(editor::Project* project, const fs::path& path) {
         if (path.empty() || path.is_absolute()) return path;
         return project->getProjectPath() / path;
     }
@@ -270,13 +271,87 @@ namespace {
             return false;
         }
 
-        fs::path source = resolveAndroidProjectFile(project, sourcePath);
+        fs::path source = resolveProjectFile(project, sourcePath);
         fs::copy_file(source, targetPath, fs::copy_options::overwrite_existing, ec);
         if (ec) {
             error = "Failed to copy Android icon " + source.string() + ": " + ec.message();
             return false;
         }
         return true;
+    }
+
+    std::string stripDesktopEntryControlChars(const std::string& value) {
+        std::string out;
+        out.reserve(value.size());
+        for (char c : value) {
+            out += (c == '\n' || c == '\r') ? ' ' : c;
+        }
+        return out;
+    }
+
+    void replacePlistStringValue(std::string& plist, const std::string& key, const std::string& value) {
+        const std::string keyTag = "\t<key>" + key + "</key>";
+        size_t keyPos = plist.find(keyTag);
+        if (keyPos == std::string::npos) {
+            const size_t dictEnd = plist.rfind("</dict>");
+            if (dictEnd == std::string::npos) return;
+            plist.insert(dictEnd, "\t<key>" + key + "</key>\n\t<string>" + escapeXmlAttribute(value) + "</string>\n");
+            return;
+        }
+
+        size_t stringStart = plist.find("<string>", keyPos);
+        size_t stringEnd = plist.find("</string>", stringStart);
+        if (stringStart == std::string::npos || stringEnd == std::string::npos) return;
+        stringStart += std::string("<string>").size();
+        plist.replace(stringStart, stringEnd - stringStart, escapeXmlAttribute(value));
+    }
+
+    void replacePlistBoolValue(std::string& plist, const std::string& key, bool value) {
+        const std::string keyTag = "\t<key>" + key + "</key>";
+        const std::string boolTag = value ? "\t<true/>\n" : "\t<false/>\n";
+        size_t keyPos = plist.find(keyTag);
+        if (keyPos == std::string::npos) {
+            const size_t dictEnd = plist.rfind("</dict>");
+            if (dictEnd == std::string::npos) return;
+            plist.insert(dictEnd, keyTag + "\n" + boolTag);
+            return;
+        }
+
+        size_t valueStart = plist.find_first_not_of(" \t\r\n", keyPos + keyTag.size());
+        if (valueStart == std::string::npos) return;
+        if (plist.compare(valueStart, 7, "<true/>") == 0) {
+            plist.replace(valueStart, 7, value ? "<true/>" : "<false/>");
+        } else if (plist.compare(valueStart, 8, "<false/>") == 0) {
+            plist.replace(valueStart, 8, value ? "<true/>" : "<false/>");
+        }
+    }
+
+    std::array<int, 4> parseWindowsVersion(const std::string& value) {
+        std::array<int, 4> parts{1, 0, 0, 0};
+        size_t start = 0;
+        for (int i = 0; i < 4 && start <= value.size(); i++) {
+            size_t dot = value.find('.', start);
+            std::string token = value.substr(start, dot == std::string::npos ? std::string::npos : dot - start);
+            try {
+                parts[i] = std::clamp(std::stoi(token), 0, 65535);
+            } catch (...) {
+                parts[i] = 0;
+            }
+            if (dot == std::string::npos) break;
+            start = dot + 1;
+        }
+        return parts;
+    }
+
+    std::string escapeWindowsRcString(const std::string& value) {
+        std::string out;
+        out.reserve(value.size());
+        for (char c : value) {
+            if (c == '\\' || c == '"') out += '\\';
+            if (c == '\n' || c == '\r') out += ' ';
+            else out += c;
+        }
+        return out;
     }
 }
 
@@ -926,7 +1001,13 @@ bool editor::Exporter::collectDesktopArtifacts() {
         // getWindowSettings() applies the window-title fallback chain AND
         // strips control characters (a newline in a hand-edited title would
         // split the desktop entry and break parsing).
-        std::string displayName = project->getWindowSettings().title;
+        const LinuxProjectSettings& linuxSettings = project->getLinuxProjectSettings();
+        std::string displayName = linuxSettings.applicationName.empty()
+            ? project->getWindowSettings().title
+            : stripDesktopEntryControlChars(linuxSettings.applicationName);
+        std::string categories = linuxSettings.categories.empty()
+            ? LinuxProjectSettings{}.categories
+            : stripDesktopEntryControlChars(linuxSettings.categories);
 
         std::string entry;
         entry += "# Generated by the Doriax editor export.\n";
@@ -935,11 +1016,14 @@ bool editor::Exporter::collectDesktopArtifacts() {
         entry += "[Desktop Entry]\n";
         entry += "Type=Application\n";
         entry += "Name=" + displayName + "\n";
+        if (!linuxSettings.comment.empty()) {
+            entry += "Comment=" + stripDesktopEntryControlChars(linuxSettings.comment) + "\n";
+        }
         entry += "Exec=" + quoteExec((destAbs / exeName).string()) + "\n";
         entry += "Path=" + destAbs.string() + "\n";
         entry += "Icon=" + (destAbs / "icon.png").string() + "\n";
         entry += "Terminal=false\n";
-        entry += "Categories=Game;\n";
+        entry += "Categories=" + categories + "\n";
         entry += "StartupWMClass=" + appName + "\n";
 
         std::ofstream f(config.destinationDir / (appName + ".desktop"), std::ios::binary);
@@ -1231,6 +1315,72 @@ bool editor::Exporter::collectWebArtifacts() {
             setError("Failed to copy " + src.filename().string() + ": " + ec.message());
             return false;
         }
+    }
+
+    const WebProjectSettings& web = project->getWebProjectSettings();
+    const std::string webTitle = web.applicationName.empty()
+        ? (project->getName().empty() ? "Doriax" : project->getName())
+        : web.applicationName;
+    const fs::path htmlPath = config.destinationDir / (appName + ".html");
+
+    std::string html;
+    {
+        std::ifstream ifs(htmlPath, std::ios::binary);
+        if (ifs) {
+            html.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+        }
+    }
+    if (!html.empty()) {
+        if (!web.customHtmlShell.empty()) {
+            fs::path shellPath = resolveProjectFile(project, web.customHtmlShell);
+            std::ifstream shellIfs(shellPath, std::ios::binary);
+            if (!shellIfs) {
+                setError("Failed to read custom web HTML shell: " + shellPath.string());
+                return false;
+            }
+            std::string customHtml((std::istreambuf_iterator<char>(shellIfs)), std::istreambuf_iterator<char>());
+            if (customHtml.find("{{DORIAX_DEFAULT_HTML}}") == std::string::npos) {
+                setError("Custom web HTML shell must contain {{DORIAX_DEFAULT_HTML}} marker");
+                return false;
+            }
+            replaceAll(customHtml, "{{DORIAX_DEFAULT_HTML}}", html);
+            html = customHtml;
+        }
+
+        const size_t titleStart = html.find("<title>");
+        const size_t titleEnd = html.find("</title>", titleStart);
+        if (titleStart != std::string::npos && titleEnd != std::string::npos) {
+            html.replace(titleStart + 7, titleEnd - titleStart - 7, escapeXmlAttribute(webTitle));
+        }
+
+        std::string headInsert;
+        if (!web.favicon.empty()) {
+            fs::path faviconSource = resolveProjectFile(project, web.favicon);
+            fs::copy_file(faviconSource, config.destinationDir / "favicon.png", fs::copy_options::overwrite_existing, ec);
+            if (ec) {
+                setError("Failed to copy web favicon: " + ec.message());
+                return false;
+            }
+            headInsert += "    <link rel=\"icon\" href=\"favicon.png\">\n";
+        }
+        if (!web.headInclude.empty()) {
+            headInsert += web.headInclude;
+            if (!headInsert.empty() && headInsert.back() != '\n') headInsert += '\n';
+        }
+        if (web.resizeCanvasToWindow) {
+            headInsert += "    <style>html, body { margin: 0; width: 100%; height: 100%; overflow: hidden; } canvas { width: 100vw !important; height: 100vh !important; display: block; }</style>\n";
+        }
+        replaceAll(html, "{{DORIAX_TITLE}}", escapeXmlAttribute(webTitle));
+        const bool usedHeadMarker = html.find("{{DORIAX_HEAD_INCLUDE}}") != std::string::npos;
+        replaceAll(html, "{{DORIAX_HEAD_INCLUDE}}", headInsert);
+        if (!headInsert.empty() && !usedHeadMarker) {
+            const size_t headEnd = html.find("</head>");
+            if (headEnd != std::string::npos) {
+                html.insert(headEnd, headInsert);
+            }
+        }
+
+        FileUtils::writeIfChanged(htmlPath, html);
     }
 
     // The .data preload bundle exists only when the project has assets or lua.
@@ -1840,7 +1990,10 @@ bool editor::Exporter::copyEngine() {
     if (!copyDir("renders", true)) return false;
     //if (!copyDir("tools")) return false;
     if (!copyDir("workspaces", true)) return false;
-    if (!writeAndroidProjectSettings()) return false;
+    if (config.mode == ExportMode::SourceCode) {
+        if (!writeAndroidProjectSettings()) return false;
+        if (!writeAppleProjectSettings()) return false;
+    }
 
     // The SDK "shaders" dir holds only stub headers (getBase64Shader returning
     // "") under the exact names buildAndSaveShaders generates into. Copy them
@@ -1905,6 +2058,9 @@ bool editor::Exporter::copyEngine() {
     bool iconGenerated = false;
     if (!project->getWindowIcon().empty()) {
         iconGenerated = writeAppIcon();
+    }
+    if (!writeWindowsResourceFile(iconGenerated)) {
+        return false;
     }
 
     const std::string projectSettingsMarker = "# @DORIAX_PROJECT_SETTINGS@";
@@ -2210,6 +2366,235 @@ bool editor::Exporter::writeAndroidProjectSettings() {
     return true;
 }
 
+bool editor::Exporter::writeAppleProjectSettings() {
+    const fs::path xcodeDir = config.targetDir / "workspaces" / "xcode";
+    const fs::path iosPlistPath = xcodeDir / "ios" / "Info.plist";
+    const fs::path macOSPlistPath = xcodeDir / "macos" / "Info.plist";
+    const fs::path appIconSetDir = xcodeDir / "Assets.xcassets" / "AppIcon.appiconset";
+
+    auto readText = [&](const fs::path& path, std::string& out) -> bool {
+        std::error_code ec;
+        if (!fs::exists(path, ec)) {
+            out.clear();
+            return true;
+        }
+        std::ifstream ifs(path, std::ios::binary);
+        if (!ifs) {
+            setError("Failed to read Apple export file: " + path.string());
+            return false;
+        }
+        out.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+        return true;
+    };
+
+    auto writeAppleIconPng = [&](const fs::path& sourcePath, const fs::path& outputPath, int size) -> bool {
+        if (sourcePath.empty()) return true;
+
+        fs::path source = resolveProjectFile(project, sourcePath);
+        int srcWidth = 0, srcHeight = 0, srcChannels = 0;
+        unsigned char* srcPixels = stbi_load(source.string().c_str(), &srcWidth, &srcHeight, &srcChannels, 4);
+        if (!srcPixels) {
+            setError("Apple icon could not be loaded: " + source.string());
+            return false;
+        }
+
+        std::vector<unsigned char> pixels((size_t)size * size * 4);
+        if (srcWidth == size && srcHeight == size) {
+            memcpy(pixels.data(), srcPixels, pixels.size());
+        } else {
+            stbir_resize_uint8_srgb(srcPixels, srcWidth, srcHeight, 0,
+                                    pixels.data(), size, size, 0, STBIR_RGBA);
+        }
+        stbi_image_free(srcPixels);
+
+        std::error_code ec;
+        fs::create_directories(outputPath.parent_path(), ec);
+        if (ec) {
+            setError("Failed to create Apple icon directory: " + ec.message());
+            return false;
+        }
+        if (!stbi_write_png(outputPath.string().c_str(), size, size, 4, pixels.data(), size * 4)) {
+            setError("Failed to write Apple icon: " + outputPath.string());
+            return false;
+        }
+        return true;
+    };
+
+    const MacOSProjectSettings& macOS = project->getMacOSProjectSettings();
+    std::string macOSPlist;
+    if (!readText(macOSPlistPath, macOSPlist)) {
+        return false;
+    }
+    if (!macOSPlist.empty()) {
+        const std::string appName = macOS.applicationName.empty()
+            ? (project->getName().empty() ? "Doriax" : project->getName())
+            : macOS.applicationName;
+        replacePlistStringValue(macOSPlist, "CFBundleName", appName);
+        replacePlistStringValue(macOSPlist, "CFBundleDisplayName", appName);
+        replacePlistStringValue(macOSPlist, "CFBundleIdentifier", macOS.bundleIdentifier);
+        replacePlistStringValue(macOSPlist, "CFBundleShortVersionString", macOS.versionName);
+        replacePlistStringValue(macOSPlist, "CFBundleVersion", macOS.buildNumber);
+        replacePlistBoolValue(macOSPlist, "NSHighResolutionCapable", macOS.highDpi);
+        FileUtils::writeIfChanged(macOSPlistPath, macOSPlist);
+    }
+
+    const IOSProjectSettings& ios = project->getIOSProjectSettings();
+    std::string iosPlist;
+    if (!readText(iosPlistPath, iosPlist)) {
+        return false;
+    }
+    if (!iosPlist.empty()) {
+        const std::string appName = ios.applicationName.empty()
+            ? (project->getName().empty() ? "Doriax" : project->getName())
+            : ios.applicationName;
+        replacePlistStringValue(iosPlist, "CFBundleName", appName);
+        replacePlistStringValue(iosPlist, "CFBundleDisplayName", appName);
+        replacePlistStringValue(iosPlist, "CFBundleIdentifier", ios.bundleIdentifier);
+        replacePlistStringValue(iosPlist, "CFBundleShortVersionString", ios.versionName);
+        replacePlistStringValue(iosPlist, "CFBundleVersion", ios.buildNumber);
+        replacePlistBoolValue(iosPlist, "UIStatusBarHidden", ios.hideStatusBar);
+        replacePlistBoolValue(iosPlist, "CADisableMinimumFrameDurationOnPhone", ios.supportsHighRefreshRate);
+        FileUtils::writeIfChanged(iosPlistPath, iosPlist);
+    }
+
+    const fs::path iosViewControllerPath = config.targetDir / "platform" / "apple" / "ios" / "ViewController.m";
+    std::string viewController;
+    if (!readText(iosViewControllerPath, viewController)) {
+        return false;
+    }
+    if (!viewController.empty()) {
+        if (viewController.find("prefersHomeIndicatorAutoHidden") == std::string::npos) {
+            const std::string method = std::string("\n- (BOOL)prefersHomeIndicatorAutoHidden\n{\n    return ")
+                + (ios.hideHomeIndicator ? "YES" : "NO") + ";\n}\n";
+            const size_t endPos = viewController.rfind("@end");
+            if (endPos != std::string::npos) {
+                viewController.insert(endPos, method);
+                FileUtils::writeIfChanged(iosViewControllerPath, viewController);
+            }
+        } else {
+            replaceAll(viewController, "return YES;\n}\n\n@end", std::string("return ") + (ios.hideHomeIndicator ? "YES" : "NO") + ";\n}\n\n@end");
+            replaceAll(viewController, "return NO;\n}\n\n@end", std::string("return ") + (ios.hideHomeIndicator ? "YES" : "NO") + ";\n}\n\n@end");
+            FileUtils::writeIfChanged(iosViewControllerPath, viewController);
+        }
+    }
+
+    if (!ios.icon.empty() || !macOS.icon.empty()) {
+        struct AppleIconSlot {
+            const char* filename;
+            const char* idiom;
+            const char* platform;
+            const char* sizeText;
+            const char* scale;
+            int pixelSize;
+            bool ios;
+        };
+        const AppleIconSlot slots[] = {
+            {"AppIcon-iOS-1024.png", "universal", "ios", "1024x1024", nullptr, 1024, true},
+            {"AppIcon-mac-16.png", "mac", nullptr, "16x16", "1x", 16, false},
+            {"AppIcon-mac-16@2x.png", "mac", nullptr, "16x16", "2x", 32, false},
+            {"AppIcon-mac-32.png", "mac", nullptr, "32x32", "1x", 32, false},
+            {"AppIcon-mac-32@2x.png", "mac", nullptr, "32x32", "2x", 64, false},
+            {"AppIcon-mac-128.png", "mac", nullptr, "128x128", "1x", 128, false},
+            {"AppIcon-mac-128@2x.png", "mac", nullptr, "128x128", "2x", 256, false},
+            {"AppIcon-mac-256.png", "mac", nullptr, "256x256", "1x", 256, false},
+            {"AppIcon-mac-256@2x.png", "mac", nullptr, "256x256", "2x", 512, false},
+            {"AppIcon-mac-512.png", "mac", nullptr, "512x512", "1x", 512, false},
+            {"AppIcon-mac-512@2x.png", "mac", nullptr, "512x512", "2x", 1024, false},
+        };
+
+        std::string contents;
+        contents += "{\n";
+        contents += "  \"images\" : [\n";
+        bool first = true;
+        for (const AppleIconSlot& slot : slots) {
+            const fs::path source = slot.ios ? ios.icon : macOS.icon;
+            if (!source.empty() && !writeAppleIconPng(source, appIconSetDir / slot.filename, slot.pixelSize)) {
+                return false;
+            }
+            if (!first) contents += ",\n";
+            first = false;
+            contents += "    {\n";
+            if (!source.empty()) contents += "      \"filename\" : \"" + std::string(slot.filename) + "\",\n";
+            contents += "      \"idiom\" : \"" + std::string(slot.idiom) + "\",\n";
+            if (slot.platform) contents += "      \"platform\" : \"" + std::string(slot.platform) + "\",\n";
+            if (slot.scale) contents += "      \"scale\" : \"" + std::string(slot.scale) + "\",\n";
+            contents += "      \"size\" : \"" + std::string(slot.sizeText) + "\"\n";
+            contents += "    }";
+        }
+        contents += "\n  ],\n";
+        contents += "  \"info\" : {\n";
+        contents += "    \"author\" : \"xcode\",\n";
+        contents += "    \"version\" : 1\n";
+        contents += "  }\n";
+        contents += "}\n";
+        FileUtils::writeIfChanged(appIconSetDir / "Contents.json", contents);
+    }
+
+    return true;
+}
+
+bool editor::Exporter::writeWindowsResourceFile(bool includeIcon) {
+    const WindowsProjectSettings& windows = project->getWindowsProjectSettings();
+    const WindowSettings window = project->getWindowSettings();
+    const std::string productName = windows.productName.empty()
+        ? (project->getName().empty() ? window.title : project->getName())
+        : windows.productName;
+    const std::string companyName = windows.companyName;
+    const std::array<int, 4> fileVersion = parseWindowsVersion(windows.fileVersion);
+    const std::array<int, 4> productVersion = parseWindowsVersion(windows.productVersion);
+
+    const fs::path projectRoot = getExportProjectRoot();
+    std::error_code ec;
+    fs::create_directories(projectRoot, ec);
+    if (ec) {
+        setError("Failed to create Windows resource directory: " + ec.message());
+        return false;
+    }
+
+    std::ofstream f(projectRoot / "app_icon.rc", std::ios::binary);
+    if (!f) {
+        setError("Failed to write app_icon.rc");
+        return false;
+    }
+
+    if (includeIcon) {
+        f << "1 ICON \"app_icon.ico\"\n\n";
+    }
+
+    f << "#include <windows.h>\n\n";
+    f << "1 VERSIONINFO\n";
+    f << "FILEVERSION " << fileVersion[0] << "," << fileVersion[1] << "," << fileVersion[2] << "," << fileVersion[3] << "\n";
+    f << "PRODUCTVERSION " << productVersion[0] << "," << productVersion[1] << "," << productVersion[2] << "," << productVersion[3] << "\n";
+    f << "FILEFLAGSMASK 0x3fL\n";
+    f << "FILEFLAGS 0x0L\n";
+    f << "FILEOS 0x40004L\n";
+    f << "FILETYPE 0x1L\n";
+    f << "FILESUBTYPE 0x0L\n";
+    f << "BEGIN\n";
+    f << "    BLOCK \"StringFileInfo\"\n";
+    f << "    BEGIN\n";
+    f << "        BLOCK \"040904b0\"\n";
+    f << "        BEGIN\n";
+    if (!companyName.empty()) {
+        f << "            VALUE \"CompanyName\", \"" << escapeWindowsRcString(companyName) << "\\0\"\n";
+    }
+    f << "            VALUE \"FileDescription\", \"" << escapeWindowsRcString(productName) << "\\0\"\n";
+    f << "            VALUE \"FileVersion\", \"" << escapeWindowsRcString(windows.fileVersion) << "\\0\"\n";
+    f << "            VALUE \"InternalName\", \"" << escapeWindowsRcString(getAppName()) << "\\0\"\n";
+    f << "            VALUE \"OriginalFilename\", \"" << escapeWindowsRcString(getAppName()) << ".exe\\0\"\n";
+    f << "            VALUE \"ProductName\", \"" << escapeWindowsRcString(productName) << "\\0\"\n";
+    f << "            VALUE \"ProductVersion\", \"" << escapeWindowsRcString(windows.productVersion) << "\\0\"\n";
+    f << "        END\n";
+    f << "    END\n";
+    f << "    BLOCK \"VarFileInfo\"\n";
+    f << "    BEGIN\n";
+    f << "        VALUE \"Translation\", 0x409, 1200\n";
+    f << "    END\n";
+    f << "END\n";
+
+    return true;
+}
+
 bool editor::Exporter::writeAppIcon() {
     fs::path iconPath = project->getWindowIcon();
     if (iconPath.is_relative()) {
@@ -2355,15 +2740,6 @@ bool editor::Exporter::writeAppIcon() {
             return false;
         }
         f.write(ico.data(), (std::streamsize)ico.size());
-    }
-    {
-        // Resource paths are relative to the .rc file, which sits next to the .ico.
-        std::ofstream f(projectRoot / "app_icon.rc", std::ios::binary);
-        if (!f) {
-            Out::warning("Failed to write app_icon.rc, exporting without icon");
-            return false;
-        }
-        f << "1 ICON \"app_icon.ico\"\n";
     }
     {
         std::ofstream f(projectRoot / "app_icon.png", std::ios::binary);

@@ -139,6 +139,8 @@ namespace doriax::editor {
         bool copyCppScripts();
         bool copyEngine();
         bool writeAndroidProjectSettings();
+        bool writeAppleProjectSettings();
+        bool writeWindowsResourceFile(bool includeIcon);
         bool writeAppIcon();
         bool buildAndSaveShaders();
 

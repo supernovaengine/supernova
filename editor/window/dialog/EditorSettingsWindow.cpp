@@ -86,12 +86,13 @@ namespace {
         const char* autoId,
         fs::path displayPath,
         bool canAuto,
+        bool selectDirectory,
         const std::function<void(const std::string&)>& onBrowse,
         const std::function<void()>& onAuto
     ) {
         const ImGuiStyle& style = ImGui::GetStyle();
-        float browseWidth = ImGui::CalcTextSize("Browse").x + style.FramePadding.x * 2.0f;
-        float autoWidth = ImGui::CalcTextSize("Auto").x + style.FramePadding.x * 2.0f;
+        float browseWidth = ImGui::CalcTextSize(browseId).x + style.FramePadding.x * 2.0f;
+        float autoWidth = ImGui::CalcTextSize(autoId).x + style.FramePadding.x * 2.0f;
         float pathWidth = std::max(1.0f, ImGui::GetContentRegionAvail().x - browseWidth - autoWidth - style.ItemSpacing.x * 2.0f);
 
         Widgets::pathDisplay(id, displayPath, Vector2(pathWidth, ImGui::GetFrameHeight()));
@@ -102,7 +103,7 @@ namespace {
             if (!displayPath.empty() && displayPath.string().rfind("<", 0) != 0) {
                 startDir = displayPath.parent_path().string();
             }
-            std::string selectedPath = FileDialogs::openFileDialog(startDir, FILE_DIALOG_ALL, false);
+            std::string selectedPath = FileDialogs::openFileDialog(startDir, FILE_DIALOG_ALL, selectDirectory);
             if (!selectedPath.empty()) {
                 onBrowse(selectedPath);
             }
@@ -144,6 +145,8 @@ void EditorSettingsWindow::open() {
     }
 
     m_emsdkOverride = AppSettings::getEmsdkPath();
+    m_editorVSyncEnabled = AppSettings::getEditorVSyncEnabled();
+    m_defaultExportDirectory = AppSettings::getDefaultExportDirectory();
     refreshEmsdkStatus();
 }
 
@@ -199,7 +202,12 @@ void EditorSettingsWindow::drawSettings() {
     );
 
     if (ImGui::BeginTabBar("##EditorSettingsTabs", ImGuiTabBarFlags_FittingPolicyShrink)) {
-        if (ImGui::BeginTabItem("CMake")) {
+        if (ImGui::BeginTabItem("General")) {
+            drawGeneralSettings();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Desktop")) {
             drawCMakeSettings();
             ImGui::EndTabItem();
         }
@@ -236,6 +244,36 @@ void EditorSettingsWindow::drawSettings() {
     }
 }
 
+void EditorSettingsWindow::drawGeneralSettings() {
+    drawSettingsPanel("##EditorGeneralSettingsPanel", [this]() {
+        if (beginSettingsRow("Default Export Directory",
+                             "Used by Export Project when the current project has no saved export directory.",
+                             !m_defaultExportDirectory.empty())) {
+            m_defaultExportDirectory.clear();
+        }
+        fs::path exportDisplay = m_defaultExportDirectory.empty()
+            ? fs::path("<Not set>")
+            : m_defaultExportDirectory;
+        drawPathPicker(
+            "##EditorDefaultExportDirectory", "Browse##editor_default_export_dir", "Clear##editor_default_export_dir",
+            exportDisplay, !m_defaultExportDirectory.empty(), true,
+            [this](const std::string& selectedPath) {
+                m_defaultExportDirectory = selectedPath;
+            },
+            [this]() {
+                m_defaultExportDirectory.clear();
+            }
+        );
+
+        if (beginSettingsRow("Editor VSync",
+                             "VSync for the editor UI. Play mode and exported builds use the project VSync setting.",
+                             m_editorVSyncEnabled != true)) {
+            m_editorVSyncEnabled = true;
+        }
+        ImGui::Checkbox("##EditorVSync", &m_editorVSyncEnabled);
+    });
+}
+
 void EditorSettingsWindow::drawCMakeSettings() {
     drawSettingsPanel("##EditorCMakeSettingsPanel", [this]() {
         beginSettingsRow("CMake", "Path to cmake executable. Empty means auto-detect from PATH.", !m_cmakeOverride.empty());
@@ -244,7 +282,7 @@ void EditorSettingsWindow::drawCMakeSettings() {
             : fs::path(m_cmakeOverride);
         drawPathPicker(
             "##EditorCMakePath", "Browse##editor_cmake", "Auto##editor_cmake",
-            cmakeDisplay, !m_cmakeOverride.empty(),
+            cmakeDisplay, !m_cmakeOverride.empty(), false,
             [this](const std::string& selectedPath) {
                 const std::string resolved = Generator::resolveCMakePath(selectedPath);
                 const std::string version = resolved.empty() ? std::string() : Generator::probeCMakeVersion(resolved);
@@ -338,7 +376,7 @@ void EditorSettingsWindow::drawWebSettings() {
             : fs::path(m_emsdkOverride);
         drawPathPicker(
             "##EditorEmsdkPath", "Browse##editor_emsdk", "Auto##editor_emsdk",
-            emsdkDisplay, !m_emsdkOverride.empty(),
+            emsdkDisplay, !m_emsdkOverride.empty(), true,
             [this](const std::string& selectedPath) {
                 m_emsdkOverride = selectedPath;
                 refreshEmsdkStatus();
@@ -363,6 +401,8 @@ void EditorSettingsWindow::drawWebSettings() {
 }
 
 void EditorSettingsWindow::applySettings() {
+    AppSettings::setEditorVSyncEnabled(m_editorVSyncEnabled);
+    AppSettings::setDefaultExportDirectory(m_defaultExportDirectory);
     AppSettings::setCMakePath(m_cmakeOverride);
     if (m_cmakeKitIndex > 0) {
         const auto& kit = m_availableKits[m_cmakeKitIndex - 1];

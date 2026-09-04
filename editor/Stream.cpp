@@ -1701,6 +1701,67 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
     }
 
     {
+        const WebProjectSettings& web = project->getWebProjectSettings();
+        const WebProjectSettings defaultWeb;
+        YAML::Node webNode;
+        if (!web.applicationName.empty()) webNode["applicationName"] = web.applicationName;
+        if (!web.favicon.empty()) webNode["favicon"] = web.favicon.generic_string();
+        if (!web.customHtmlShell.empty()) webNode["customHtmlShell"] = web.customHtmlShell.generic_string();
+        if (!web.headInclude.empty()) webNode["headInclude"] = web.headInclude;
+        if (web.resizeCanvasToWindow != defaultWeb.resizeCanvasToWindow) webNode["resizeCanvasToWindow"] = web.resizeCanvasToWindow;
+        if (webNode.IsDefined()) root["web"] = webNode;
+    }
+
+    {
+        const LinuxProjectSettings& linuxSettings = project->getLinuxProjectSettings();
+        const LinuxProjectSettings defaultLinux;
+        YAML::Node linuxNode;
+        if (!linuxSettings.applicationName.empty()) linuxNode["applicationName"] = linuxSettings.applicationName;
+        if (!linuxSettings.comment.empty()) linuxNode["comment"] = linuxSettings.comment;
+        if (linuxSettings.categories != defaultLinux.categories) linuxNode["categories"] = linuxSettings.categories;
+        if (linuxNode.IsDefined()) root["linux"] = linuxNode;
+    }
+
+    {
+        const WindowsProjectSettings& windows = project->getWindowsProjectSettings();
+        const WindowsProjectSettings defaultWindows;
+        YAML::Node windowsNode;
+        if (!windows.productName.empty()) windowsNode["productName"] = windows.productName;
+        if (!windows.companyName.empty()) windowsNode["companyName"] = windows.companyName;
+        if (windows.fileVersion != defaultWindows.fileVersion) windowsNode["fileVersion"] = windows.fileVersion;
+        if (windows.productVersion != defaultWindows.productVersion) windowsNode["productVersion"] = windows.productVersion;
+        if (windowsNode.IsDefined()) root["windows"] = windowsNode;
+    }
+
+    {
+        const MacOSProjectSettings& macOS = project->getMacOSProjectSettings();
+        const MacOSProjectSettings defaultMacOS;
+        YAML::Node macOSNode;
+        if (!macOS.applicationName.empty()) macOSNode["applicationName"] = macOS.applicationName;
+        if (macOS.bundleIdentifier != defaultMacOS.bundleIdentifier) macOSNode["bundleIdentifier"] = macOS.bundleIdentifier;
+        if (macOS.versionName != defaultMacOS.versionName) macOSNode["versionName"] = macOS.versionName;
+        if (macOS.buildNumber != defaultMacOS.buildNumber) macOSNode["buildNumber"] = macOS.buildNumber;
+        if (!macOS.icon.empty()) macOSNode["icon"] = macOS.icon.generic_string();
+        if (macOS.highDpi != defaultMacOS.highDpi) macOSNode["highDpi"] = macOS.highDpi;
+        if (macOSNode.IsDefined()) root["macos"] = macOSNode;
+    }
+
+    {
+        const IOSProjectSettings& ios = project->getIOSProjectSettings();
+        const IOSProjectSettings defaultIOS;
+        YAML::Node iosNode;
+        if (!ios.applicationName.empty()) iosNode["applicationName"] = ios.applicationName;
+        if (ios.bundleIdentifier != defaultIOS.bundleIdentifier) iosNode["bundleIdentifier"] = ios.bundleIdentifier;
+        if (ios.versionName != defaultIOS.versionName) iosNode["versionName"] = ios.versionName;
+        if (ios.buildNumber != defaultIOS.buildNumber) iosNode["buildNumber"] = ios.buildNumber;
+        if (!ios.icon.empty()) iosNode["icon"] = ios.icon.generic_string();
+        if (ios.hideStatusBar != defaultIOS.hideStatusBar) iosNode["hideStatusBar"] = ios.hideStatusBar;
+        if (ios.hideHomeIndicator != defaultIOS.hideHomeIndicator) iosNode["hideHomeIndicator"] = ios.hideHomeIndicator;
+        if (ios.supportsHighRefreshRate != defaultIOS.supportsHighRefreshRate) iosNode["supportsHighRefreshRate"] = ios.supportsHighRefreshRate;
+        if (iosNode.IsDefined()) root["ios"] = iosNode;
+    }
+
+    {
         const AndroidProjectSettings& android = project->getAndroidProjectSettings();
         YAML::Node androidNode;
         if (!android.applicationName.empty()) {
@@ -1985,6 +2046,57 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         }
     }
 
+    if (node["web"] && node["web"].IsMap()) {
+        const YAML::Node& webNode = node["web"];
+        WebProjectSettings& web = project->getWebProjectSettings();
+        if (webNode["applicationName"]) web.applicationName = webNode["applicationName"].as<std::string>();
+        if (webNode["favicon"]) web.favicon = webNode["favicon"].as<std::string>();
+        if (webNode["customHtmlShell"]) web.customHtmlShell = webNode["customHtmlShell"].as<std::string>();
+        if (webNode["headInclude"]) web.headInclude = webNode["headInclude"].as<std::string>();
+        if (webNode["resizeCanvasToWindow"].IsDefined()) web.resizeCanvasToWindow = webNode["resizeCanvasToWindow"].as<bool>();
+    }
+
+    if (node["linux"] && node["linux"].IsMap()) {
+        const YAML::Node& linuxNode = node["linux"];
+        LinuxProjectSettings& linuxSettings = project->getLinuxProjectSettings();
+        if (linuxNode["applicationName"]) linuxSettings.applicationName = linuxNode["applicationName"].as<std::string>();
+        if (linuxNode["comment"]) linuxSettings.comment = linuxNode["comment"].as<std::string>();
+        if (linuxNode["categories"]) linuxSettings.categories = linuxNode["categories"].as<std::string>();
+    }
+
+    if (node["windows"] && node["windows"].IsMap()) {
+        const YAML::Node& windowsNode = node["windows"];
+        WindowsProjectSettings& windows = project->getWindowsProjectSettings();
+        if (windowsNode["productName"]) windows.productName = windowsNode["productName"].as<std::string>();
+        if (windowsNode["companyName"]) windows.companyName = windowsNode["companyName"].as<std::string>();
+        if (windowsNode["fileVersion"]) windows.fileVersion = windowsNode["fileVersion"].as<std::string>();
+        if (windowsNode["productVersion"]) windows.productVersion = windowsNode["productVersion"].as<std::string>();
+    }
+
+    if (node["macos"] && node["macos"].IsMap()) {
+        const YAML::Node& macOSNode = node["macos"];
+        MacOSProjectSettings& macOS = project->getMacOSProjectSettings();
+        if (macOSNode["applicationName"]) macOS.applicationName = macOSNode["applicationName"].as<std::string>();
+        if (macOSNode["bundleIdentifier"]) macOS.bundleIdentifier = macOSNode["bundleIdentifier"].as<std::string>();
+        if (macOSNode["versionName"]) macOS.versionName = macOSNode["versionName"].as<std::string>();
+        if (macOSNode["buildNumber"]) macOS.buildNumber = macOSNode["buildNumber"].as<std::string>();
+        if (macOSNode["icon"]) macOS.icon = macOSNode["icon"].as<std::string>();
+        if (macOSNode["highDpi"].IsDefined()) macOS.highDpi = macOSNode["highDpi"].as<bool>();
+    }
+
+    if (node["ios"] && node["ios"].IsMap()) {
+        const YAML::Node& iosNode = node["ios"];
+        IOSProjectSettings& ios = project->getIOSProjectSettings();
+        if (iosNode["applicationName"]) ios.applicationName = iosNode["applicationName"].as<std::string>();
+        if (iosNode["bundleIdentifier"]) ios.bundleIdentifier = iosNode["bundleIdentifier"].as<std::string>();
+        if (iosNode["versionName"]) ios.versionName = iosNode["versionName"].as<std::string>();
+        if (iosNode["buildNumber"]) ios.buildNumber = iosNode["buildNumber"].as<std::string>();
+        if (iosNode["icon"]) ios.icon = iosNode["icon"].as<std::string>();
+        if (iosNode["hideStatusBar"].IsDefined()) ios.hideStatusBar = iosNode["hideStatusBar"].as<bool>();
+        if (iosNode["hideHomeIndicator"].IsDefined()) ios.hideHomeIndicator = iosNode["hideHomeIndicator"].as<bool>();
+        if (iosNode["supportsHighRefreshRate"].IsDefined()) ios.supportsHighRefreshRate = iosNode["supportsHighRefreshRate"].as<bool>();
+    }
+
     if (node["android"] && node["android"].IsMap()) {
         const YAML::Node& androidNode = node["android"];
         AndroidProjectSettings& android = project->getAndroidProjectSettings();
@@ -2006,6 +2118,9 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
             if (abiNode["arm64-v8a"].IsDefined()) android.abiArm64V8a = abiNode["arm64-v8a"].as<bool>();
             if (abiNode["x86"].IsDefined()) android.abiX86 = abiNode["x86"].as<bool>();
             if (abiNode["x86_64"].IsDefined()) android.abiX86_64 = abiNode["x86_64"].as<bool>();
+        }
+        if (!android.abiArmeabiV7a && !android.abiArm64V8a && !android.abiX86 && !android.abiX86_64) {
+            android.abiArm64V8a = true;
         }
 
         if (androidNode["permissions"] && androidNode["permissions"].IsSequence()) {

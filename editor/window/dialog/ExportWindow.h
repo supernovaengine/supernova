@@ -33,6 +33,7 @@ namespace doriax::editor {
         // UI state
         char m_targetDirBuffer[512] = "";
         fs::path m_targetDir;
+        bool m_targetDirFromDefault = false;
 
         // Start scene
         uint32_t m_startSceneId = NULL_PROJECT_SCENE;

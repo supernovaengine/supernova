@@ -162,6 +162,47 @@ namespace doriax::editor{
         std::string emsdkPath;
     };
 
+    struct WebProjectSettings {
+        std::string applicationName;
+        std::filesystem::path favicon;
+        std::filesystem::path customHtmlShell;
+        std::string headInclude;
+        bool resizeCanvasToWindow = true;
+    };
+
+    struct LinuxProjectSettings {
+        std::string applicationName;
+        std::string comment;
+        std::string categories = "Game;";
+    };
+
+    struct WindowsProjectSettings {
+        std::string productName;
+        std::string companyName;
+        std::string fileVersion = "1.0.0.0";
+        std::string productVersion = "1.0.0.0";
+    };
+
+    struct MacOSProjectSettings {
+        std::string applicationName;
+        std::string bundleIdentifier = "DoriaxEngine.Doriax";
+        std::string versionName = "1.0";
+        std::string buildNumber = "1";
+        std::filesystem::path icon;
+        bool highDpi = true;
+    };
+
+    struct IOSProjectSettings {
+        std::string applicationName;
+        std::string bundleIdentifier = "DoriaxEngine.Doriax";
+        std::string versionName = "1.0";
+        std::string buildNumber = "1";
+        std::filesystem::path icon;
+        bool hideStatusBar = true;
+        bool hideHomeIndicator = true;
+        bool supportsHighRefreshRate = true;
+    };
+
     enum class AndroidOrientation {
         Unspecified,
         Portrait,
@@ -233,6 +274,11 @@ namespace doriax::editor{
         SourceCodeExportSettings sourceCodeExportSettings;
         DesktopExportSettings desktopExportSettings;
         WebExportSettings webExportSettings;
+        WebProjectSettings webProjectSettings;
+        LinuxProjectSettings linuxProjectSettings;
+        WindowsProjectSettings windowsProjectSettings;
+        MacOSProjectSettings macOSProjectSettings;
+        IOSProjectSettings iosProjectSettings;
         AndroidProjectSettings androidProjectSettings;
         CommandHistory projectHistory;
 
@@ -478,6 +524,16 @@ namespace doriax::editor{
         const DesktopExportSettings& getDesktopExportSettings() const;
         WebExportSettings& getWebExportSettings();
         const WebExportSettings& getWebExportSettings() const;
+        WebProjectSettings& getWebProjectSettings();
+        const WebProjectSettings& getWebProjectSettings() const;
+        LinuxProjectSettings& getLinuxProjectSettings();
+        const LinuxProjectSettings& getLinuxProjectSettings() const;
+        WindowsProjectSettings& getWindowsProjectSettings();
+        const WindowsProjectSettings& getWindowsProjectSettings() const;
+        MacOSProjectSettings& getMacOSProjectSettings();
+        const MacOSProjectSettings& getMacOSProjectSettings() const;
+        IOSProjectSettings& getIOSProjectSettings();
+        const IOSProjectSettings& getIOSProjectSettings() const;
         AndroidProjectSettings& getAndroidProjectSettings();
         const AndroidProjectSettings& getAndroidProjectSettings() const;
 

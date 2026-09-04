@@ -61,6 +61,7 @@ void ExportWindow::open(Project* project) {
     m_step = Step::ModeSelect;
     m_project = project;
     m_targetDir.clear();
+    m_targetDirFromDefault = false;
     m_targetDirBuffer[0] = '\0';
     m_startSceneId = project->getStartSceneId();
     const SceneProject* startScene = project->getScene(m_startSceneId);
@@ -188,6 +189,7 @@ void ExportWindow::loadSettingsFromProject() {
     if (!m_project) return;
 
     m_targetDir.clear();
+    m_targetDirFromDefault = false;
     m_targetDirBuffer[0] = '\0';
     m_selectedShaderIndex = -1;
     m_shaderKeysConfigured = false;
@@ -228,6 +230,11 @@ void ExportWindow::loadSettingsFromProject() {
         loadShaderListFromSettings(settings);
     }
 
+    if (m_targetDir.empty()) {
+        m_targetDir = AppSettings::getDefaultExportDirectory();
+        m_targetDirFromDefault = !m_targetDir.empty();
+    }
+
     if (!m_targetDir.empty()) {
         std::string targetDirString = m_targetDir.string();
         strncpy(m_targetDirBuffer, targetDirString.c_str(), sizeof(m_targetDirBuffer) - 1);
@@ -246,7 +253,9 @@ void ExportWindow::saveCurrentSettingsToProject(bool saveProjectFile) {
 
     if (m_mode == ExportMode::SourceCode) {
         SourceCodeExportSettings& settings = m_project->getSourceCodeExportSettings();
-        settings.targetDir = m_targetDir;
+        if (!m_targetDirFromDefault) {
+            settings.targetDir = m_targetDir;
+        }
         settings.shaderKeys = shaderKeys;
         settings.shaderKeysConfigured = m_shaderKeysConfigured;
         settings.graphicBackends.clear();
@@ -258,7 +267,9 @@ void ExportWindow::saveCurrentSettingsToProject(bool saveProjectFile) {
         settings.graphicBackendsConfigured = m_sourceBackendsConfigured;
     } else if (m_mode == ExportMode::Desktop) {
         DesktopExportSettings& settings = m_project->getDesktopExportSettings();
-        settings.targetDir = m_targetDir;
+        if (!m_targetDirFromDefault) {
+            settings.targetDir = m_targetDir;
+        }
         settings.shaderKeys = shaderKeys;
         settings.shaderKeysConfigured = m_shaderKeysConfigured;
 
@@ -270,7 +281,9 @@ void ExportWindow::saveCurrentSettingsToProject(bool saveProjectFile) {
         settings.graphicBackendConfigured = m_desktopBackendConfigured;
     } else if (m_mode == ExportMode::Web) {
         WebExportSettings& settings = m_project->getWebExportSettings();
-        settings.targetDir = m_targetDir;
+        if (!m_targetDirFromDefault) {
+            settings.targetDir = m_targetDir;
+        }
         settings.emsdkPath = m_emsdkOverride;
         settings.shaderKeys = shaderKeys;
         settings.shaderKeysConfigured = m_shaderKeysConfigured;
@@ -441,6 +454,7 @@ void ExportWindow::drawOutputDirRow(const char* label) {
             std::string selectedPath = FileDialogs::openFileDialog(homeDirPath, FILE_DIALOG_ALL, true);
             if (!selectedPath.empty()) {
                 m_targetDir = selectedPath;
+                m_targetDirFromDefault = false;
                 strncpy(m_targetDirBuffer, selectedPath.c_str(), sizeof(m_targetDirBuffer) - 1);
                 m_targetDirBuffer[sizeof(m_targetDirBuffer) - 1] = '\0';
                 saveCurrentSettingsToProject();

@@ -933,7 +933,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
     # Embed the exported icon into the Windows executable (Explorer, taskbar
     # and window icon). Other platforms set the window icon at runtime instead.
-    if(WIN32 AND DORIAX_WINDOW_ICON AND EXISTS "${PROJECT_ROOT}/app_icon.rc")
+    if(WIN32 AND EXISTS "${PROJECT_ROOT}/app_icon.rc")
         list(APPEND PLATFORM_SOURCE ${PROJECT_ROOT}/app_icon.rc)
     endif()
 

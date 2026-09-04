@@ -2319,6 +2319,46 @@ const editor::WebExportSettings& editor::Project::getWebExportSettings() const{
     return webExportSettings;
 }
 
+editor::WebProjectSettings& editor::Project::getWebProjectSettings(){
+    return webProjectSettings;
+}
+
+const editor::WebProjectSettings& editor::Project::getWebProjectSettings() const{
+    return webProjectSettings;
+}
+
+editor::LinuxProjectSettings& editor::Project::getLinuxProjectSettings(){
+    return linuxProjectSettings;
+}
+
+const editor::LinuxProjectSettings& editor::Project::getLinuxProjectSettings() const{
+    return linuxProjectSettings;
+}
+
+editor::WindowsProjectSettings& editor::Project::getWindowsProjectSettings(){
+    return windowsProjectSettings;
+}
+
+const editor::WindowsProjectSettings& editor::Project::getWindowsProjectSettings() const{
+    return windowsProjectSettings;
+}
+
+editor::MacOSProjectSettings& editor::Project::getMacOSProjectSettings(){
+    return macOSProjectSettings;
+}
+
+const editor::MacOSProjectSettings& editor::Project::getMacOSProjectSettings() const{
+    return macOSProjectSettings;
+}
+
+editor::IOSProjectSettings& editor::Project::getIOSProjectSettings(){
+    return iosProjectSettings;
+}
+
+const editor::IOSProjectSettings& editor::Project::getIOSProjectSettings() const{
+    return iosProjectSettings;
+}
+
 editor::AndroidProjectSettings& editor::Project::getAndroidProjectSettings(){
     return androidProjectSettings;
 }
@@ -3492,6 +3532,11 @@ void editor::Project::resetConfigs() {
     sourceCodeExportSettings = {};
     desktopExportSettings = {};
     webExportSettings = {};
+    webProjectSettings = {};
+    linuxProjectSettings = {};
+    windowsProjectSettings = {};
+    macOSProjectSettings = {};
+    iosProjectSettings = {};
     androidProjectSettings = {};
     selectedScene = NULL_PROJECT_SCENE;
     selectedSceneForProperties = NULL_PROJECT_SCENE;

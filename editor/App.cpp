@@ -180,7 +180,6 @@ enum class AppMenuCommand : uint32_t {
     ToggleTerrain,
     ToggleAiChat,
     ToggleDetachableWindows,
-    ToggleEditorVSync,
     ResetLayout,
     ProjectSettings,
     ProjectScenes,
@@ -357,8 +356,6 @@ editor::PlatformMenuModel editor::App::buildMenuModel(){
         menuSeparator(),
         menuToggle(AppMenuCommand::ToggleDetachableWindows, "Detachable Windows",
                    AppSettings::getMultiViewportEnabled()),
-        menuToggle(AppMenuCommand::ToggleEditorVSync, "Editor VSync",
-                   AppSettings::getEditorVSyncEnabled()),
         menuSeparator(),
         menuCommand(AppMenuCommand::ResetLayout, "Reset Layout")
     }));
@@ -524,10 +521,6 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
 #endif
             break;
         }
-        case AppMenuCommand::ToggleEditorVSync:
-            AppSettings::setEditorVSyncEnabled(!AppSettings::getEditorVSyncEnabled());
-            AppSettings::saveSettings();
-            break;
         case AppMenuCommand::ResetLayout:
             structureWindow->setOpen(true);
             propertiesWindow->setOpen(true);

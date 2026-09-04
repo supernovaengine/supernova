@@ -84,6 +84,7 @@ std::string AppSettings::lastCMakeGenerator;
 std::string AppSettings::emsdkPath;
 std::string AppSettings::cmakePath;
 unsigned int AppSettings::editorCMakeBuildJobs = 0;
+std::filesystem::path AppSettings::defaultExportDirectory;
 int AppSettings::windowWidth = 1280;
 int AppSettings::windowHeight = 720;
 bool AppSettings::isMaximized = false;
@@ -177,6 +178,10 @@ bool AppSettings::loadSettings() {
         }
         if (settingsData["cmake"] && settingsData["cmake"]["build_jobs"]) {
             editorCMakeBuildJobs = settingsData["cmake"]["build_jobs"].as<unsigned int>();
+        }
+
+        if (settingsData["export"] && settingsData["export"]["default_dir"]) {
+            defaultExportDirectory = settingsData["export"]["default_dir"].as<std::string>();
         }
 
         // Load recent projects
@@ -344,6 +349,14 @@ bool AppSettings::saveSettings() {
         } else {
             settingsData.remove("cmake");
         }
+
+        if (!defaultExportDirectory.empty()) {
+            YAML::Node exportNode;
+            exportNode["default_dir"] = defaultExportDirectory.string();
+            settingsData["export"] = exportNode;
+        } else {
+            settingsData.remove("export");
+        }
         
         // Window settings
         YAML::Node windowNode;
@@ -474,6 +487,15 @@ unsigned int AppSettings::getEditorCMakeBuildJobs() {
 
 void AppSettings::setEditorCMakeBuildJobs(unsigned int jobs) {
     editorCMakeBuildJobs = jobs;
+    saveSettings();
+}
+
+std::filesystem::path AppSettings::getDefaultExportDirectory() {
+    return defaultExportDirectory;
+}
+
+void AppSettings::setDefaultExportDirectory(const std::filesystem::path& path) {
+    defaultExportDirectory = path;
     saveSettings();
 }
 

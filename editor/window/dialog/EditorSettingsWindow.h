@@ -7,6 +7,7 @@
 #include "Generator.h"
 #include "imgui.h"
 
+#include <filesystem>
 #include <string>
 #include <vector>
 
@@ -26,10 +27,13 @@ namespace doriax::editor {
 
         std::string m_emsdkOverride;
         EmsdkInfo m_emsdkInfo;
+        bool m_editorVSyncEnabled = true;
+        std::filesystem::path m_defaultExportDirectory;
 
         void refreshCMakeStatus();
         void refreshEmsdkStatus();
         void drawSettings();
+        void drawGeneralSettings();
         void drawCMakeSettings();
         void drawWebSettings();
         void applySettings();
