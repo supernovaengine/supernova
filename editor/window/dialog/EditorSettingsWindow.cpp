@@ -80,6 +80,10 @@ namespace {
         ImGui::EndTooltip();
     }
 
+    float buttonVisibleWidth(const char* label) {
+        return ImGui::CalcTextSize(label, nullptr, true).x + ImGui::GetStyle().FramePadding.x * 2.0f;
+    }
+
     void drawPathPicker(
         const char* id,
         const char* browseId,
@@ -91,8 +95,8 @@ namespace {
         const std::function<void()>& onAuto
     ) {
         const ImGuiStyle& style = ImGui::GetStyle();
-        float browseWidth = ImGui::CalcTextSize(browseId).x + style.FramePadding.x * 2.0f;
-        float autoWidth = ImGui::CalcTextSize(autoId).x + style.FramePadding.x * 2.0f;
+        float browseWidth = buttonVisibleWidth(browseId);
+        float autoWidth = buttonVisibleWidth(autoId);
         float pathWidth = std::max(1.0f, ImGui::GetContentRegionAvail().x - browseWidth - autoWidth - style.ItemSpacing.x * 2.0f);
 
         Widgets::pathDisplay(id, displayPath, Vector2(pathWidth, ImGui::GetFrameHeight()));
