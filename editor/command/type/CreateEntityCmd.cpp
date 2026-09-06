@@ -670,8 +670,10 @@ bool editor::CreateEntityCmd::execute(){
         sceneProject->entities.push_back(child.entity);
     }
 
-    lastSelected = project->getSelectedEntities(sceneId);
-    project->setSelectedEntity(sceneId, entity);
+    if (!quiet){
+        lastSelected = project->getSelectedEntities(sceneId);
+        project->setSelectedEntity(sceneId, entity);
+    }
 
     sceneProject->isModified = true;
 
@@ -682,11 +684,13 @@ bool editor::CreateEntityCmd::execute(){
         }
     }
 
-    if (ImGui::GetCurrentContext()){
-        ImGui::SetWindowFocus(("###Scene" + std::to_string(sceneId)).c_str());
-    }
+    if (!quiet){
+        if (ImGui::GetCurrentContext()){
+            ImGui::SetWindowFocus(("###Scene" + std::to_string(sceneId)).c_str());
+        }
 
-    editor::Out::info("Created entity '%s' at scene '%s'", entityName.c_str(), sceneProject->name.c_str());
+        editor::Out::info("Created entity '%s' at scene '%s'", entityName.c_str(), sceneProject->name.c_str());
+    }
 
     return true;
 }
@@ -725,4 +729,8 @@ bool editor::CreateEntityCmd::mergeWith(editor::Command* otherCommand){
 
 Entity editor::CreateEntityCmd::getEntity(){
     return entity;
+}
+
+void editor::CreateEntityCmd::setQuiet(bool quiet){
+    this->quiet = quiet;
 }

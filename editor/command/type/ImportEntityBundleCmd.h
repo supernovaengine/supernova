@@ -5,6 +5,8 @@
 
 #include "command/Command.h"
 #include "Project.h"
+#include "math/Vector3.h"
+#include "math/Quaternion.h"
 #include <cstdint>
 #include <filesystem>
 #include <vector>
@@ -28,6 +30,12 @@ namespace doriax::editor{
         bool wasModified;
         bool addedToParentBundle;
 
+        bool quiet = false;
+        bool hasPlacement = false;
+        Vector3 placementPosition;
+        Quaternion placementRotation;
+        Vector3 placementScale = Vector3(1.0f, 1.0f, 1.0f);
+
     public:
         ImportEntityBundleCmd(Project* project, uint32_t sceneId, const fs::path& filepath, Entity parent = NULL_ENTITY, bool needSaveScene = true);
 
@@ -37,6 +45,12 @@ namespace doriax::editor{
         bool mergeWith(Command* otherCommand) override;
 
         std::vector<Entity> getImportedEntities() const;
+
+        // Terrain object placement: the imported root is transformed on every execute
+        // (so redo lands in the same spot) and stays quiet, because a brush stroke
+        // drops many of these in a row.
+        void setPlacement(const Vector3& position, const Quaternion& rotation, const Vector3& scale);
+        void setQuiet(bool quiet);
     };
 
 }

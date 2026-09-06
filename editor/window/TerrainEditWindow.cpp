@@ -7,10 +7,14 @@
 #include "Catalog.h"
 #include "Out.h"
 #include "command/CommandHandle.h"
+#include "command/type/DeleteEntityCmd.h"
+#include "command/type/ImportEntityBundleCmd.h"
+#include "command/type/ModelLoadCmd.h"
 #include "command/type/PropertyCmd.h"
 #include "command/type/TerrainMapPatchCmd.h"
 #include "external/IconsFontAwesome6.h"
 #include "subsystem/MeshSystem.h"
+#include "util/Angle.h"
 #include "util/FileDialogs.h"
 #include "util/TerrainMapFileWriter.h"
 #include "util/TerrainMapUtils.h"
@@ -1007,6 +1011,12 @@ editor::TerrainEditWindow::TerrainEditWindow(Project* project){
     normalizeBlendPaint = true;
     heightMapStartAtMiddle = true;
     flattenPickOnStroke = true;
+    placeSpacing = 2.0f;
+    placeMinScale = 1.0f;
+    placeMaxScale = 1.0f;
+    placeRotationJitter = 1.0f;
+    placeAlignToNormal = 0.0f;
+    placementRandom.seed(std::random_device{}());
 }
 
 editor::TerrainEditWindow::~TerrainEditWindow(){
@@ -1019,6 +1029,65 @@ editor::TerrainEditWindow::~TerrainEditWindow(){
                    TerrainMapFileWriter::get().failedCount());
     }
 }
+
+// One undo step per placement stroke. Each stamp adds its own create/delete command
+// and merges into the stroke's previous one, so a drag that drops thirty rocks undoes
+// as a single action; the stroke id keeps separate strokes from collapsing together.
+class editor::TerrainEditWindow::TerrainObjectStrokeCmd: public editor::Command{
+private:
+    uint64_t strokeId;
+    std::vector<Command*> commands;
+    size_t executedCount = 0;
+
+public:
+    TerrainObjectStrokeCmd(uint64_t strokeId, Command* command): strokeId(strokeId){
+        commands.push_back(command);
+    }
+
+    ~TerrainObjectStrokeCmd() override{
+        for (Command* command : commands){
+            delete command;
+        }
+    }
+
+    bool execute() override{
+        bool applied = false;
+        while (executedCount < commands.size()){
+            Command* command = commands[executedCount];
+            if (!command->execute()){
+                // Drop a placement that could not be applied instead of leaving undo to
+                // run against something that was never created.
+                delete command;
+                commands.erase(commands.begin() + executedCount);
+                continue;
+            }
+            executedCount++;
+            applied = true;
+        }
+        return applied;
+    }
+
+    void undo() override{
+        for (size_t i = executedCount; i > 0; i--){
+            commands[i - 1]->undo();
+        }
+        executedCount = 0;
+    }
+
+    bool mergeWith(Command* otherCommand) override{
+        TerrainObjectStrokeCmd* otherCmd = dynamic_cast<TerrainObjectStrokeCmd*>(otherCommand);
+        if (!otherCmd || otherCmd->strokeId != strokeId){
+            return false;
+        }
+        // The history deletes the older command right after a merge, so its placements
+        // are moved out rather than copied.
+        commands.insert(commands.begin(), otherCmd->commands.begin(), otherCmd->commands.end());
+        executedCount = commands.size();
+        otherCmd->commands.clear();
+        otherCmd->executedCount = 0;
+        return true;
+    }
+};
 
 SceneProject* editor::TerrainEditWindow::findSceneProject(Scene* scene) const{
     if (!project || !scene){
@@ -1107,6 +1176,15 @@ bool editor::TerrainEditWindow::isDensityBrush() const{
     return brushMode == TerrainBrushMode::PaintDensity || brushMode == TerrainBrushMode::EraseDensity;
 }
 
+bool editor::TerrainEditWindow::isPlacementBrush() const{
+    return brushMode == TerrainBrushMode::PlaceObject || brushMode == TerrainBrushMode::EraseObject;
+}
+
+// Erasing only needs objects to be there; placing needs something to place.
+bool editor::TerrainEditWindow::isPlacementReady() const{
+    return brushMode == TerrainBrushMode::EraseObject || !placeAssetPath.empty();
+}
+
 // Height and density share the single-channel storage and stamping path.
 bool editor::TerrainEditWindow::isScalarTarget(TerrainMapTarget target){
     return target != TerrainMapTarget::BlendMap;
@@ -1163,6 +1241,8 @@ static constexpr float BRUSH_BLEND_FLOW_PER_SECOND = 10.0f;
 static constexpr float BRUSH_CLICK_SECONDS = 1.0f / 60.0f;
 // Longest interval a single event may deposit, so hitches don't cause spikes.
 static constexpr float BRUSH_MAX_STAMP_SECONDS = 0.05f;
+// Objects any closer than this would stack on top of each other.
+static constexpr float MIN_PLACE_SPACING = 0.05f;
 
 bool editor::TerrainEditWindow::applyBrush(SceneProject* sceneProject, Entity entity, const Vector3& localPoint){
     if (!sceneProject || !stroke.active || !sceneProject->scene->findComponent<TerrainComponent>(entity)){
@@ -1450,6 +1530,151 @@ bool editor::TerrainEditWindow::addStrokePatchCommand(SceneProject* sceneProject
     return true;
 }
 
+// Objects placed on a terrain are its direct children, which is also what makes the
+// erase brush and the spacing test able to find them again.
+std::vector<Vector2> editor::TerrainEditWindow::collectPlacedPoints(SceneProject* sceneProject, Entity terrainEntity) const{
+    std::vector<Vector2> points;
+    Scene* scene = sceneProject->scene;
+    for (Entity entity : sceneProject->entities){
+        if (entity == terrainEntity){
+            continue;
+        }
+        Transform* transform = scene->findComponent<Transform>(entity);
+        if (!transform || transform->parent != terrainEntity){
+            continue;
+        }
+        points.push_back(Vector2(transform->position.x, transform->position.z));
+    }
+    return points;
+}
+
+editor::Command* editor::TerrainEditWindow::makePlacementCommand(SceneProject* sceneProject, Entity terrainEntity, const Vector3& localPosition, const Quaternion& rotation, const Vector3& scale){
+    if (placeAssetPath.empty()){
+        return nullptr;
+    }
+
+    // Bundle paths are stored relative to the project, asset paths relative to the
+    // assets directory — the same forms their own import paths expect.
+    if (Util::isBundleFile(placeAssetPath)){
+        ImportEntityBundleCmd* command = new ImportEntityBundleCmd(project, sceneProject->id, fs::path(placeAssetPath), terrainEntity, true);
+        command->setQuiet(true);
+        command->setPlacement(localPosition, rotation, scale);
+        return command;
+    }
+
+    if (!Util::isModelFile(placeAssetPath)){
+        return nullptr;
+    }
+
+    std::string name = fs::path(placeAssetPath).stem().string();
+    if (name.empty()){
+        name = "Object";
+    }
+    return new ModelLoadCmd(project, sceneProject->id, name, terrainEntity, localPosition, rotation, scale, placeAssetPath);
+}
+
+void editor::TerrainEditWindow::addStrokeObjectCommand(SceneProject* sceneProject, Command* command){
+    CommandHandle::get(sceneProject->id)->addCommand(new TerrainObjectStrokeCmd(stroke.placementStrokeId, command));
+}
+
+bool editor::TerrainEditWindow::applyPlacement(SceneProject* sceneProject, Entity entity, const Vector3& localPoint){
+    Scene* scene = sceneProject->scene;
+    TerrainComponent& terrain = scene->getComponent<TerrainComponent>(entity);
+    const float halfSize = std::max(terrain.terrainSize, std::numeric_limits<float>::epsilon()) * 0.5f;
+
+    std::uniform_real_distribution<float> unit(0.0f, 1.0f);
+
+    // One attempt per event: a click drops a single object near the cursor, a drag lays
+    // a trail, and the brush size is how far each one can scatter from the ray hit.
+    float offsetX = 0.0f;
+    float offsetZ = 0.0f;
+    if (brushShape == TerrainBrushShape::Circle){
+        const float angle = unit(placementRandom) * 6.28318530718f;
+        const float radius = brushSize * std::sqrt(unit(placementRandom));
+        offsetX = std::cos(angle) * radius;
+        offsetZ = std::sin(angle) * radius;
+    }else{
+        offsetX = (unit(placementRandom) * 2.0f - 1.0f) * brushSize;
+        offsetZ = (unit(placementRandom) * 2.0f - 1.0f) * brushSize;
+    }
+
+    const float localX = std::clamp(localPoint.x + offsetX, -halfSize, halfSize);
+    const float localZ = std::clamp(localPoint.z + offsetZ, -halfSize, halfSize);
+
+    const float spacing = std::max(placeSpacing, MIN_PLACE_SPACING);
+    const float spacingSquared = spacing * spacing;
+    for (const Vector2& point : stroke.placedPoints){
+        const float dx = point.x - localX;
+        const float dz = point.y - localZ;
+        if ((dx * dx + dz * dz) < spacingSquared){
+            return false;
+        }
+    }
+
+    float height = 0.0f;
+    Vector3 normal(0.0f, 1.0f, 0.0f);
+    scene->getSystem<MeshSystem>()->sampleTerrainSurface(terrain, localX, localZ, height, normal);
+
+    // Same jitter the foliage scatter uses, so painted grass and placed props sit on the
+    // surface the same way.
+    const float scaleRange = std::max(0.0f, placeMaxScale - placeMinScale);
+    const Vector3 scale = Vector3(placeMinScale + unit(placementRandom) * scaleRange);
+    Quaternion rotation(unit(placementRandom) * Angle::degToDefault(360.0f) * placeRotationJitter, Vector3(0.0f, 1.0f, 0.0f));
+
+    if (placeAlignToNormal > 0.0f){
+        const float slope = Angle::radToDefault(std::acos(std::clamp(normal.y, -1.0f, 1.0f)));
+        const Vector3 axis = Vector3(0.0f, 1.0f, 0.0f).crossProduct(normal);
+        if (axis.length() > std::numeric_limits<float>::epsilon()){
+            const Quaternion tilt(slope, axis.normalized());
+            rotation = Quaternion::slerp(placeAlignToNormal, Quaternion(), tilt) * rotation;
+        }
+    }
+
+    Command* command = makePlacementCommand(sceneProject, entity, Vector3(localX, height, localZ), rotation, scale);
+    if (!command){
+        return false;
+    }
+
+    addStrokeObjectCommand(sceneProject, command);
+    stroke.placedPoints.push_back(Vector2(localX, localZ));
+    return true;
+}
+
+bool editor::TerrainEditWindow::applyObjectErase(SceneProject* sceneProject, Entity entity, const Vector3& localPoint){
+    Scene* scene = sceneProject->scene;
+    const float radiusSquared = brushSize * brushSize;
+
+    std::vector<Entity> targets;
+    for (Entity candidate : sceneProject->entities){
+        if (candidate == entity){
+            continue;
+        }
+        Transform* transform = scene->findComponent<Transform>(candidate);
+        if (!transform || transform->parent != entity){
+            continue;
+        }
+        const float dx = transform->position.x - localPoint.x;
+        const float dz = transform->position.z - localPoint.z;
+        if (brushShape == TerrainBrushShape::Circle){
+            if ((dx * dx + dz * dz) > radiusSquared){
+                continue;
+            }
+        }else if (std::abs(dx) > brushSize || std::abs(dz) > brushSize){
+            continue;
+        }
+        targets.push_back(candidate);
+    }
+
+    if (targets.empty()){
+        return false;
+    }
+
+    addStrokeObjectCommand(sceneProject, new DeleteEntityCmd(project, sceneProject->id, targets));
+    // What is left is what the spacing test should see for the rest of the stroke.
+    stroke.placedPoints = collectPlacedPoints(sceneProject, entity);
+    return true;
+}
+
 void editor::TerrainEditWindow::clearStroke(){
     stroke = ActiveStroke();
 }
@@ -1630,14 +1855,13 @@ void editor::TerrainEditWindow::drawMapSettings(const TerrainMapRef& ref, const 
     ImGui::PopID();
 }
 
-void editor::TerrainEditWindow::drawFoliageMesh(const TerrainFoliageLayer& layer){
-    terrainPropertyRow("Mesh", "Choose a model or drag one from Resources.");
-    ImGui::BeginGroup();
-    const float available = std::max(1.0f, ImGui::GetContentRegionAvail().x);
-    const float thumbSize = std::min(ImGui::GetFrameHeight() * 3.0f, available);
+// Shared by the foliage layer and the object placement palette. Returns the size it
+// drew at, which is what decides whether the details fit beside it.
+float editor::TerrainEditWindow::drawAssetThumbnail(const std::string& path, const char* id){
+    const float thumbSize = std::min(ImGui::GetFrameHeight() * 3.0f, std::max(1.0f, ImGui::GetContentRegionAvail().x));
     int width = 0;
     int height = 0;
-    ImTextureID thumbnail = Backend::getApp().getResourcesWindow()->getAssetThumbnail(layer.meshPath, width, height);
+    ImTextureID thumbnail = Backend::getApp().getResourcesWindow()->getAssetThumbnail(path, width, height);
     const ImVec2 p = ImGui::GetCursorScreenPos();
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     const float rounding = ImGui::GetStyle().FrameRounding;
@@ -1650,14 +1874,22 @@ void editor::TerrainEditWindow::drawFoliageMesh(const TerrainFoliageLayer& layer
         const ImVec2 size = ImGui::CalcTextSize(ICON_FA_CUBE);
         drawList->AddText(ImVec2(p.x + (thumbSize - size.x) * 0.5f, p.y + (thumbSize - size.y) * 0.5f), ImGui::GetColorU32(ImGuiCol_TextDisabled), ICON_FA_CUBE);
     }
-    ImGui::InvisibleButton("##foliage_preview", ImVec2(thumbSize, thumbSize));
+    ImGui::InvisibleButton(id, ImVec2(thumbSize, thumbSize));
     if (ImGui::IsItemHovered() && thumbnail){
         ImGui::BeginTooltip();
         const float scale = std::min(1.0f, ImGui::GetFontSize() * 18.0f / std::max(width, height));
         Widgets::image(thumbnail, ImVec2(width * scale, height * scale));
-        ImGui::TextUnformatted(layer.meshPath.c_str());
+        ImGui::TextUnformatted(path.c_str());
         ImGui::EndTooltip();
     }
+    return thumbSize;
+}
+
+void editor::TerrainEditWindow::drawFoliageMesh(const TerrainFoliageLayer& layer){
+    terrainPropertyRow("Mesh", "Choose a model or drag one from Resources.");
+    ImGui::BeginGroup();
+    const float available = std::max(1.0f, ImGui::GetContentRegionAvail().x);
+    const float thumbSize = drawAssetThumbnail(layer.meshPath, "##foliage_preview");
     if (available > thumbSize + ImGui::GetFrameHeight() * 4.0f){
         ImGui::SameLine();
     }
@@ -1704,6 +1936,75 @@ void editor::TerrainEditWindow::drawFoliageMesh(const TerrainFoliageLayer& layer
             const std::vector<std::string> dropped = Util::getStringsFromPayload(payload);
             if (!dropped.empty() && Util::isModelFile(dropped[0])){
                 assignMesh(dropped[0]);
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+}
+
+void editor::TerrainEditWindow::drawPlacementAsset(){
+    terrainPropertyRow("Asset", "Model or entity bundle the placement brush drops. Drag one from Resources.");
+    ImGui::BeginGroup();
+    const float available = std::max(1.0f, ImGui::GetContentRegionAvail().x);
+    const float thumbSize = drawAssetThumbnail(placeAssetPath, "##place_preview");
+    if (available > thumbSize + ImGui::GetFrameHeight() * 4.0f){
+        ImGui::SameLine();
+    }
+    ImGui::BeginGroup();
+    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x);
+    if (placeAssetPath.empty()){
+        ImGui::TextDisabled("No asset selected");
+    }else{
+        ImGui::TextUnformatted(fs::path(placeAssetPath).filename().string().c_str());
+        showTooltip(placeAssetPath.c_str());
+    }
+    ImGui::PopTextWrapPos();
+
+    // Bundles are stored relative to the project and models relative to the assets
+    // directory, matching what each one's import path expects.
+    auto assignAsset = [&](const fs::path& path){
+        endStroke();
+        if (path.empty()){
+            placeAssetPath.clear();
+            return;
+        }
+        if (Util::isBundleFile(path.string())){
+            std::error_code ec;
+            const fs::path relative = fs::relative(path, project->getProjectPath(), ec);
+            if (ec || relative.empty() || *relative.begin() == ".."){
+                Backend::getApp().registerOutsideAssetsAlert(path.string());
+                return;
+            }
+            placeAssetPath = relative.generic_string();
+            return;
+        }
+        if (!project->isInsideAssetsPath(path)){
+            Backend::getApp().registerOutsideAssetsAlert(path.string());
+            return;
+        }
+        placeAssetPath = project->normalizeToAssetsRelative(path).generic_string();
+    };
+
+    const ImVec2 buttonSize(ImGui::GetFrameHeight(), ImGui::GetFrameHeight());
+    if (iconButton(ICON_FA_FOLDER_OPEN, "browse_place_asset", "Choose model or bundle", false, buttonSize)){
+        const std::string path = FileDialogs::openFileDialog(project->getAssetsPath().string(), FILE_DIALOG_MODEL | FILE_DIALOG_BUNDLE);
+        if (!path.empty()){
+            assignAsset(path);
+        }
+    }
+    ImGui::SameLine();
+    ImGui::BeginDisabled(placeAssetPath.empty());
+    if (iconButton(ICON_FA_XMARK, "clear_place_asset", "Clear placement asset", false, buttonSize)){
+        assignAsset({});
+    }
+    ImGui::EndDisabled();
+    ImGui::EndGroup();
+    ImGui::EndGroup();
+    if (ImGui::BeginDragDropTarget()){
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("resource_files")){
+            const std::vector<std::string> dropped = Util::getStringsFromPayload(payload);
+            if (!dropped.empty() && (Util::isModelFile(dropped[0]) || Util::isBundleFile(dropped[0]))){
+                assignAsset(dropped[0]);
             }
         }
         ImGui::EndDragDropTarget();
@@ -1909,8 +2210,40 @@ void editor::TerrainEditWindow::show(){
         ImGui::EndTable();
     }
 
-    Texture* brushTexture = TerrainMapUtils::findTexture(terrain, getBrushMapRef());
-    const bool brushTargetAvailable = brushTexture && !brushTexture->empty();
+    if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen) && beginTerrainProperties("object_properties")){
+        drawPlacementAsset();
+        terrainPropertyRow("Place", "Placed props are ordinary entities parented to the terrain: they show in the outliner and can be transformed one by one.");
+        ImGui::BeginDisabled(placeAssetPath.empty());
+        brushButton(TerrainBrushMode::PlaceObject, ICON_FA_TREE, "terrain_place_object", "Place objects along the drag (Ctrl erases)");
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+        brushButton(TerrainBrushMode::EraseObject, ICON_FA_ERASER, "terrain_erase_object", "Erase the terrain's child objects under the brush (Ctrl places)");
+
+        terrainPropertyRow("Spacing", "Closest two placed objects are allowed to get, in world units.");
+        if (ImGui::DragFloat("##place_spacing", &placeSpacing, 0.05f, MIN_PLACE_SPACING, 100.0f, "%.2f")){
+            placeSpacing = std::clamp(placeSpacing, MIN_PLACE_SPACING, 100.0f);
+        }
+        terrainPropertyRow("Scale range", "Random scale per object. Left at 1, a model keeps the scale its file authored.");
+        if (ImGui::DragFloatRange2("##place_scale", &placeMinScale, &placeMaxScale, 0.01f, 0.01f, 20.0f, "%.2f", "%.2f")){
+            placeMinScale = std::max(0.01f, placeMinScale);
+            placeMaxScale = std::max(placeMinScale, placeMaxScale);
+        }
+        terrainPropertyRow("Rotation", "Random yaw as a share of a full turn.");
+        float placeRotation = placeRotationJitter * 100.0f;
+        if (ImGui::SliderFloat("##place_rotation", &placeRotation, 0.0f, 100.0f, "%.0f%%", ImGuiSliderFlags_AlwaysClamp)){
+            placeRotationJitter = placeRotation / 100.0f;
+        }
+        terrainPropertyRow("Normal alignment", "Blend from upright (0%) to aligned with the terrain normal (100%).");
+        float placeAlignment = placeAlignToNormal * 100.0f;
+        if (ImGui::SliderFloat("##place_align", &placeAlignment, 0.0f, 100.0f, "%.0f%%", ImGuiSliderFlags_AlwaysClamp)){
+            placeAlignToNormal = placeAlignment / 100.0f;
+        }
+        ImGui::EndTable();
+    }
+
+    const bool placementBrush = isPlacementBrush();
+    Texture* brushTexture = placementBrush ? nullptr : TerrainMapUtils::findTexture(terrain, getBrushMapRef());
+    const bool brushTargetAvailable = placementBrush ? isPlacementReady() : (brushTexture && !brushTexture->empty());
     if (brushActive && !brushTargetAvailable){
         brushActive = false;
         endStroke();
@@ -1925,19 +2258,26 @@ void editor::TerrainEditWindow::show(){
         if (iconButton(ICON_FA_SQUARE, "shape_square", "Square brush", brushShape == TerrainBrushShape::Square, buttonSize)){
             brushShape = TerrainBrushShape::Square;
         }
+        // Placement has no gradient and no flow: the brush is only an area.
+        ImGui::BeginDisabled(placementBrush);
         terrainPropertyRow("Falloff", "How brush strength fades from its center to its edge.");
         int falloff = static_cast<int>(brushFalloff);
         if (ImGui::Combo("##falloff", &falloff, "Smooth\0Linear\0Constant\0")){
             brushFalloff = static_cast<TerrainBrushFalloff>(falloff);
         }
-        terrainPropertyRow("Size", "Brush size in world units. Adjust with [ and ] while painting.");
+        ImGui::EndDisabled();
+        terrainPropertyRow("Size", placementBrush ?
+            "How far objects can scatter from the cursor, in world units. Adjust with [ and ] while painting." :
+            "Brush size in world units. Adjust with [ and ] while painting.");
         brushSize = std::clamp(brushSize, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE);
         UIUtils::sliderFloatInput("##brush_size", &brushSize, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, "%.2f");
+        ImGui::BeginDisabled(placementBrush);
         terrainPropertyRow("Strength", "Brush flow while held. Adjust with Shift+[ and Shift+] while painting.");
         float strength = std::clamp(brushStrength, MIN_BRUSH_STRENGTH, MAX_BRUSH_STRENGTH) * 100.0f;
         if (UIUtils::sliderFloatInput("##brush_strength", &strength, MIN_BRUSH_STRENGTH * 100.0f, MAX_BRUSH_STRENGTH * 100.0f, "%.0f%%")){
             brushStrength = strength / 100.0f;
         }
+        ImGui::EndDisabled();
         if (brushMode == TerrainBrushMode::Flatten){
             terrainPropertyRow("Sample height", "Pick the flatten height from the terrain at the start of each stroke.");
             ImGui::Checkbox("##flatten_pick", &flattenPickOnStroke);
@@ -1964,6 +2304,12 @@ void editor::TerrainEditWindow::show(){
     ts.normalizeBlendPaint = normalizeBlendPaint;
     ts.heightMapStartAtMiddle = heightMapStartAtMiddle;
     ts.flattenPickOnStroke = flattenPickOnStroke;
+    ts.placeAssetPath = placeAssetPath;
+    ts.placeSpacing = placeSpacing;
+    ts.placeMinScale = placeMinScale;
+    ts.placeMaxScale = placeMaxScale;
+    ts.placeRotationJitter = placeRotationJitter;
+    ts.placeAlignToNormal = placeAlignToNormal;
     if (!windowOpen){
         setOpen(false);
     }
@@ -2011,6 +2357,12 @@ void editor::TerrainEditWindow::openForEntity(Entity entity, uint32_t sceneId){
     normalizeBlendPaint = ts.normalizeBlendPaint;
     heightMapStartAtMiddle = ts.heightMapStartAtMiddle;
     flattenPickOnStroke = ts.flattenPickOnStroke;
+    placeAssetPath = ts.placeAssetPath;
+    placeSpacing = std::max(MIN_PLACE_SPACING, ts.placeSpacing);
+    placeMinScale = std::max(0.01f, ts.placeMinScale);
+    placeMaxScale = std::max(placeMinScale, ts.placeMaxScale);
+    placeRotationJitter = std::clamp(ts.placeRotationJitter, 0.0f, 1.0f);
+    placeAlignToNormal = std::clamp(ts.placeAlignToNormal, 0.0f, 1.0f);
 }
 
 bool editor::TerrainEditWindow::isOpen() const{
@@ -2031,6 +2383,11 @@ bool editor::TerrainEditWindow::isEditingScene(Scene* scene) const{
         return false;
     }
 
+    // Placement writes entities, not a map, so it has no brush texture to require.
+    if (isPlacementBrush()){
+        return isPlacementReady();
+    }
+
     Texture* texture = TerrainMapUtils::findTexture(*terrain, getBrushMapRef());
     return texture && !texture->empty();
 }
@@ -2049,6 +2406,33 @@ bool editor::TerrainEditWindow::beginStroke(Scene* scene, const Ray& ray){
         return false;
     }
 
+    const ImGuiIO& io = ImGui::GetIO();
+
+    if (isPlacementBrush()){
+        clearStroke();
+        stroke.active = true;
+        stroke.placement = true;
+        stroke.sceneId = sceneProject->id;
+        stroke.entity = entity;
+        stroke.placementStrokeId = ++placementStrokeCounter;
+        stroke.placedPoints = collectPlacedPoints(sceneProject, entity);
+
+        // Ctrl swaps place and erase for the stroke, matching the paint brushes.
+        stroke.effectiveMode = brushMode;
+        if (io.KeyCtrl){
+            if (brushMode == TerrainBrushMode::PlaceObject){
+                stroke.effectiveMode = TerrainBrushMode::EraseObject;
+            }else if (!placeAssetPath.empty()){
+                stroke.effectiveMode = TerrainBrushMode::PlaceObject;
+            }
+        }
+
+        if (stroke.effectiveMode == TerrainBrushMode::EraseObject){
+            return applyObjectErase(sceneProject, entity, localPoint);
+        }
+        return applyPlacement(sceneProject, entity, localPoint);
+    }
+
     const TerrainMapRef ref = getBrushMapRef();
     Texture* texture = TerrainMapUtils::findTexture(scene->getComponent<TerrainComponent>(entity), ref);
     if (!texture){
@@ -2063,7 +2447,6 @@ bool editor::TerrainEditWindow::beginStroke(Scene* scene, const Ray& ray){
 
     // Modifiers picked up at stroke start and held for the whole stroke:
     // Shift turns any sculpt brush into Smooth, Ctrl inverts Raise/Lower and paint/erase.
-    const ImGuiIO& io = ImGui::GetIO();
     stroke.effectiveMode = brushMode;
     if (isHeightBrush()){
         if (io.KeyShift){
@@ -2116,11 +2499,24 @@ bool editor::TerrainEditWindow::paintStroke(Scene* scene, const Ray& ray){
         return false;
     }
 
+    if (stroke.placement){
+        if (stroke.effectiveMode == TerrainBrushMode::EraseObject){
+            return applyObjectErase(sceneProject, entity, localPoint);
+        }
+        return applyPlacement(sceneProject, entity, localPoint);
+    }
+
     return applyBrush(sceneProject, entity, localPoint);
 }
 
 void editor::TerrainEditWindow::endStroke(){
     if (!stroke.active){
+        return;
+    }
+
+    // Placement already pushed its own commands; there is no map to diff.
+    if (stroke.placement){
+        clearStroke();
         return;
     }
 
@@ -2216,7 +2612,8 @@ bool editor::TerrainEditWindow::updateCursor(Scene* scene, const Ray& ray, Terra
 
     cursor.visible = true;
     buildLoop(brushSize, 16, cursor.outerPoints);
-    if (brushFalloff != TerrainBrushFalloff::Constant){
+    // Placement has no falloff — the ring is the area objects can scatter into.
+    if (brushFalloff != TerrainBrushFalloff::Constant && !isPlacementBrush()){
         // Half-strength contour: both smoothstep and linear falloff reach 0.5 at
         // half the brush radius.
         buildLoop(brushSize * 0.5f, 12, cursor.innerPoints);

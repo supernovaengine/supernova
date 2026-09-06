@@ -141,6 +141,17 @@ namespace doriax::editor{
         bool normalizeBlendPaint = true;
         bool heightMapStartAtMiddle = true;
         bool flattenPickOnStroke = true;
+
+        // Object placement palette. Placed props are ordinary entities, so this is
+        // tool state, not scene data.
+        std::string placeAssetPath;
+        float placeSpacing = 2.0f;
+        // 1.0 leaves a model at the scale its file authored, matching a drag-drop; widen
+        // the range to opt into an absolute scale with variation.
+        float placeMinScale = 1.0f;
+        float placeMaxScale = 1.0f;
+        float placeRotationJitter = 1.0f;
+        float placeAlignToNormal = 0.0f;
     };
 
     using SharedMoveRecovery = std::map<std::string, SharedMoveRecoveryEntry>;

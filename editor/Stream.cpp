@@ -658,6 +658,10 @@ std::string terrainBrushModeToString(editor::TerrainBrushMode mode) {
         case editor::TerrainBrushMode::PaintRed: return "PaintRed";
         case editor::TerrainBrushMode::PaintGreen: return "PaintGreen";
         case editor::TerrainBrushMode::PaintBlue: return "PaintBlue";
+        case editor::TerrainBrushMode::PaintDensity: return "PaintDensity";
+        case editor::TerrainBrushMode::EraseDensity: return "EraseDensity";
+        case editor::TerrainBrushMode::PlaceObject: return "PlaceObject";
+        case editor::TerrainBrushMode::EraseObject: return "EraseObject";
         default: return "Raise";
     }
 }
@@ -670,6 +674,10 @@ editor::TerrainBrushMode stringToTerrainBrushMode(const std::string& str) {
     if (str == "PaintRed") return editor::TerrainBrushMode::PaintRed;
     if (str == "PaintGreen") return editor::TerrainBrushMode::PaintGreen;
     if (str == "PaintBlue") return editor::TerrainBrushMode::PaintBlue;
+    if (str == "PaintDensity") return editor::TerrainBrushMode::PaintDensity;
+    if (str == "EraseDensity") return editor::TerrainBrushMode::EraseDensity;
+    if (str == "PlaceObject") return editor::TerrainBrushMode::PlaceObject;
+    if (str == "EraseObject") return editor::TerrainBrushMode::EraseObject;
     return editor::TerrainBrushMode::Raise;
 }
 
@@ -1596,6 +1604,12 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         terrainNode["normalizeBlendPaint"] = ts.normalizeBlendPaint;
         terrainNode["heightMapStartAtMiddle"] = ts.heightMapStartAtMiddle;
         terrainNode["flattenPickOnStroke"] = ts.flattenPickOnStroke;
+        terrainNode["placeAssetPath"] = ts.placeAssetPath;
+        encodePositiveFinite(terrainNode, "placeSpacing", ts.placeSpacing);
+        encodePositiveFinite(terrainNode, "placeMinScale", ts.placeMinScale);
+        encodePositiveFinite(terrainNode, "placeMaxScale", ts.placeMaxScale);
+        encodeFinite(terrainNode, "placeRotationJitter", ts.placeRotationJitter);
+        encodeFinite(terrainNode, "placeAlignToNormal", ts.placeAlignToNormal);
         root["terrainEditor"] = terrainNode;
     }
 
@@ -1788,6 +1802,12 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         if (tn["heightMapStartAtMiddle"].IsDefined()) ts.heightMapStartAtMiddle = tn["heightMapStartAtMiddle"].as<bool>();
         if (tn["flattenPickOnStroke"].IsDefined()) ts.flattenPickOnStroke = tn["flattenPickOnStroke"].as<bool>();
         else ts.brushStrength = TerrainEditorSettings{}.brushStrength; // file predates time-based flow; old per-event strengths are far too weak under the new semantics
+        if (tn["placeAssetPath"].IsDefined())     ts.placeAssetPath     = tn["placeAssetPath"].as<std::string>();
+        if (tn["placeSpacing"].IsDefined())       ts.placeSpacing       = decodePositiveFinite(tn["placeSpacing"], ts.placeSpacing);
+        if (tn["placeMinScale"].IsDefined())      ts.placeMinScale      = decodePositiveFinite(tn["placeMinScale"], ts.placeMinScale);
+        if (tn["placeMaxScale"].IsDefined())      ts.placeMaxScale      = decodePositiveFinite(tn["placeMaxScale"], ts.placeMaxScale);
+        if (tn["placeRotationJitter"].IsDefined()) ts.placeRotationJitter = decodeFinite(tn["placeRotationJitter"], ts.placeRotationJitter);
+        if (tn["placeAlignToNormal"].IsDefined()) ts.placeAlignToNormal = decodeFinite(tn["placeAlignToNormal"], ts.placeAlignToNormal);
         project->getTerrainEditorSettings() = ts;
     }
 

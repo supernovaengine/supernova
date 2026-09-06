@@ -87,6 +87,7 @@ namespace doriax::editor{
         EntityCreationType type;
         std::vector<Entity> lastSelected;
         bool addToBundle;
+        bool quiet = false;
         bool wasModified;
         bool wasMainCamera;
 
@@ -105,6 +106,10 @@ namespace doriax::editor{
         bool mergeWith(Command* otherCommand) override;
 
         Entity getEntity();
+
+        // Brush-rate creation (terrain object placement): skip the selection change,
+        // scene focus and log line a single interactive create wants.
+        void setQuiet(bool quiet);
 
         template<typename T>
         void addProperty(ComponentType componentType, const std::string& propertyName, T value) {

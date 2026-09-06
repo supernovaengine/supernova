@@ -137,7 +137,6 @@ namespace doriax{
         void destroyFoliageInstances(TerrainFoliageInstances& instances);
         void destroyTerrainFoliage(Entity entity);
         bool loadFoliageMesh(Entity entity, const std::string& path);
-        void sampleTerrainSurface(TerrainComponent& terrain, float localX, float localZ, float& height, Vector3& normal);
         float sampleFoliageDensity(TerrainComponent& terrain, TerrainFoliageLayer& layer, float localX, float localZ);
         void appendFoliageCell(TerrainComponent& terrain, TerrainFoliageLayer& layer, int cellX, int cellZ, std::vector<InstanceData>& instances);
         void updateFoliageLayer(TerrainComponent& terrain, TerrainFoliageLayer& layer, TerrainFoliageInstances& instances, const Vector3& viewLocal, bool preview);
@@ -192,6 +191,9 @@ namespace doriax{
         void resetModelToBindPose(ModelComponent& model);
 
         bool raycastTerrainSurface(const Ray& ray, TerrainComponent& terrain, Transform& transform, Vector3& worldPoint);
+        // Height and normal in terrain-local space. Public so the editor can place
+        // objects on the same surface the foliage scatter resolves against.
+        void sampleTerrainSurface(TerrainComponent& terrain, float localX, float localZ, float& height, Vector3& normal);
 
         bool hasPendingAsyncModelLoads() const;
         void cancelAsyncModelLoads();

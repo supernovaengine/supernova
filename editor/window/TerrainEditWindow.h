@@ -10,6 +10,7 @@
 #include "imgui.h"
 
 #include <chrono>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -24,7 +25,9 @@ namespace doriax::editor{
         PaintGreen,
         PaintBlue,
         PaintDensity,
-        EraseDensity
+        EraseDensity,
+        PlaceObject,
+        EraseObject
     };
 
     enum class TerrainBrushShape{
@@ -91,6 +94,13 @@ namespace doriax::editor{
         int workingHeight = 0;
         // Texels written so far, cut into the undo patch when the stroke ends
         TerrainMapRegion dirtyRegion;
+        // Object placement strokes write entities instead of a map, so none of the
+        // texture state above applies to them.
+        bool placement = false;
+        uint64_t placementStrokeId = 0;
+        // Terrain-local XZ of everything already standing on this terrain, grown as the
+        // stroke places more, so the spacing test sees the whole field.
+        std::vector<Vector2> placedPoints;
         bool heightReferenceValid = false;
         float heightReferenceTerrainSize = 0.0f;
         float heightReferenceMaxHeight = 0.0f;
@@ -101,9 +111,12 @@ namespace doriax::editor{
         std::vector<unsigned char> heightReferencePixels;
     };
 
+    class Command;
+
     class TerrainEditWindow{
     private:
         class TerrainTextureEditCmd;
+        class TerrainObjectStrokeCmd;
 
         Project* project;
 
@@ -130,6 +143,17 @@ namespace doriax::editor{
         int densityMapResolution;
         int selectedFoliageLayer;
 
+        // Object placement palette. Placed props are ordinary entities parented to the
+        // terrain, so none of this belongs on TerrainComponent.
+        std::string placeAssetPath;
+        float placeSpacing;
+        float placeMinScale;
+        float placeMaxScale;
+        float placeRotationJitter;
+        float placeAlignToNormal;
+        uint64_t placementStrokeCounter = 0;
+        std::mt19937 placementRandom;
+
         uint64_t editTextureCounter = 1;
 
         ActiveStroke stroke;
@@ -137,7 +161,9 @@ namespace doriax::editor{
         void showTooltip(const char* text, ImGuiHoveredFlags flags = 0);
         bool iconButton(const char* icon, const char* id, const char* tooltip, bool selected, const ImVec2& size);
         void drawMapSettings(const TerrainMapRef& ref, const char* label, int& resolution);
+        float drawAssetThumbnail(const std::string& path, const char* id);
         void drawFoliageMesh(const TerrainFoliageLayer& layer);
+        void drawPlacementAsset();
         std::string makeEditableTextureId(uint32_t sceneId, Entity entity, const TerrainMapRef& ref);
         std::string makeEditableTexturePath(Project* project, uint32_t sceneId, Entity entity, const TerrainMapRef& ref);
         int expectedChannels(TerrainMapTarget target);
@@ -170,6 +196,9 @@ namespace doriax::editor{
         TerrainMapRef getBrushMapRef() const;
         bool isHeightBrush() const;
         bool isDensityBrush() const;
+        bool isPlacementBrush() const;
+        // Erase needs no asset; placing does.
+        bool isPlacementReady() const;
         static bool isScalarTarget(TerrainMapTarget target);
 
         void captureStrokeHeightReference(TerrainComponent& terrain);
@@ -177,6 +206,11 @@ namespace doriax::editor{
         bool applyBrush(SceneProject* sceneProject, Entity entity, const Vector3& localPoint);
         bool stampBrush(TerrainComponent& terrain, TextureData& data, TerrainMapTarget target, const Vector3& localPoint, float deltaTime);
         bool addStrokePatchCommand(SceneProject* sceneProject, Texture& texture);
+        std::vector<Vector2> collectPlacedPoints(SceneProject* sceneProject, Entity terrainEntity) const;
+        Command* makePlacementCommand(SceneProject* sceneProject, Entity terrainEntity, const Vector3& localPosition, const Quaternion& rotation, const Vector3& scale);
+        void addStrokeObjectCommand(SceneProject* sceneProject, Command* command);
+        bool applyPlacement(SceneProject* sceneProject, Entity entity, const Vector3& localPoint);
+        bool applyObjectErase(SceneProject* sceneProject, Entity entity, const Vector3& localPoint);
         void clearStroke();
 
         bool createMapForTarget(const TerrainMapRef& ref, int width, int height);

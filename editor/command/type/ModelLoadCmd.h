@@ -8,6 +8,7 @@
 #include "command/type/CreateEntityCmd.h"
 #include "Project.h"
 #include "math/Vector3.h"
+#include "math/Quaternion.h"
 #include "subsystem/MeshSystem.h"
 #include "yaml-cpp/yaml.h"
 
@@ -54,6 +55,9 @@ namespace doriax::editor{
         ModelLoadCmd(Project* project, uint32_t sceneId, Entity entity, const std::string& modelPath);
         ModelLoadCmd(Project* project, uint32_t sceneId, Entity entity, const std::string& modelPath, bool mergeStaticMeshes);
         ModelLoadCmd(Project* project, uint32_t sceneId, const std::string& entityName, const Vector3& position, const std::string& modelPath);
+        // Terrain object placement: created under `parent` with a local transform, and
+        // quiet, because a brush stroke drops many of these in a row.
+        ModelLoadCmd(Project* project, uint32_t sceneId, const std::string& entityName, Entity parent, const Vector3& position, const Quaternion& rotation, const Vector3& scale, const std::string& modelPath);
         ~ModelLoadCmd() override;
 
         bool execute() override;

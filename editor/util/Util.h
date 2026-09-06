@@ -39,6 +39,10 @@ namespace doriax::editor{
              return "gltf,glb,obj";
         }
 
+        inline static std::string getBundleExtensions() {
+             return "bundle";
+        }
+
         inline static std::string getAudioExtensions() {
              return "wav,ogg,mp3,flac";
         }
