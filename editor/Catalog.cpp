@@ -1277,6 +1277,8 @@ namespace {
         if (fieldName == ".alignToNormal") return {PropertyType::Float, UpdateFlags_Terrain_Foliage, &def.alignToNormal, &layer.alignToNormal};
         if (fieldName == ".minSlope") return {PropertyType::Float, UpdateFlags_Terrain_Foliage, &def.minSlope, &layer.minSlope};
         if (fieldName == ".maxSlope") return {PropertyType::Float, UpdateFlags_Terrain_Foliage, &def.maxSlope, &layer.maxSlope};
+        if (fieldName == ".minHeight") return {PropertyType::Float, UpdateFlags_Terrain_Foliage, &def.minHeight, &layer.minHeight};
+        if (fieldName == ".maxHeight") return {PropertyType::Float, UpdateFlags_Terrain_Foliage, &def.maxHeight, &layer.maxHeight};
         if (fieldName == ".drawDistance") return {PropertyType::Float, UpdateFlags_Terrain_Foliage, &def.drawDistance, &layer.drawDistance};
         if (fieldName == ".seed") return {PropertyType::UInt, UpdateFlags_Terrain_Foliage, &def.seed, &layer.seed};
 
@@ -2252,6 +2254,8 @@ namespace {
             field(".alignToNormal", PropertyType::Float, (void*)&defLayer.alignToNormal, layer ? (void*)&layer->alignToNormal : nullptr);
             field(".minSlope", PropertyType::Float, (void*)&defLayer.minSlope, layer ? (void*)&layer->minSlope : nullptr);
             field(".maxSlope", PropertyType::Float, (void*)&defLayer.maxSlope, layer ? (void*)&layer->maxSlope : nullptr);
+            field(".minHeight", PropertyType::Float, (void*)&defLayer.minHeight, layer ? (void*)&layer->minHeight : nullptr);
+            field(".maxHeight", PropertyType::Float, (void*)&defLayer.maxHeight, layer ? (void*)&layer->maxHeight : nullptr);
             field(".drawDistance", PropertyType::Float, (void*)&defLayer.drawDistance, layer ? (void*)&layer->drawDistance : nullptr);
             field(".seed", PropertyType::UInt, (void*)&defLayer.seed, layer ? (void*)&layer->seed : nullptr);
         }

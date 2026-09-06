@@ -1878,6 +1878,15 @@ void editor::TerrainEditWindow::show(){
                     setFoliageLayerProperty("maxSlope", layer.maxSlope);
                 }
             }
+            terrainPropertyRow("Height range", "Allowed ground height, from the terrain base (0) to its max height (1).");
+            if (ImGui::DragFloatRange2("##foliage_height", &layer.minHeight, &layer.maxHeight, 0.01f, 0.0f, 1.0f, "%.2f", "%.2f", ImGuiSliderFlags_AlwaysClamp)){
+                if (layer.minHeight != currentLayer.minHeight){
+                    setFoliageLayerProperty("minHeight", layer.minHeight);
+                }
+                if (layer.maxHeight != currentLayer.maxHeight){
+                    setFoliageLayerProperty("maxHeight", layer.maxHeight);
+                }
+            }
             terrainPropertyRow("Rotation", "Random yaw as a share of a full turn.");
             float rotation = layer.rotationJitter * 100.0f;
             if (ImGui::SliderFloat("##foliage_rotation", &rotation, 0.0f, 100.0f, "%.0f%%", ImGuiSliderFlags_AlwaysClamp)){

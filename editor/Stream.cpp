@@ -4760,6 +4760,8 @@ YAML::Node editor::Stream::encodeTerrainFoliageLayer(const TerrainFoliageLayer& 
     node["alignToNormal"] = layer.alignToNormal;
     node["minSlope"] = layer.minSlope;
     node["maxSlope"] = layer.maxSlope;
+    node["minHeight"] = layer.minHeight;
+    node["maxHeight"] = layer.maxHeight;
     node["drawDistance"] = layer.drawDistance;
     node["seed"] = layer.seed;
     return node;
@@ -4777,6 +4779,8 @@ TerrainFoliageLayer editor::Stream::decodeTerrainFoliageLayer(const YAML::Node& 
     layer.alignToNormal = decodeFinite(node["alignToNormal"], layer.alignToNormal);
     layer.minSlope = decodeFinite(node["minSlope"], layer.minSlope);
     layer.maxSlope = decodeFinite(node["maxSlope"], layer.maxSlope);
+    layer.minHeight = decodeFinite(node["minHeight"], layer.minHeight);
+    layer.maxHeight = decodeFinite(node["maxHeight"], layer.maxHeight);
     layer.drawDistance = decodeFinite(node["drawDistance"], layer.drawDistance);
     return layer;
 }

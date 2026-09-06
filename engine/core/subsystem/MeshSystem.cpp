@@ -2989,6 +2989,12 @@ void MeshSystem::appendFoliageCell(TerrainComponent& terrain, TerrainFoliageLaye
             continue;
         }
 
+        // A zero maxHeight leaves nothing to normalise against, so everything reads as the base.
+        const float normalizedHeight = (terrain.maxHeight != 0.0f) ? (height / terrain.maxHeight) : 0.0f;
+        if (normalizedHeight < layer.minHeight || normalizedHeight > layer.maxHeight){
+            continue;
+        }
+
         InstanceData instance;
         instance.position = Vector3(localX, height, localZ);
         instance.scale = Vector3(layer.minScale + randomFoliage(hashScale) * scaleRange);

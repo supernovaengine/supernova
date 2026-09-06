@@ -72,6 +72,8 @@ namespace doriax{
         float alignToNormal = 0; //0 stands instances upright, 1 lays them along the surface
         float minSlope = 0; //degrees
         float maxSlope = 35;
+        float minHeight = 0; //normalized against the terrain maxHeight
+        float maxHeight = 1;
         float drawDistance = 50;
         unsigned int seed = 0;
     };

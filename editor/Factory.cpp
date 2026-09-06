@@ -1287,6 +1287,8 @@ std::string editor::Factory::createTerrainComponent(int indentSpaces, EntityRegi
         code << ind << var << ".alignToNormal = " << formatFloat(layer.alignToNormal) << ";\n";
         code << ind << var << ".minSlope = " << formatFloat(layer.minSlope) << ";\n";
         code << ind << var << ".maxSlope = " << formatFloat(layer.maxSlope) << ";\n";
+        code << ind << var << ".minHeight = " << formatFloat(layer.minHeight) << ";\n";
+        code << ind << var << ".maxHeight = " << formatFloat(layer.maxHeight) << ";\n";
         code << ind << var << ".drawDistance = " << formatFloat(layer.drawDistance) << ";\n";
         code << ind << var << ".seed = " << formatUInt(layer.seed) << ";\n";
         code << ind << "terrain.foliageLayers.push_back(" << var << ");\n";
