@@ -145,6 +145,9 @@ namespace doriax::editor{
         // Object placement palette. Placed props are ordinary entities, so this is
         // tool state, not scene data.
         std::string placeAssetPath;
+        // Instanced placement batches a whole asset into one draw at the cost of the
+        // per-object components an entity can carry.
+        bool placeInstanced = true;
         float placeSpacing = 2.0f;
         // 1.0 leaves a model at the scale its file authored, matching a drag-drop; widen
         // the range to opt into an absolute scale with variation.

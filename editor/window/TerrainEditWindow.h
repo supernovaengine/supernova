@@ -97,6 +97,8 @@ namespace doriax::editor{
         // Object placement strokes write entities instead of a map, so none of the
         // texture state above applies to them.
         bool placement = false;
+        // Fixed at stroke start; cleared if the asset turns out not to be instanceable.
+        bool instanced = false;
         uint64_t placementStrokeId = 0;
         // Terrain-local XZ of everything already standing on this terrain, grown as the
         // stroke places more, so the spacing test sees the whole field.
@@ -117,6 +119,8 @@ namespace doriax::editor{
     private:
         class TerrainTextureEditCmd;
         class TerrainObjectStrokeCmd;
+        class TerrainInstancePlaceCmd;
+        class TerrainInstanceEraseCmd;
 
         Project* project;
 
@@ -146,6 +150,9 @@ namespace doriax::editor{
         // Object placement palette. Placed props are ordinary entities parented to the
         // terrain, so none of this belongs on TerrainComponent.
         std::string placeAssetPath;
+        bool placeInstanced;
+        // An asset the load proved cannot be instanced, so the brush stops retrying it.
+        std::string instancingRejectedAsset;
         float placeSpacing;
         float placeMinScale;
         float placeMaxScale;
@@ -207,6 +214,9 @@ namespace doriax::editor{
         bool stampBrush(TerrainComponent& terrain, TextureData& data, TerrainMapTarget target, const Vector3& localPoint, float deltaTime);
         bool addStrokePatchCommand(SceneProject* sceneProject, Texture& texture);
         std::vector<Vector2> collectPlacedPoints(SceneProject* sceneProject, Entity terrainEntity) const;
+        // Instanced placement keeps one host entity per asset under the terrain.
+        static Entity findInstanceHost(SceneProject* sceneProject, Entity terrainEntity, const std::string& assetPath);
+        bool useInstancedPlacement() const;
         Command* makePlacementCommand(SceneProject* sceneProject, Entity terrainEntity, const Vector3& localPosition, const Quaternion& rotation, const Vector3& scale);
         void addStrokeObjectCommand(SceneProject* sceneProject, Command* command);
         bool applyPlacement(SceneProject* sceneProject, Entity entity, const Vector3& localPoint);

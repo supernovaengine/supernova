@@ -1605,6 +1605,7 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         terrainNode["heightMapStartAtMiddle"] = ts.heightMapStartAtMiddle;
         terrainNode["flattenPickOnStroke"] = ts.flattenPickOnStroke;
         terrainNode["placeAssetPath"] = ts.placeAssetPath;
+        terrainNode["placeInstanced"] = ts.placeInstanced;
         encodePositiveFinite(terrainNode, "placeSpacing", ts.placeSpacing);
         encodePositiveFinite(terrainNode, "placeMinScale", ts.placeMinScale);
         encodePositiveFinite(terrainNode, "placeMaxScale", ts.placeMaxScale);
@@ -1803,6 +1804,7 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         if (tn["flattenPickOnStroke"].IsDefined()) ts.flattenPickOnStroke = tn["flattenPickOnStroke"].as<bool>();
         else ts.brushStrength = TerrainEditorSettings{}.brushStrength; // file predates time-based flow; old per-event strengths are far too weak under the new semantics
         if (tn["placeAssetPath"].IsDefined())     ts.placeAssetPath     = tn["placeAssetPath"].as<std::string>();
+        if (tn["placeInstanced"].IsDefined())     ts.placeInstanced     = tn["placeInstanced"].as<bool>();
         if (tn["placeSpacing"].IsDefined())       ts.placeSpacing       = decodePositiveFinite(tn["placeSpacing"], ts.placeSpacing);
         if (tn["placeMinScale"].IsDefined())      ts.placeMinScale      = decodePositiveFinite(tn["placeMinScale"], ts.placeMinScale);
         if (tn["placeMaxScale"].IsDefined())      ts.placeMaxScale      = decodePositiveFinite(tn["placeMaxScale"], ts.placeMaxScale);
