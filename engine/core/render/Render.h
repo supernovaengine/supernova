@@ -111,6 +111,7 @@ namespace doriax{
         MATERIAL,
         PBR_FS_PARAMS,
         PBR_FS_TEXCOORDSETS,
+        PBR_VS_FADE,
         FS_LIGHTING,
         FS_REFLECTION_PROBE,
         FS_FOG,

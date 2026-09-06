@@ -7,6 +7,13 @@ uniform u_vs_depthParams {
     mat4 lightVPMatrix;
 } depthParams;
 
+#ifdef USE_INSTANCE_FADE
+    uniform u_vs_fade {
+        vec4 fadeRange; //start.x, end.y
+        vec4 fadeEye;   //camera in model space.xyz
+    } fadeParams;
+#endif
+
 in vec3 a_position;
 out vec2 v_projZW;
 
@@ -54,6 +61,18 @@ void main() {
 
     #if defined(HAS_TEXTURE)
         v_uv1 = a_texcoord1;
+    #endif
+
+    #ifdef USE_INSTANCE_FADE
+        // Matches mesh.vert exactly, so a shrinking instance shrinks its shadow in step.
+        vec3 fadeOrigin = i_matrix_col4.xyz;
+        float fadeVisible = 1.0;
+        if (fadeParams.fadeRange.y > fadeParams.fadeRange.x){
+            float fadeDistance = length(fadeParams.fadeEye.xz - fadeOrigin.xz);
+            fadeVisible = clamp((fadeParams.fadeRange.y - fadeDistance) /
+                (fadeParams.fadeRange.y - fadeParams.fadeRange.x), 0.0, 1.0);
+        }
+        pos.xyz = mix(fadeOrigin, pos.xyz, fadeVisible);
     #endif
 
     gl_Position = lightMVPMatrix * pos;

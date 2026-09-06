@@ -271,6 +271,9 @@ namespace doriax{
 		std::unordered_map<Entity, std::unique_ptr<ReflectionProbeRuntime>> reflectionProbeRuntimes;
 		// Each mirror's reflection camera. Kept here so the authored component stays copiable.
 		std::unordered_map<Entity, Entity> mirrorCameras;
+		// Main camera position for the instance distance fade: the colour and depth passes must
+		// fade against the same point or a shadow outlives its instance.
+		Vector3 fadeEyePosition;
 		Entity activeReflectionProbe = NULL_ENTITY;
 		fs_reflection_probe_t fs_reflection_probe;
 

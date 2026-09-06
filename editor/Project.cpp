@@ -2618,10 +2618,14 @@ void editor::Project::collectSceneShaderKeys(const SceneProject* sceneProject, s
                     // stored key too (identical when it was computed).
                     bool isTerrain = signature.test(scene->getComponentId<TerrainComponent>());
                     bool isInstanced = signature.test(scene->getComponentId<InstancedMeshComponent>());
+                    // From the component, not depthShaderProperties: that word stays 0 until a
+                    // shadow or SSAO pass has built the depth shader at least once.
+                    bool instancedFade = isInstanced && scene->getComponent<InstancedMeshComponent>(entity).distanceFade;
                     uint32_t depthProperties = ShaderPool::getDepthMeshProperties(
                         mesh.submeshes[s].textureShadow, mesh.submeshes[s].hasSkinning,
                         mesh.submeshes[s].hasMorphTarget, mesh.submeshes[s].hasMorphNormal,
-                        mesh.submeshes[s].hasMorphTangent, isTerrain, isInstanced);
+                        mesh.submeshes[s].hasMorphTangent, isTerrain, isInstanced, false,
+                        instancedFade);
                     keys.insert(ShaderPool::getShaderKey(ShaderType::DEPTH, depthProperties));
                     keys.insert(ShaderPool::getShaderKey(ShaderType::DEPTH, mesh.submeshes[s].depthShaderProperties));
                     if (mesh.submeshes[s].gbufferShader) {

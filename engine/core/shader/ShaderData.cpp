@@ -153,6 +153,8 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type){
         ustr = "u_fs_pbrParams";
     }else if (type == UniformBlockType::PBR_FS_TEXCOORDSETS){
         ustr = "u_fs_texCoordSets";
+    }else if (type == UniformBlockType::PBR_VS_FADE){
+        ustr = "u_vs_fade";
     }else if (type == UniformBlockType::FS_LIGHTING){
         ustr = "u_fs_lighting";
     }else if (type == UniformBlockType::FS_REFLECTION_PROBE){

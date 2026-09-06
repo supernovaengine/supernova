@@ -64,6 +64,12 @@ namespace {
         render.applyUniformBlock(slot, sizeof(normAdjust), &normAdjust);
     }
 
+    void applyInstanceFadeUniform(ObjectRender& render, int slot, const InstancedMeshComponent& instmesh){
+        float fade[8] = {instmesh.fadeStart, instmesh.fadeEnd, 0.0f, 0.0f,
+            instmesh.fadeEyeLocal.x, instmesh.fadeEyeLocal.y, instmesh.fadeEyeLocal.z, 0.0f};
+        render.applyUniformBlock(slot, sizeof(fade), &fade);
+    }
+
     bool usesAlphaMask(const Material& material, bool textureShadow){
         return material.alphaMode == MaterialAlphaMode::MASK ||
             (material.alphaMode == MaterialAlphaMode::AUTO && textureShadow);
@@ -2424,13 +2430,16 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         bool p_depthTexture = p_depthAlphaMask && mesh.submeshes[i].hasTexCoord1 &&
             !mesh.submeshes[i].material.baseColorTexture.empty();
 
+        // Opted in per field, not per band, so emptying the band (editor preview) neither
+        // rebuilds the shader nor drops the variant from an export.
+        const bool p_instanceFade = instmesh && instmesh->distanceFade;
         mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(
                         p_unlit, p_hasTexture1, p_hasTexture2, p_punctual,
                         p_receiveShadows, p_hasNormal, p_hasNormalMap,
                         p_hasTangent, mesh.submeshes[i].hasVertexColor3, mesh.submeshes[i].hasVertexColor4, mesh.submeshes[i].hasTextureRect,
                         hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent,
                         (terrain)?true:false, (instmesh)?true:false, p_ibl, p_mirror, p_ssao, p_light2d, p_shadows2d,
-                        p_alphaMask, p_alphaOpaque);
+                        p_alphaMask, p_alphaOpaque, p_instanceFade);
         // a user-forked main shader overrides the built-in Mesh shader; the variant
         // (#define) system, depth/gbuffer passes and bind-slots are unchanged.
         // Priority: component customShader > scene default shader > built-in (empty)
@@ -2443,7 +2452,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
             mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(
                 p_depthTexture, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget,
                 mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent, (terrain)?true:false, (instmesh)?true:false,
-                p_depthAlphaMask);
+                p_depthAlphaMask, p_instanceFade);
             mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
             if (!mesh.submeshes[i].depthShader->isCreated())
                 return false;
@@ -2483,6 +2492,9 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         mesh.submeshes[i].slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS);
         if (p_hasTexture2){
             mesh.submeshes[i].slotFSTexCoordSets = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_TEXCOORDSETS);
+        }
+        if (p_instanceFade){
+            mesh.submeshes[i].slotVSFade = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_FADE);
         }
         if (hasFog){
             mesh.submeshes[i].slotFSFog = shaderData.getUniformBlockIndex(UniformBlockType::FS_FOG);
@@ -2631,6 +2643,9 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
             mesh.submeshes[i].slotVSDepthParams = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_PARAMS);
             if (p_depthAlphaMask){
                 mesh.submeshes[i].slotFSDepthMaterial = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_FS_MATERIAL);
+            }
+            if (p_instanceFade){
+                mesh.submeshes[i].slotVSDepthFade = depthShaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_FADE);
             }
 
             if (mesh.submeshes[i].hasSkinning){
@@ -3081,6 +3096,10 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
                 render.applyUniformBlock(mesh.submeshes[i].slotFSParams, sizeof(float) * 4, &mesh.submeshes[i].material);
             }
 
+            if (mesh.submeshes[i].slotVSFade != -1 && instmesh){
+                applyInstanceFadeUniform(render, mesh.submeshes[i].slotVSFade, *instmesh);
+            }
+
             if (mesh.submeshes[i].slotFSTexCoordSets != -1){
                 // per-texture UV set selector (0 = a_texcoord1, 1 = a_texcoord2):
                 // set0 = baseColor, metallicRoughness, occlusion, emissive; set1.x = normal
@@ -3175,6 +3194,10 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, con
 
             //model, mvp matrix
             depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthParams, sizeof(float) * 32, &vsDepthParams);
+
+            if (mesh.submeshes[i].slotVSDepthFade != -1 && instmesh){
+                applyInstanceFadeUniform(depthRender, mesh.submeshes[i].slotVSDepthFade, *instmesh);
+            }
 
             if (mesh.submeshes[i].slotFSDepthMaterial != -1){
                 const Material& material = mesh.submeshes[i].material;
@@ -4252,6 +4275,7 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh, bool clearAss
         submesh.slotVSParams = -1;
         submesh.slotFSParams = -1;
         submesh.slotFSTexCoordSets = -1;
+        submesh.slotVSFade = -1;
         submesh.slotFSLighting = -1;
         submesh.slotFSReflectionProbe = -1;
         submesh.slotVSSprite = -1;
@@ -4263,6 +4287,7 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh, bool clearAss
         submesh.slotVSTerrain = -1;
 
         submesh.slotVSDepthParams = -1;
+        submesh.slotVSDepthFade = -1;
         submesh.slotFSDepthMaterial = -1;
         submesh.slotVSDepthSkinning = -1;
         submesh.slotVSDepthMorphTarget = -1;
@@ -6459,6 +6484,7 @@ void RenderSystem::update(double dt){
 
     CameraComponent& mainCamera = *mainCameraPtr;
     Transform& mainCameraTransform = *mainCameraTransformPtr;
+    fadeEyePosition = mainCameraTransform.worldPosition;
 
     // while extra cameras render, draw() rewrites the shared MVP and sky matrices
     // per camera; removing the last of them (a mirror, a reflection probe) would
@@ -6538,6 +6564,14 @@ void RenderSystem::update(double dt){
 
             InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
             if (instmesh){
+                if (instmesh->distanceFade){
+                    // The range is a model-space distance, so the eye moves into that space
+                    // instead: scaling the range into world space breaks on a scaled mesh.
+                    const Matrix4 inverseModel = transform.modelMatrix.inverse();
+                    instmesh->fadeEyeLocal = inverseModel.isValid() ?
+                        (inverseModel * fadeEyePosition) : fadeEyePosition;
+                }
+
                 bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_UI;
 
                 bool instancesNeedUpdate = instmesh->needUpdateInstances || mesh.needUpdateAABB;

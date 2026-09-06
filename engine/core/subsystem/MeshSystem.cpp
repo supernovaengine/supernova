@@ -2727,6 +2727,8 @@ bool MeshSystem::createTerrain(TerrainComponent& terrain, MeshComponent& mesh){
 static const int TERRAIN_FOLIAGE_TARGET_BATCH_RADIUS = 2;
 static const float TERRAIN_FOLIAGE_CELL_SIZE = 8.0f;
 static const unsigned int TERRAIN_FOLIAGE_MAX_CHUNK_INSTANCES = 8192;
+// Share of the draw distance that stays full size; the rest shrinks out.
+static const float TERRAIN_FOLIAGE_FADE_START = 0.75f;
 
 bool MeshSystem::setFoliagePreviewEntity(Entity entity){
     if (foliagePreviewEntity == entity){
@@ -3037,6 +3039,8 @@ void MeshSystem::updateFoliageLayer(TerrainComponent& terrain, TerrainFoliageLay
     const int columns = std::max(0, lastChunk(viewLocal.x) - startX + 1);
     const int rows = std::max(0, lastChunk(viewLocal.z) - startZ + 1);
     const unsigned int capacity = attempts * batchSide * batchSide;
+    const float fadeEnd = preview ? 0.0f : drawDistance;
+    const float fadeStart = fadeEnd * TERRAIN_FOLIAGE_FADE_START;
     instances.pending = false;
 
     const size_t chunkCount = static_cast<size_t>(columns) * rows;
@@ -3131,6 +3135,12 @@ void MeshSystem::updateFoliageLayer(TerrainComponent& terrain, TerrainFoliageLay
                 chunk.assigned = false;
                 continue;
             }
+
+            // Shrinks before the draw distance so a chunk does not pop in. The preview shows the
+            // whole terrain, so it empties the band instead of dropping the variant.
+            instmesh.distanceFade = true;
+            instmesh.fadeStart = fadeStart;
+            instmesh.fadeEnd = fadeEnd;
 
             // Grows with headroom and never shrinks, so a draw distance drag rebuilds little.
             if (instmesh.maxInstances < capacity){
