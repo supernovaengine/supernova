@@ -1060,7 +1060,6 @@ static bool executeSync(editor::Command* command){
     return done;
 }
 
-// Appends one instance to the host for this asset, creating the host the first time.
 class editor::TerrainEditWindow::TerrainInstancePlaceCmd: public editor::Command{
 private:
     Project* project;
@@ -1187,7 +1186,6 @@ public:
     }
 };
 
-// Removes instances from one host, putting them back at their original indices on undo.
 class editor::TerrainEditWindow::TerrainInstanceEraseCmd: public editor::Command{
 private:
     Project* project;
@@ -1836,7 +1834,6 @@ Entity editor::TerrainEditWindow::findInstanceHost(SceneProject* sceneProject, E
     return NULL_ENTITY;
 }
 
-// Bundles are a hierarchy of entities, so there is nothing to instance them into.
 // A bundle is a hierarchy of entities, so there is nothing to instance it into
 bool editor::TerrainEditWindow::useInstancedPlacement() const{
     return placeInstanced && !Util::isBundleFile(placeAssetPath) && placeAssetPath != instancingRejectedAsset;
@@ -2726,7 +2723,6 @@ void editor::TerrainEditWindow::show(){
         if (iconButton(ICON_FA_SQUARE, "shape_square", "Square brush", brushShape == TerrainBrushShape::Square, buttonSize)){
             brushShape = TerrainBrushShape::Square;
         }
-        // Placement has no gradient or flow, only an area
         ImGui::BeginDisabled(placementBrush);
         terrainPropertyRow("Falloff", "How brush strength fades from its center to its edge.");
         int falloff = static_cast<int>(brushFalloff);
@@ -2874,7 +2870,6 @@ bool editor::TerrainEditWindow::isEditingScene(Scene* scene) const{
         return false;
     }
 
-    // Placement writes entities, not a map, so there is no brush texture to require
     if (isPlacementBrush()){
         return isPlacementReady();
     }
