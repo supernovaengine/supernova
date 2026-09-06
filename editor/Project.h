@@ -148,6 +148,12 @@ namespace doriax::editor{
         float placeMaxScale = 1.0f;
         float placeRotationJitter = 1.0f;
         float placeAlignToNormal = 0.0f;
+
+        bool paintUseMask = false;       // restrict texture paint to a slope and height range
+        float paintMinSlope = 0.0f;      // degrees
+        float paintMaxSlope = 90.0f;
+        float paintMinHeight = 0.0f;     // normalized against the terrain maxHeight
+        float paintMaxHeight = 1.0f;
     };
 
     using SharedMoveRecovery = std::map<std::string, SharedMoveRecoveryEntry>;

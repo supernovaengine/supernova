@@ -21,6 +21,7 @@ namespace doriax::editor{
         Lower,
         Smooth,
         Flatten,
+        PaintBase,
         PaintRed,
         PaintGreen,
         PaintBlue,
@@ -152,6 +153,12 @@ namespace doriax::editor{
         float placeRotationJitter;
         float placeAlignToNormal;
 
+        bool paintUseMask;
+        float paintMinSlope;
+        float paintMaxSlope;
+        float paintMinHeight;
+        float paintMaxHeight;
+
         // An asset the load proved cannot be instanced, so the brush stops retrying it
         std::string instancingRejectedAsset;
         uint64_t placementStrokeCounter = 0;
@@ -164,7 +171,8 @@ namespace doriax::editor{
         void showTooltip(const char* text, ImGuiHoveredFlags flags = 0);
         bool iconButton(const char* icon, const char* id, const char* tooltip, bool selected, const ImVec2& size);
         void drawMapSettings(const TerrainMapRef& ref, const char* label, int& resolution);
-        float drawAssetThumbnail(const std::string& path, const char* id);
+        float drawAssetThumbnail(const std::string& path, const char* id, bool selected = false, float scale = 3.0f);
+        void drawTextureLayers(TerrainComponent& terrain);
         void drawFoliageMesh(const TerrainFoliageLayer& layer);
         void drawPlacementAsset();
         std::string makeEditableTextureId(uint32_t sceneId, Entity entity, const TerrainMapRef& ref);
@@ -198,6 +206,7 @@ namespace doriax::editor{
         int mapResolutionFor(TerrainMapTarget target) const;
         TerrainMapRef getBrushMapRef() const;
         bool isHeightBrush() const;
+        bool isBlendBrush() const;
         bool isDensityBrush() const;
         bool isPlacementBrush() const;
         // Erase needs no asset, placing does

@@ -6,6 +6,7 @@
 #include "Backend.h"
 #include "Catalog.h"
 #include "Out.h"
+#include "Theme.h"
 #include "command/CommandHandle.h"
 #include "command/type/CreateEntityCmd.h"
 #include "command/type/DeleteEntityCmd.h"
@@ -1018,6 +1019,11 @@ editor::TerrainEditWindow::TerrainEditWindow(Project* project){
     placeMaxScale = 1.0f;
     placeRotationJitter = 1.0f;
     placeAlignToNormal = 0.0f;
+    paintUseMask = false;
+    paintMinSlope = 0.0f;
+    paintMaxSlope = 90.0f;
+    paintMinHeight = 0.0f;
+    paintMaxHeight = 1.0f;
     placementRandom.seed(std::random_device{}());
 }
 
@@ -1399,6 +1405,13 @@ bool editor::TerrainEditWindow::isHeightBrush() const{
            brushMode == TerrainBrushMode::Flatten;
 }
 
+bool editor::TerrainEditWindow::isBlendBrush() const{
+    return brushMode == TerrainBrushMode::PaintBase ||
+           brushMode == TerrainBrushMode::PaintRed ||
+           brushMode == TerrainBrushMode::PaintGreen ||
+           brushMode == TerrainBrushMode::PaintBlue;
+}
+
 bool editor::TerrainEditWindow::isDensityBrush() const{
     return brushMode == TerrainBrushMode::PaintDensity || brushMode == TerrainBrushMode::EraseDensity;
 }
@@ -1618,12 +1631,45 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
         return smoothSource[static_cast<size_t>(sy) * srcWidth + sx];
     };
 
-    int paintChannel = 0;
-    if (mode == TerrainBrushMode::PaintGreen){
+    // Base owns no channel: painting it clears the others and lets the base texture back in
+    int paintChannel = -1;
+    if (mode == TerrainBrushMode::PaintRed){
+        paintChannel = 0;
+    }else if (mode == TerrainBrushMode::PaintGreen){
         paintChannel = 1;
     }else if (mode == TerrainBrushMode::PaintBlue){
         paintChannel = 2;
     }
+
+    // "Rock above 40 degrees" and the like: texels outside the range keep what they had
+    const bool useMask = paintUseMask && target == TerrainMapTarget::BlendMap;
+    std::shared_ptr<MeshSystem> meshSystem;
+    if (useMask){
+        SceneProject* maskScene = project->getScene(stroke.sceneId);
+        if (maskScene){
+            meshSystem = maskScene->scene->getSystem<MeshSystem>();
+        }
+        // Nothing to test the terrain against, so the mask holds everything back
+        if (!meshSystem){
+            return false;
+        }
+    }
+    const float maskSpanX = static_cast<float>(std::max(1, width - 1));
+    const float maskSpanY = static_cast<float>(std::max(1, height - 1));
+    auto maskedOut = [&](int x, int y){
+        const float localX = (static_cast<float>(x) / maskSpanX) * terrain.terrainSize - halfSize;
+        const float localZ = (static_cast<float>(y) / maskSpanY) * terrain.terrainSize - halfSize;
+        float surfaceHeight = 0.0f;
+        Vector3 normal(0.0f, 1.0f, 0.0f);
+        meshSystem->sampleTerrainSurface(terrain, localX, localZ, surfaceHeight, normal);
+
+        const float slope = Angle::radToDeg(std::acos(std::clamp(normal.y, -1.0f, 1.0f)));
+        if (slope < paintMinSlope || slope > paintMaxSlope){
+            return true;
+        }
+        const float normalized = (terrain.maxHeight != 0.0f) ? (surfaceHeight / terrain.maxHeight) : 0.0f;
+        return normalized < paintMinHeight || normalized > paintMaxHeight;
+    };
 
     auto applyTexel = [&](int x, int y, float weight){
         const size_t texelIndex = static_cast<size_t>(y) * width + x;
@@ -1654,7 +1700,7 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
             const size_t index = texelIndex * 4;
             for (int c = 0; c < 3; c++){
                 const float current = stroke.workingPixels[index + c];
-                const float targetValue = c == paintChannel ? 1.0f : (normalizeBlendPaint ? 0.0f : current);
+                const float targetValue = (c == paintChannel) ? 1.0f : ((normalizeBlendPaint || paintChannel < 0) ? 0.0f : current);
                 stroke.workingPixels[index + c] = current + (targetValue - current) * weight;
             }
             stroke.workingPixels[index + 3] = 1.0f;
@@ -1668,6 +1714,9 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
             const float dy = (static_cast<float>(y) - centerY) / radiusY;
             const float distance = brushShape == TerrainBrushShape::Circle ? std::sqrt(dx * dx + dy * dy) : std::max(std::abs(dx), std::abs(dy));
             if (distance > 1.0f){
+                continue;
+            }
+            if (useMask && maskedOut(x, y)){
                 continue;
             }
 
@@ -1689,8 +1738,14 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
     if (!touched){
         const int x = std::clamp(static_cast<int>(std::lround(centerX)), minX, maxX);
         const int y = std::clamp(static_cast<int>(std::lround(centerY)), minY, maxY);
-        applyTexel(x, y, std::clamp(brushStrength * flowRate * deltaTime, 0.0f, 1.0f));
-        touched = true;
+        if (!useMask || !maskedOut(x, y)){
+            applyTexel(x, y, std::clamp(brushStrength * flowRate * deltaTime, 0.0f, 1.0f));
+            touched = true;
+        }
+    }
+
+    if (!touched){
+        return false;
     }
 
     stroke.dirtyRegion.merge(minX, minY, maxX, maxY);
@@ -2159,22 +2214,26 @@ void editor::TerrainEditWindow::drawMapSettings(const TerrainMapRef& ref, const 
 }
 
 // Returns the size it drew at, which decides whether the details fit beside it
-float editor::TerrainEditWindow::drawAssetThumbnail(const std::string& path, const char* id){
-    const float thumbSize = std::min(ImGui::GetFrameHeight() * 3.0f, std::max(1.0f, ImGui::GetContentRegionAvail().x));
+float editor::TerrainEditWindow::drawAssetThumbnail(const std::string& path, const char* id, bool selected, float scale){
+    const float thumbSize = std::min(ImGui::GetFrameHeight() * scale, std::max(1.0f, ImGui::GetContentRegionAvail().x));
     int width = 0;
     int height = 0;
     ImTextureID thumbnail = Backend::getApp().getResourcesWindow()->getAssetThumbnail(path, width, height);
     const ImVec2 p = ImGui::GetCursorScreenPos();
     ImDrawList* drawList = ImGui::GetWindowDrawList();
     const float rounding = ImGui::GetStyle().FrameRounding;
-    drawList->AddRectFilled(p, ImVec2(p.x + thumbSize, p.y + thumbSize), ImGui::GetColorU32(ImGuiCol_FrameBg), rounding);
+    const ImVec4 background = selected ? Theme::Colors::ButtonActivated : ImGui::GetStyleColorVec4(ImGuiCol_FrameBg);
+    drawList->AddRectFilled(p, ImVec2(p.x + thumbSize, p.y + thumbSize), ImGui::GetColorU32(background), rounding);
     if (thumbnail && width > 0 && height > 0){
-        const float scale = thumbSize / std::max(width, height);
-        const ImVec2 min(p.x + (thumbSize - width * scale) * 0.5f, p.y + (thumbSize - height * scale) * 0.5f);
-        Widgets::addImageRounded(drawList, thumbnail, min, ImVec2(min.x + width * scale, min.y + height * scale), ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE, rounding, ImDrawFlags_RoundCornersAll);
+        const float fit = thumbSize / std::max(width, height);
+        const ImVec2 min(p.x + (thumbSize - width * fit) * 0.5f, p.y + (thumbSize - height * fit) * 0.5f);
+        Widgets::addImageRounded(drawList, thumbnail, min, ImVec2(min.x + width * fit, min.y + height * fit), ImVec2(0, 0), ImVec2(1, 1), IM_COL32_WHITE, rounding, ImDrawFlags_RoundCornersAll);
     }else{
         const ImVec2 size = ImGui::CalcTextSize(ICON_FA_CUBE);
         drawList->AddText(ImVec2(p.x + (thumbSize - size.x) * 0.5f, p.y + (thumbSize - size.y) * 0.5f), ImGui::GetColorU32(ImGuiCol_TextDisabled), ICON_FA_CUBE);
+    }
+    if (selected){
+        drawList->AddRect(p, ImVec2(p.x + thumbSize, p.y + thumbSize), ImGui::GetColorU32(ImGuiCol_NavHighlight), rounding, 0, 2.0f);
     }
     ImGui::InvisibleButton(id, ImVec2(thumbSize, thumbSize));
     if (ImGui::IsItemHovered() && thumbnail){
@@ -2187,13 +2246,120 @@ float editor::TerrainEditWindow::drawAssetThumbnail(const std::string& path, con
     return thumbSize;
 }
 
+// The blend map channels as a material list, so nobody has to remember which one is the rock
+void editor::TerrainEditWindow::drawTextureLayers(TerrainComponent& terrain){
+    SceneProject* sceneProject = getTargetSceneProject();
+    const ImVec2 buttonSize(ImGui::GetFrameHeight(), ImGui::GetFrameHeight());
+    const ImVec2 spacing = ImGui::GetStyle().ItemSpacing;
+    const ImVec2 detailsSpacing(spacing.x * 0.5f, spacing.y * 0.5f);
+    const float labelHeight = ImGui::GetTextLineHeight();
+    const float previewHeight = buttonSize.y * 2.0f + spacing.y;
+
+    auto assignLayer = [&](const char* property, const fs::path& path){
+        if (!path.empty() && !project->isInsideAssetsPath(path)){
+            Backend::getApp().registerOutsideAssetsAlert(path.string());
+            return;
+        }
+        endStroke();
+        Texture texture;
+        if (!path.empty()){
+            texture = Texture(project->normalizeToAssetsRelative(path).generic_string());
+        }
+        CommandHandle::get(sceneProject->id)->addCommandNoMerge(new PropertyCmd<Texture>(
+            project, sceneProject->id, selectedEntity, ComponentType::TerrainComponent, property, texture));
+    };
+
+    // property is null for the base, whose texture belongs to the material, not the terrain
+    auto layerRow = [&](const char* label, const char* tooltip, TerrainBrushMode mode, const std::string& path, const char* property){
+        terrainPropertyRow(label, tooltip);
+        ImGui::PushID(label);
+        ImGui::BeginGroup();
+
+        const float available = std::max(1.0f, ImGui::GetContentRegionAvail().x);
+        const float startY = ImGui::GetCursorPosY();
+        const bool selected = brushActive && brushMode == mode;
+        const float thumbSize = drawAssetThumbnail(path, "##thumb", selected, previewHeight / buttonSize.y);
+        if (ImGui::IsItemClicked()){
+            endStroke();
+            brushMode = mode;
+            brushActive = !selected;
+        }
+
+        const char* emptyLabel = property ? "No texture" : "Material base color";
+        const float detailsWidth = std::max(ImGui::CalcTextSize(emptyLabel).x, buttonSize.x * 2.0f + detailsSpacing.x);
+        if (available >= thumbSize + spacing.x + detailsWidth){
+            ImGui::SameLine(0.0f, spacing.x);
+            const float detailsHeight = labelHeight + (property ? detailsSpacing.y + buttonSize.y : 0.0f);
+            ImGui::SetCursorPosY(startY + std::floor(std::max(0.0f, (thumbSize - detailsHeight) * 0.5f)));
+        }
+        ImGui::BeginGroup();
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, detailsSpacing);
+        // Give the label its own baseline and clip long filenames to the value column.
+        if (ImGui::BeginChild("##texture_name", ImVec2(std::max(1.0f, ImGui::GetContentRegionAvail().x), labelHeight), ImGuiChildFlags_None,
+                              ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)){
+            if (path.empty()){
+                ImGui::TextDisabled("%s", emptyLabel);
+            }else{
+                ImGui::TextUnformatted(fs::path(path).filename().string().c_str());
+            }
+        }
+        ImGui::EndChild();
+        if (!path.empty()){
+            showTooltip(path.c_str());
+        }
+        if (property){
+            if (iconButton(ICON_FA_FOLDER_OPEN, "browse", "Choose layer texture", false, buttonSize)){
+                const std::string chosen = FileDialogs::openFileDialog(project->getAssetsPath().string(), FILE_DIALOG_IMAGE);
+                if (!chosen.empty()){
+                    assignLayer(property, chosen);
+                }
+            }
+            ImGui::SameLine();
+            ImGui::BeginDisabled(path.empty());
+            if (iconButton(ICON_FA_XMARK, "clear", "Clear layer texture", false, buttonSize)){
+                assignLayer(property, {});
+            }
+            ImGui::EndDisabled();
+        }
+        ImGui::PopStyleVar();
+        ImGui::EndGroup();
+        ImGui::EndGroup();
+
+        if (property && ImGui::BeginDragDropTarget()){
+            if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("resource_files")){
+                const std::vector<std::string> dropped = Util::getStringsFromPayload(payload);
+                if (!dropped.empty() && Util::isImageFile(dropped[0])){
+                    assignLayer(property, dropped[0]);
+                }
+            }
+            ImGui::EndDragDropTarget();
+        }
+        ImGui::PopID();
+    };
+
+    std::string basePath;
+    if (MeshComponent* mesh = sceneProject->scene->findComponent<MeshComponent>(selectedEntity)){
+        if (mesh->numSubmeshes > 0){
+            basePath = mesh->submeshes[0].material.baseColorTexture.getPath(0);
+        }
+    }
+
+    layerRow("Base", "The material's base color, shown where nothing is painted over it.", TerrainBrushMode::PaintBase, basePath, nullptr);
+    layerRow("Layer 1", "Painted into the blend map's red channel.", TerrainBrushMode::PaintRed, terrain.textureDetailRed.getPath(0), "textureDetailRed");
+    layerRow("Layer 2", "Painted into the blend map's green channel.", TerrainBrushMode::PaintGreen, terrain.textureDetailGreen.getPath(0), "textureDetailGreen");
+    layerRow("Layer 3", "Painted into the blend map's blue channel.", TerrainBrushMode::PaintBlue, terrain.textureDetailBlue.getPath(0), "textureDetailBlue");
+}
+
 void editor::TerrainEditWindow::drawFoliageMesh(const TerrainFoliageLayer& layer){
     terrainPropertyRow("Mesh", "Choose a model or drag one from Resources.");
     ImGui::BeginGroup();
     const float available = std::max(1.0f, ImGui::GetContentRegionAvail().x);
+    const float startY = ImGui::GetCursorPosY();
     const float thumbSize = drawAssetThumbnail(layer.meshPath, "##foliage_preview");
     if (available > thumbSize + ImGui::GetFrameHeight() * 4.0f){
         ImGui::SameLine();
+        const float detailsHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeight();
+        ImGui::SetCursorPosY(startY + std::max(0.0f, (thumbSize - detailsHeight) * 0.5f));
     }
     ImGui::BeginGroup();
     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x);
@@ -2248,9 +2414,12 @@ void editor::TerrainEditWindow::drawPlacementAsset(){
     terrainPropertyRow("Asset", "Model or entity bundle the placement brush drops. Drag one from Resources.");
     ImGui::BeginGroup();
     const float available = std::max(1.0f, ImGui::GetContentRegionAvail().x);
+    const float startY = ImGui::GetCursorPosY();
     const float thumbSize = drawAssetThumbnail(placeAssetPath, "##place_preview");
     if (available > thumbSize + ImGui::GetFrameHeight() * 4.0f){
         ImGui::SameLine();
+        const float detailsHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeight();
+        ImGui::SetCursorPosY(startY + std::max(0.0f, (thumbSize - detailsHeight) * 0.5f));
     }
     ImGui::BeginGroup();
     ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x);
@@ -2363,15 +2532,10 @@ void editor::TerrainEditWindow::show(){
             brushActive = !selected;
         }
     };
-    auto paintButton = [&](TerrainBrushMode mode, const char* id, const char* tooltip, const ImVec4& color){
-        ImGui::PushStyleColor(ImGuiCol_Text, color);
-        brushButton(mode, ICON_FA_BRUSH, id, tooltip);
-        ImGui::PopStyleColor();
-    };
 
-    if (ImGui::CollapsingHeader("Terrain", ImGuiTreeNodeFlags_DefaultOpen) && beginTerrainProperties("terrain_properties")){
+    if (ImGui::CollapsingHeader("Sculpt", ImGuiTreeNodeFlags_DefaultOpen) && beginTerrainProperties("sculpt_properties")){
         drawMapSettings(TerrainMapTarget::HeightMap, "Heightmap", heightMapResolution);
-        terrainPropertyRow("Sculpt");
+        terrainPropertyRow("Brushes");
         ImGui::BeginDisabled(terrain.heightMap.empty());
         brushButton(TerrainBrushMode::Raise, ICON_FA_ARROW_UP, "terrain_raise", "Raise terrain (Ctrl lowers, Shift smooths)");
         ImGui::SameLine();
@@ -2381,19 +2545,17 @@ void editor::TerrainEditWindow::show(){
         ImGui::SameLine();
         brushButton(TerrainBrushMode::Flatten, ICON_FA_GRIP_LINES, "terrain_flatten", "Flatten terrain (Shift smooths)");
         ImGui::EndDisabled();
+        ImGui::EndTable();
+    }
 
+    if (ImGui::CollapsingHeader("Texture Paint", ImGuiTreeNodeFlags_DefaultOpen) && beginTerrainProperties("texture_paint_properties")){
         drawMapSettings(TerrainMapTarget::BlendMap, "Blendmap", blendMapResolution);
-        terrainPropertyRow("Paint");
         ImGui::BeginDisabled(terrain.blendMap.empty());
-        paintButton(TerrainBrushMode::PaintRed, "terrain_paint_red", "Paint red blend channel", ImVec4(0.95f, 0.28f, 0.20f, 1.0f));
-        ImGui::SameLine();
-        paintButton(TerrainBrushMode::PaintGreen, "terrain_paint_green", "Paint green blend channel", ImVec4(0.28f, 0.78f, 0.28f, 1.0f));
-        ImGui::SameLine();
-        paintButton(TerrainBrushMode::PaintBlue, "terrain_paint_blue", "Paint blue blend channel", ImVec4(0.25f, 0.48f, 0.95f, 1.0f));
-        ImGui::SameLine();
-        if (iconButton(ICON_FA_SCALE_BALANCED, "normalize_blend", "Normalize paint: fade other channels while painting", normalizeBlendPaint, buttonSize)){
-            normalizeBlendPaint = !normalizeBlendPaint;
-        }
+        drawTextureLayers(terrain);
+        terrainPropertyRow("Normalize", "Fade the other layers while painting one. Base always clears them.");
+        ImGui::BeginDisabled(brushMode == TerrainBrushMode::PaintBase);
+        ImGui::Checkbox("##normalize_blend", &normalizeBlendPaint);
+        ImGui::EndDisabled();
         ImGui::EndDisabled();
         ImGui::EndTable();
     }
@@ -2585,6 +2747,16 @@ void editor::TerrainEditWindow::show(){
             brushStrength = strength / 100.0f;
         }
         ImGui::EndDisabled();
+        if (isBlendBrush()){
+            terrainPropertyRow("Mask", "Restrict painting to a range of slope and height.");
+            ImGui::Checkbox("##paint_mask", &paintUseMask);
+            ImGui::BeginDisabled(!paintUseMask);
+            terrainPropertyRow("Slope range", "Allowed ground slope in degrees, from flat (0) to vertical (90).");
+            ImGui::DragFloatRange2("##paint_slope", &paintMinSlope, &paintMaxSlope, 0.5f, 0.0f, 90.0f, "%.0f deg", "%.0f deg", ImGuiSliderFlags_AlwaysClamp);
+            terrainPropertyRow("Height range", "Allowed ground height, from the terrain base (0) to its max height (1).");
+            ImGui::DragFloatRange2("##paint_height", &paintMinHeight, &paintMaxHeight, 0.01f, 0.0f, 1.0f, "%.2f", "%.2f", ImGuiSliderFlags_AlwaysClamp);
+            ImGui::EndDisabled();
+        }
         if (brushMode == TerrainBrushMode::Flatten){
             terrainPropertyRow("Sample height", "Pick the flatten height from the terrain at the start of each stroke.");
             ImGui::Checkbox("##flatten_pick", &flattenPickOnStroke);
@@ -2611,6 +2783,11 @@ void editor::TerrainEditWindow::show(){
     ts.normalizeBlendPaint = normalizeBlendPaint;
     ts.heightMapStartAtMiddle = heightMapStartAtMiddle;
     ts.flattenPickOnStroke = flattenPickOnStroke;
+    ts.paintUseMask = paintUseMask;
+    ts.paintMinSlope = paintMinSlope;
+    ts.paintMaxSlope = paintMaxSlope;
+    ts.paintMinHeight = paintMinHeight;
+    ts.paintMaxHeight = paintMaxHeight;
     ts.placeAssetPath = placeAssetPath;
     ts.placeInstanced = placeInstanced;
     ts.placeSpacing = placeSpacing;
@@ -2665,6 +2842,11 @@ void editor::TerrainEditWindow::openForEntity(Entity entity, uint32_t sceneId){
     normalizeBlendPaint = ts.normalizeBlendPaint;
     heightMapStartAtMiddle = ts.heightMapStartAtMiddle;
     flattenPickOnStroke = ts.flattenPickOnStroke;
+    paintUseMask = ts.paintUseMask;
+    paintMinSlope = std::clamp(ts.paintMinSlope, 0.0f, 90.0f);
+    paintMaxSlope = std::clamp(ts.paintMaxSlope, paintMinSlope, 90.0f);
+    paintMinHeight = std::clamp(ts.paintMinHeight, 0.0f, 1.0f);
+    paintMaxHeight = std::clamp(ts.paintMaxHeight, paintMinHeight, 1.0f);
     placeAssetPath = ts.placeAssetPath;
     placeInstanced = ts.placeInstanced;
     placeSpacing = std::max(MIN_PLACE_SPACING, ts.placeSpacing);

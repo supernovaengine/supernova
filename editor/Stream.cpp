@@ -655,6 +655,7 @@ std::string terrainBrushModeToString(editor::TerrainBrushMode mode) {
         case editor::TerrainBrushMode::Lower: return "Lower";
         case editor::TerrainBrushMode::Smooth: return "Smooth";
         case editor::TerrainBrushMode::Flatten: return "Flatten";
+        case editor::TerrainBrushMode::PaintBase: return "PaintBase";
         case editor::TerrainBrushMode::PaintRed: return "PaintRed";
         case editor::TerrainBrushMode::PaintGreen: return "PaintGreen";
         case editor::TerrainBrushMode::PaintBlue: return "PaintBlue";
@@ -671,6 +672,7 @@ editor::TerrainBrushMode stringToTerrainBrushMode(const std::string& str) {
     if (str == "Lower") return editor::TerrainBrushMode::Lower;
     if (str == "Smooth") return editor::TerrainBrushMode::Smooth;
     if (str == "Flatten") return editor::TerrainBrushMode::Flatten;
+    if (str == "PaintBase") return editor::TerrainBrushMode::PaintBase;
     if (str == "PaintRed") return editor::TerrainBrushMode::PaintRed;
     if (str == "PaintGreen") return editor::TerrainBrushMode::PaintGreen;
     if (str == "PaintBlue") return editor::TerrainBrushMode::PaintBlue;
@@ -1604,6 +1606,11 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         terrainNode["normalizeBlendPaint"] = ts.normalizeBlendPaint;
         terrainNode["heightMapStartAtMiddle"] = ts.heightMapStartAtMiddle;
         terrainNode["flattenPickOnStroke"] = ts.flattenPickOnStroke;
+        terrainNode["paintUseMask"] = ts.paintUseMask;
+        encodeFinite(terrainNode, "paintMinSlope", ts.paintMinSlope);
+        encodeFinite(terrainNode, "paintMaxSlope", ts.paintMaxSlope);
+        encodeFinite(terrainNode, "paintMinHeight", ts.paintMinHeight);
+        encodeFinite(terrainNode, "paintMaxHeight", ts.paintMaxHeight);
         terrainNode["placeAssetPath"] = ts.placeAssetPath;
         terrainNode["placeInstanced"] = ts.placeInstanced;
         encodePositiveFinite(terrainNode, "placeSpacing", ts.placeSpacing);
@@ -1803,6 +1810,11 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         if (tn["heightMapStartAtMiddle"].IsDefined()) ts.heightMapStartAtMiddle = tn["heightMapStartAtMiddle"].as<bool>();
         if (tn["flattenPickOnStroke"].IsDefined()) ts.flattenPickOnStroke = tn["flattenPickOnStroke"].as<bool>();
         else ts.brushStrength = TerrainEditorSettings{}.brushStrength; // file predates time-based flow; old per-event strengths are far too weak under the new semantics
+        if (tn["paintUseMask"].IsDefined())       ts.paintUseMask       = tn["paintUseMask"].as<bool>();
+        if (tn["paintMinSlope"].IsDefined())      ts.paintMinSlope      = decodeFinite(tn["paintMinSlope"], ts.paintMinSlope);
+        if (tn["paintMaxSlope"].IsDefined())      ts.paintMaxSlope      = decodeFinite(tn["paintMaxSlope"], ts.paintMaxSlope);
+        if (tn["paintMinHeight"].IsDefined())     ts.paintMinHeight     = decodeFinite(tn["paintMinHeight"], ts.paintMinHeight);
+        if (tn["paintMaxHeight"].IsDefined())     ts.paintMaxHeight     = decodeFinite(tn["paintMaxHeight"], ts.paintMaxHeight);
         if (tn["placeAssetPath"].IsDefined())     ts.placeAssetPath     = tn["placeAssetPath"].as<std::string>();
         if (tn["placeInstanced"].IsDefined())     ts.placeInstanced     = tn["placeInstanced"].as<bool>();
         if (tn["placeSpacing"].IsDefined())       ts.placeSpacing       = decodePositiveFinite(tn["placeSpacing"], ts.placeSpacing);
