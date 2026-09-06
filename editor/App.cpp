@@ -2117,7 +2117,9 @@ std::filesystem::path editor::App::getUserShaderCacheDir(){
     //      (params.w), so SSR can composite to the swapchain in exported builds.
     // v23: explicit SSR LOD sampling prevents D3D11 loop-unrolling failures.
     // v24: instanced distance fade (USE_INSTANCE_FADE) scales each instance toward its own
-    //      base in the mesh and depth vertex shaders, from the new u_vs_fade block.
+    //      base in the mesh and depth vertex shaders, from the new u_vs_fade block. Terrain
+    //      detail layers blend by height, project triplanar on steep ground and break their
+    //      tiling with distance, from three new terrain varyings.
     return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v24";
 }
 
