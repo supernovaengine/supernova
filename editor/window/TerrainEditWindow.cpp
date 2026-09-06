@@ -1033,9 +1033,7 @@ editor::TerrainEditWindow::~TerrainEditWindow(){
 }
 
 // Instancing draws the host entity's own mesh, so an asset only qualifies when the load
-// puts every part of it on the root. A skinned or animated model spreads across child
-// entities and a skeleton instead, and reopening the project would rebuild it that way
-// even if the first load had been flattened.
+// puts all of its geometry on the root.
 static bool isInstanceableHost(Scene* scene, Entity host){
     ModelComponent* model = scene->findComponent<ModelComponent>(host);
     MeshComponent* mesh = scene->findComponent<MeshComponent>(host);
@@ -1047,20 +1045,16 @@ static bool isInstanceableHost(Scene* scene, Entity host){
            model->skeleton == NULL_ENTITY;
 }
 
-// Grows the instance buffer with headroom; the mesh has to reload for the larger one.
-static void reserveInstances(Scene* scene, Entity host, size_t needed){
-    InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(host);
-    if (instmesh.maxInstances >= needed){
-        return;
-    }
-    instmesh.maxInstances = static_cast<unsigned int>(needed + needed / 4 + 8);
-    scene->getComponent<MeshComponent>(host).needReload = true;
+// The brush has to know whether an asset can be instanced before it places the stamp.
+static bool executeSync(editor::Command* command){
+    const bool wasAsync = Engine::isAsyncLoading();
+    Engine::setAsyncLoading(false);
+    const bool done = command->execute();
+    Engine::setAsyncLoading(wasAsync);
+    return done;
 }
 
 // Appends one instance to the host for this asset, creating the host the first time.
-// The host is a merged static model so a multi-node asset still draws as one instance;
-// an asset that cannot merge (skinned or animated) fails here and the brush falls back
-// to placing entities.
 class editor::TerrainEditWindow::TerrainInstancePlaceCmd: public editor::Command{
 private:
     Project* project;
@@ -1074,23 +1068,49 @@ private:
     ModelLoadCmd* mergeHostCmd = nullptr;
     Entity host = NULL_ENTITY;
     size_t insertedIndex = 0;
-    bool wasModified;
+    bool wasModified = false;
 
-    // Loaded synchronously so the host can be judged right here: the caller needs to know
-    // whether this asset can be instanced before it decides how to place the stamp.
-    static bool executeSync(Command* command){
-        const bool wasAsync = Engine::isAsyncLoading();
-        Engine::setAsyncLoading(false);
-        const bool done = command->execute();
-        Engine::setAsyncLoading(wasAsync);
-        return done;
+    bool createHost(SceneProject* sceneProject){
+        Scene* scene = sceneProject->scene;
+
+        if (!createHostCmd){
+            std::string name = fs::path(assetPath).stem().string();
+            createHostCmd = new CreateEntityCmd(project, sceneId, name.empty() ? "Objects" : name, EntityCreationType::MODEL, terrainEntity);
+            createHostCmd->setQuiet(true);
+        }
+        if (!createHostCmd->execute()){
+            return false;
+        }
+
+        host = createHostCmd->getEntity();
+        scene->addComponent<InstancedMeshComponent>(host, {});
+
+        if (!loadHostCmd){
+            loadHostCmd = new ModelLoadCmd(project, sceneId, host, assetPath);
+        }
+        bool usable = executeSync(loadHostCmd);
+
+        // A multi-node asset spreads over child entities until it is merged as one static mesh.
+        if (usable && !isInstanceableHost(scene, host)){
+            if (!mergeHostCmd){
+                mergeHostCmd = new ModelLoadCmd(project, sceneId, host, assetPath, true);
+            }
+            usable = executeSync(mergeHostCmd) && isInstanceableHost(scene, host);
+        }
+
+        if (!usable){
+            loadHostCmd->undo();
+            createHostCmd->undo();
+            host = NULL_ENTITY;
+            return false;
+        }
+
+        return true;
     }
 
 public:
     TerrainInstancePlaceCmd(Project* project, uint32_t sceneId, Entity terrainEntity, const std::string& assetPath, const InstanceData& instance):
-        project(project), sceneId(sceneId), terrainEntity(terrainEntity), assetPath(assetPath), instance(instance),
-        wasModified(project->getScene(sceneId)->isModified){
-    }
+        project(project), sceneId(sceneId), terrainEntity(terrainEntity), assetPath(assetPath), instance(instance){}
 
     ~TerrainInstancePlaceCmd() override{
         delete mergeHostCmd;
@@ -1103,60 +1123,25 @@ public:
         if (!sceneProject){
             return false;
         }
-        Scene* scene = sceneProject->scene;
+        wasModified = sceneProject->isModified;
 
         host = findInstanceHost(sceneProject, terrainEntity, assetPath);
-        if (host == NULL_ENTITY){
-            if (!createHostCmd){
-                std::string name = fs::path(assetPath).stem().string();
-                createHostCmd = new CreateEntityCmd(project, sceneId, name.empty() ? "Objects" : name,
-                                                    EntityCreationType::MODEL, terrainEntity);
-                createHostCmd->setQuiet(true);
-            }
-            if (!createHostCmd->execute()){
-                return false;
-            }
-            host = createHostCmd->getEntity();
-
-            if (!scene->findComponent<InstancedMeshComponent>(host)){
-                scene->addComponent<InstancedMeshComponent>(host, {});
-            }
-
-            delete mergeHostCmd;
-            mergeHostCmd = nullptr;
-            delete loadHostCmd;
-            loadHostCmd = new ModelLoadCmd(project, sceneId, host, assetPath);
-
-            bool usable = executeSync(loadHostCmd);
-            if (usable && !isInstanceableHost(scene, host)){
-                // A multi-node asset spreads over child entities, so reload it as one
-                // merged static mesh — the same shape the foliage chunks use, and one
-                // that survives reopening the project because the flag is serialized.
-                mergeHostCmd = new ModelLoadCmd(project, sceneId, host, assetPath, true);
-                usable = executeSync(mergeHostCmd) && isInstanceableHost(scene, host);
-                if (!usable){
-                    delete mergeHostCmd;
-                    mergeHostCmd = nullptr;
-                }
-            }
-
-            if (!usable){
-                if (loadHostCmd){
-                    loadHostCmd->undo();
-                    delete loadHostCmd;
-                    loadHostCmd = nullptr;
-                }
-                createHostCmd->undo();
-                host = NULL_ENTITY;
-                return false;
-            }
+        if (host == NULL_ENTITY && !createHost(sceneProject)){
+            return false;
         }
 
+        Scene* scene = sceneProject->scene;
         InstancedMeshComponent& instmesh = scene->getComponent<InstancedMeshComponent>(host);
         insertedIndex = instmesh.instances.size();
         instmesh.instances.push_back(instance);
         instmesh.needUpdateInstances = true;
-        reserveInstances(scene, host, instmesh.instances.size());
+
+        // Grows with headroom, and the mesh reloads to get the larger buffer
+        const size_t needed = instmesh.instances.size();
+        if (instmesh.maxInstances < needed){
+            instmesh.maxInstances = static_cast<unsigned int>(needed + needed / 4 + 8);
+            scene->getComponent<MeshComponent>(host).needReload = true;
+        }
 
         sceneProject->isModified = true;
         return true;
@@ -1178,14 +1163,8 @@ public:
             }
         }
 
-        // Only the command that created the host takes it away again.
+        // Only the stamp that created the host takes it away again.
         if (createHostCmd){
-            if (mergeHostCmd){
-                mergeHostCmd->undo();
-            }
-            if (loadHostCmd){
-                loadHostCmd->undo();
-            }
             createHostCmd->undo();
             host = NULL_ENTITY;
         }
@@ -1193,18 +1172,16 @@ public:
         sceneProject->isModified = wasModified;
     }
 
-    bool mergeWith(Command* otherCommand) override{
+    bool mergeWith(editor::Command* otherCommand) override{
         return false;
     }
 
-    // Appending to an existing host changes no entity, so the outliner has nothing to
-    // rebuild; only the stamp that brought the host into being is structural.
     bool affectsStructure() const override{
         return createHostCmd != nullptr;
     }
 };
 
-// Removes instances from one host and puts them back, at their original indices, on undo.
+// Removes instances from one host, putting them back at their original indices on undo.
 class editor::TerrainEditWindow::TerrainInstanceEraseCmd: public editor::Command{
 private:
     Project* project;
@@ -1212,13 +1189,11 @@ private:
     Entity host;
     std::vector<size_t> indices; //ascending
     std::vector<InstanceData> removed;
-    bool wasModified;
+    bool wasModified = false;
 
 public:
     TerrainInstanceEraseCmd(Project* project, uint32_t sceneId, Entity host, const std::vector<size_t>& indices):
-        project(project), sceneId(sceneId), host(host), indices(indices),
-        wasModified(project->getScene(sceneId)->isModified){
-    }
+        project(project), sceneId(sceneId), host(host), indices(indices){}
 
     bool execute() override{
         SceneProject* sceneProject = project->getScene(sceneId);
@@ -1229,9 +1204,10 @@ public:
         if (!instmesh){
             return false;
         }
+        wasModified = sceneProject->isModified;
 
+        // Back to front, so the indices still address what they did at collection.
         removed.clear();
-        // Back to front, so the indices still address what they addressed at collection.
         for (size_t i = indices.size(); i > 0; i--){
             const size_t index = indices[i - 1];
             if (index >= instmesh->instances.size()){
@@ -1257,7 +1233,6 @@ public:
             return;
         }
 
-        // Front to back, so each one lands back on the index it came from.
         for (size_t i = 0; i < indices.size() && i < removed.size(); i++){
             const size_t index = std::min(indices[i], instmesh->instances.size());
             instmesh->instances.insert(instmesh->instances.begin() + index, removed[i]);
@@ -1266,32 +1241,30 @@ public:
         sceneProject->isModified = wasModified;
     }
 
-    bool mergeWith(Command* otherCommand) override{
+    bool mergeWith(editor::Command* otherCommand) override{
         return false;
     }
 
-    // The host entity stays either way, so nothing structural changes.
     bool affectsStructure() const override{
         return false;
     }
 };
 
-// One undo step per placement stroke. Each stamp adds its own create/delete command
-// and merges into the stroke's previous one, so a drag that drops thirty rocks undoes
-// as a single action; the stroke id keeps separate strokes from collapsing together.
+// One undo step per stroke: each stamp merges into the previous one while the stroke id
+// matches, so a drag that drops thirty rocks undoes as a single action.
 class editor::TerrainEditWindow::TerrainObjectStrokeCmd: public editor::Command{
 private:
     uint64_t strokeId;
-    std::vector<Command*> commands;
+    std::vector<editor::Command*> commands;
     size_t executedCount = 0;
 
 public:
-    TerrainObjectStrokeCmd(uint64_t strokeId, Command* command): strokeId(strokeId){
+    TerrainObjectStrokeCmd(uint64_t strokeId, editor::Command* command): strokeId(strokeId){
         commands.push_back(command);
     }
 
     ~TerrainObjectStrokeCmd() override{
-        for (Command* command : commands){
+        for (editor::Command* command : commands){
             delete command;
         }
     }
@@ -1299,10 +1272,9 @@ public:
     bool execute() override{
         bool applied = false;
         while (executedCount < commands.size()){
-            Command* command = commands[executedCount];
+            editor::Command* command = commands[executedCount];
             if (!command->execute()){
-                // Drop a placement that could not be applied instead of leaving undo to
-                // run against something that was never created.
+                // Dropped, so undo never runs against something that was not created.
                 delete command;
                 commands.erase(commands.begin() + executedCount);
                 continue;
@@ -1320,30 +1292,27 @@ public:
         executedCount = 0;
     }
 
-    // A stroke that only appends to or erases from an existing host adds and removes no
-    // entity, so the outliner has nothing to rebuild while it is dragged. The history
-    // reads this before running an undo, so it has to describe the whole command.
-    bool affectsStructure() const override{
-        for (Command* command : commands){
-            if (command->affectsStructure()){
-                return true;
-            }
-        }
-        return false;
-    }
-
-    bool mergeWith(Command* otherCommand) override{
+    bool mergeWith(editor::Command* otherCommand) override{
         TerrainObjectStrokeCmd* otherCmd = dynamic_cast<TerrainObjectStrokeCmd*>(otherCommand);
         if (!otherCmd || otherCmd->strokeId != strokeId){
             return false;
         }
-        // The history deletes the older command right after a merge, so its placements
-        // are moved out rather than copied.
+        // The history deletes the older command after a merge, so its placements move out.
         commands.insert(commands.begin(), otherCmd->commands.begin(), otherCmd->commands.end());
         executedCount = commands.size();
         otherCmd->commands.clear();
         otherCmd->executedCount = 0;
         return true;
+    }
+
+    // Read before an undo runs, so it describes the whole stroke.
+    bool affectsStructure() const override{
+        for (editor::Command* command : commands){
+            if (command->affectsStructure()){
+                return true;
+            }
+        }
+        return false;
     }
 };
 
@@ -1438,7 +1407,6 @@ bool editor::TerrainEditWindow::isPlacementBrush() const{
     return brushMode == TerrainBrushMode::PlaceObject || brushMode == TerrainBrushMode::EraseObject;
 }
 
-// Erasing only needs objects to be there; placing needs something to place.
 bool editor::TerrainEditWindow::isPlacementReady() const{
     return brushMode == TerrainBrushMode::EraseObject || !placeAssetPath.empty();
 }
@@ -1499,7 +1467,7 @@ static constexpr float BRUSH_BLEND_FLOW_PER_SECOND = 10.0f;
 static constexpr float BRUSH_CLICK_SECONDS = 1.0f / 60.0f;
 // Longest interval a single event may deposit, so hitches don't cause spikes.
 static constexpr float BRUSH_MAX_STAMP_SECONDS = 0.05f;
-// Objects any closer than this would stack on top of each other.
+// Objects any closer than this would stack on top of each other
 static constexpr float MIN_PLACE_SPACING = 0.05f;
 
 bool editor::TerrainEditWindow::applyBrush(SceneProject* sceneProject, Entity entity, const Vector3& localPoint){
@@ -1788,9 +1756,8 @@ bool editor::TerrainEditWindow::addStrokePatchCommand(SceneProject* sceneProject
     return true;
 }
 
-// The brush places models, instanced hosts and bundle roots. Anything else parented to
-// the terrain — a light, a camera, an empty group — is not a prop, so it neither blocks
-// placement spacing nor answers to the erase brush.
+// The brush places models, instanced hosts and bundle roots. A light or a camera parented
+// to the terrain is not a prop, so it neither blocks spacing nor answers to the erase brush.
 static bool isPlacedObject(Scene* scene, Entity entity){
     return scene->findComponent<MeshComponent>(entity) != nullptr ||
            scene->findComponent<BundleComponent>(entity) != nullptr;
@@ -1815,20 +1782,16 @@ Entity editor::TerrainEditWindow::findInstanceHost(SceneProject* sceneProject, E
 }
 
 // Bundles are a hierarchy of entities, so there is nothing to instance them into.
+// A bundle is a hierarchy of entities, so there is nothing to instance it into
 bool editor::TerrainEditWindow::useInstancedPlacement() const{
     return placeInstanced && !Util::isBundleFile(placeAssetPath) && placeAssetPath != instancingRejectedAsset;
 }
 
-// Objects placed on a terrain are its direct children, which is also what makes the
-// erase brush and the spacing test able to find them again. An instanced host counts
-// as its instances, not as itself.
+// Props are direct children of the terrain, and an instanced host counts as its instances
 std::vector<Vector2> editor::TerrainEditWindow::collectPlacedPoints(SceneProject* sceneProject, Entity terrainEntity) const{
     std::vector<Vector2> points;
     Scene* scene = sceneProject->scene;
     for (Entity entity : sceneProject->entities){
-        if (entity == terrainEntity){
-            continue;
-        }
         Transform* transform = scene->findComponent<Transform>(entity);
         if (!transform || transform->parent != terrainEntity || !isPlacedObject(scene, entity)){
             continue;
@@ -1846,12 +1809,7 @@ std::vector<Vector2> editor::TerrainEditWindow::collectPlacedPoints(SceneProject
 }
 
 editor::Command* editor::TerrainEditWindow::makePlacementCommand(SceneProject* sceneProject, Entity terrainEntity, const Vector3& localPosition, const Quaternion& rotation, const Vector3& scale){
-    if (placeAssetPath.empty()){
-        return nullptr;
-    }
-
-    // Bundle paths are stored relative to the project, asset paths relative to the
-    // assets directory — the same forms their own import paths expect.
+    // Bundle paths are stored relative to the project, asset paths relative to the assets directory
     if (Util::isBundleFile(placeAssetPath)){
         ImportEntityBundleCmd* command = new ImportEntityBundleCmd(project, sceneProject->id, fs::path(placeAssetPath), terrainEntity, true);
         command->setQuiet(true);
@@ -1881,8 +1839,7 @@ bool editor::TerrainEditWindow::applyPlacement(SceneProject* sceneProject, Entit
 
     std::uniform_real_distribution<float> unit(0.0f, 1.0f);
 
-    // One attempt per event: a click drops a single object near the cursor, a drag lays
-    // a trail, and the brush size is how far each one can scatter from the ray hit.
+    // One attempt per event, scattered inside the brush: a click drops one, a drag lays a trail
     float offsetX = 0.0f;
     float offsetZ = 0.0f;
     if (brushShape == TerrainBrushShape::Circle){
@@ -1912,8 +1869,7 @@ bool editor::TerrainEditWindow::applyPlacement(SceneProject* sceneProject, Entit
     Vector3 normal(0.0f, 1.0f, 0.0f);
     scene->getSystem<MeshSystem>()->sampleTerrainSurface(terrain, localX, localZ, height, normal);
 
-    // Same jitter the foliage scatter uses, so painted grass and placed props sit on the
-    // surface the same way.
+    // Same jitter the foliage scatter uses, so grass and props sit on the surface alike
     const float scaleRange = std::max(0.0f, placeMaxScale - placeMinScale);
     const Vector3 scale = Vector3(placeMinScale + unit(placementRandom) * scaleRange);
     Quaternion rotation(unit(placementRandom) * Angle::degToDefault(360.0f) * placeRotationJitter, Vector3(0.0f, 1.0f, 0.0f));
@@ -1937,9 +1893,7 @@ bool editor::TerrainEditWindow::applyPlacement(SceneProject* sceneProject, Entit
 
         addStrokeObjectCommand(sceneProject, new TerrainInstancePlaceCmd(project, sceneProject->id, entity, placeAssetPath, instance));
 
-        // A host that cannot be built (a skinned or animated asset will not merge as one
-        // static mesh) leaves nothing behind, so the stroke drops back to entities rather
-        // than placing nothing at all.
+        // A host that could not be built leaves nothing behind, so the stroke drops back to entities
         if (findInstanceHost(sceneProject, entity, placeAssetPath) != NULL_ENTITY){
             stroke.placedPoints.push_back(Vector2(localX, localZ));
             return true;
@@ -1947,7 +1901,7 @@ bool editor::TerrainEditWindow::applyPlacement(SceneProject* sceneProject, Entit
 
         stroke.instanced = false;
         instancingRejectedAsset = placeAssetPath;
-        Out::warning("'%s' cannot be instanced (skinned, animated, or failed to load); placing separate entities instead.", placeAssetPath.c_str());
+        Out::warning("Cannot instance '%s', placing separate entities instead", placeAssetPath.c_str());
     }
 
     Command* command = makePlacementCommand(sceneProject, entity, position, rotation, scale);
@@ -1955,8 +1909,7 @@ bool editor::TerrainEditWindow::applyPlacement(SceneProject* sceneProject, Entit
         return false;
     }
 
-    // A command that fails (a missing file, say) is dropped by the history, and the spot
-    // it did not fill must stay open for the rest of the stroke.
+    // A command the history dropped placed nothing, so its spot stays open for the stroke
     const size_t before = sceneProject->entities.size();
     addStrokeObjectCommand(sceneProject, command);
     if (sceneProject->entities.size() == before){
@@ -1981,13 +1934,10 @@ bool editor::TerrainEditWindow::applyObjectErase(SceneProject* sceneProject, Ent
     };
 
     std::vector<Entity> targets;
-    // Erasing instances is a separate command per host, since each one edits its own array.
+    // One command per host, since each edits its own array
     std::vector<std::pair<Entity, std::vector<size_t>>> instanceTargets;
 
     for (Entity candidate : sceneProject->entities){
-        if (candidate == entity){
-            continue;
-        }
         Transform* transform = scene->findComponent<Transform>(candidate);
         if (!transform || transform->parent != entity || !isPlacedObject(scene, candidate)){
             continue;
@@ -2208,8 +2158,7 @@ void editor::TerrainEditWindow::drawMapSettings(const TerrainMapRef& ref, const 
     ImGui::PopID();
 }
 
-// Shared by the foliage layer and the object placement palette. Returns the size it
-// drew at, which is what decides whether the details fit beside it.
+// Returns the size it drew at, which decides whether the details fit beside it
 float editor::TerrainEditWindow::drawAssetThumbnail(const std::string& path, const char* id){
     const float thumbSize = std::min(ImGui::GetFrameHeight() * 3.0f, std::max(1.0f, ImGui::GetContentRegionAvail().x));
     int width = 0;
@@ -2313,8 +2262,7 @@ void editor::TerrainEditWindow::drawPlacementAsset(){
     }
     ImGui::PopTextWrapPos();
 
-    // Bundles are stored relative to the project and models relative to the assets
-    // directory, matching what each one's import path expects.
+    // Bundles are stored relative to the project, models relative to the assets directory
     auto assignAsset = [&](const fs::path& path){
         endStroke();
         instancingRejectedAsset.clear();
@@ -2566,14 +2514,14 @@ void editor::TerrainEditWindow::show(){
 
     if (ImGui::CollapsingHeader("Objects", ImGuiTreeNodeFlags_DefaultOpen) && beginTerrainProperties("object_properties")){
         drawPlacementAsset();
-        terrainPropertyRow("Place", "Placed props are ordinary entities parented to the terrain: they show in the outliner and can be transformed one by one.");
+        terrainPropertyRow("Place", "Props are parented to the terrain, so they show in the outliner and can be transformed one by one.");
         ImGui::BeginDisabled(placeAssetPath.empty());
         brushButton(TerrainBrushMode::PlaceObject, ICON_FA_TREE, "terrain_place_object", "Place objects along the drag (Ctrl erases)");
         ImGui::EndDisabled();
         ImGui::SameLine();
         brushButton(TerrainBrushMode::EraseObject, ICON_FA_ERASER, "terrain_erase_object", "Erase the terrain's child objects under the brush (Ctrl places)");
 
-        terrainPropertyRow("Instanced", "Batch every object of this asset into one draw. Instances can be selected and moved, but cannot carry their own components — turn this off for props that need collision, scripts or animation. Bundles are always separate entities.");
+        terrainPropertyRow("Instanced", "Batch every object of this asset into one draw. Instances can be moved but carry no components of their own, so turn this off for props that need collision, scripts or animation.");
         ImGui::BeginDisabled(Util::isBundleFile(placeAssetPath));
         ImGui::Checkbox("##place_instanced", &placeInstanced);
         ImGui::EndDisabled();
@@ -2616,7 +2564,7 @@ void editor::TerrainEditWindow::show(){
         if (iconButton(ICON_FA_SQUARE, "shape_square", "Square brush", brushShape == TerrainBrushShape::Square, buttonSize)){
             brushShape = TerrainBrushShape::Square;
         }
-        // Placement has no gradient and no flow: the brush is only an area.
+        // Placement has no gradient or flow, only an area
         ImGui::BeginDisabled(placementBrush);
         terrainPropertyRow("Falloff", "How brush strength fades from its center to its edge.");
         int falloff = static_cast<int>(brushFalloff);
@@ -2624,9 +2572,10 @@ void editor::TerrainEditWindow::show(){
             brushFalloff = static_cast<TerrainBrushFalloff>(falloff);
         }
         ImGui::EndDisabled();
-        terrainPropertyRow("Size", placementBrush ?
-            "How far objects can scatter from the cursor, in world units. Adjust with [ and ] while painting." :
-            "Brush size in world units. Adjust with [ and ] while painting.");
+        const char* sizeTooltip = placementBrush ?
+            "How far objects scatter from the cursor, in world units. Adjust with [ and ] while painting." :
+            "Brush size in world units. Adjust with [ and ] while painting.";
+        terrainPropertyRow("Size", sizeTooltip);
         brushSize = std::clamp(brushSize, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE);
         UIUtils::sliderFloatInput("##brush_size", &brushSize, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE, "%.2f");
         ImGui::BeginDisabled(placementBrush);
@@ -2743,7 +2692,7 @@ bool editor::TerrainEditWindow::isEditingScene(Scene* scene) const{
         return false;
     }
 
-    // Placement writes entities, not a map, so it has no brush texture to require.
+    // Placement writes entities, not a map, so there is no brush texture to require
     if (isPlacementBrush()){
         return isPlacementReady();
     }

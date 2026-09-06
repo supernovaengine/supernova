@@ -55,8 +55,7 @@ namespace doriax::editor{
         ModelLoadCmd(Project* project, uint32_t sceneId, Entity entity, const std::string& modelPath);
         ModelLoadCmd(Project* project, uint32_t sceneId, Entity entity, const std::string& modelPath, bool mergeStaticMeshes);
         ModelLoadCmd(Project* project, uint32_t sceneId, const std::string& entityName, const Vector3& position, const std::string& modelPath);
-        // Terrain object placement: created under `parent` with a local transform, and
-        // quiet, because a brush stroke drops many of these in a row.
+        // Terrain object placement: created quiet, under `parent`, with a local transform
         ModelLoadCmd(Project* project, uint32_t sceneId, const std::string& entityName, Entity parent, const Vector3& position, const Quaternion& rotation, const Vector3& scale, const std::string& modelPath);
         ~ModelLoadCmd() override;
 

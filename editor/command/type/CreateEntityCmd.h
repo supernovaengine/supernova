@@ -107,8 +107,7 @@ namespace doriax::editor{
 
         Entity getEntity();
 
-        // Brush-rate creation (terrain object placement): skip the selection change,
-        // scene focus and log line a single interactive create wants.
+        // Skips the selection change, scene focus and log line, for brush-rate creation
         void setQuiet(bool quiet);
 
         template<typename T>

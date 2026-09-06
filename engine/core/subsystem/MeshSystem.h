@@ -191,8 +191,7 @@ namespace doriax{
         void resetModelToBindPose(ModelComponent& model);
 
         bool raycastTerrainSurface(const Ray& ray, TerrainComponent& terrain, Transform& transform, Vector3& worldPoint);
-        // Height and normal in terrain-local space. Public so the editor can place
-        // objects on the same surface the foliage scatter resolves against.
+        // Height and normal in terrain-local space, the surface the foliage scatter uses
         void sampleTerrainSurface(TerrainComponent& terrain, float localX, float localZ, float& height, Vector3& normal);
 
         bool hasPendingAsyncModelLoads() const;

@@ -141,17 +141,10 @@ namespace doriax::editor{
         bool normalizeBlendPaint = true;
         bool heightMapStartAtMiddle = true;
         bool flattenPickOnStroke = true;
-
-        // Object placement palette. Placed props are ordinary entities, so this is
-        // tool state, not scene data.
         std::string placeAssetPath;
-        // Instanced placement batches a whole asset into one draw at the cost of the
-        // per-object components an entity can carry.
-        bool placeInstanced = true;
+        bool placeInstanced = true;      // one draw per asset instead of one entity per object
         float placeSpacing = 2.0f;
-        // 1.0 leaves a model at the scale its file authored, matching a drag-drop; widen
-        // the range to opt into an absolute scale with variation.
-        float placeMinScale = 1.0f;
+        float placeMinScale = 1.0f;      // 1.0 keeps the scale the model file authored
         float placeMaxScale = 1.0f;
         float placeRotationJitter = 1.0f;
         float placeAlignToNormal = 0.0f;

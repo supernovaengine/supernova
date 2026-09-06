@@ -94,14 +94,12 @@ namespace doriax::editor{
         int workingHeight = 0;
         // Texels written so far, cut into the undo patch when the stroke ends
         TerrainMapRegion dirtyRegion;
-        // Object placement strokes write entities instead of a map, so none of the
-        // texture state above applies to them.
+        // Placement strokes write entities instead of a map, so none of the texture state applies
         bool placement = false;
-        // Fixed at stroke start; cleared if the asset turns out not to be instanceable.
+        // Fixed at stroke start, cleared if the asset turns out not to be instanceable
         bool instanced = false;
         uint64_t placementStrokeId = 0;
-        // Terrain-local XZ of everything already standing on this terrain, grown as the
-        // stroke places more, so the spacing test sees the whole field.
+        // Terrain-local XZ of every prop already on this terrain, grown as the stroke places more
         std::vector<Vector2> placedPoints;
         bool heightReferenceValid = false;
         float heightReferenceTerrainSize = 0.0f;
@@ -113,14 +111,12 @@ namespace doriax::editor{
         std::vector<unsigned char> heightReferencePixels;
     };
 
-    class Command;
-
     class TerrainEditWindow{
     private:
         class TerrainTextureEditCmd;
-        class TerrainObjectStrokeCmd;
         class TerrainInstancePlaceCmd;
         class TerrainInstanceEraseCmd;
+        class TerrainObjectStrokeCmd;
 
         Project* project;
 
@@ -147,17 +143,17 @@ namespace doriax::editor{
         int densityMapResolution;
         int selectedFoliageLayer;
 
-        // Object placement palette. Placed props are ordinary entities parented to the
-        // terrain, so none of this belongs on TerrainComponent.
+        // Placed props are ordinary entities, so the palette is tool state, not component data
         std::string placeAssetPath;
         bool placeInstanced;
-        // An asset the load proved cannot be instanced, so the brush stops retrying it.
-        std::string instancingRejectedAsset;
         float placeSpacing;
         float placeMinScale;
         float placeMaxScale;
         float placeRotationJitter;
         float placeAlignToNormal;
+
+        // An asset the load proved cannot be instanced, so the brush stops retrying it
+        std::string instancingRejectedAsset;
         uint64_t placementStrokeCounter = 0;
         std::mt19937 placementRandom;
 
@@ -204,7 +200,7 @@ namespace doriax::editor{
         bool isHeightBrush() const;
         bool isDensityBrush() const;
         bool isPlacementBrush() const;
-        // Erase needs no asset; placing does.
+        // Erase needs no asset, placing does
         bool isPlacementReady() const;
         static bool isScalarTarget(TerrainMapTarget target);
 
@@ -214,7 +210,7 @@ namespace doriax::editor{
         bool stampBrush(TerrainComponent& terrain, TextureData& data, TerrainMapTarget target, const Vector3& localPoint, float deltaTime);
         bool addStrokePatchCommand(SceneProject* sceneProject, Texture& texture);
         std::vector<Vector2> collectPlacedPoints(SceneProject* sceneProject, Entity terrainEntity) const;
-        // Instanced placement keeps one host entity per asset under the terrain.
+        // Instanced placement keeps one host entity per asset under the terrain
         static Entity findInstanceHost(SceneProject* sceneProject, Entity terrainEntity, const std::string& assetPath);
         bool useInstancedPlacement() const;
         Command* makePlacementCommand(SceneProject* sceneProject, Entity terrainEntity, const Vector3& localPosition, const Quaternion& rotation, const Vector3& scale);
