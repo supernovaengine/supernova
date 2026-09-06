@@ -1074,6 +1074,7 @@ private:
     ModelLoadCmd* mergeHostCmd = nullptr;
     Entity host = NULL_ENTITY;
     size_t insertedIndex = 0;
+    bool wasModified;
 
     // Loaded synchronously so the host can be judged right here: the caller needs to know
     // whether this asset can be instanced before it decides how to place the stamp.
@@ -1087,7 +1088,8 @@ private:
 
 public:
     TerrainInstancePlaceCmd(Project* project, uint32_t sceneId, Entity terrainEntity, const std::string& assetPath, const InstanceData& instance):
-        project(project), sceneId(sceneId), terrainEntity(terrainEntity), assetPath(assetPath), instance(instance){
+        project(project), sceneId(sceneId), terrainEntity(terrainEntity), assetPath(assetPath), instance(instance),
+        wasModified(project->getScene(sceneId)->isModified){
     }
 
     ~TerrainInstancePlaceCmd() override{
@@ -1188,11 +1190,17 @@ public:
             host = NULL_ENTITY;
         }
 
-        sceneProject->isModified = true;
+        sceneProject->isModified = wasModified;
     }
 
     bool mergeWith(Command* otherCommand) override{
         return false;
+    }
+
+    // Appending to an existing host changes no entity, so the outliner has nothing to
+    // rebuild; only the stamp that brought the host into being is structural.
+    bool affectsStructure() const override{
+        return createHostCmd != nullptr;
     }
 };
 
@@ -1204,10 +1212,12 @@ private:
     Entity host;
     std::vector<size_t> indices; //ascending
     std::vector<InstanceData> removed;
+    bool wasModified;
 
 public:
     TerrainInstanceEraseCmd(Project* project, uint32_t sceneId, Entity host, const std::vector<size_t>& indices):
-        project(project), sceneId(sceneId), host(host), indices(indices){
+        project(project), sceneId(sceneId), host(host), indices(indices),
+        wasModified(project->getScene(sceneId)->isModified){
     }
 
     bool execute() override{
@@ -1253,10 +1263,15 @@ public:
             instmesh->instances.insert(instmesh->instances.begin() + index, removed[i]);
         }
         instmesh->needUpdateInstances = true;
-        sceneProject->isModified = true;
+        sceneProject->isModified = wasModified;
     }
 
     bool mergeWith(Command* otherCommand) override{
+        return false;
+    }
+
+    // The host entity stays either way, so nothing structural changes.
+    bool affectsStructure() const override{
         return false;
     }
 };
@@ -1303,6 +1318,18 @@ public:
             commands[i - 1]->undo();
         }
         executedCount = 0;
+    }
+
+    // A stroke that only appends to or erases from an existing host adds and removes no
+    // entity, so the outliner has nothing to rebuild while it is dragged. The history
+    // reads this before running an undo, so it has to describe the whole command.
+    bool affectsStructure() const override{
+        for (Command* command : commands){
+            if (command->affectsStructure()){
+                return true;
+            }
+        }
+        return false;
     }
 
     bool mergeWith(Command* otherCommand) override{
@@ -1761,6 +1788,14 @@ bool editor::TerrainEditWindow::addStrokePatchCommand(SceneProject* sceneProject
     return true;
 }
 
+// The brush places models, instanced hosts and bundle roots. Anything else parented to
+// the terrain — a light, a camera, an empty group — is not a prop, so it neither blocks
+// placement spacing nor answers to the erase brush.
+static bool isPlacedObject(Scene* scene, Entity entity){
+    return scene->findComponent<MeshComponent>(entity) != nullptr ||
+           scene->findComponent<BundleComponent>(entity) != nullptr;
+}
+
 Entity editor::TerrainEditWindow::findInstanceHost(SceneProject* sceneProject, Entity terrainEntity, const std::string& assetPath){
     Scene* scene = sceneProject->scene;
     for (Entity entity : sceneProject->entities){
@@ -1795,7 +1830,7 @@ std::vector<Vector2> editor::TerrainEditWindow::collectPlacedPoints(SceneProject
             continue;
         }
         Transform* transform = scene->findComponent<Transform>(entity);
-        if (!transform || transform->parent != terrainEntity){
+        if (!transform || transform->parent != terrainEntity || !isPlacedObject(scene, entity)){
             continue;
         }
         if (InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity)){
@@ -1920,7 +1955,14 @@ bool editor::TerrainEditWindow::applyPlacement(SceneProject* sceneProject, Entit
         return false;
     }
 
+    // A command that fails (a missing file, say) is dropped by the history, and the spot
+    // it did not fill must stay open for the rest of the stroke.
+    const size_t before = sceneProject->entities.size();
     addStrokeObjectCommand(sceneProject, command);
+    if (sceneProject->entities.size() == before){
+        return false;
+    }
+
     stroke.placedPoints.push_back(Vector2(localX, localZ));
     return true;
 }
@@ -1947,7 +1989,7 @@ bool editor::TerrainEditWindow::applyObjectErase(SceneProject* sceneProject, Ent
             continue;
         }
         Transform* transform = scene->findComponent<Transform>(candidate);
-        if (!transform || transform->parent != entity){
+        if (!transform || transform->parent != entity || !isPlacedObject(scene, candidate)){
             continue;
         }
 

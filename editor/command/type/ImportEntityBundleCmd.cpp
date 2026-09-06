@@ -124,9 +124,11 @@ bool editor::ImportEntityBundleCmd::execute(){
         }
     }
 
-    // If parent is part of a bundle, add the new root as a nested bundle member
+    // If parent is part of a bundle, add the new root as a nested bundle member. A
+    // placement never does: a brush stroke drops props into the scene, and editing a
+    // shared bundle asset from one is not what the stroke asked for.
     addedToParentBundle = false;
-    if (parent != NULL_ENTITY && project->isEntityInBundle(sceneId, parent)) {
+    if (parent != NULL_ENTITY && !hasPlacement && project->isEntityInBundle(sceneId, parent)) {
         addedToParentBundle = project->addEntityToBundle(sceneId, rootEntity, parent, false);
     }
 
