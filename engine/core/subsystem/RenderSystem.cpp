@@ -64,6 +64,12 @@ namespace {
         render.applyUniformBlock(slot, sizeof(normAdjust), &normAdjust);
     }
 
+    void applyInstanceFadeUniform(ObjectRender& render, int slot, const InstancedMeshComponent& instmesh){
+        float fade[8] = {instmesh.fadeStart, instmesh.fadeEnd, 0.0f, 0.0f,
+            instmesh.fadeEyeLocal.x, instmesh.fadeEyeLocal.y, instmesh.fadeEyeLocal.z, 0.0f};
+        render.applyUniformBlock(slot, sizeof(fade), &fade);
+    }
+
     bool usesAlphaMask(const Material& material, bool textureShadow){
         return material.alphaMode == MaterialAlphaMode::MASK ||
             (material.alphaMode == MaterialAlphaMode::AUTO && textureShadow);
@@ -143,6 +149,7 @@ uint32_t RenderSystem::pixelsBlack[64];
 uint32_t RenderSystem::pixelsNormal[64];
 
 TextureRender RenderSystem::emptyWhite;
+TextureRender RenderSystem::emptyArrayWhite;
 TextureRender RenderSystem::emptyBlack;
 TextureRender RenderSystem::emptyCubeBlack;
 TextureRender RenderSystem::emptyCubeWhite;
@@ -231,6 +238,11 @@ void RenderSystem::load(){
 }
 
 void RenderSystem::destroy(){
+    // Before the transform traversal below, which the camera entities are part of.
+    while (!mirrorCameras.empty()){
+        destroyMirrorCamera(mirrorCameras.begin()->first);
+    }
+
     // cannot destroy static textures because it affects other scenes
     //emptyWhite.destroyTexture();
     //emptyBlack.destroyTexture();
@@ -357,6 +369,10 @@ void RenderSystem::createEmptyTextures(){
 
         emptyWhite.createTexture(
                 "empty|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array,
+                TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
+
+        emptyArrayWhite.createTexture(
+                "empty|array|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_ARRAY, 1, data_array, size_array,
                 TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
 
         // white cube fallback for the skybox cube sampler: a color-only sky (no
@@ -1980,7 +1996,138 @@ bool RenderSystem::loadGBufferTextures(Material& material, ShaderData& shaderDat
     return true;
 }
 
-bool RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData){
+// Read here rather than through Texture, which would upload a 2D image per layer on top
+// of the array. Rebuilt only when the set of files changes.
+RenderSystem::TerrainDetailArray* RenderSystem::getTerrainDetailArray(Entity entity, TerrainComponent& terrain){
+    // The shader reaches all three layers of any bound blend map, so slices come in threes
+    std::vector<std::string> paths;
+    for (const Texture& layer : terrain.textureLayers){
+        // The loader parses the scale back out of the suffix, and the cache key carries it
+        const std::string path = layer.getPath(0);
+        paths.push_back(TextureData::hasSvgExtension(path.c_str()) ? TextureData::buildSvgScalePath(path, layer.getSvgScale()) : path);
+    }
+    paths.resize(((paths.size() + 2) / 3) * 3);
+    if (std::all_of(paths.begin(), paths.end(), [](const std::string& path){ return path.empty(); })){
+        destroyTerrainDetailArray(entity);
+        return NULL;
+    }
+
+    // One sampler covers every slice, so the first assigned layer sets it for all of them
+    const Texture* sampled = &terrain.textureLayers[0];
+    for (size_t i = 0; i < paths.size(); i++){
+        if (!paths[i].empty()){
+            sampled = &terrain.textureLayers[i];
+            break;
+        }
+    }
+
+    auto it = terrainDetailArrays.find(entity);
+    if (it != terrainDetailArrays.end()){
+        const TerrainDetailArray& cached = it->second;
+        if (cached.paths == paths && cached.minFilter == sampled->getMinFilter() && cached.magFilter == sampled->getMagFilter() &&
+            cached.wrapU == sampled->getWrapU() && cached.wrapV == sampled->getWrapV()){
+            // A set that could not be built is remembered, not retried every frame
+            return cached.failed ? NULL : &it->second;
+        }
+        destroyTerrainDetailArray(entity);
+    }
+
+    auto remember = [&](bool failed) -> TerrainDetailArray& {
+        TerrainDetailArray& entry = terrainDetailArrays[entity];
+        entry.paths = paths;
+        entry.minFilter = sampled->getMinFilter();
+        entry.magFilter = sampled->getMagFilter();
+        entry.wrapU = sampled->getWrapU();
+        entry.wrapV = sampled->getWrapV();
+        entry.failed = failed;
+        return entry;
+    };
+
+    std::vector<TextureData> slices(paths.size());
+    int width = 0;
+    int height = 0;
+    bool anyRGBA = false;
+    for (size_t i = 0; i < paths.size(); i++){
+        if (paths[i].empty() || !slices[i].loadTextureFromFile(paths[i].c_str())){
+            continue;
+        }
+        // stb hands over the pixels, and nothing else will free them
+        slices[i].setDataOwned(true);
+        width = std::max(width, slices[i].getWidth());
+        height = std::max(height, slices[i].getHeight());
+        anyRGBA = anyRGBA || slices[i].getColorFormat() == ColorFormat::RGBA;
+    }
+    if (width == 0){
+        remember(true);
+        return NULL;
+    }
+
+    // One image holds a single format, so grayscale layers are widened instead of refused
+    const ColorFormat colorFormat = anyRGBA ? ColorFormat::RGBA : slices[0].getColorFormat();
+    std::vector<std::vector<unsigned char>> widened(paths.size());
+    size_t sliceSize = 0;
+    for (size_t i = 0; i < paths.size(); i++){
+        if (!slices[i].getData()){
+            continue;
+        }
+        if (slices[i].getWidth() != width || slices[i].getHeight() != height){
+            slices[i].resize(width, height);
+        }
+        if (slices[i].getColorFormat() == ColorFormat::RED && colorFormat == ColorFormat::RGBA){
+            const unsigned char* grey = static_cast<const unsigned char*>(slices[i].getData());
+            widened[i].resize(static_cast<size_t>(width) * height * 4);
+            for (size_t t = 0; t < static_cast<size_t>(width) * height; t++){
+                widened[i][t * 4 + 0] = grey[t];
+                widened[i][t * 4 + 1] = grey[t];
+                widened[i][t * 4 + 2] = grey[t];
+                widened[i][t * 4 + 3] = 0xFF;
+            }
+        }else if (slices[i].getColorFormat() != colorFormat){
+            Log::error("Terrain detail layer '%s' does not have the same format as the other layers", paths[i].c_str());
+            remember(true);
+            return NULL;
+        }
+        sliceSize = widened[i].empty() ? slices[i].getSize() : widened[i].size();
+    }
+
+    // An unassigned layer still needs a slice, and white is what it used to bind
+    std::vector<unsigned char> whiteSlice(sliceSize, 0xFF);
+
+    std::vector<void*> data(paths.size());
+    std::vector<size_t> size(paths.size());
+    for (size_t i = 0; i < paths.size(); i++){
+        if (!widened[i].empty()){
+            data[i] = widened[i].data();
+            size[i] = widened[i].size();
+        }else if (slices[i].getData()){
+            data[i] = slices[i].getData();
+            size[i] = slices[i].getSize();
+        }else{
+            data[i] = whiteSlice.data();
+            size[i] = sliceSize;
+        }
+    }
+
+    TerrainDetailArray& detail = remember(false);
+    if (!detail.render.createTexture("terrain|detail|" + std::to_string(entity), width, height,
+            colorFormat, TextureType::TEXTURE_ARRAY, static_cast<int>(paths.size()), data.data(), size.data(),
+            sampled->getMinFilter(), sampled->getMagFilter(), sampled->getWrapU(), sampled->getWrapV())){
+        detail.failed = true;
+        return NULL;
+    }
+
+    return &detail;
+}
+
+void RenderSystem::destroyTerrainDetailArray(Entity entity){
+    auto it = terrainDetailArrays.find(entity);
+    if (it != terrainDetailArrays.end()){
+        it->second.render.destroyTexture();
+        terrainDetailArrays.erase(it);
+    }
+}
+
+bool RenderSystem::loadTerrainTextures(Entity entity, TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData){
     TextureRender* textureRender = NULL;
     std::pair<int, int> slotTex(-1, -1);
 
@@ -1988,8 +2135,10 @@ bool RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ObjectRender& 
     // the border texels, not the REPEAT blend with the opposite edge (detail maps are tiled).
     terrain.heightMap.setWrapU(TextureWrap::CLAMP_TO_EDGE);
     terrain.heightMap.setWrapV(TextureWrap::CLAMP_TO_EDGE);
-    terrain.blendMap.setWrapU(TextureWrap::CLAMP_TO_EDGE);
-    terrain.blendMap.setWrapV(TextureWrap::CLAMP_TO_EDGE);
+    for (Texture& blendMap : terrain.blendMaps){
+        blendMap.setWrapU(TextureWrap::CLAMP_TO_EDGE);
+        blendMap.setWrapV(TextureWrap::CLAMP_TO_EDGE);
+    }
 
     textureRender = terrain.heightMap.getRender(&emptyWhite);
     slotTex = shaderData.getTextureIndex(TextureShaderType::HEIGHTMAP);
@@ -2002,48 +2151,27 @@ bool RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ObjectRender& 
         render.addTexture(slotTex, ShaderStageType::VERTEX, &emptyWhite);
     }
 
-    textureRender = terrain.blendMap.getRender(&emptyBlack);
-    slotTex = shaderData.getTextureIndex(TextureShaderType::BLENDMAP);
-    if (textureRender){
-        if (!textureRender->isCreated()){
-            return false;
-        }
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-    }else{
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
-    }
+    // The array comes first: how deep it came out is what decides which blend maps may
+    // weight anything, and the white fallback is a single slice.
+    TerrainDetailArray* detail = getTerrainDetailArray(entity, terrain);
+    const bool arrayCreated = detail && detail->render.isCreated();
+    slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL);
+    render.addTexture(slotTex, ShaderStageType::FRAGMENT, arrayCreated ? &detail->render : &emptyArrayWhite);
 
-    textureRender = terrain.textureDetailRed.getRender(&emptyWhite);
-    slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_RED);
-    if (textureRender){
-        if (!textureRender->isCreated()){
-            return false;
+    // The rest bind black, which weights none of their layers
+    const int coveredMaps = arrayCreated ? static_cast<int>(detail->paths.size() / 3) : 0;
+    for (int m = 0; m < MAX_TERRAIN_BLENDMAPS; m++){
+        const bool covered = m < coveredMaps && m < static_cast<int>(terrain.blendMaps.size());
+        textureRender = covered ? terrain.blendMaps[m].getRender(&emptyBlack) : NULL;
+        slotTex = shaderData.getTextureIndex(static_cast<TextureShaderType>(static_cast<int>(TextureShaderType::BLENDMAP) + m));
+        if (textureRender){
+            if (!textureRender->isCreated()){
+                return false;
+            }
+            render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+        }else{
+            render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
         }
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-    }else{
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
-    }
-
-    textureRender = terrain.textureDetailGreen.getRender(&emptyWhite);
-    slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_GREEN);
-    if (textureRender){
-        if (!textureRender->isCreated()){
-            return false;
-        }
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-    }else{
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
-    }
-
-    textureRender = terrain.textureDetailBlue.getRender(&emptyWhite);
-    slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_BLUE);
-    if (textureRender){
-        if (!textureRender->isCreated()){
-            return false;
-        }
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-    }else{
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
     }
 
     return true;
@@ -2064,7 +2192,7 @@ bool RenderSystem::loadTerrainHeightTexture(TerrainComponent& terrain, ObjectRen
     return true;
 }
 
-bool RenderSystem::updateTerrainRenderTextures(TerrainComponent& terrain, MeshComponent& mesh){
+bool RenderSystem::updateTerrainRenderTextures(Entity entity, TerrainComponent& terrain, MeshComponent& mesh){
     if (!terrain.needUpdateTexture){
         return true;
     }
@@ -2079,7 +2207,7 @@ bool RenderSystem::updateTerrainRenderTextures(TerrainComponent& terrain, MeshCo
             continue;
         }
         ShaderData& shaderData = mesh.submeshes[s].shader.get()->shaderData;
-        if (!loadTerrainTextures(terrain, mesh.submeshes[s].render, shaderData)){
+        if (!loadTerrainTextures(entity, terrain, mesh.submeshes[s].render, shaderData)){
             texLoaded = false;
         }
         if (mesh.submeshes[s].depthShader){
@@ -2114,7 +2242,7 @@ void RenderSystem::updateAllTerrainRenderTextures(){
         Entity entity = meshes->getEntity(i);
         TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
         if (terrain){
-            updateTerrainRenderTextures(*terrain, mesh);
+            updateTerrainRenderTextures(entity, *terrain, mesh);
         }
     }
 }
@@ -2367,7 +2495,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         if (mesh.submeshes[i].hasTexCoord1 && mesh.submeshes[i].hasTexCoord2 && hasPBRTextures){
             p_hasTexture2 = true;
         }
-        if (terrain && (!terrain->blendMap.empty() || hasPBRTextures)){
+        if (terrain && (!terrain->blendMaps.empty() || hasPBRTextures)){
             p_hasTexture1 = true;
         }
         bool useIBL = (hasIBL || hasReflectionProbes) && mesh.receiveIBL;
@@ -2419,13 +2547,16 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         bool p_depthTexture = p_depthAlphaMask && mesh.submeshes[i].hasTexCoord1 &&
             !mesh.submeshes[i].material.baseColorTexture.empty();
 
+        // Opted in per field, not per band, so emptying the band (editor preview) neither
+        // rebuilds the shader nor drops the variant from an export.
+        const bool p_instanceFade = instmesh && instmesh->distanceFade;
         mesh.submeshes[i].shaderProperties = ShaderPool::getMeshProperties(
                         p_unlit, p_hasTexture1, p_hasTexture2, p_punctual,
                         p_receiveShadows, p_hasNormal, p_hasNormalMap,
                         p_hasTangent, mesh.submeshes[i].hasVertexColor3, mesh.submeshes[i].hasVertexColor4, mesh.submeshes[i].hasTextureRect,
                         hasFog, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget, mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent,
                         (terrain)?true:false, (instmesh)?true:false, p_ibl, p_mirror, p_ssao, p_light2d, p_shadows2d,
-                        p_alphaMask, p_alphaOpaque);
+                        p_alphaMask, p_alphaOpaque, p_instanceFade);
         // a user-forked main shader overrides the built-in Mesh shader; the variant
         // (#define) system, depth/gbuffer passes and bind-slots are unchanged.
         // Priority: component customShader > scene default shader > built-in (empty)
@@ -2438,7 +2569,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
             mesh.submeshes[i].depthShaderProperties = ShaderPool::getDepthMeshProperties(
                 p_depthTexture, mesh.submeshes[i].hasSkinning, mesh.submeshes[i].hasMorphTarget,
                 mesh.submeshes[i].hasMorphNormal, mesh.submeshes[i].hasMorphTangent, (terrain)?true:false, (instmesh)?true:false,
-                p_depthAlphaMask);
+                p_depthAlphaMask, p_instanceFade);
             mesh.submeshes[i].depthShader = ShaderPool::get(ShaderType::DEPTH, mesh.submeshes[i].depthShaderProperties);
             if (!mesh.submeshes[i].depthShader->isCreated())
                 return false;
@@ -2478,6 +2609,9 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         mesh.submeshes[i].slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_PARAMS);
         if (p_hasTexture2){
             mesh.submeshes[i].slotFSTexCoordSets = shaderData.getUniformBlockIndex(UniformBlockType::PBR_FS_TEXCOORDSETS);
+        }
+        if (p_instanceFade){
+            mesh.submeshes[i].slotVSFade = shaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_FADE);
         }
         if (hasFog){
             mesh.submeshes[i].slotFSFog = shaderData.getUniformBlockIndex(UniformBlockType::FS_FOG);
@@ -2536,7 +2670,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         if (terrain){
             mesh.submeshes[i].slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS);
 
-            if (!loadTerrainTextures(*terrain, mesh.submeshes[i].render, shaderData)){
+            if (!loadTerrainTextures(entity, *terrain, mesh.submeshes[i].render, shaderData)){
                 return false;
             }
 
@@ -2626,6 +2760,9 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
             mesh.submeshes[i].slotVSDepthParams = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_VS_PARAMS);
             if (p_depthAlphaMask){
                 mesh.submeshes[i].slotFSDepthMaterial = depthShaderData.getUniformBlockIndex(UniformBlockType::DEPTH_FS_MATERIAL);
+            }
+            if (p_instanceFade){
+                mesh.submeshes[i].slotVSDepthFade = depthShaderData.getUniformBlockIndex(UniformBlockType::PBR_VS_FADE);
             }
 
             if (mesh.submeshes[i].hasSkinning){
@@ -2941,6 +3078,11 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
             return false;
         }
 
+        // unpainted foliage chunks make this common
+        if (instmesh && instmesh->numVisible == 0){
+            return false;
+        }
+
         updateMeshBuffers(mesh);
 
         // Buffer already uploaded this frame by updateInstanceBuffers().
@@ -3071,6 +3213,10 @@ bool RenderSystem::drawMesh(MeshComponent& mesh, Transform& transform, CameraCom
                 render.applyUniformBlock(mesh.submeshes[i].slotFSParams, sizeof(float) * 4, &mesh.submeshes[i].material);
             }
 
+            if (mesh.submeshes[i].slotVSFade != -1 && instmesh){
+                applyInstanceFadeUniform(render, mesh.submeshes[i].slotVSFade, *instmesh);
+            }
+
             if (mesh.submeshes[i].slotFSTexCoordSets != -1){
                 // per-texture UV set selector (0 = a_texcoord1, 1 = a_texcoord2):
                 // set0 = baseColor, metallicRoughness, occlusion, emissive; set1.x = normal
@@ -3113,6 +3259,11 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, con
         }
 
         if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(cameraFar, frustumPlanes, mesh.worldAABB)) {
+            return false;
+        }
+
+        // unpainted foliage chunks make this common
+        if (instmesh && instmesh->numVisible == 0){
             return false;
         }
 
@@ -3160,6 +3311,10 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, const float cameraFar, con
 
             //model, mvp matrix
             depthRender.applyUniformBlock(mesh.submeshes[i].slotVSDepthParams, sizeof(float) * 32, &vsDepthParams);
+
+            if (mesh.submeshes[i].slotVSDepthFade != -1 && instmesh){
+                applyInstanceFadeUniform(depthRender, mesh.submeshes[i].slotVSDepthFade, *instmesh);
+            }
 
             if (mesh.submeshes[i].slotFSDepthMaterial != -1){
                 const Material& material = mesh.submeshes[i].material;
@@ -3459,6 +3614,11 @@ bool RenderSystem::drawMeshGBuffer(MeshComponent& mesh, const float cameraFar, c
     }
 
     if (mesh.worldAABB != AABB::ZERO && !isInsideCamera(cameraFar, frustumPlanes, mesh.worldAABB)) {
+        return false;
+    }
+
+    // unpainted foliage chunks make this common
+    if (instmesh && instmesh->numVisible == 0){
         return false;
     }
 
@@ -4201,10 +4361,13 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh, bool clearAss
             //Destroy terrain texture
             if (!preserveAssets){
                 terrain->heightMap.destroy();
-                terrain->blendMap.destroy();
-                terrain->textureDetailRed.destroy();
-                terrain->textureDetailGreen.destroy();
-                terrain->textureDetailBlue.destroy();
+                for (Texture& blendMap : terrain->blendMaps){
+                    blendMap.destroy();
+                }
+                for (Texture& layer : terrain->textureLayers){
+                    layer.destroy();
+                }
+                destroyTerrainDetailArray(entity);
             }
 
             //Destroy terrain buffer
@@ -4232,6 +4395,7 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh, bool clearAss
         submesh.slotVSParams = -1;
         submesh.slotFSParams = -1;
         submesh.slotFSTexCoordSets = -1;
+        submesh.slotVSFade = -1;
         submesh.slotFSLighting = -1;
         submesh.slotFSReflectionProbe = -1;
         submesh.slotVSSprite = -1;
@@ -4243,6 +4407,7 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh, bool clearAss
         submesh.slotVSTerrain = -1;
 
         submesh.slotVSDepthParams = -1;
+        submesh.slotVSDepthFade = -1;
         submesh.slotFSDepthMaterial = -1;
         submesh.slotVSDepthSkinning = -1;
         submesh.slotVSDepthMorphTarget = -1;
@@ -5154,6 +5319,13 @@ void RenderSystem::updateCamera(CameraComponent& camera, Transform& transform){
 // entity (not serialized, not shown in the editor) whose framebuffer feeds the
 // mirror mesh base texture. Returns the camera entity.
 Entity RenderSystem::createMirrorCamera(Entity mirrorEntity){
+    if (!scene->findComponent<MirrorComponent>(mirrorEntity))
+        return NULL_ENTITY;
+
+    const Entity existing = getMirrorCamera(mirrorEntity);
+    if (existing != NULL_ENTITY && scene->isEntityCreated(existing))
+        return existing;
+
     Entity camEntity = scene->createSystemEntity();
     scene->addComponent<Transform>(camEntity, {});
     scene->addComponent<CameraComponent>(camEntity, {});
@@ -5170,7 +5342,37 @@ Entity RenderSystem::createMirrorCamera(Entity mirrorEntity){
     cam.framebufferWidth = w;
     cam.framebufferHeight = h;
 
+    mirrorCameras[mirrorEntity] = camEntity;
     return camEntity;
+}
+
+Entity RenderSystem::getMirrorCamera(Entity mirrorEntity) const{
+    auto it = mirrorCameras.find(mirrorEntity);
+    return it != mirrorCameras.end() ? it->second : NULL_ENTITY;
+}
+
+void RenderSystem::destroyMirrorCamera(Entity entity){
+    // Ownership leaves the map before entity destruction dispatches removal callbacks.
+    auto camera = mirrorCameras.extract(entity);
+    if (camera.empty())
+        return;
+
+    const Entity cameraEntity = camera.mapped();
+    if (cameraEntity == NULL_ENTITY || !scene->isEntityCreated(cameraEntity))
+        return;
+
+    // Detach the borrowed framebuffer before destroying the camera that owns it.
+    if (CameraComponent* cameraComponent = scene->findComponent<CameraComponent>(cameraEntity)){
+        if (MeshComponent* mesh = scene->findComponent<MeshComponent>(entity)){
+            if (mesh->numSubmeshes > 0){
+                Texture& baseTexture = mesh->submeshes[0].material.baseColorTexture;
+                if (baseTexture.getFramebuffer() == cameraComponent->framebuffer){
+                    baseTexture = Texture();
+                }
+            }
+        }
+    }
+    scene->destroyEntity(cameraEntity);
 }
 
 // Drives each mirror's reflection camera: its view = mainView * reflect(plane),
@@ -5205,10 +5407,9 @@ void RenderSystem::updateMirrors(Entity mainCameraEntity){
     for (size_t i = 0; i < mirrors->size(); i++){
         Entity entity = mirrors->getEntity(i);
 
-        Entity camEntity = mirrors->getComponentFromIndex(i).reflectionCamera;
+        Entity camEntity = getMirrorCamera(entity);
         if (camEntity == NULL_ENTITY || !scene->isEntityCreated(camEntity)){
             camEntity = createMirrorCamera(entity);
-            mirrors->getComponentFromIndex(i).reflectionCamera = camEntity;
             // the loop counting render-to-texture cameras has run, but draw() still
             // renders this one in the same frame
             hasMultipleCameras = true;
@@ -5705,7 +5906,9 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
         bRotation = transform.worldRotation.inverse() * bRotation;
     }
 
-    mesh.aabb = AABB::ZERO;
+    // Not AABB::ZERO: that is a finite box at the origin, so merging into it stretches every
+    // instanced mesh back to its own origin and defeats culling.
+    mesh.aabb.setNull();
     instmesh.numVisible = 0;
     size_t instancesSize = (instmesh.instances.size() < instmesh.maxInstances)? instmesh.instances.size() : instmesh.maxInstances;
     for (int i = 0; i < instancesSize; i++){
@@ -6401,6 +6604,7 @@ void RenderSystem::update(double dt){
 
     CameraComponent& mainCamera = *mainCameraPtr;
     Transform& mainCameraTransform = *mainCameraTransformPtr;
+    fadeEyePosition = mainCameraTransform.worldPosition;
 
     // while extra cameras render, draw() rewrites the shared MVP and sky matrices
     // per camera; removing the last of them (a mirror, a reflection probe) would
@@ -6480,6 +6684,14 @@ void RenderSystem::update(double dt){
 
             InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
             if (instmesh){
+                if (instmesh->distanceFade){
+                    // The range is a model-space distance, so the eye moves into that space
+                    // instead: scaling the range into world space breaks on a scaled mesh.
+                    const Matrix4 inverseModel = transform.modelMatrix.inverse();
+                    instmesh->fadeEyeLocal = inverseModel.isValid() ?
+                        (inverseModel * fadeEyePosition) : fadeEyePosition;
+                }
+
                 bool sortTransparentInstances = mesh.transparent && mainCamera.type != CameraType::CAMERA_UI;
 
                 bool instancesNeedUpdate = instmesh->needUpdateInstances || mesh.needUpdateAABB;
@@ -7472,32 +7684,7 @@ void RenderSystem::onComponentRemoved(Entity entity, ComponentId componentId) {
         CameraComponent& camera = scene->getComponent<CameraComponent>(entity);
         destroyCamera(camera, true);
     } else if (componentId == scene->getComponentId<MirrorComponent>()) {
-        MirrorComponent& mirror = scene->getComponent<MirrorComponent>(entity);
-
-        Framebuffer* reflectionFb = nullptr;
-        if (mirror.reflectionCamera != NULL_ENTITY && scene->isEntityCreated(mirror.reflectionCamera)){
-            if (CameraComponent* refCam = scene->findComponent<CameraComponent>(mirror.reflectionCamera)){
-                reflectionFb = refCam->framebuffer;
-            }
-        }
-
-        // The mirror bound the reflection camera's framebuffer as the mesh base texture.
-        // Clear that binding before destroying the camera, otherwise the mesh would keep
-        // a dangling pointer to the deleted framebuffer and dereference it on reload.
-        if (reflectionFb){
-            MeshComponent* mesh = scene->findComponent<MeshComponent>(entity);
-            if (mesh && mesh->numSubmeshes > 0){
-                Texture& baseTex = mesh->submeshes[0].material.baseColorTexture;
-                if (baseTex.getFramebuffer() == reflectionFb){
-                    baseTex = Texture();
-                }
-            }
-        }
-
-        // destroy the internal reflection camera owned by this mirror
-        if (mirror.reflectionCamera != NULL_ENTITY && scene->isEntityCreated(mirror.reflectionCamera)){
-            scene->destroyEntity(mirror.reflectionCamera);
-        }
+        destroyMirrorCamera(entity);
 
         // reload meshes so the surface drops the projective-mirror shader variant and
         // other meshes drop the now-unused inverted-culling pipeline

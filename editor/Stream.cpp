@@ -655,9 +655,12 @@ std::string terrainBrushModeToString(editor::TerrainBrushMode mode) {
         case editor::TerrainBrushMode::Lower: return "Lower";
         case editor::TerrainBrushMode::Smooth: return "Smooth";
         case editor::TerrainBrushMode::Flatten: return "Flatten";
-        case editor::TerrainBrushMode::PaintRed: return "PaintRed";
-        case editor::TerrainBrushMode::PaintGreen: return "PaintGreen";
-        case editor::TerrainBrushMode::PaintBlue: return "PaintBlue";
+        case editor::TerrainBrushMode::PaintBase: return "PaintBase";
+        case editor::TerrainBrushMode::PaintLayer: return "PaintLayer";
+        case editor::TerrainBrushMode::PaintDensity: return "PaintDensity";
+        case editor::TerrainBrushMode::EraseDensity: return "EraseDensity";
+        case editor::TerrainBrushMode::PlaceObject: return "PlaceObject";
+        case editor::TerrainBrushMode::EraseObject: return "EraseObject";
         default: return "Raise";
     }
 }
@@ -667,9 +670,15 @@ editor::TerrainBrushMode stringToTerrainBrushMode(const std::string& str) {
     if (str == "Lower") return editor::TerrainBrushMode::Lower;
     if (str == "Smooth") return editor::TerrainBrushMode::Smooth;
     if (str == "Flatten") return editor::TerrainBrushMode::Flatten;
-    if (str == "PaintRed") return editor::TerrainBrushMode::PaintRed;
-    if (str == "PaintGreen") return editor::TerrainBrushMode::PaintGreen;
-    if (str == "PaintBlue") return editor::TerrainBrushMode::PaintBlue;
+    if (str == "PaintBase") return editor::TerrainBrushMode::PaintBase;
+    if (str == "PaintLayer") return editor::TerrainBrushMode::PaintLayer;
+    // Backward compatibility: the three channel brushes became one layer brush with an
+    // index. Remove this branch once those editor versions are no longer supported.
+    if (str == "PaintRed" || str == "PaintGreen" || str == "PaintBlue") return editor::TerrainBrushMode::PaintLayer;
+    if (str == "PaintDensity") return editor::TerrainBrushMode::PaintDensity;
+    if (str == "EraseDensity") return editor::TerrainBrushMode::EraseDensity;
+    if (str == "PlaceObject") return editor::TerrainBrushMode::PlaceObject;
+    if (str == "EraseObject") return editor::TerrainBrushMode::EraseObject;
     return editor::TerrainBrushMode::Raise;
 }
 
@@ -1592,9 +1601,22 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         encodeFinite(terrainNode, "flattenHeight", ts.flattenHeight);
         terrainNode["heightMapResolution"] = ts.heightMapResolution;
         terrainNode["blendMapResolution"] = ts.blendMapResolution;
+        terrainNode["densityMapResolution"] = ts.densityMapResolution;
         terrainNode["normalizeBlendPaint"] = ts.normalizeBlendPaint;
         terrainNode["heightMapStartAtMiddle"] = ts.heightMapStartAtMiddle;
         terrainNode["flattenPickOnStroke"] = ts.flattenPickOnStroke;
+        terrainNode["paintUseMask"] = ts.paintUseMask;
+        encodeFinite(terrainNode, "paintMinSlope", ts.paintMinSlope);
+        encodeFinite(terrainNode, "paintMaxSlope", ts.paintMaxSlope);
+        encodeFinite(terrainNode, "paintMinHeight", ts.paintMinHeight);
+        encodeFinite(terrainNode, "paintMaxHeight", ts.paintMaxHeight);
+        terrainNode["placeAssetPath"] = ts.placeAssetPath;
+        terrainNode["placeInstanced"] = ts.placeInstanced;
+        encodePositiveFinite(terrainNode, "placeSpacing", ts.placeSpacing);
+        encodePositiveFinite(terrainNode, "placeMinScale", ts.placeMinScale);
+        encodePositiveFinite(terrainNode, "placeMaxScale", ts.placeMaxScale);
+        encodeFinite(terrainNode, "placeRotationJitter", ts.placeRotationJitter);
+        encodeFinite(terrainNode, "placeAlignToNormal", ts.placeAlignToNormal);
         root["terrainEditor"] = terrainNode;
     }
 
@@ -1782,10 +1804,23 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         if (tn["flattenHeight"].IsDefined())      ts.flattenHeight      = decodeFinite(tn["flattenHeight"], ts.flattenHeight);
         if (tn["heightMapResolution"].IsDefined()) ts.heightMapResolution = tn["heightMapResolution"].as<int>();
         if (tn["blendMapResolution"].IsDefined()) ts.blendMapResolution = tn["blendMapResolution"].as<int>();
+        if (tn["densityMapResolution"].IsDefined()) ts.densityMapResolution = tn["densityMapResolution"].as<int>();
         if (tn["normalizeBlendPaint"].IsDefined()) ts.normalizeBlendPaint = tn["normalizeBlendPaint"].as<bool>();
         if (tn["heightMapStartAtMiddle"].IsDefined()) ts.heightMapStartAtMiddle = tn["heightMapStartAtMiddle"].as<bool>();
         if (tn["flattenPickOnStroke"].IsDefined()) ts.flattenPickOnStroke = tn["flattenPickOnStroke"].as<bool>();
         else ts.brushStrength = TerrainEditorSettings{}.brushStrength; // file predates time-based flow; old per-event strengths are far too weak under the new semantics
+        if (tn["paintUseMask"].IsDefined())       ts.paintUseMask       = tn["paintUseMask"].as<bool>();
+        if (tn["paintMinSlope"].IsDefined())      ts.paintMinSlope      = decodeFinite(tn["paintMinSlope"], ts.paintMinSlope);
+        if (tn["paintMaxSlope"].IsDefined())      ts.paintMaxSlope      = decodeFinite(tn["paintMaxSlope"], ts.paintMaxSlope);
+        if (tn["paintMinHeight"].IsDefined())     ts.paintMinHeight     = decodeFinite(tn["paintMinHeight"], ts.paintMinHeight);
+        if (tn["paintMaxHeight"].IsDefined())     ts.paintMaxHeight     = decodeFinite(tn["paintMaxHeight"], ts.paintMaxHeight);
+        if (tn["placeAssetPath"].IsDefined())     ts.placeAssetPath     = tn["placeAssetPath"].as<std::string>();
+        if (tn["placeInstanced"].IsDefined())     ts.placeInstanced     = tn["placeInstanced"].as<bool>();
+        if (tn["placeSpacing"].IsDefined())       ts.placeSpacing       = decodePositiveFinite(tn["placeSpacing"], ts.placeSpacing);
+        if (tn["placeMinScale"].IsDefined())      ts.placeMinScale      = decodePositiveFinite(tn["placeMinScale"], ts.placeMinScale);
+        if (tn["placeMaxScale"].IsDefined())      ts.placeMaxScale      = decodePositiveFinite(tn["placeMaxScale"], ts.placeMaxScale);
+        if (tn["placeRotationJitter"].IsDefined()) ts.placeRotationJitter = decodeFinite(tn["placeRotationJitter"], ts.placeRotationJitter);
+        if (tn["placeAlignToNormal"].IsDefined()) ts.placeAlignToNormal = decodeFinite(tn["placeAlignToNormal"], ts.placeAlignToNormal);
         project->getTerrainEditorSettings() = ts;
     }
 
@@ -4747,13 +4782,56 @@ TilemapComponent editor::Stream::decodeTilemapComponent(const YAML::Node& node, 
     return tilemap;
 }
 
+YAML::Node editor::Stream::encodeTerrainFoliageLayer(const TerrainFoliageLayer& layer) {
+    YAML::Node node;
+    node["meshPath"] = layer.meshPath;
+    node["densityMap"] = encodeTexture(layer.densityMap);
+    node["density"] = layer.density;
+    node["minScale"] = layer.minScale;
+    node["maxScale"] = layer.maxScale;
+    node["rotationJitter"] = layer.rotationJitter;
+    node["alignToNormal"] = layer.alignToNormal;
+    node["minSlope"] = layer.minSlope;
+    node["maxSlope"] = layer.maxSlope;
+    node["minHeight"] = layer.minHeight;
+    node["maxHeight"] = layer.maxHeight;
+    node["drawDistance"] = layer.drawDistance;
+    node["seed"] = layer.seed;
+    return node;
+}
+
+TerrainFoliageLayer editor::Stream::decodeTerrainFoliageLayer(const YAML::Node& node) {
+    TerrainFoliageLayer layer;
+    if (node["meshPath"]) layer.meshPath = node["meshPath"].as<std::string>();
+    if (node["densityMap"]) layer.densityMap = decodeTexture(node["densityMap"]);
+    if (node["seed"]) layer.seed = node["seed"].as<unsigned int>();
+    layer.density = decodeFinite(node["density"], layer.density);
+    layer.minScale = decodeFinite(node["minScale"], layer.minScale);
+    layer.maxScale = decodeFinite(node["maxScale"], layer.maxScale);
+    layer.rotationJitter = decodeFinite(node["rotationJitter"], layer.rotationJitter);
+    layer.alignToNormal = decodeFinite(node["alignToNormal"], layer.alignToNormal);
+    layer.minSlope = decodeFinite(node["minSlope"], layer.minSlope);
+    layer.maxSlope = decodeFinite(node["maxSlope"], layer.maxSlope);
+    layer.minHeight = decodeFinite(node["minHeight"], layer.minHeight);
+    layer.maxHeight = decodeFinite(node["maxHeight"], layer.maxHeight);
+    layer.drawDistance = decodeFinite(node["drawDistance"], layer.drawDistance);
+    return layer;
+}
+
 YAML::Node editor::Stream::encodeTerrainComponent(const TerrainComponent& terrain) {
     YAML::Node node;
     node["heightMap"] = encodeTexture(terrain.heightMap);
-    node["blendMap"] = encodeTexture(terrain.blendMap);
-    node["textureDetailRed"] = encodeTexture(terrain.textureDetailRed);
-    node["textureDetailGreen"] = encodeTexture(terrain.textureDetailGreen);
-    node["textureDetailBlue"] = encodeTexture(terrain.textureDetailBlue);
+    YAML::Node blendMapsNode;
+    for (const Texture& blendMap : terrain.blendMaps) {
+        blendMapsNode.push_back(encodeTexture(blendMap));
+    }
+    node["blendMaps"] = blendMapsNode;
+
+    YAML::Node layersNode;
+    for (const Texture& layer : terrain.textureLayers) {
+        layersNode.push_back(encodeTexture(layer));
+    }
+    node["textureLayers"] = layersNode;
     node["autoSetRanges"] = terrain.autoSetRanges;
     node["offset"] = encodeVector2(terrain.offset);
     node["terrainSize"] = terrain.terrainSize;
@@ -4772,6 +4850,14 @@ YAML::Node editor::Stream::encodeTerrainComponent(const TerrainComponent& terrai
         node["ranges"] = rangesNode;
     }
 
+    if (!terrain.foliageLayers.empty()) {
+        YAML::Node layersNode;
+        for (const TerrainFoliageLayer& layer : terrain.foliageLayers) {
+            layersNode.push_back(encodeTerrainFoliageLayer(layer));
+        }
+        node["foliageLayers"] = layersNode;
+    }
+
     return node;
 }
 
@@ -4783,10 +4869,45 @@ TerrainComponent editor::Stream::decodeTerrainComponent(const YAML::Node& node, 
     }
 
     if (node["heightMap"]) terrain.heightMap = decodeTexture(node["heightMap"]);
-    if (node["blendMap"]) terrain.blendMap = decodeTexture(node["blendMap"]);
-    if (node["textureDetailRed"]) terrain.textureDetailRed = decodeTexture(node["textureDetailRed"]);
-    if (node["textureDetailGreen"]) terrain.textureDetailGreen = decodeTexture(node["textureDetailGreen"]);
-    if (node["textureDetailBlue"]) terrain.textureDetailBlue = decodeTexture(node["textureDetailBlue"]);
+    // Cleared like the other lists below: decoding over a loaded terrain (a stop, a bundle
+    // reload) must replace what it has, not append to it.
+    terrain.blendMaps.clear();
+    if (node["blendMaps"] && node["blendMaps"].IsSequence()) {
+        for (std::size_t i = 0; i < node["blendMaps"].size(); i++) {
+            terrain.blendMaps.push_back(decodeTexture(node["blendMaps"][i]));
+        }
+    }
+
+    terrain.textureLayers.clear();
+    if (node["textureLayers"] && node["textureLayers"].IsSequence()) {
+        for (std::size_t i = 0; i < node["textureLayers"].size(); i++) {
+            terrain.textureLayers.push_back(decodeTexture(node["textureLayers"][i]));
+        }
+    }
+
+    // Backward compatibility: scenes saved before the terrain took lists named the single
+    // blend map and the first three layers. Remove this block with support for them.
+    if (node["blendMap"] && terrain.blendMaps.empty()) {
+        terrain.blendMaps.push_back(decodeTexture(node["blendMap"]));
+    }
+    if (terrain.textureLayers.empty()) {
+        const char* legacyKeys[] = {"textureDetailRed", "textureDetailGreen", "textureDetailBlue"};
+        int lastKey = -1;
+        for (int i = 0; i < 3; i++) {
+            if (node[legacyKeys[i]]) lastKey = i;
+        }
+        // A missing key still holds its slot, or the layers after it would shift down
+        for (int i = 0; i <= lastKey; i++) {
+            terrain.textureLayers.push_back(node[legacyKeys[i]] ? decodeTexture(node[legacyKeys[i]]) : Texture());
+        }
+    }
+
+    if (terrain.blendMaps.size() > MAX_TERRAIN_BLENDMAPS) {
+        terrain.blendMaps.resize(MAX_TERRAIN_BLENDMAPS);
+    }
+    if (terrain.textureLayers.size() > MAX_TERRAIN_LAYERS) {
+        terrain.textureLayers.resize(MAX_TERRAIN_LAYERS);
+    }
     if (node["autoSetRanges"]) terrain.autoSetRanges = node["autoSetRanges"].as<bool>();
     if (node["offset"]) terrain.offset = decodeVector2(node["offset"]);
     if (node["terrainSize"]) terrain.terrainSize = node["terrainSize"].as<float>();
@@ -4797,8 +4918,9 @@ TerrainComponent editor::Stream::decodeTerrainComponent(const YAML::Node& node, 
     if (node["rootGridSize"]) terrain.rootGridSize = node["rootGridSize"].as<int>();
     if (node["levels"]) terrain.levels = node["levels"].as<int>();
 
+    // The encoder omits empty ranges, so applying a full component must clear old values.
+    terrain.ranges.clear();
     if (node["ranges"] && node["ranges"].IsSequence()) {
-        terrain.ranges.clear();
         for (std::size_t i = 0; i < node["ranges"].size(); i++) {
             if (!node["ranges"][i] || node["ranges"][i].IsNull()) {
                 continue;
@@ -4807,7 +4929,20 @@ TerrainComponent editor::Stream::decodeTerrainComponent(const YAML::Node& node, 
         }
     }
 
+    // Cleared unconditionally: an absent key means the terrain has no layers, and reloading a
+    // scene over a loaded terrain must not resurrect layers that were removed.
+    terrain.foliageLayers.clear();
+    if (node["foliageLayers"] && node["foliageLayers"].IsSequence()) {
+        for (std::size_t i = 0; i < node["foliageLayers"].size(); i++) {
+            if (!node["foliageLayers"][i] || node["foliageLayers"][i].IsNull()) {
+                continue;
+            }
+            terrain.foliageLayers.push_back(decodeTerrainFoliageLayer(node["foliageLayers"][i]));
+        }
+    }
+
     terrain.needUpdateTerrain = true;
+    terrain.needUpdateFoliage = true;
     terrain.needUpdateTexture = true;
     for (int v = 0; v < MAX_TERRAIN_VIEWS; v++){
         terrain.views[v].needUpdateNodesBuffer = false;
@@ -5120,7 +5255,6 @@ FogComponent editor::Stream::decodeFogComponent(const YAML::Node& node, const Fo
 YAML::Node editor::Stream::encodeMirrorComponent(const MirrorComponent& mirror) {
     YAML::Node node;
 
-    // reflectionCamera is an engine-created runtime entity; not serialized
     node["normal"] = encodeVector3(mirror.normal);
 
     return node;

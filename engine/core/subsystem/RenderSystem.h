@@ -223,6 +223,7 @@ namespace doriax{
 		static uint32_t pixelsNormal[64];
 
 		static TextureRender emptyWhite;
+		static TextureRender emptyArrayWhite;
 		static TextureRender emptyBlack;
 		static TextureRender emptyCubeBlack;
 		static TextureRender emptyCubeWhite;
@@ -269,6 +270,11 @@ namespace doriax{
 		};
 
 		std::unordered_map<Entity, std::unique_ptr<ReflectionProbeRuntime>> reflectionProbeRuntimes;
+		// Each mirror's reflection camera. Kept here so the authored component stays copiable.
+		std::unordered_map<Entity, Entity> mirrorCameras;
+		// Main camera position for the instance distance fade: the colour and depth passes must
+		// fade against the same point or a shadow outlives its instance.
+		Vector3 fadeEyePosition;
 		Entity activeReflectionProbe = NULL_ENTITY;
 		fs_reflection_probe_t fs_reflection_probe;
 
@@ -463,9 +469,25 @@ namespace doriax{
 		void updateShadowBindings();
 		bool loadDepthTexture(Material& material, ShaderData& shaderData, ObjectRender& render);
 		bool loadGBufferTextures(Material& material, ShaderData& shaderData, ObjectRender& render);
-		bool loadTerrainTextures(TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData);
+		// The detail layers upload as one array texture, so they cost a single bind slot no
+		// matter how many there are. Kept here, not on the component, which stays copiable.
+		struct TerrainDetailArray{
+			TextureRender render;
+			std::vector<std::string> paths;
+			// one sampler serves every slice, so its settings are part of what the cache holds
+			TextureFilter minFilter = TextureFilter::LINEAR;
+			TextureFilter magFilter = TextureFilter::LINEAR;
+			TextureWrap wrapU = TextureWrap::REPEAT;
+			TextureWrap wrapV = TextureWrap::REPEAT;
+			bool failed = false;
+		};
+		std::unordered_map<Entity, TerrainDetailArray> terrainDetailArrays;
+
+		TerrainDetailArray* getTerrainDetailArray(Entity entity, TerrainComponent& terrain);
+		void destroyTerrainDetailArray(Entity entity);
+		bool loadTerrainTextures(Entity entity, TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData);
 		bool loadTerrainHeightTexture(TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData);
-		bool updateTerrainRenderTextures(TerrainComponent& terrain, MeshComponent& mesh);
+		bool updateTerrainRenderTextures(Entity entity, TerrainComponent& terrain, MeshComponent& mesh);
 		void updateAllTerrainRenderTextures();
 		void updateInstanceBuffers();
 		Rect getScissorRect(UILayoutComponent& layout, ImageComponent& img, Transform& transform, const Rect& passViewport);
@@ -580,6 +602,8 @@ namespace doriax{
 		void updateCamera(CameraComponent& camera, Transform& transform);
 		void updateMirrors(Entity mainCameraEntity);
 		Entity createMirrorCamera(Entity mirrorEntity);
+		Entity getMirrorCamera(Entity mirrorEntity) const;
+		void destroyMirrorCamera(Entity entity);
 
 		// camera
 		void updateCameraSize(Entity entity);

@@ -520,6 +520,8 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addConstructor <void (*) (Scene*), void (*) (Scene*, Entity)> ()
         .addFunction("setHeightMap", (void(Terrain::*)(const std::string&))&Terrain::setHeightMap)
         .addFunction("setBlendMap", (void(Terrain::*)(const std::string&))&Terrain::setBlendMap)
+        .addFunction("setBlendMapIndex", (void(Terrain::*)(unsigned int, const std::string&))&Terrain::setBlendMap)
+        .addFunction("setTextureLayer", &Terrain::setTextureLayer)
         .addFunction("setTextureDetailRed", (void(Terrain::*)(const std::string&))&Terrain::setTextureDetailRed)
         .addFunction("setTextureDetailGreen", (void(Terrain::*)(const std::string&))&Terrain::setTextureDetailGreen)
         .addFunction("setTextureDetailBlue", (void(Terrain::*)(const std::string&))&Terrain::setTextureDetailBlue)

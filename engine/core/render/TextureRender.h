@@ -24,7 +24,7 @@ namespace doriax {
 
         bool createTexture(
                 const std::string& label, int width, int height,
-                ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6],
+                ColorFormat colorFormat, TextureType type, int numFaces, void* data[], size_t size[],
                 TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV);
 
         // creates a cubemap with custom (pre-filtered) mipmap data,

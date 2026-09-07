@@ -75,6 +75,7 @@ namespace doriax{
         int slotVSParams = -1;
         int slotFSParams = -1;
         int slotFSTexCoordSets = -1;
+        int slotVSFade = -1;
         int slotFSLighting = -1;
         int slotFSReflectionProbe = -1;
         int slotFSLighting2D = -1;
@@ -90,6 +91,7 @@ namespace doriax{
 
         int slotVSDepthParams = -1;
         int slotFSDepthMaterial = -1;
+        int slotVSDepthFade = -1;
         int slotVSDepthSkinning = -1;
         int slotVSDepthMorphTarget = -1;
         int slotVSDepthTerrain = -1;

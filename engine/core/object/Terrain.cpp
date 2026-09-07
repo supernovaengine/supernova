@@ -44,43 +44,61 @@ void Terrain::setHeightMap(Framebuffer* framebuffer){
 }
 
 void Terrain::setBlendMap(const std::string& path){
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    terrain.blendMap.setPath(path);
-
-    terrain.needUpdateTexture = true;
+    setBlendMap(0, path);
 }
 
 void Terrain::setBlendMap(Framebuffer* framebuffer){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
-    terrain.blendMap.setFramebuffer(framebuffer);
+    if (terrain.blendMaps.empty()){
+        terrain.blendMaps.resize(1);
+    }
+    terrain.blendMaps[0].setFramebuffer(framebuffer);
 
     terrain.needUpdateTexture = true;
 }
 
-void Terrain::setTextureDetailRed(const std::string& path){
+void Terrain::setBlendMap(unsigned int index, const std::string& path){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
 
-    terrain.textureDetailRed.setPath(path);
+    if (index >= MAX_TERRAIN_BLENDMAPS){
+        Log::error("Terrain has no blend map %u, the limit is %d", index, MAX_TERRAIN_BLENDMAPS);
+        return;
+    }
+    if (index >= terrain.blendMaps.size()){
+        terrain.blendMaps.resize(index + 1);
+    }
+    terrain.blendMaps[index].setPath(path);
 
     terrain.needUpdateTexture = true;
+}
+
+void Terrain::setTextureLayer(unsigned int index, const std::string& path){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    if (index >= MAX_TERRAIN_LAYERS){
+        Log::error("Terrain has no layer %u, the limit is %d", index, MAX_TERRAIN_LAYERS);
+        return;
+    }
+    if (index >= terrain.textureLayers.size()){
+        terrain.textureLayers.resize(index + 1);
+    }
+    terrain.textureLayers[index].setPath(path);
+
+    terrain.needUpdateTexture = true;
+}
+
+// The first three layers, under the names they had when a blend map was the only one
+void Terrain::setTextureDetailRed(const std::string& path){
+    setTextureLayer(0, path);
 }
 
 void Terrain::setTextureDetailGreen(const std::string& path){
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    terrain.textureDetailGreen.setPath(path);
-
-    terrain.needUpdateTexture = true;
+    setTextureLayer(1, path);
 }
 
 void Terrain::setTextureDetailBlue(const std::string& path){
-    TerrainComponent& terrain = getComponent<TerrainComponent>();
-
-    terrain.textureDetailBlue.setPath(path);
-
-    terrain.needUpdateTexture = true;
+    setTextureLayer(2, path);
 }
 
 void Terrain::setSize(float size){

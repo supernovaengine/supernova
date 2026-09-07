@@ -647,10 +647,20 @@ bool editor::Project::visitAssetPathsInRegistry(EntityRegistry* registry, const 
     visitComponents(registry->getComponentArray<TerrainComponent>(), [&](TerrainComponent& terrain) {
         bool heightMapChanged = visitTexturePaths(terrain.heightMap, transform);
         bool terrainChanged = heightMapChanged;
-        terrainChanged |= visitTexturePaths(terrain.blendMap, transform);
-        terrainChanged |= visitTexturePaths(terrain.textureDetailRed, transform);
-        terrainChanged |= visitTexturePaths(terrain.textureDetailGreen, transform);
-        terrainChanged |= visitTexturePaths(terrain.textureDetailBlue, transform);
+        for (Texture& blendMap : terrain.blendMaps) {
+            terrainChanged |= visitTexturePaths(blendMap, transform);
+        }
+        for (Texture& layer : terrain.textureLayers) {
+            terrainChanged |= visitTexturePaths(layer, transform);
+        }
+
+        for (TerrainFoliageLayer& layer : terrain.foliageLayers) {
+            if (visitTexturePaths(layer.densityMap, transform) ||
+                (!layer.meshPath.empty() && transform(layer.meshPath))) {
+                terrain.needUpdateFoliage = true;
+                changed = true;
+            }
+        }
 
         // The node tree and the physics heightfield are built from the map, so they follow it
         if (heightMapChanged) {
@@ -2562,7 +2572,17 @@ void editor::Project::collectSceneShaderKeys(const SceneProject* sceneProject, s
         }
     };
 
-    for (Entity entity : sceneProject->entities) {
+    // Foliage entities are created at runtime and kept out of sceneProject->entities, so the
+    // authored list alone would export the field without its instanced variant.
+    std::vector<Entity> shaderEntities = sceneProject->entities;
+    auto meshSystem = scene->getSystem<MeshSystem>();
+    auto terrains = scene->getComponentArray<TerrainComponent>();
+    for (size_t i = 0; i < terrains->size(); ++i) {
+        const std::vector<Entity> foliage = meshSystem->getFoliageEntities(terrains->getEntity(i));
+        shaderEntities.insert(shaderEntities.end(), foliage.begin(), foliage.end());
+    }
+
+    for (Entity entity : shaderEntities) {
         Signature signature = scene->getSignature(entity);
 
         if (signature.test(scene->getComponentId<MeshComponent>())) {
@@ -2600,10 +2620,14 @@ void editor::Project::collectSceneShaderKeys(const SceneProject* sceneProject, s
                     // stored key too (identical when it was computed).
                     bool isTerrain = signature.test(scene->getComponentId<TerrainComponent>());
                     bool isInstanced = signature.test(scene->getComponentId<InstancedMeshComponent>());
+                    // From the component, not depthShaderProperties: that word stays 0 until a
+                    // shadow or SSAO pass has built the depth shader at least once.
+                    bool instancedFade = isInstanced && scene->getComponent<InstancedMeshComponent>(entity).distanceFade;
                     uint32_t depthProperties = ShaderPool::getDepthMeshProperties(
                         mesh.submeshes[s].textureShadow, mesh.submeshes[s].hasSkinning,
                         mesh.submeshes[s].hasMorphTarget, mesh.submeshes[s].hasMorphNormal,
-                        mesh.submeshes[s].hasMorphTangent, isTerrain, isInstanced);
+                        mesh.submeshes[s].hasMorphTangent, isTerrain, isInstanced, false,
+                        instancedFade);
                     keys.insert(ShaderPool::getShaderKey(ShaderType::DEPTH, depthProperties));
                     keys.insert(ShaderPool::getShaderKey(ShaderType::DEPTH, mesh.submeshes[s].depthShaderProperties));
                     if (mesh.submeshes[s].gbufferShader) {
@@ -2749,6 +2773,8 @@ Entity editor::Project::getSceneCamera(const SceneProject* sceneProject) const {
 
 void editor::Project::prepareRuntimeScene(PlayRuntimeScene& entry) {
     if (!entry.runtime || !entry.runtime->scene) return;
+
+    entry.runtime->scene->getSystem<MeshSystem>()->setFoliagePreviewEntity(NULL_ENTITY);
 
     Entity camera = getSceneCamera(entry.runtime);
     entry.runtime->scene->setCamera(camera);

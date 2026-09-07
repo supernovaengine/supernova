@@ -19,6 +19,13 @@ in float i_terrainnode_resolution; //int
 #ifndef DEPTH_SHADER
     out vec2 v_terrainTextureCoords;
     out vec2 v_terrainTextureDetailTiled;
+    // surface height in the same units as the tiled coords, for the triplanar side planes
+    out float v_terrainDetailHeight;
+    // eye distance counted in detail tiles, so the tiling break follows the tile size
+    out float v_terrainEyeTiles;
+    #ifdef HAS_NORMALS
+        out vec3 v_terrainNormal;
+    #endif
 #endif
 
 float morphFactor;
@@ -50,6 +57,10 @@ vec3 getTerrainPosition(vec3 pos, mat4 modelMatrix){
 
     float dist = distance(terrain.eyePos, vec3(modelMatrix * vec4(pos, 1.0)));
 
+    #ifndef DEPTH_SHADER
+        v_terrainEyeTiles = dist * float(terrain.textureDetailTiles) / terrain.size;
+    #endif
+
     float nextlevel_thresh = ((i_terrainnode_range - dist) / i_terrainnode_size * i_terrainnode_resolution / float(terrain.resolution));
     morphFactor = 1.0 - smoothstep(morphStart, morphEnd, nextlevel_thresh);
 
@@ -79,6 +90,10 @@ vec3 getTerrainNormal(vec3 normal, vec3 position){
         pB += normal * hB;
 
         normal = normalize(cross(pB - p, pA - p));
+
+        #ifndef DEPTH_SHADER
+            v_terrainNormal = normal;
+        #endif
     #endif
 
     return normal;
@@ -88,6 +103,7 @@ vec3 getTerrainNormal(vec3 normal, vec3 position){
     vec2 getTerrainTiledTexture(vec3 position){
         v_terrainTextureCoords = (position.xz + (terrain.size/2.0)) / terrain.size;
         v_terrainTextureDetailTiled = v_terrainTextureCoords * float(terrain.textureDetailTiles);
+        v_terrainDetailHeight = position.y / terrain.size * float(terrain.textureDetailTiles);
         return v_terrainTextureCoords * float(terrain.textureBaseTiles);
     }
 #endif

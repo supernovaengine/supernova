@@ -569,7 +569,9 @@ void TextureData::resize(int newWidth, int newHeight){
 
     if ((newWidth != width) || (newHeight != height)){
 
-        int bufsize = newWidth * newHeight * channels;
+        // RED16 carries two bytes per channel, so a pixel is not always one byte per channel
+        int pixelSize = channels * getBytesPerChannel(color_format);
+        int bufsize = newWidth * newHeight * pixelSize;
         unsigned char* newData = (unsigned char*) malloc(bufsize*sizeof(unsigned char));
 
         #if RESIZE_WITH_STB
@@ -585,8 +587,10 @@ void TextureData::resize(int newWidth, int newHeight){
             pixel_layout = stbir_pixel_layout::STBIR_RGBA;
         }
 
-        stbir_resize_uint8_linear((unsigned char*)data, width, height, 0,
-	                   newData, newWidth, newHeight, 0, pixel_layout);
+        stbir_resize((unsigned char*)data, width, height, 0,
+	                   newData, newWidth, newHeight, 0, pixel_layout,
+	                   (color_format == ColorFormat::RED16) ? STBIR_TYPE_UINT16 : STBIR_TYPE_UINT8,
+	                   STBIR_EDGE_CLAMP, STBIR_FILTER_DEFAULT);
 
         #else
 
@@ -596,11 +600,11 @@ void TextureData::resize(int newWidth, int newHeight){
         for(int cy = 0; cy < newHeight; cy++){
             for(int cx = 0; cx < newWidth; cx++){
                 
-                int pixel = (cy * (newWidth*channels)) + (cx*channels);
-                int nearestMatch =  (((int)(cy / scaleHeight) * (width*channels)) + ((int)(cx / scaleWidth) * channels) );
+                int pixel = (cy * (newWidth*pixelSize)) + (cx*pixelSize);
+                int nearestMatch =  (((int)(cy / scaleHeight) * (width*pixelSize)) + ((int)(cx / scaleWidth) * pixelSize) );
             
-                for (int color = 0; color < channels; color++){
-                    newData[pixel + color] =  ((unsigned char*)data)[nearestMatch + color];
+                for (int b = 0; b < pixelSize; b++){
+                    newData[pixel + b] =  ((unsigned char*)data)[nearestMatch + b];
                 }
             
             }

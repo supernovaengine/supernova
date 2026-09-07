@@ -39,6 +39,21 @@ editor::ModelLoadCmd::ModelLoadCmd(Project* project, uint32_t sceneId, const std
     createEntityCmd->addProperty<Vector3>(ComponentType::Transform, "position", position);
 }
 
+editor::ModelLoadCmd::ModelLoadCmd(Project* project, uint32_t sceneId, const std::string& entityName, Entity parent, const Vector3& position, const Quaternion& rotation, const Vector3& scale, const std::string& modelPath){
+    this->project = project;
+    this->sceneId = sceneId;
+    this->entity = NULL_ENTITY;
+    this->modelPath = modelPath;
+
+    this->wasModified = project->getScene(sceneId)->isModified;
+
+    createEntityCmd = new CreateEntityCmd(project, sceneId, entityName, EntityCreationType::MODEL, parent);
+    createEntityCmd->setQuiet(true);
+    createEntityCmd->addProperty<Vector3>(ComponentType::Transform, "position", position);
+    createEntityCmd->addProperty<Quaternion>(ComponentType::Transform, "rotation", rotation);
+    createEntityCmd->addProperty<Vector3>(ComponentType::Transform, "scale", scale);
+}
+
 editor::ModelLoadCmd::~ModelLoadCmd(){
     if (cancelFlag) cancelFlag->store(true);
     if (asyncPending){

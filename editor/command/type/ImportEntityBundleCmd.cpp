@@ -114,20 +114,33 @@ bool editor::ImportEntityBundleCmd::execute(){
         return false;
     }
 
-    // If parent is part of a bundle, add the new root as a nested bundle member
+    // Applied after the import so nothing the bundle brings in overwrites it.
+    if (hasPlacement){
+        if (Transform* rootTransform = scene->findComponent<Transform>(rootEntity)){
+            rootTransform->position = placementPosition;
+            rootTransform->rotation = placementRotation;
+            rootTransform->scale = placementScale;
+            rootTransform->needUpdate = true;
+        }
+    }
+
+    // If parent is part of a bundle, add the new root as a nested bundle member. A brush
+    // placement never does: it drops props into the scene, not into a shared bundle asset.
     addedToParentBundle = false;
-    if (parent != NULL_ENTITY && project->isEntityInBundle(sceneId, parent)) {
+    if (parent != NULL_ENTITY && !hasPlacement && project->isEntityInBundle(sceneId, parent)) {
         addedToParentBundle = project->addEntityToBundle(sceneId, rootEntity, parent, false);
     }
 
-    // Select the root entity
-    project->setSelectedEntity(sceneId, rootEntity);
+    if (!quiet){
+        // Select the root entity
+        project->setSelectedEntity(sceneId, rootEntity);
 
-    if (ImGui::GetCurrentContext()){
-        ImGui::SetWindowFocus(("###Scene" + std::to_string(sceneId)).c_str());
+        if (ImGui::GetCurrentContext()){
+            ImGui::SetWindowFocus(("###Scene" + std::to_string(sceneId)).c_str());
+        }
+
+        editor::Out::info("Imported entity bundle from '%s' to scene '%s'", filepath.string().c_str(), sceneProject->name.c_str());
     }
-
-    editor::Out::info("Imported entity bundle from '%s' to scene '%s'", filepath.string().c_str(), sceneProject->name.c_str());
 
     return true;
 }
@@ -148,7 +161,7 @@ void editor::ImportEntityBundleCmd::undo(){
     project->unimportEntityBundle(sceneId, filepath, rootEntity, importedEntities);
 
     // Restore previous selection
-    if (!lastSelected.empty()) {
+    if (!quiet && !lastSelected.empty()) {
         project->replaceSelectedEntities(sceneId, lastSelected);
     }
 
@@ -162,4 +175,15 @@ bool editor::ImportEntityBundleCmd::mergeWith(editor::Command* otherCommand){
 
 std::vector<Entity> editor::ImportEntityBundleCmd::getImportedEntities() const{
     return importedEntities;
+}
+
+void editor::ImportEntityBundleCmd::setPlacement(const Vector3& position, const Quaternion& rotation, const Vector3& scale){
+    hasPlacement = true;
+    placementPosition = position;
+    placementRotation = rotation;
+    placementScale = scale;
+}
+
+void editor::ImportEntityBundleCmd::setQuiet(bool quiet){
+    this->quiet = quiet;
 }

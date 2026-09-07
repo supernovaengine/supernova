@@ -7792,15 +7792,30 @@ void editor::Properties::drawTerrainComponent(ComponentType cpType, SceneProject
     ImGui::SeparatorText("Maps");
     beginTable(cpType, getLabelSize("Height Map"), "terrain_maps");
     propertyRow(RowPropertyType::Texture, cpType, "heightMap", "Height Map", sceneProject, entities, textureSettings);
-    propertyRow(RowPropertyType::Texture, cpType, "blendMap", "Blend Map", sceneProject, entities, textureSettings);
     endTable();
 
-    ImGui::SeparatorText("Details");
-    beginTable(cpType, getLabelSize("Detail Green"), "terrain_details");
-    propertyRow(RowPropertyType::Texture, cpType, "textureDetailRed", "Detail Red", sceneProject, entities, textureSettings);
-    propertyRow(RowPropertyType::Texture, cpType, "textureDetailGreen", "Detail Green", sceneProject, entities, textureSettings);
-    propertyRow(RowPropertyType::Texture, cpType, "textureDetailBlue", "Detail Blue", sceneProject, entities, textureSettings);
-    endTable();
+    // The Terrain Editor owns adding and removing these, so here they are only listed
+    if (!terrain.blendMaps.empty()){
+        ImGui::SeparatorText("Blend Maps");
+        beginTable(cpType, getLabelSize("Blend Map 1"), "terrain_blendmaps");
+        for (size_t i = 0; i < terrain.blendMaps.size(); i++){
+            const std::string property = "blendMaps[" + std::to_string(i) + "]";
+            const std::string label = "Blend Map " + std::to_string(i + 1);
+            propertyRow(RowPropertyType::Texture, cpType, property, label, sceneProject, entities, textureSettings);
+        }
+        endTable();
+    }
+
+    if (!terrain.textureLayers.empty()){
+        ImGui::SeparatorText("Layers");
+        beginTable(cpType, getLabelSize("Layer 1"), "terrain_layers");
+        for (size_t i = 0; i < terrain.textureLayers.size(); i++){
+            const std::string property = "textureLayers[" + std::to_string(i) + "]";
+            const std::string label = "Layer " + std::to_string(i + 1);
+            propertyRow(RowPropertyType::Texture, cpType, property, label, sceneProject, entities, textureSettings);
+        }
+        endTable();
+    }
 
     RowSettings settingsFloat;
     settingsFloat.secondColSize = 6 * ImGui::GetFontSize();

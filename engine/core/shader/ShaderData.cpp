@@ -153,6 +153,8 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type){
         ustr = "u_fs_pbrParams";
     }else if (type == UniformBlockType::PBR_FS_TEXCOORDSETS){
         ustr = "u_fs_texCoordSets";
+    }else if (type == UniformBlockType::PBR_VS_FADE){
+        ustr = "u_vs_fade";
     }else if (type == UniformBlockType::FS_LIGHTING){
         ustr = "u_fs_lighting";
     }else if (type == UniformBlockType::FS_REFLECTION_PROBE){
@@ -318,12 +320,12 @@ std::pair<int, int> ShaderData::getTextureIndex(TextureShaderType type){
         texstr = "u_heightMap";
     }else if (type == TextureShaderType::BLENDMAP){
         texstr = "u_blendMap";
-    }else if (type == TextureShaderType::TERRAINDETAIL_RED){
-        texstr = "u_terrainDetailR";
-    }else if (type == TextureShaderType::TERRAINDETAIL_GREEN){
-        texstr = "u_terrainDetailG";
-    }else if (type == TextureShaderType::TERRAINDETAIL_BLUE){
-        texstr = "u_terrainDetailB";
+    }else if (type == TextureShaderType::BLENDMAP1){
+        texstr = "u_blendMap1";
+    }else if (type == TextureShaderType::BLENDMAP2){
+        texstr = "u_blendMap2";
+    }else if (type == TextureShaderType::TERRAINDETAIL){
+        texstr = "u_terrainDetail";
     }else if (type == TextureShaderType::DEPTHTEXTURE){
         texstr = "u_depthTexture";
     }else if (type == TextureShaderType::SSAOTEXTURE){

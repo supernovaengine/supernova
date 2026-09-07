@@ -10,6 +10,7 @@
 #include "imgui.h"
 
 #include <chrono>
+#include <random>
 #include <string>
 #include <vector>
 
@@ -20,9 +21,12 @@ namespace doriax::editor{
         Lower,
         Smooth,
         Flatten,
-        PaintRed,
-        PaintGreen,
-        PaintBlue
+        PaintBase,
+        PaintLayer,
+        PaintDensity,
+        EraseDensity,
+        PlaceObject,
+        EraseObject
     };
 
     enum class TerrainBrushShape{
@@ -62,17 +66,15 @@ namespace doriax::editor{
     struct TerrainMapInfo{
         bool present = false;
         bool sizeKnown = false;
-        bool framebuffer = false;
         int width = 0;
         int height = 0;
-        int channels = 0;
     };
 
     struct ActiveStroke{
         bool active = false;
         uint32_t sceneId = NULL_PROJECT_SCENE;
         Entity entity = NULL_ENTITY;
-        TerrainMapTarget target = TerrainMapTarget::HeightMap;
+        TerrainMapRef ref;
         TerrainMapSnapshot beforeSnapshot;
         // Brush mode for this stroke (modifiers can override the selected mode)
         TerrainBrushMode effectiveMode = TerrainBrushMode::Raise;
@@ -91,6 +93,13 @@ namespace doriax::editor{
         int workingHeight = 0;
         // Texels written so far, cut into the undo patch when the stroke ends
         TerrainMapRegion dirtyRegion;
+        // Placement strokes write entities instead of a map, so none of the texture state applies
+        bool placement = false;
+        // Fixed at stroke start, cleared if the asset turns out not to be instanceable
+        bool instanced = false;
+        uint64_t placementStrokeId = 0;
+        // Terrain-local XZ of every prop already on this terrain, grown as the stroke places more
+        std::vector<Vector2> placedPoints;
         bool heightReferenceValid = false;
         float heightReferenceTerrainSize = 0.0f;
         float heightReferenceMaxHeight = 0.0f;
@@ -104,6 +113,9 @@ namespace doriax::editor{
     class TerrainEditWindow{
     private:
         class TerrainTextureEditCmd;
+        class TerrainInstancePlaceCmd;
+        class TerrainInstanceEraseCmd;
+        class TerrainObjectStrokeCmd;
 
         Project* project;
 
@@ -127,6 +139,29 @@ namespace doriax::editor{
 
         int heightMapResolution;
         int blendMapResolution;
+        int densityMapResolution;
+        int selectedFoliageLayer;
+        int selectedTextureLayer;
+
+        // Placed props are ordinary entities, so the palette is tool state, not component data
+        std::string placeAssetPath;
+        bool placeInstanced;
+        float placeSpacing;
+        float placeMinScale;
+        float placeMaxScale;
+        float placeRotationJitter;
+        float placeAlignToNormal;
+
+        bool paintUseMask;
+        float paintMinSlope;
+        float paintMaxSlope;
+        float paintMinHeight;
+        float paintMaxHeight;
+
+        // An asset the load proved cannot be instanced, so the brush stops retrying it
+        std::string instancingRejectedAsset;
+        uint64_t placementStrokeCounter = 0;
+        std::mt19937 placementRandom;
 
         uint64_t editTextureCounter = 1;
 
@@ -134,9 +169,13 @@ namespace doriax::editor{
 
         void showTooltip(const char* text, ImGuiHoveredFlags flags = 0);
         bool iconButton(const char* icon, const char* id, const char* tooltip, bool selected, const ImVec2& size);
-        bool colorIconButton(const char* icon, const char* id, const char* tooltip, bool selected, const ImVec4& color, const ImVec2& size);
-        std::string makeEditableTextureId(uint32_t sceneId, Entity entity, TerrainMapTarget target);
-        std::string makeEditableTexturePath(Project* project, uint32_t sceneId, Entity entity, TerrainMapTarget target);
+        void drawMapSettings(const TerrainMapRef& ref, const char* label, int& resolution);
+        float drawAssetThumbnail(const std::string& path, const char* id, bool selected = false, float scale = 3.0f);
+        void drawTextureLayers(TerrainComponent& terrain);
+        void drawFoliageMesh(const TerrainFoliageLayer& layer);
+        void drawPlacementAsset();
+        std::string makeEditableTextureId(uint32_t sceneId, Entity entity, const TerrainMapRef& ref);
+        std::string makeEditableTexturePath(Project* project, uint32_t sceneId, Entity entity, const TerrainMapRef& ref);
         int expectedChannels(TerrainMapTarget target);
         ColorFormat expectedFormat(TerrainMapTarget target);
         int expectedBytesPerTexel(TerrainMapTarget target);
@@ -144,11 +183,9 @@ namespace doriax::editor{
         static void encodeHeightTexel(unsigned char* pixels, size_t texelIndex, int bytesPerChannel, float value);
         unsigned char clampByte(float value);
         bool setFileBackedTextureData(Project* project, Texture& texture, const std::string& relativePath, int width, int height, ColorFormat format, int channels, const std::vector<unsigned char>& pixels);
-        bool isOwnedEditableTexturePath(const std::string& path, uint32_t sceneId, Entity entity, TerrainMapTarget target);
+        bool isOwnedEditableTexturePath(const std::string& path, uint32_t sceneId, Entity entity, const TerrainMapRef& ref);
         bool loadTerrainTextureDataFromPath(Project* project, const std::string& path, TextureData& data);
         TerrainMapInfo getTerrainMapInfo(Texture& texture);
-        std::string getTerrainMapStatusText(const TerrainMapInfo& info);
-        void showTerrainMapStatus(const TerrainMapInfo& info);
         std::vector<unsigned char> copyTexturePixels(TextureData& data);
         std::vector<unsigned char> convertTexturePixels(TextureData& data, TerrainMapTarget target);
         std::vector<unsigned char> makeInitialMapPixels(TerrainMapTarget target, int width, int height);
@@ -156,7 +193,7 @@ namespace doriax::editor{
         TerrainMapSnapshot captureSnapshot(Project* project, Texture& texture, bool forcePixels);
         bool snapshotsEqual(const TerrainMapSnapshot& a, const TerrainMapSnapshot& b);
         void applySnapshotToTexture(Project* project, Texture& texture, const TerrainMapSnapshot& snapshot);
-        bool ensureEditableMap(Project* project, SceneProject* sceneProject, Entity entity, TerrainMapTarget target, int resolution);
+        bool ensureEditableMap(Project* project, SceneProject* sceneProject, Entity entity, const TerrainMapRef& ref, int resolution);
         void writeHeight(TextureData& data, int x, int y, float value);
         static float bilinearHeightSample(const unsigned char* pixels, int width, int height, int channels, int bytesPerChannel, float texelX, float texelY);
         bool raycastTerrainStrokeSurface(const Ray& localRay, TerrainComponent& terrain, const ActiveStroke* activeStroke, Vector3& localPoint, float& localHeight) const;
@@ -165,18 +202,35 @@ namespace doriax::editor{
         SceneProject* getTargetSceneProject() const;
         bool updateTargetFromSelection();
         bool hasValidTarget(SceneProject* sceneProject = nullptr) const;
-        TerrainMapTarget getBrushTarget() const;
+        int mapResolutionFor(TerrainMapTarget target) const;
+        TerrainMapRef getBrushMapRef() const;
         bool isHeightBrush() const;
+        bool isBlendBrush() const;
+        bool isDensityBrush() const;
+        bool isPlacementBrush() const;
+        // Erase needs no asset, placing does
+        bool isPlacementReady() const;
+        static bool isScalarTarget(TerrainMapTarget target);
 
         void captureStrokeHeightReference(TerrainComponent& terrain);
         bool findTerrainHit(Scene* scene, const Ray& ray, Entity& entity, Vector3& localPoint, Vector3& worldPoint, float& localHeight, const ActiveStroke* activeStroke = nullptr) const;
         bool applyBrush(SceneProject* sceneProject, Entity entity, const Vector3& localPoint);
         bool stampBrush(TerrainComponent& terrain, TextureData& data, TerrainMapTarget target, const Vector3& localPoint, float deltaTime);
         bool addStrokePatchCommand(SceneProject* sceneProject, Texture& texture);
+        std::vector<Vector2> collectPlacedPoints(SceneProject* sceneProject, Entity terrainEntity) const;
+        // Instanced placement keeps one host entity per asset under the terrain
+        static Entity findInstanceHost(SceneProject* sceneProject, Entity terrainEntity, const std::string& assetPath);
+        bool useInstancedPlacement() const;
+        Command* makePlacementCommand(SceneProject* sceneProject, Entity terrainEntity, const Vector3& localPosition, const Quaternion& rotation, const Vector3& scale);
+        void addStrokeObjectCommand(SceneProject* sceneProject, Command* command);
+        bool applyPlacement(SceneProject* sceneProject, Entity entity, const Vector3& localPoint);
+        bool applyObjectErase(SceneProject* sceneProject, Entity entity, const Vector3& localPoint);
         void clearStroke();
 
-        bool createMapForTarget(TerrainMapTarget target, int width, int height);
-        bool deleteMapForTarget(TerrainMapTarget target);
+        bool createMapForTarget(const TerrainMapRef& ref, int width, int height);
+        bool deleteMapForTarget(const TerrainMapRef& ref);
+        bool setFoliageLayers(const std::vector<TerrainFoliageLayer>& layers);
+        template<typename T> bool setFoliageLayerProperty(const char* field, const T& value);
 
     public:
         static constexpr const char* WINDOW_NAME = "Terrain Editor";
@@ -204,6 +258,7 @@ namespace doriax::editor{
         bool beginStroke(Scene* scene, const Ray& ray);
         bool paintStroke(Scene* scene, const Ray& ray);
         void endStroke();
+        void updateFoliagePreview();
         bool updateCursor(Scene* scene, const Ray& ray, TerrainBrushCursor& cursor) const;
 
         void adjustBrushSize(float factor);
@@ -211,4 +266,3 @@ namespace doriax::editor{
     };
 
 }
-

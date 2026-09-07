@@ -18,10 +18,19 @@
 #define MAX_TERRAIN_LEVELS 20
 #define MAX_TERRAIN_NODES 2000000u
 
+// A blend map weights three layers in its RGB. Alpha is not a fourth weight: saved
+// maps are opaque, so it would read as full strength.
+#define MAX_TERRAIN_BLENDMAPS 3
+#define MAX_TERRAIN_LAYERS (MAX_TERRAIN_BLENDMAPS * 3)
+
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
 #include "texture/Material.h"
+#include "ecs/Entity.h"
 #include "Engine.h"
+
+#include <string>
+#include <vector>
 
 namespace doriax{
 
@@ -56,16 +65,36 @@ namespace doriax{
         bool needUpdateNodesBuffer = false;
     };
 
+    // A scattered mesh layer painted over the terrain. The editor authors its density map;
+    // instances are resolved from that map instead of being stored.
+    struct TerrainFoliageLayer{
+        std::string meshPath;
+        Texture densityMap;
+
+        float density = 1; //instances per square world unit where the map is fully painted
+        float minScale = 0.8f;
+        float maxScale = 1.2f;
+        float rotationJitter = 1; //share of a full turn of random yaw
+        float alignToNormal = 0; //0 stands instances upright, 1 lays them along the surface
+        float minSlope = 0; //degrees
+        float maxSlope = 35;
+        float minHeight = 0; //normalized against the terrain maxHeight
+        float maxHeight = 1;
+        float drawDistance = 50;
+        unsigned int seed = 0;
+    };
+
     struct DORIAX_API TerrainComponent{
         // per-view CDLOD node selection (see TerrainView). Extra RTT cameras beyond
         // MAX_TERRAIN_VIEWS fall back to the main camera's selection (view 0).
         TerrainView views[MAX_TERRAIN_VIEWS];
 
         Texture heightMap;
-        Texture blendMap;
-        Texture textureDetailRed;
-        Texture textureDetailGreen;
-        Texture textureDetailBlue;
+        // blendMaps[m] channel c weights textureLayers[m * 3 + c]
+        std::vector<Texture> blendMaps;
+        std::vector<Texture> textureLayers;
+
+        std::vector<TerrainFoliageLayer> foliageLayers;
 
         bool autoSetRanges = true;
         bool heightMapLoaded = false;
@@ -96,6 +125,7 @@ namespace doriax{
 
         bool needUpdateTerrain = true;
         bool needUpdateTexture = false;
+        bool needUpdateFoliage = true;
     };
     
 }

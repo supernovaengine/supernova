@@ -80,6 +80,8 @@ sg_image_type SokolTexture::getTextureType(TextureType textureType){
         return SG_IMAGETYPE_2D;
     }else if (textureType == TextureType::TEXTURE_CUBE){
         return SG_IMAGETYPE_CUBE;
+    }else if (textureType == TextureType::TEXTURE_ARRAY){
+        return SG_IMAGETYPE_ARRAY;
     }
 
     return _SG_IMAGETYPE_DEFAULT;
@@ -258,7 +260,7 @@ sg_image SokolTexture::generateMipmaps(const sg_image_desc* desc_){
 
 bool SokolTexture::createTexture(
             const std::string& label, int width, int height,
-            ColorFormat colorFormat, TextureType type, int numFaces, void* data[6], size_t size[6], 
+            ColorFormat colorFormat, TextureType type, int numFaces, void* data[], size_t size[], 
             TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV){
 
     sg_pixel_format pixelFormat;
@@ -277,7 +279,7 @@ bool SokolTexture::createTexture(
     image_desc.width = width;
     image_desc.height = height;
     image_desc.pixel_format = pixelFormat;
-    image_desc.num_slices = (type == TextureType::TEXTURE_CUBE)? 6 : 1;
+    image_desc.num_slices = (type == TextureType::TEXTURE_CUBE)? 6 : ((type == TextureType::TEXTURE_ARRAY)? numFaces : 1);
     image_desc.label = label.c_str();
 
     sg_sampler_desc sampler_desc = {0};

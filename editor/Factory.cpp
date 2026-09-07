@@ -1253,10 +1253,14 @@ std::string editor::Factory::createTerrainComponent(int indentSpaces, EntityRegi
     const std::string ind = indentation(indentSpaces);
     code << ind << "TerrainComponent terrain;\n";
     code << formatTexture(indentSpaces, terrain.heightMap, "terrain.heightMap", projectPath);
-    code << formatTexture(indentSpaces, terrain.blendMap, "terrain.blendMap", projectPath);
-    code << formatTexture(indentSpaces, terrain.textureDetailRed, "terrain.textureDetailRed", projectPath);
-    code << formatTexture(indentSpaces, terrain.textureDetailGreen, "terrain.textureDetailGreen", projectPath);
-    code << formatTexture(indentSpaces, terrain.textureDetailBlue, "terrain.textureDetailBlue", projectPath);
+    code << ind << "terrain.blendMaps.resize(" << terrain.blendMaps.size() << ");\n";
+    for (size_t i = 0; i < terrain.blendMaps.size(); i++){
+        code << formatTexture(indentSpaces, terrain.blendMaps[i], "terrain.blendMaps[" + std::to_string(i) + "]", projectPath);
+    }
+    code << ind << "terrain.textureLayers.resize(" << terrain.textureLayers.size() << ");\n";
+    for (size_t i = 0; i < terrain.textureLayers.size(); i++){
+        code << formatTexture(indentSpaces, terrain.textureLayers[i], "terrain.textureLayers[" + std::to_string(i) + "]", projectPath);
+    }
     code << ind << "terrain.autoSetRanges = " << formatBool(terrain.autoSetRanges) << ";\n";
     code << ind << "terrain.offset = " << formatVector2(terrain.offset) << ";\n";
     code << ind << "terrain.terrainSize = " << formatFloat(terrain.terrainSize) << ";\n";
@@ -1274,8 +1278,28 @@ std::string editor::Factory::createTerrainComponent(int indentSpaces, EntityRegi
         }
         code << "};\n";
     }
+    for (size_t i = 0; i < terrain.foliageLayers.size(); i++) {
+        const TerrainFoliageLayer& layer = terrain.foliageLayers[i];
+        const std::string var = "foliageLayer" + std::to_string(i);
+        code << ind << "TerrainFoliageLayer " << var << ";\n";
+        code << ind << var << ".meshPath = " << formatString(layer.meshPath) << ";\n";
+        code << formatTexture(indentSpaces, layer.densityMap, var + ".densityMap", projectPath);
+        code << ind << var << ".density = " << formatFloat(layer.density) << ";\n";
+        code << ind << var << ".minScale = " << formatFloat(layer.minScale) << ";\n";
+        code << ind << var << ".maxScale = " << formatFloat(layer.maxScale) << ";\n";
+        code << ind << var << ".rotationJitter = " << formatFloat(layer.rotationJitter) << ";\n";
+        code << ind << var << ".alignToNormal = " << formatFloat(layer.alignToNormal) << ";\n";
+        code << ind << var << ".minSlope = " << formatFloat(layer.minSlope) << ";\n";
+        code << ind << var << ".maxSlope = " << formatFloat(layer.maxSlope) << ";\n";
+        code << ind << var << ".minHeight = " << formatFloat(layer.minHeight) << ";\n";
+        code << ind << var << ".maxHeight = " << formatFloat(layer.maxHeight) << ";\n";
+        code << ind << var << ".drawDistance = " << formatFloat(layer.drawDistance) << ";\n";
+        code << ind << var << ".seed = " << formatUInt(layer.seed) << ";\n";
+        code << ind << "terrain.foliageLayers.push_back(" << var << ");\n";
+    }
     code << ind << "terrain.needUpdateTerrain = true;\n";
     code << ind << "terrain.needUpdateTexture = true;\n";
+    code << ind << "terrain.needUpdateFoliage = true;\n";
     code << ind << "terrain.heightMapLoaded = false;\n";
     addComponentCode(code, ind, sceneName, entityName, entity, "TerrainComponent", "terrain", assignExisting);
     return code.str();
@@ -1362,7 +1386,6 @@ std::string editor::Factory::createMirrorComponent(int indentSpaces, EntityRegis
     std::ostringstream code;
     const std::string ind = indentation(indentSpaces);
     code << ind << "MirrorComponent mirror;\n";
-    // reflectionCamera is created automatically at runtime by RenderSystem
     code << ind << "mirror.normal = " << formatVector3(mirror.normal) << ";\n";
     addComponentCode(code, ind, sceneName, entityName, entity, "MirrorComponent", "mirror", assignExisting);
     return code.str();

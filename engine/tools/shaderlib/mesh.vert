@@ -6,6 +6,13 @@ uniform u_vs_pbrParams {
     mat4 mvpMatrix;
 } pbrParams;
 
+#ifdef USE_INSTANCE_FADE
+    uniform u_vs_fade {
+        vec4 fadeRange; //start.x, end.y
+        vec4 fadeEye;   //camera in model space.xyz
+    } fadeParams;
+#endif
+
 #if defined(HAS_TEXTURERECT) && (defined(HAS_UV_SET1) || defined(HAS_UV_SET2))
     uniform u_vs_spriteParams {
         vec4 textureRect;
@@ -132,6 +139,19 @@ void main() {
         vec4 pos = instanceMatrix * getPosition(boneTransform);
     #else
         vec4 pos = getPosition(boneTransform);
+    #endif
+
+    #ifdef USE_INSTANCE_FADE
+        // Shrink toward the instance base, on XZ like the chunk selection so looking down does
+        // not eat grass still inside the spawn square. An empty range keeps everything solid.
+        vec3 fadeOrigin = i_matrix_col4.xyz;
+        float fadeVisible = 1.0;
+        if (fadeParams.fadeRange.y > fadeParams.fadeRange.x){
+            float fadeDistance = length(fadeParams.fadeEye.xz - fadeOrigin.xz);
+            fadeVisible = clamp((fadeParams.fadeRange.y - fadeDistance) /
+                (fadeParams.fadeRange.y - fadeParams.fadeRange.x), 0.0, 1.0);
+        }
+        pos.xyz = mix(fadeOrigin, pos.xyz, fadeVisible);
     #endif
 
     vec4 worldPos = pbrParams.modelMatrix * pos;

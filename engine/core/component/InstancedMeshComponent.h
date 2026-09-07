@@ -34,6 +34,13 @@ namespace doriax{
         unsigned int maxInstances = 100;
         unsigned int numVisible = 0;
 
+        // Instances shrink to nothing between fadeStart and fadeEnd, both model-space distances.
+        // distanceFade picks the shader variant, so an empty range disables it without a rebuild.
+        bool distanceFade = false;
+        float fadeStart = 0;
+        float fadeEnd = 0;
+        Vector3 fadeEyeLocal; //camera in model space, where the range is measured
+
         bool instancedBillboard = false;
         bool instancedCylindricalBillboard = false;
 

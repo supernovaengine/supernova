@@ -12,6 +12,7 @@
 #include "component/SpriteComponent.h"
 #include "component/MeshPolygonComponent.h"
 #include "component/CameraComponent.h"
+#include "component/InstancedMeshComponent.h"
 #include "component/TerrainComponent.h"
 #include "component/TilemapComponent.h"
 #include "component/Transform.h"
@@ -43,6 +44,30 @@ namespace doriax{
 
         // Files that already failed to load, so createOrUpdateModel stops retrying them.
         std::set<std::string> failedModelLoads;
+
+        // One instanced entity per chunk, so each is culled on its own AABB. Slots are recycled as
+        // the ring follows the camera: a chunk that stays in it keeps its mesh and its instances.
+        struct TerrainFoliageChunk{
+            Entity entity = NULL_ENTITY;
+            int chunkX = 0;
+            int chunkZ = 0;
+            bool assigned = false; //false until the slot holds the resolve of the coordinate above
+            bool meshLoaded = false;
+        };
+
+        struct TerrainFoliageInstances{
+            std::vector<TerrainFoliageChunk> chunks; //grid indexed by wrapped coordinates
+            std::string loadedMeshPath;
+            bool loadFailed = false;
+            float chunkSize = 0; //the size the slot coordinates are in
+            bool needUpdate = true;
+            bool pending = false;
+        };
+
+        Entity foliagePreviewEntity = NULL_ENTITY;
+
+        // Resolve of each terrain's foliageLayers. Kept here so the authored component stays copiable.
+        std::unordered_map<Entity, std::vector<TerrainFoliageInstances>> terrainFoliage;
 
         static void decodeGLTFImage(tinygltf::Image& image, size_t index, int maxDimension);
         template<typename Fn>
@@ -107,9 +132,26 @@ namespace doriax{
         void createTerrainNode(TerrainComponent& terrain, float x, float y, float size, int lodDepth);
         void updateTerrainAutoRanges(TerrainComponent& terrain);
 
+        Entity createFoliageEntity(unsigned int capacity);
+        void destroyFoliageEntity(TerrainFoliageChunk& chunk);
+        void destroyFoliageInstances(TerrainFoliageInstances& instances);
+        void destroyTerrainFoliage(Entity entity);
+        bool loadFoliageMesh(Entity entity, const std::string& path);
+        float sampleFoliageDensity(TerrainComponent& terrain, TerrainFoliageLayer& layer, float localX, float localZ);
+        void appendFoliageCell(TerrainComponent& terrain, TerrainFoliageLayer& layer, int cellX, int cellZ, std::vector<InstanceData>& instances);
+        void updateFoliageLayer(TerrainComponent& terrain, TerrainFoliageLayer& layer, TerrainFoliageInstances& instances, const Vector3& viewLocal, bool preview);
+        void updateTerrainFoliage(Entity entity, TerrainComponent& terrain, Transform& transform);
+
     public:
         MeshSystem(Scene* scene);
         virtual ~MeshSystem();
+
+        bool setFoliagePreviewEntity(Entity entity);
+        bool hasPendingFoliageUpdates() const;
+
+        // Foliage ownership, for editor shader collection and selection.
+        std::vector<Entity> getFoliageEntities(Entity terrainEntity) const;
+        Entity getFoliageOwner(Entity foliageEntity) const;
 
         void createPlane(MeshComponent& mesh, float width=1, float depth=1, unsigned int tiles=1);
         void createWall(MeshComponent& mesh, float width=1, float height=1, unsigned int tiles=1);
@@ -149,6 +191,8 @@ namespace doriax{
         void resetModelToBindPose(ModelComponent& model);
 
         bool raycastTerrainSurface(const Ray& ray, TerrainComponent& terrain, Transform& transform, Vector3& worldPoint);
+        // Height and normal in terrain-local space, the surface the foliage scatter uses
+        void sampleTerrainSurface(TerrainComponent& terrain, float localX, float localZ, float& height, Vector3& normal);
 
         bool hasPendingAsyncModelLoads() const;
         void cancelAsyncModelLoads();

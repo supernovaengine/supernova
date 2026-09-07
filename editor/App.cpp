@@ -1635,7 +1635,7 @@ void editor::App::engineRender(){
         if (isSelected && sp.scene && sp.sceneRender) {
             // Still loading a model, previewing a camera, or capturing a thumbnail.
             auto ms = sp.scene->getSystem<MeshSystem>();
-            if (ms && ms->hasPendingAsyncModelLoads()) active = true;
+            if (ms && (ms->hasPendingAsyncModelLoads() || ms->hasPendingFoliageUpdates())) active = true;
             // A parsed model still has per-mesh work that only runs while drawing.
             auto rs = sp.scene->getSystem<RenderSystem>();
             if (rs && !rs->isAllLoaded()) active = true;
@@ -1949,6 +1949,10 @@ void editor::App::updateWindowTitle(const std::string& projectName) {
 }
 
 void editor::App::stopTransientPreviews() {
+    if (terrainEditWindow) {
+        terrainEditWindow->endStroke();
+        terrainEditWindow->updateFoliagePreview();
+    }
     if (propertiesWindow) {
         propertiesWindow->stopTransientPreviews();
     }
@@ -2112,7 +2116,11 @@ std::filesystem::path editor::App::getUserShaderCacheDir(){
     // v22: composite.frag samples the scene color and reflection in destination space
     //      (params.w), so SSR can composite to the swapchain in exported builds.
     // v23: explicit SSR LOD sampling prevents D3D11 loop-unrolling failures.
-    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v23";
+    // v24: instanced distance fade (USE_INSTANCE_FADE) scales each instance toward its own
+    //      base in the mesh and depth vertex shaders, from the new u_vs_fade block. Terrain
+    //      detail layers blend by height, project triplanar on steep ground and break their
+    //      tiling with distance, from three new terrain varyings.
+    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v24";
 }
 
 void editor::App::pushTabNotificationStyle(){
