@@ -3973,6 +3973,11 @@ bool editor::Project::saveProjectFile() {
         fout << YAML::Dump(root);
         fout.close();
 
+        if (!fout) {
+            Out::error("Failed to write project file: %s", projectFile.string().c_str());
+            return false;
+        }
+
         return true;
     } catch (const std::exception& e) {
         Out::error("Failed to save project file: \"%s\"", e.what());

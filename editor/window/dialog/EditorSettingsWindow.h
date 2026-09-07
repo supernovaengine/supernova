@@ -36,7 +36,7 @@ namespace doriax::editor {
         void drawGeneralSettings();
         void drawCMakeSettings();
         void drawWebSettings();
-        void applySettings();
+        bool applySettings();
 
     public:
         EditorSettingsWindow() = default;

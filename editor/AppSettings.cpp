@@ -422,8 +422,16 @@ bool AppSettings::saveSettings() {
 
         // Save to file
         std::ofstream fout(configFilePath.string());
+        if (!fout) {
+            Out::error("Failed to open editor settings for writing: %s", configFilePath.string().c_str());
+            return false;
+        }
         fout << YAML::Dump(settingsData);
         fout.close();
+        if (!fout) {
+            Out::error("Failed to write editor settings: %s", configFilePath.string().c_str());
+            return false;
+        }
         
         return true;
     } catch (const std::exception& e) {

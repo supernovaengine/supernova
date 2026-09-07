@@ -236,9 +236,10 @@ void EditorSettingsWindow::drawSettings() {
     ImGui::SetCursorPos(ImVec2(buttonX, footerY));
 
     if (ImGui::Button("OK", ImVec2(buttonWidth, 0))) {
-        applySettings();
-        m_isOpen = false;
-        ImGui::CloseCurrentPopup();
+        if (applySettings()) {
+            m_isOpen = false;
+            ImGui::CloseCurrentPopup();
+        }
     }
 
     ImGui::SameLine();
@@ -404,7 +405,7 @@ void EditorSettingsWindow::drawWebSettings() {
     });
 }
 
-void EditorSettingsWindow::applySettings() {
+bool EditorSettingsWindow::applySettings() {
     AppSettings::setEditorVSyncEnabled(m_editorVSyncEnabled);
     AppSettings::setDefaultExportDirectory(m_defaultExportDirectory);
     AppSettings::setCMakePath(m_cmakeOverride);
@@ -416,7 +417,7 @@ void EditorSettingsWindow::applySettings() {
     }
     AppSettings::setEditorCMakeBuildJobs(static_cast<unsigned int>(m_cmakeBuildJobs));
     AppSettings::setEmsdkPath(m_emsdkOverride);
-    AppSettings::saveSettings();
+    return AppSettings::saveSettings();
 }
 
 } // namespace doriax::editor

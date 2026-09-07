@@ -2048,7 +2048,7 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
             if (desktopNode["buildJobs"]) {
                 const long long jobs = desktopNode["buildJobs"].as<long long>();
                 const long long maxJobs = static_cast<long long>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS);
-                desktop.buildJobs = static_cast<unsigned int>(std::clamp(jobs, 1LL, maxJobs));
+                desktop.buildJobs = static_cast<unsigned int>(std::clamp(jobs, 0LL, maxJobs));
             }
             if (desktopNode["shaders"]) {
                 desktop.shaderKeys = decodeExportShaderKeys(desktopNode["shaders"]);

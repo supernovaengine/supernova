@@ -149,7 +149,7 @@ namespace {
         std::string out;
         out.reserve(value.size());
         for (char c : value) {
-            if (c == '\\' || c == '"') {
+            if (c == '\\' || c == '"' || c == '$') {
                 out += '\\';
                 out += c;
             } else if (c == '\n') {
@@ -179,6 +179,23 @@ namespace {
             }
         }
         return out;
+    }
+
+    // Android parses string-resource escapes after decoding XML entities.
+    // Quoting preserves whitespace and literal @/? prefixes in application names.
+    std::string escapeAndroidStringResource(const std::string& value) {
+        std::string out = "\"";
+        for (char c : value) {
+            switch (c) {
+                case '\\': out += "\\\\"; break;
+                case '"': out += "\\\""; break;
+                case '\n': out += "\\n"; break;
+                case '\r': out += "\\r"; break;
+                case '\t': out += "\\t"; break;
+                default: out += c; break;
+            }
+        }
+        return escapeXmlAttribute(out + '"');
     }
 
     std::string androidOrientationManifestValue(editor::AndroidOrientation orientation) {
@@ -2354,7 +2371,7 @@ bool editor::Exporter::writeAndroidProjectSettings() {
     std::string strings;
     strings += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n";
     strings += "<resources>\n";
-    strings += "    <string name=\"app_name\">" + escapeXmlAttribute(appName) + "</string>\n";
+    strings += "    <string name=\"app_name\" formatted=\"false\">" + escapeAndroidStringResource(appName) + "</string>\n";
     strings += "</resources>";
     FileUtils::writeIfChanged(stringsPath, strings);
 

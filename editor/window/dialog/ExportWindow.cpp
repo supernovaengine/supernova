@@ -669,7 +669,10 @@ void ExportWindow::applySourcePlatformPresets() {
 
     for (auto& entry : m_backendEntries) {
         if (required.count(entry.backend) > 0) {
-            entry.selected = true;
+            // Preserve manual choices for backends already covered by a preset.
+            if (m_sourcePresetBackends.count(entry.backend) == 0) {
+                entry.selected = true;
+            }
         } else if (m_sourcePresetBackends.count(entry.backend) > 0) {
             entry.selected = false;
         }

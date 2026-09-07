@@ -132,6 +132,14 @@ static int findAndroidOrientationIndex(AndroidOrientation orientation) {
     return 0;
 }
 
+// Opening and accepting the dialog must not truncate untouched persisted text.
+template <size_t N>
+static void applyTextBuffer(std::string& value, const char (&buffer)[N]) {
+    if (value.compare(0, N - 1, buffer) != 0) {
+        value = buffer;
+    }
+}
+
 static bool isIdentifierPartValid(const std::string& value, size_t start, size_t end) {
     if (start >= end) return false;
     unsigned char first = static_cast<unsigned char>(value[start]);
@@ -145,6 +153,7 @@ static bool isIdentifierPartValid(const std::string& value, size_t start, size_t
 }
 
 static bool isJavaPackageNameValid(const std::string& value) {
+    if (value.empty() || value.back() == '.') return false;
     size_t start = 0;
     int parts = 0;
     while (start < value.size()) {
@@ -826,9 +835,10 @@ void ProjectSettingsWindow::drawSettings() {
 
     ImGui::BeginDisabled(!canSave);
     if (ImGui::Button("OK", ImVec2(buttonWidth, 0))) {
-        applySettings();
-        m_isOpen = false;
-        ImGui::CloseCurrentPopup();
+        if (applySettings()) {
+            m_isOpen = false;
+            ImGui::CloseCurrentPopup();
+        }
     }
     ImGui::EndDisabled();
     if (!canSave && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled)) {
@@ -1287,7 +1297,10 @@ void ProjectSettingsWindow::drawAndroidSettings() {
     });
 }
 
-void ProjectSettingsWindow::applySettings() {
+bool ProjectSettingsWindow::applySettings() {
+    if (!hasAndroidAbiSelection(m_androidAbiArmeabiV7a, m_androidAbiArm64V8a, m_androidAbiX86, m_androidAbiX86_64)) {
+        return false;
+    }
     // The edit buffer truncates long names. Only write back when the value
     // changed, since setName also rebuilds libName and the window title.
     std::string projectName = m_projectNameBuffer;
@@ -1315,44 +1328,44 @@ void ProjectSettingsWindow::applySettings() {
     m_project->setScriptDirs(m_scriptDirs);
 
     WebProjectSettings& web = m_project->getWebProjectSettings();
-    web.applicationName = m_webApplicationNameBuffer;
+    applyTextBuffer(web.applicationName, m_webApplicationNameBuffer);
     web.favicon = m_webFavicon;
     web.customHtmlShell = m_webCustomHtmlShell;
-    web.headInclude = m_webHeadIncludeBuffer;
+    applyTextBuffer(web.headInclude, m_webHeadIncludeBuffer);
     web.resizeCanvasToWindow = m_webResizeCanvasToWindow;
     web.hideEmscriptenUI = m_webHideEmscriptenUI;
 
     LinuxProjectSettings& linuxSettings = m_project->getLinuxProjectSettings();
-    linuxSettings.applicationName = m_linuxApplicationNameBuffer;
-    linuxSettings.comment = m_linuxCommentBuffer;
-    linuxSettings.categories = m_linuxCategoriesBuffer;
+    applyTextBuffer(linuxSettings.applicationName, m_linuxApplicationNameBuffer);
+    applyTextBuffer(linuxSettings.comment, m_linuxCommentBuffer);
+    applyTextBuffer(linuxSettings.categories, m_linuxCategoriesBuffer);
     if (linuxSettings.categories.empty()) {
         linuxSettings.categories = LinuxProjectSettings{}.categories;
     }
 
     WindowsProjectSettings& windows = m_project->getWindowsProjectSettings();
-    windows.productName = m_windowsProductNameBuffer;
-    windows.companyName = m_windowsCompanyNameBuffer;
-    windows.fileVersion = m_windowsFileVersionBuffer;
+    applyTextBuffer(windows.productName, m_windowsProductNameBuffer);
+    applyTextBuffer(windows.companyName, m_windowsCompanyNameBuffer);
+    applyTextBuffer(windows.fileVersion, m_windowsFileVersionBuffer);
     if (!isDottedVersionValid(windows.fileVersion)) {
         windows.fileVersion = WindowsProjectSettings{}.fileVersion;
     }
-    windows.productVersion = m_windowsProductVersionBuffer;
+    applyTextBuffer(windows.productVersion, m_windowsProductVersionBuffer);
     if (!isDottedVersionValid(windows.productVersion)) {
         windows.productVersion = WindowsProjectSettings{}.productVersion;
     }
 
     MacOSProjectSettings& macOS = m_project->getMacOSProjectSettings();
-    macOS.applicationName = m_macOSApplicationNameBuffer;
-    macOS.bundleIdentifier = m_macOSBundleIdentifierBuffer;
+    applyTextBuffer(macOS.applicationName, m_macOSApplicationNameBuffer);
+    applyTextBuffer(macOS.bundleIdentifier, m_macOSBundleIdentifierBuffer);
     if (!isJavaPackageNameValid(macOS.bundleIdentifier)) {
         macOS.bundleIdentifier = MacOSProjectSettings{}.bundleIdentifier;
     }
-    macOS.versionName = m_macOSVersionNameBuffer;
+    applyTextBuffer(macOS.versionName, m_macOSVersionNameBuffer);
     if (macOS.versionName.empty()) {
         macOS.versionName = MacOSProjectSettings{}.versionName;
     }
-    macOS.buildNumber = m_macOSBuildNumberBuffer;
+    applyTextBuffer(macOS.buildNumber, m_macOSBuildNumberBuffer);
     if (macOS.buildNumber.empty()) {
         macOS.buildNumber = MacOSProjectSettings{}.buildNumber;
     }
@@ -1360,16 +1373,16 @@ void ProjectSettingsWindow::applySettings() {
     macOS.highDpi = m_macOSHighDpi;
 
     IOSProjectSettings& ios = m_project->getIOSProjectSettings();
-    ios.applicationName = m_iosApplicationNameBuffer;
-    ios.bundleIdentifier = m_iosBundleIdentifierBuffer;
+    applyTextBuffer(ios.applicationName, m_iosApplicationNameBuffer);
+    applyTextBuffer(ios.bundleIdentifier, m_iosBundleIdentifierBuffer);
     if (!isJavaPackageNameValid(ios.bundleIdentifier)) {
         ios.bundleIdentifier = IOSProjectSettings{}.bundleIdentifier;
     }
-    ios.versionName = m_iosVersionNameBuffer;
+    applyTextBuffer(ios.versionName, m_iosVersionNameBuffer);
     if (ios.versionName.empty()) {
         ios.versionName = IOSProjectSettings{}.versionName;
     }
-    ios.buildNumber = m_iosBuildNumberBuffer;
+    applyTextBuffer(ios.buildNumber, m_iosBuildNumberBuffer);
     if (ios.buildNumber.empty()) {
         ios.buildNumber = IOSProjectSettings{}.buildNumber;
     }
@@ -1379,13 +1392,13 @@ void ProjectSettingsWindow::applySettings() {
     ios.supportsHighRefreshRate = m_iosSupportsHighRefreshRate;
 
     AndroidProjectSettings& android = m_project->getAndroidProjectSettings();
-    android.applicationName = m_androidApplicationNameBuffer;
-    android.packageName = m_androidPackageNameBuffer;
+    applyTextBuffer(android.applicationName, m_androidApplicationNameBuffer);
+    applyTextBuffer(android.packageName, m_androidPackageNameBuffer);
     if (!isJavaPackageNameValid(android.packageName)) {
         android.packageName = AndroidProjectSettings{}.packageName;
     }
     android.versionCode = static_cast<unsigned int>(std::max(1, m_androidVersionCode));
-    android.versionName = m_androidVersionNameBuffer;
+    applyTextBuffer(android.versionName, m_androidVersionNameBuffer);
     if (android.versionName.empty()) {
         android.versionName = AndroidProjectSettings{}.versionName;
     }
@@ -1413,7 +1426,7 @@ void ProjectSettingsWindow::applySettings() {
 
     m_project->setPackNativeResources(m_packNativeResources);
 
-    m_project->saveProjectFile();
+    return m_project->saveProjectFile();
 }
 
 } // namespace doriax::editor

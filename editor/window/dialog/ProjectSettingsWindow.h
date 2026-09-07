@@ -102,7 +102,7 @@ namespace doriax::editor {
         void drawMacOSSettings();
         void drawIOSSettings();
         void drawAndroidSettings();
-        void applySettings();
+        bool applySettings();
 
     public:
         ProjectSettingsWindow() = default;
