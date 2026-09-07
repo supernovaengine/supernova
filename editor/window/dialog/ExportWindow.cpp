@@ -201,6 +201,7 @@ void ExportWindow::loadSettingsFromProject() {
     m_sourcePlatformIOS = false;
     m_sourcePlatformAndroid = false;
     m_sourcePlatformWeb = false;
+    m_sourcePresetBackends.clear();
     m_desktopBackendConfigured = false;
 
     if (m_mode == ExportMode::SourceCode) {
@@ -227,6 +228,15 @@ void ExportWindow::loadSettingsFromProject() {
             m_sourcePlatformLinux = true;
             #endif
         }
+        auto addPresetBackends = [&](std::initializer_list<ShaderBackend> backends) {
+            m_sourcePresetBackends.insert(backends.begin(), backends.end());
+        };
+        if (m_sourcePlatformWindows) addPresetBackends({ShaderBackend::GLCore, ShaderBackend::Vulkan, ShaderBackend::D3D11});
+        if (m_sourcePlatformLinux) addPresetBackends({ShaderBackend::GLCore, ShaderBackend::Vulkan});
+        if (m_sourcePlatformMacOS) addPresetBackends({ShaderBackend::MetalMacOS, ShaderBackend::GLCore});
+        if (m_sourcePlatformIOS) addPresetBackends({ShaderBackend::MetalIOS});
+        if (m_sourcePlatformAndroid) addPresetBackends({ShaderBackend::GLES3, ShaderBackend::Vulkan});
+        if (m_sourcePlatformWeb) addPresetBackends({ShaderBackend::GLES3});
         if (settings.graphicBackendsConfigured) {
             for (auto& entry : m_backendEntries) {
                 entry.selected = settings.graphicBackends.count(entry.backend) > 0;
@@ -658,8 +668,13 @@ void ExportWindow::applySourcePlatformPresets() {
     if (m_sourcePlatformWeb) add({ShaderBackend::GLES3});
 
     for (auto& entry : m_backendEntries) {
-        entry.selected = required.count(entry.backend) > 0;
+        if (required.count(entry.backend) > 0) {
+            entry.selected = true;
+        } else if (m_sourcePresetBackends.count(entry.backend) > 0) {
+            entry.selected = false;
+        }
     }
+    m_sourcePresetBackends = required;
     m_sourceBackendsConfigured = true;
 }
 

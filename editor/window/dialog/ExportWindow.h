@@ -69,6 +69,7 @@ namespace doriax::editor {
         bool m_sourcePlatformIOS = false;
         bool m_sourcePlatformAndroid = false;
         bool m_sourcePlatformWeb = false;
+        std::set<ShaderBackend> m_sourcePresetBackends;
 
         // Desktop backend selection. The entries themselves are host-specific
         // and live in ExportWindow.cpp.
