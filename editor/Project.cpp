@@ -3906,10 +3906,6 @@ bool editor::Project::createTempProject(std::string projectName, bool deleteIfEx
                 setCMakeKit(cc, cxx, gen);
             }
         }
-        if (AppSettings::getEditorCMakeBuildJobs() != 0) {
-            setCMakeBuildJobs(AppSettings::getEditorCMakeBuildJobs());
-        }
-
         if (deleteIfExists && fs::exists(projectPath)) {
             fs::remove_all(projectPath);
         }

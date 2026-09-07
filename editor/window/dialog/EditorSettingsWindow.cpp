@@ -130,11 +130,6 @@ void EditorSettingsWindow::open() {
     m_cmakeKitIndex = 0;
     m_cmakeOverride = AppSettings::getCMakePath();
     m_cmakePickError.clear();
-    m_cmakeBuildJobs = static_cast<int>(AppSettings::getEditorCMakeBuildJobs());
-    m_cmakeBuildJobsTooltip =
-        "Default maximum number of concurrent build jobs for new projects. "
-        "Set to 0 to automatically use " + std::to_string(Generator::getAutomaticParallelBuildJobs()) +
-        " detected logical CPU threads. Project Settings may still override this per project.";
     refreshCMakeStatus();
 
     std::string currentCxx = AppSettings::getLastCMakeCxxCompiler();
@@ -363,12 +358,6 @@ void EditorSettingsWindow::drawCMakeSettings() {
             }
         }
 
-        if (beginSettingsRow("Default Parallel Jobs", m_cmakeBuildJobsTooltip.c_str(), m_cmakeBuildJobs != 0)) {
-            m_cmakeBuildJobs = 0;
-        }
-        ImGui::SetNextItemWidth(-1);
-        ImGui::InputInt("##EditorCMakeBuildJobs", &m_cmakeBuildJobs);
-        m_cmakeBuildJobs = std::clamp(m_cmakeBuildJobs, 0, static_cast<int>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS));
     });
 }
 
@@ -415,7 +404,6 @@ bool EditorSettingsWindow::applySettings() {
     } else {
         AppSettings::setLastCMakeKit("", "", "");
     }
-    AppSettings::setEditorCMakeBuildJobs(static_cast<unsigned int>(m_cmakeBuildJobs));
     AppSettings::setEmsdkPath(m_emsdkOverride);
     return AppSettings::saveSettings();
 }

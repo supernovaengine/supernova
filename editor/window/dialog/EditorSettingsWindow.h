@@ -22,8 +22,6 @@ namespace doriax::editor {
         std::string m_cmakeOverride;
         CMakeInfo m_cmakeInfo;
         std::string m_cmakePickError;
-        int m_cmakeBuildJobs = 0;
-        std::string m_cmakeBuildJobsTooltip;
 
         std::string m_emsdkOverride;
         EmsdkInfo m_emsdkInfo;

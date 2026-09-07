@@ -57,7 +57,6 @@ private:
     // cmake executable override ("" = look it up on PATH). Machine-specific,
     // stored editor-wide like emsdkPath.
     static std::string cmakePath;
-    static unsigned int editorCMakeBuildJobs;
     static std::filesystem::path defaultExportDirectory;
     
     // Window settings. The size is physical pixels, only meaningful again at the
@@ -119,8 +118,6 @@ public:
     // cmake executable override ("" = look it up on PATH)
     static std::string getCMakePath();
     static void setCMakePath(const std::string& path);
-    static unsigned int getEditorCMakeBuildJobs();
-    static void setEditorCMakeBuildJobs(unsigned int jobs);
     static std::filesystem::path getDefaultExportDirectory();
     static void setDefaultExportDirectory(const std::filesystem::path& path);
     

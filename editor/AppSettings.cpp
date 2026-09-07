@@ -83,7 +83,6 @@ std::string AppSettings::lastCMakeCxxCompiler;
 std::string AppSettings::lastCMakeGenerator;
 std::string AppSettings::emsdkPath;
 std::string AppSettings::cmakePath;
-unsigned int AppSettings::editorCMakeBuildJobs = 0;
 std::filesystem::path AppSettings::defaultExportDirectory;
 int AppSettings::windowWidth = 1280;
 int AppSettings::windowHeight = 720;
@@ -176,10 +175,6 @@ bool AppSettings::loadSettings() {
         if (settingsData["cmake"] && settingsData["cmake"]["path"]) {
             cmakePath = settingsData["cmake"]["path"].as<std::string>();
         }
-        if (settingsData["cmake"] && settingsData["cmake"]["build_jobs"]) {
-            editorCMakeBuildJobs = settingsData["cmake"]["build_jobs"].as<unsigned int>();
-        }
-
         if (settingsData["export"] && settingsData["export"]["default_dir"]) {
             defaultExportDirectory = settingsData["export"]["default_dir"].as<std::string>();
         }
@@ -337,14 +332,9 @@ bool AppSettings::saveSettings() {
         }
 
         // cmake executable override
-        if (!cmakePath.empty() || editorCMakeBuildJobs != 0) {
+        if (!cmakePath.empty()) {
             YAML::Node cmakeNode;
-            if (!cmakePath.empty()) {
-                cmakeNode["path"] = cmakePath;
-            }
-            if (editorCMakeBuildJobs != 0) {
-                cmakeNode["build_jobs"] = editorCMakeBuildJobs;
-            }
+            cmakeNode["path"] = cmakePath;
             settingsData["cmake"] = cmakeNode;
         } else {
             settingsData.remove("cmake");
@@ -486,15 +476,6 @@ std::string AppSettings::getCMakePath() {
 
 void AppSettings::setCMakePath(const std::string& path) {
     cmakePath = path;
-    saveSettings();
-}
-
-unsigned int AppSettings::getEditorCMakeBuildJobs() {
-    return editorCMakeBuildJobs;
-}
-
-void AppSettings::setEditorCMakeBuildJobs(unsigned int jobs) {
-    editorCMakeBuildJobs = jobs;
     saveSettings();
 }
 
