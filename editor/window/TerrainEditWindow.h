@@ -22,9 +22,7 @@ namespace doriax::editor{
         Smooth,
         Flatten,
         PaintBase,
-        PaintRed,
-        PaintGreen,
-        PaintBlue,
+        PaintLayer,
         PaintDensity,
         EraseDensity,
         PlaceObject,
@@ -143,6 +141,7 @@ namespace doriax::editor{
         int blendMapResolution;
         int densityMapResolution;
         int selectedFoliageLayer;
+        int selectedTextureLayer;
 
         // Placed props are ordinary entities, so the palette is tool state, not component data
         std::string placeAssetPath;

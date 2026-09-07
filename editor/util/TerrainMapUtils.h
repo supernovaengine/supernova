@@ -17,7 +17,7 @@ namespace doriax::editor{
         DensityMap
     };
 
-    // Names one editable map. Only DensityMap uses "layer", to pick the foliage layer.
+    // Names one editable map. "layer" picks the blend map or the foliage layer.
     struct TerrainMapRef{
         TerrainMapTarget target = TerrainMapTarget::HeightMap;
         int layer = 0;
@@ -89,6 +89,9 @@ namespace doriax::editor{
         // Null when a density map is asked for a foliage layer the terrain no longer has.
         static Texture* findTexture(TerrainComponent& terrain, const TerrainMapRef& ref);
         static std::string getPropertyName(const TerrainMapRef& ref);
+        // The list a map lives in, empty when it is not in one. An indexed name alone does
+        // not carry a newly created slot to a bundle instance.
+        static std::string getContainerPropertyName(const TerrainMapRef& ref);
         static bool hasLoadedData(Texture& texture);
         static bool writeFile(Project* project, const std::string& relativePath, int width, int height, int channels, int bytesPerChannel, const std::vector<unsigned char>& pixels);
         static void refresh(SceneProject* sceneProject, Entity entity, const TerrainMapRef& ref);

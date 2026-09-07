@@ -3260,13 +3260,31 @@ ActionResult EditorActionExecutor::setTerrainTextures(const Json& arguments) {
     Entity entity = resolveTerrainEntity(project, sceneProject, arguments);
     if (entity == NULL_ENTITY) return failResult("Terrain entity not found.");
 
-    struct TextureField { const char* arg; const char* property; bool height; };
+    // slot is the index inside blendMaps or textureLayers, -1 for the height map
+    struct TextureField { const char* arg; bool height; int slot; bool layer; };
     static const TextureField fields[] = {
-        {"heightmap_path", "heightMap", true},
-        {"blendmap_path", "blendMap", false},
-        {"detail_red_path", "textureDetailRed", false},
-        {"detail_green_path", "textureDetailGreen", false},
-        {"detail_blue_path", "textureDetailBlue", false}
+        {"heightmap_path", true, -1, false},
+        {"blendmap_path", false, 0, false},
+        {"detail_red_path", false, 0, true},
+        {"detail_green_path", false, 1, true},
+        {"detail_blue_path", false, 2, true}
+    };
+
+    TerrainComponent& terrain = sceneProject->scene->getComponent<TerrainComponent>(entity);
+    std::vector<Texture> blendMaps = terrain.blendMaps;
+    std::vector<Texture> textureLayers = terrain.textureLayers;
+    bool blendMapsChanged = false;
+    bool layersChanged = false;
+
+    auto terrainChanged = [project = this->project, sceneId, entity](bool height) {
+        return [project, sceneId, entity, height]() {
+            SceneProject* sp = project ? project->getScene(sceneId) : nullptr;
+            TerrainComponent* terrain = sp && sp->scene ? sp->scene->findComponent<TerrainComponent>(entity) : nullptr;
+            if (!terrain) return;
+            if (height) terrain->heightMapLoaded = false;
+            terrain->needUpdateTerrain = height;
+            terrain->needUpdateTexture = true;
+        };
     };
 
     auto* multiCmd = new MultiPropertyCmd();
@@ -3282,17 +3300,29 @@ ActionResult EditorActionExecutor::setTerrainTextures(const Json& arguments) {
             delete multiCmd;
             return failResult(outsideAssetsError(project, field.arg));
         }
-        auto onChanged = [project = this->project, sceneId, entity, height = field.height]() {
-            SceneProject* sp = project ? project->getScene(sceneId) : nullptr;
-            TerrainComponent* terrain = sp && sp->scene ? sp->scene->findComponent<TerrainComponent>(entity) : nullptr;
-            if (!terrain) return;
-            if (height) terrain->heightMapLoaded = false;
-            terrain->needUpdateTerrain = height;
-            terrain->needUpdateTexture = true;
-        };
-        multiCmd->addPropertyCmd<Texture>(project, sceneId, entity, ComponentType::TerrainComponent,
-                                          field.property, Texture(assetPathFromAi(project, rel)), onChanged);
+        // The whole vector is set at once, so filling a slot can also grow it
+        if (field.slot >= 0) {
+            std::vector<Texture>& textures = field.layer ? textureLayers : blendMaps;
+            bool& touched = field.layer ? layersChanged : blendMapsChanged;
+            if (textures.size() <= static_cast<size_t>(field.slot)) {
+                textures.resize(field.slot + 1);
+            }
+            textures[field.slot] = Texture(assetPathFromAi(project, rel));
+            touched = true;
+        } else {
+            multiCmd->addPropertyCmd<Texture>(project, sceneId, entity, ComponentType::TerrainComponent,
+                                              "heightMap", Texture(assetPathFromAi(project, rel)), terrainChanged(true));
+        }
         changed++;
+    }
+
+    if (blendMapsChanged) {
+        multiCmd->addPropertyCmd<std::vector<Texture>>(project, sceneId, entity, ComponentType::TerrainComponent,
+                                                       "blendMaps", blendMaps, terrainChanged(false));
+    }
+    if (layersChanged) {
+        multiCmd->addPropertyCmd<std::vector<Texture>>(project, sceneId, entity, ComponentType::TerrainComponent,
+                                                       "textureLayers", textureLayers, terrainChanged(false));
     }
 
     if (changed == 0) {
@@ -3329,9 +3359,15 @@ ActionResult EditorActionExecutor::createTerrainBlendmap(const Json& arguments) 
         if (!terrain) return;
         terrain->needUpdateTexture = true;
     };
+    // The whole vector is set at once, so the first map can also create the slot
+    std::vector<Texture> blendMaps = sceneProject->scene->getComponent<TerrainComponent>(entity).blendMaps;
+    if (blendMaps.empty()) {
+        blendMaps.resize(1);
+    }
+    blendMaps[0] = Texture(generated.relativePath);
     CommandHandle::get(sceneId)->addCommandNoMerge(
-        new PropertyCmd<Texture>(project, sceneId, entity, ComponentType::TerrainComponent,
-                                 "blendMap", Texture(generated.relativePath), onChanged));
+        new PropertyCmd<std::vector<Texture>>(project, sceneId, entity, ComponentType::TerrainComponent,
+                                              "blendMaps", blendMaps, onChanged));
     if (resourcesWindow) resourcesWindow->requestThumbnailGeneration(generated.fullPath, true);
     return okResult("Created terrain blendmap through the command history.",
                     Json{{"path", generated.relativePath}, {"resolution", resolution}});

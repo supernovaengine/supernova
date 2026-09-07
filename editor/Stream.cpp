@@ -656,9 +656,7 @@ std::string terrainBrushModeToString(editor::TerrainBrushMode mode) {
         case editor::TerrainBrushMode::Smooth: return "Smooth";
         case editor::TerrainBrushMode::Flatten: return "Flatten";
         case editor::TerrainBrushMode::PaintBase: return "PaintBase";
-        case editor::TerrainBrushMode::PaintRed: return "PaintRed";
-        case editor::TerrainBrushMode::PaintGreen: return "PaintGreen";
-        case editor::TerrainBrushMode::PaintBlue: return "PaintBlue";
+        case editor::TerrainBrushMode::PaintLayer: return "PaintLayer";
         case editor::TerrainBrushMode::PaintDensity: return "PaintDensity";
         case editor::TerrainBrushMode::EraseDensity: return "EraseDensity";
         case editor::TerrainBrushMode::PlaceObject: return "PlaceObject";
@@ -673,9 +671,10 @@ editor::TerrainBrushMode stringToTerrainBrushMode(const std::string& str) {
     if (str == "Smooth") return editor::TerrainBrushMode::Smooth;
     if (str == "Flatten") return editor::TerrainBrushMode::Flatten;
     if (str == "PaintBase") return editor::TerrainBrushMode::PaintBase;
-    if (str == "PaintRed") return editor::TerrainBrushMode::PaintRed;
-    if (str == "PaintGreen") return editor::TerrainBrushMode::PaintGreen;
-    if (str == "PaintBlue") return editor::TerrainBrushMode::PaintBlue;
+    if (str == "PaintLayer") return editor::TerrainBrushMode::PaintLayer;
+    // Backward compatibility: the three channel brushes became one layer brush with an
+    // index. Remove this branch once those editor versions are no longer supported.
+    if (str == "PaintRed" || str == "PaintGreen" || str == "PaintBlue") return editor::TerrainBrushMode::PaintLayer;
     if (str == "PaintDensity") return editor::TerrainBrushMode::PaintDensity;
     if (str == "EraseDensity") return editor::TerrainBrushMode::EraseDensity;
     if (str == "PlaceObject") return editor::TerrainBrushMode::PlaceObject;
@@ -4822,10 +4821,17 @@ TerrainFoliageLayer editor::Stream::decodeTerrainFoliageLayer(const YAML::Node& 
 YAML::Node editor::Stream::encodeTerrainComponent(const TerrainComponent& terrain) {
     YAML::Node node;
     node["heightMap"] = encodeTexture(terrain.heightMap);
-    node["blendMap"] = encodeTexture(terrain.blendMap);
-    node["textureDetailRed"] = encodeTexture(terrain.textureDetailRed);
-    node["textureDetailGreen"] = encodeTexture(terrain.textureDetailGreen);
-    node["textureDetailBlue"] = encodeTexture(terrain.textureDetailBlue);
+    YAML::Node blendMapsNode;
+    for (const Texture& blendMap : terrain.blendMaps) {
+        blendMapsNode.push_back(encodeTexture(blendMap));
+    }
+    node["blendMaps"] = blendMapsNode;
+
+    YAML::Node layersNode;
+    for (const Texture& layer : terrain.textureLayers) {
+        layersNode.push_back(encodeTexture(layer));
+    }
+    node["textureLayers"] = layersNode;
     node["autoSetRanges"] = terrain.autoSetRanges;
     node["offset"] = encodeVector2(terrain.offset);
     node["terrainSize"] = terrain.terrainSize;
@@ -4863,10 +4869,45 @@ TerrainComponent editor::Stream::decodeTerrainComponent(const YAML::Node& node, 
     }
 
     if (node["heightMap"]) terrain.heightMap = decodeTexture(node["heightMap"]);
-    if (node["blendMap"]) terrain.blendMap = decodeTexture(node["blendMap"]);
-    if (node["textureDetailRed"]) terrain.textureDetailRed = decodeTexture(node["textureDetailRed"]);
-    if (node["textureDetailGreen"]) terrain.textureDetailGreen = decodeTexture(node["textureDetailGreen"]);
-    if (node["textureDetailBlue"]) terrain.textureDetailBlue = decodeTexture(node["textureDetailBlue"]);
+    // Cleared like the other lists below: decoding over a loaded terrain (a stop, a bundle
+    // reload) must replace what it has, not append to it.
+    terrain.blendMaps.clear();
+    if (node["blendMaps"] && node["blendMaps"].IsSequence()) {
+        for (std::size_t i = 0; i < node["blendMaps"].size(); i++) {
+            terrain.blendMaps.push_back(decodeTexture(node["blendMaps"][i]));
+        }
+    }
+
+    terrain.textureLayers.clear();
+    if (node["textureLayers"] && node["textureLayers"].IsSequence()) {
+        for (std::size_t i = 0; i < node["textureLayers"].size(); i++) {
+            terrain.textureLayers.push_back(decodeTexture(node["textureLayers"][i]));
+        }
+    }
+
+    // Backward compatibility: scenes saved before the terrain took lists named the single
+    // blend map and the first three layers. Remove this block with support for them.
+    if (node["blendMap"] && terrain.blendMaps.empty()) {
+        terrain.blendMaps.push_back(decodeTexture(node["blendMap"]));
+    }
+    if (terrain.textureLayers.empty()) {
+        const char* legacyKeys[] = {"textureDetailRed", "textureDetailGreen", "textureDetailBlue"};
+        int lastKey = -1;
+        for (int i = 0; i < 3; i++) {
+            if (node[legacyKeys[i]]) lastKey = i;
+        }
+        // A missing key still holds its slot, or the layers after it would shift down
+        for (int i = 0; i <= lastKey; i++) {
+            terrain.textureLayers.push_back(node[legacyKeys[i]] ? decodeTexture(node[legacyKeys[i]]) : Texture());
+        }
+    }
+
+    if (terrain.blendMaps.size() > MAX_TERRAIN_BLENDMAPS) {
+        terrain.blendMaps.resize(MAX_TERRAIN_BLENDMAPS);
+    }
+    if (terrain.textureLayers.size() > MAX_TERRAIN_LAYERS) {
+        terrain.textureLayers.resize(MAX_TERRAIN_LAYERS);
+    }
     if (node["autoSetRanges"]) terrain.autoSetRanges = node["autoSetRanges"].as<bool>();
     if (node["offset"]) terrain.offset = decodeVector2(node["offset"]);
     if (node["terrainSize"]) terrain.terrainSize = node["terrainSize"].as<float>();

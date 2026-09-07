@@ -314,10 +314,6 @@ namespace {
 
     static const FastPropertyDescriptor kTerrainProperties[] = {
         makeFastProperty<TerrainComponent, Texture, &TerrainComponent::heightMap>("heightMap", PropertyType::Texture, UpdateFlags_Terrain | UpdateFlags_Terrain_Texture | UpdateFlags_Terrain_Foliage),
-        makeFastProperty<TerrainComponent, Texture, &TerrainComponent::blendMap>("blendMap", PropertyType::Texture, UpdateFlags_Terrain_Texture),
-        makeFastProperty<TerrainComponent, Texture, &TerrainComponent::textureDetailRed>("textureDetailRed", PropertyType::Texture, UpdateFlags_Terrain_Texture),
-        makeFastProperty<TerrainComponent, Texture, &TerrainComponent::textureDetailGreen>("textureDetailGreen", PropertyType::Texture, UpdateFlags_Terrain_Texture),
-        makeFastProperty<TerrainComponent, Texture, &TerrainComponent::textureDetailBlue>("textureDetailBlue", PropertyType::Texture, UpdateFlags_Terrain_Texture),
         makeFastProperty<TerrainComponent, bool, &TerrainComponent::autoSetRanges>("autoSetRanges", PropertyType::Bool, UpdateFlags_Terrain),
         makeFastProperty<TerrainComponent, Vector2, &TerrainComponent::offset>("offset", PropertyType::Vector2, UpdateFlags_None),
         makeFastProperty<TerrainComponent, float, &TerrainComponent::terrainSize>("terrainSize", PropertyType::Float, UpdateFlags_Terrain | UpdateFlags_Terrain_Foliage),
@@ -1285,6 +1281,18 @@ namespace {
         return PropertyData();
     }
 
+    PropertyData getTerrainTexturePropertyFast(std::vector<Texture>& textures, const std::string& propertyName, size_t pos) {
+        size_t index = 0;
+        if (!parseIndex(propertyName, pos, index) || pos + 1 != propertyName.size() || propertyName[pos] != ']') {
+            return PropertyData();
+        }
+        if (index >= textures.size()) {
+            return PropertyData();
+        }
+        static Texture defTexture;
+        return {PropertyType::Texture, UpdateFlags_Terrain_Texture, (void*)&defTexture, (void*)&textures[index]};
+    }
+
     PropertyData resolveTerrainPropertyFast(void* compRef, const std::string& propertyName) {
         TerrainComponent* comp = static_cast<TerrainComponent*>(compRef);
         if (!comp) return PropertyData();
@@ -1309,6 +1317,22 @@ namespace {
             }
             static float defValue = 0.0f;
             return {PropertyType::Float, UpdateFlags_Terrain, (void*)&defValue, (void*)&comp->ranges[index]};
+        }
+
+        if (propertyName == "blendMaps") {
+            return {PropertyType::Custom, UpdateFlags_Terrain_Texture, (void*)&def.blendMaps, (void*)&comp->blendMaps};
+        }
+
+        if (propertyName.compare(0, 10, "blendMaps[") == 0) {
+            return getTerrainTexturePropertyFast(comp->blendMaps, propertyName, 10);
+        }
+
+        if (propertyName == "textureLayers") {
+            return {PropertyType::Custom, UpdateFlags_Terrain_Texture, (void*)&def.textureLayers, (void*)&comp->textureLayers};
+        }
+
+        if (propertyName.compare(0, 14, "textureLayers[") == 0) {
+            return getTerrainTexturePropertyFast(comp->textureLayers, propertyName, 14);
         }
 
         if (propertyName == "foliageLayers") {
@@ -2234,6 +2258,20 @@ namespace {
         for (size_t i = 0; i < (compRef ? comp->ranges.size() : 1); i++) {
             std::string idx = compRef ? std::to_string(i) : "";
             ps["ranges[" + idx + "]"] = {PropertyType::Float, UpdateFlags_Terrain, (void*)&defValue, compRef ? (void*)&comp->ranges[i] : nullptr};
+        }
+
+        ps["blendMaps"] = {PropertyType::Custom, UpdateFlags_Terrain_Texture, (void*)&def.blendMaps, compRef ? (void*)&comp->blendMaps : nullptr};
+        ps["textureLayers"] = {PropertyType::Custom, UpdateFlags_Terrain_Texture, (void*)&def.textureLayers, compRef ? (void*)&comp->textureLayers : nullptr};
+
+        static Texture defTexture;
+        for (size_t i = 0; i < (compRef ? comp->blendMaps.size() : 1); i++) {
+            std::string idx = compRef ? std::to_string(i) : "";
+            ps["blendMaps[" + idx + "]"] = {PropertyType::Texture, UpdateFlags_Terrain_Texture, (void*)&defTexture, compRef ? (void*)&comp->blendMaps[i] : nullptr};
+        }
+
+        for (size_t i = 0; i < (compRef ? comp->textureLayers.size() : 1); i++) {
+            std::string idx = compRef ? std::to_string(i) : "";
+            ps["textureLayers[" + idx + "]"] = {PropertyType::Texture, UpdateFlags_Terrain_Texture, (void*)&defTexture, compRef ? (void*)&comp->textureLayers[i] : nullptr};
         }
 
         ps["foliageLayers"] = {PropertyType::Custom, UpdateFlags_Terrain_Foliage, (void*)&def.foliageLayers, compRef ? (void*)&comp->foliageLayers : nullptr};
@@ -4306,6 +4344,11 @@ void editor::Catalog::copyPropertyValue(EntityRegistry* sourceRegistry, Entity s
             } else if (compType == ComponentType::TerrainComponent && property == "foliageLayers") {
                 auto* source = Catalog::getPropertyRef<std::vector<TerrainFoliageLayer>>(sourceRegistry, sourceEntity, compType, property);
                 auto* target = Catalog::getPropertyRef<std::vector<TerrainFoliageLayer>>(targetRegistry, targetEntity, compType, property);
+                if (source && target) *target = *source;
+            } else if (compType == ComponentType::TerrainComponent &&
+                       (property == "blendMaps" || property == "textureLayers")) {
+                auto* source = Catalog::getPropertyRef<std::vector<Texture>>(sourceRegistry, sourceEntity, compType, property);
+                auto* target = Catalog::getPropertyRef<std::vector<Texture>>(targetRegistry, targetEntity, compType, property);
                 if (source && target) *target = *source;
             }
             break;

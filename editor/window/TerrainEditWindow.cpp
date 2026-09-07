@@ -528,8 +528,10 @@ bool editor::TerrainEditWindow::cleanUnusedTerrainMaps(Project* project){
                 if (!terrain->heightMap.getPath(0).empty() && isEditableTexturePath(terrain->heightMap.getPath(0))){
                     activeFiles.insert(fs::path(terrain->heightMap.getPath(0)).filename().string());
                 }
-                if (!terrain->blendMap.getPath(0).empty() && isEditableTexturePath(terrain->blendMap.getPath(0))){
-                    activeFiles.insert(fs::path(terrain->blendMap.getPath(0)).filename().string());
+                for (const Texture& blendMap : terrain->blendMaps){
+                    if (!blendMap.getPath(0).empty() && isEditableTexturePath(blendMap.getPath(0))){
+                        activeFiles.insert(fs::path(blendMap.getPath(0)).filename().string());
+                    }
                 }
                 for (const TerrainFoliageLayer& layer : terrain->foliageLayers){
                     const std::string& densityPath = layer.densityMap.getPath(0);
@@ -602,8 +604,17 @@ std::vector<unsigned char> editor::TerrainEditWindow::makeInitialMapPixels(Terra
     return pixels;
 }
 
+// Blend maps past the first only exist once a layer on them is painted
+static void ensureMapSlot(TerrainComponent& terrain, const TerrainMapRef& ref){
+    if (ref.target == TerrainMapTarget::BlendMap && ref.layer >= static_cast<int>(terrain.blendMaps.size()) &&
+        ref.layer < MAX_TERRAIN_BLENDMAPS){
+        terrain.blendMaps.resize(ref.layer + 1);
+    }
+}
+
 bool editor::TerrainEditWindow::ensureEditableMap(Project* project, SceneProject* sceneProject, Entity entity, const TerrainMapRef& ref, int resolution){
     TerrainComponent& terrain = sceneProject->scene->getComponent<TerrainComponent>(entity);
+    ensureMapSlot(terrain, ref);
     Texture* texturePtr = TerrainMapUtils::findTexture(terrain, ref);
     if (!texturePtr){
         return false;
@@ -959,7 +970,13 @@ private:
         TerrainMapUtils::refresh(sceneProject, entity, ref);
 
         if (project->isEntityInBundle(sceneId, entity)){
-            project->bundlePropertyChanged(sceneId, entity, ComponentType::TerrainComponent, {TerrainMapUtils::getPropertyName(ref)});
+            std::vector<std::string> properties = {TerrainMapUtils::getPropertyName(ref)};
+            // The list carries its own length, which is what a newly created map needs
+            const std::string container = TerrainMapUtils::getContainerPropertyName(ref);
+            if (!container.empty()){
+                properties.push_back(container);
+            }
+            project->bundlePropertyChanged(sceneId, entity, ComponentType::TerrainComponent, properties);
         }
 
         if (restoreModifiedState){
@@ -1010,6 +1027,7 @@ editor::TerrainEditWindow::TerrainEditWindow(Project* project){
     blendMapResolution  = 512;
     densityMapResolution = 512;
     selectedFoliageLayer = 0;
+    selectedTextureLayer = 0;
     normalizeBlendPaint = true;
     heightMapStartAtMiddle = true;
     flattenPickOnStroke = true;
@@ -1392,8 +1410,11 @@ editor::TerrainMapRef editor::TerrainEditWindow::getBrushMapRef() const{
     if (isHeightBrush()){
         return TerrainMapRef(TerrainMapTarget::HeightMap);
     }
-    // only a density brush reads the layer
-    return TerrainMapRef(isDensityBrush() ? TerrainMapTarget::DensityMap : TerrainMapTarget::BlendMap, selectedFoliageLayer);
+    if (isDensityBrush()){
+        return TerrainMapRef(TerrainMapTarget::DensityMap, selectedFoliageLayer);
+    }
+    // three layers share a blend map, so the selected one picks which map the stroke edits
+    return TerrainMapRef(TerrainMapTarget::BlendMap, selectedTextureLayer / 3);
 }
 
 bool editor::TerrainEditWindow::isHeightBrush() const{
@@ -1404,10 +1425,7 @@ bool editor::TerrainEditWindow::isHeightBrush() const{
 }
 
 bool editor::TerrainEditWindow::isBlendBrush() const{
-    return brushMode == TerrainBrushMode::PaintBase ||
-           brushMode == TerrainBrushMode::PaintRed ||
-           brushMode == TerrainBrushMode::PaintGreen ||
-           brushMode == TerrainBrushMode::PaintBlue;
+    return brushMode == TerrainBrushMode::PaintBase || brushMode == TerrainBrushMode::PaintLayer;
 }
 
 bool editor::TerrainEditWindow::isDensityBrush() const{
@@ -1630,14 +1648,7 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
     };
 
     // Base owns no channel: painting it clears the others and lets the base texture back in
-    int paintChannel = -1;
-    if (mode == TerrainBrushMode::PaintRed){
-        paintChannel = 0;
-    }else if (mode == TerrainBrushMode::PaintGreen){
-        paintChannel = 1;
-    }else if (mode == TerrainBrushMode::PaintBlue){
-        paintChannel = 2;
-    }
+    const int paintChannel = (mode == TerrainBrushMode::PaintLayer) ? (selectedTextureLayer % 3) : -1;
 
     // "Rock above 40 degrees" and the like: texels outside the range keep what they had
     const bool useMask = paintUseMask && target == TerrainMapTarget::BlendMap;
@@ -2041,6 +2052,7 @@ bool editor::TerrainEditWindow::createMapForTarget(const TerrainMapRef& ref, int
     }
 
     TerrainComponent& terrain = sceneProject->scene->getComponent<TerrainComponent>(selectedEntity);
+    ensureMapSlot(terrain, ref);
     Texture* texture = TerrainMapUtils::findTexture(terrain, ref);
     if (!texture){
         return false;
@@ -2252,41 +2264,51 @@ void editor::TerrainEditWindow::drawTextureLayers(TerrainComponent& terrain){
     const float labelHeight = ImGui::GetTextLineHeight();
     const float previewHeight = buttonSize.y * 2.0f + spacing.y;
 
-    auto assignLayer = [&](const char* property, const fs::path& path){
+    auto setTextureLayers = [&](const std::vector<Texture>& layers){
+        CommandHandle::get(sceneProject->id)->addCommandNoMerge(new PropertyCmd<std::vector<Texture>>(
+            project, sceneProject->id, selectedEntity, ComponentType::TerrainComponent, "textureLayers", layers));
+    };
+
+    // The whole vector is set at once, so assigning a layer can also grow it
+    auto assignLayer = [&](int index, const fs::path& path){
         if (!path.empty() && !project->isInsideAssetsPath(path)){
             Backend::getApp().registerOutsideAssetsAlert(path.string());
             return;
         }
         endStroke();
-        Texture texture;
-        if (!path.empty()){
-            texture = Texture(project->normalizeToAssetsRelative(path).generic_string());
+        std::vector<Texture> layers = terrain.textureLayers;
+        if (index >= static_cast<int>(layers.size())){
+            layers.resize(index + 1);
         }
-        CommandHandle::get(sceneProject->id)->addCommandNoMerge(new PropertyCmd<Texture>(
-            project, sceneProject->id, selectedEntity, ComponentType::TerrainComponent, property, texture));
+        layers[index] = path.empty() ? Texture() : Texture(project->normalizeToAssetsRelative(path).generic_string());
+        setTextureLayers(layers);
     };
 
-    // property is null for the base, whose texture belongs to the material, not the terrain
-    auto layerRow = [&](const char* label, const char* tooltip, TerrainBrushMode mode, const std::string& path, const char* property){
+    // index is -1 for the base, whose texture belongs to the material, not the terrain
+    auto layerRow = [&](const char* label, const char* tooltip, const std::string& path, int index){
         terrainPropertyRow(label, tooltip);
         ImGui::PushID(label);
         ImGui::BeginGroup();
 
         const float available = std::max(1.0f, ImGui::GetContentRegionAvail().x);
         const float startY = ImGui::GetCursorPosY();
-        const bool selected = brushActive && brushMode == mode;
+        const bool selected = brushActive && (index < 0 ? brushMode == TerrainBrushMode::PaintBase
+                                                       : (brushMode == TerrainBrushMode::PaintLayer && selectedTextureLayer == index));
         const float thumbSize = drawAssetThumbnail(path, "##thumb", selected, previewHeight / buttonSize.y);
         if (ImGui::IsItemClicked()){
             endStroke();
-            brushMode = mode;
+            brushMode = (index < 0) ? TerrainBrushMode::PaintBase : TerrainBrushMode::PaintLayer;
+            if (index >= 0){
+                selectedTextureLayer = index;
+            }
             brushActive = !selected;
         }
 
-        const char* emptyLabel = property ? "No texture" : "Material base color";
+        const char* emptyLabel = (index >= 0) ? "No texture" : "Material base color";
         const float detailsWidth = std::max(ImGui::CalcTextSize(emptyLabel).x, buttonSize.x * 2.0f + detailsSpacing.x);
         if (available >= thumbSize + spacing.x + detailsWidth){
             ImGui::SameLine(0.0f, spacing.x);
-            const float detailsHeight = labelHeight + (property ? detailsSpacing.y + buttonSize.y : 0.0f);
+            const float detailsHeight = labelHeight + ((index >= 0) ? detailsSpacing.y + buttonSize.y : 0.0f);
             ImGui::SetCursorPosY(startY + std::floor(std::max(0.0f, (thumbSize - detailsHeight) * 0.5f)));
         }
         ImGui::BeginGroup();
@@ -2304,17 +2326,17 @@ void editor::TerrainEditWindow::drawTextureLayers(TerrainComponent& terrain){
         if (!path.empty()){
             showTooltip(path.c_str());
         }
-        if (property){
+        if (index >= 0){
             if (iconButton(ICON_FA_FOLDER_OPEN, "browse", "Choose layer texture", false, buttonSize)){
                 const std::string chosen = FileDialogs::openFileDialog(project->getAssetsPath().string(), FILE_DIALOG_IMAGE);
                 if (!chosen.empty()){
-                    assignLayer(property, chosen);
+                    assignLayer(index, chosen);
                 }
             }
             ImGui::SameLine();
             ImGui::BeginDisabled(path.empty());
             if (iconButton(ICON_FA_XMARK, "clear", "Clear layer texture", false, buttonSize)){
-                assignLayer(property, {});
+                assignLayer(index, {});
             }
             ImGui::EndDisabled();
         }
@@ -2322,11 +2344,11 @@ void editor::TerrainEditWindow::drawTextureLayers(TerrainComponent& terrain){
         ImGui::EndGroup();
         ImGui::EndGroup();
 
-        if (property && ImGui::BeginDragDropTarget()){
+        if (index >= 0 && ImGui::BeginDragDropTarget()){
             if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("resource_files")){
                 const std::vector<std::string> dropped = Util::getStringsFromPayload(payload);
                 if (!dropped.empty() && Util::isImageFile(dropped[0])){
-                    assignLayer(property, dropped[0]);
+                    assignLayer(index, dropped[0]);
                 }
             }
             ImGui::EndDragDropTarget();
@@ -2341,10 +2363,34 @@ void editor::TerrainEditWindow::drawTextureLayers(TerrainComponent& terrain){
         }
     }
 
-    layerRow("Base", "The material's base color, shown where nothing is painted over it.", TerrainBrushMode::PaintBase, basePath, nullptr);
-    layerRow("Layer 1", "Painted into the blend map's red channel.", TerrainBrushMode::PaintRed, terrain.textureDetailRed.getPath(0), "textureDetailRed");
-    layerRow("Layer 2", "Painted into the blend map's green channel.", TerrainBrushMode::PaintGreen, terrain.textureDetailGreen.getPath(0), "textureDetailGreen");
-    layerRow("Layer 3", "Painted into the blend map's blue channel.", TerrainBrushMode::PaintBlue, terrain.textureDetailBlue.getPath(0), "textureDetailBlue");
+    layerRow("Base", "The material's base color. Painting it clears the blend map the selected layer sits on.", basePath, -1);
+
+    const int layerCount = static_cast<int>(terrain.textureLayers.size());
+    for (int i = 0; i < layerCount; i++){
+        const std::string label = "Layer " + std::to_string(i + 1);
+        layerRow(label.c_str(), "Click to paint this layer. Every three layers share a blend map.",
+                 terrain.textureLayers[i].getPath(0), i);
+    }
+
+    terrainPropertyRow("Layers", "Up to nine, three per blend map.");
+    ImGui::BeginDisabled(layerCount >= MAX_TERRAIN_LAYERS);
+    if (iconButton(ICON_FA_PLUS, "add_texture_layer", "Add texture layer", false, buttonSize)){
+        endStroke();
+        std::vector<Texture> layers = terrain.textureLayers;
+        layers.resize(layers.size() + 1);
+        setTextureLayers(layers);
+    }
+    ImGui::EndDisabled();
+    ImGui::SameLine();
+    ImGui::BeginDisabled(layerCount == 0);
+    if (iconButton(ICON_FA_TRASH_CAN, "remove_texture_layer", "Remove the last texture layer", false, buttonSize)){
+        endStroke();
+        std::vector<Texture> layers = terrain.textureLayers;
+        layers.pop_back();
+        setTextureLayers(layers);
+        selectedTextureLayer = std::clamp(selectedTextureLayer, 0, std::max(0, static_cast<int>(layers.size()) - 1));
+    }
+    ImGui::EndDisabled();
 }
 
 void editor::TerrainEditWindow::drawFoliageMesh(const TerrainFoliageLayer& layer){
@@ -2518,6 +2564,7 @@ void editor::TerrainEditWindow::show(){
     ImGui::Spacing();
     const int layerCount = static_cast<int>(terrain.foliageLayers.size());
     selectedFoliageLayer = std::clamp(selectedFoliageLayer, 0, std::max(0, layerCount - 1));
+    selectedTextureLayer = std::clamp(selectedTextureLayer, 0, std::max(0, static_cast<int>(terrain.textureLayers.size()) - 1));
     const ImVec2 buttonSize(ImGui::GetFrameHeight(), ImGui::GetFrameHeight());
     const float spacing = ImGui::GetStyle().ItemSpacing.x;
 
@@ -2546,10 +2593,13 @@ void editor::TerrainEditWindow::show(){
     }
 
     if (ImGui::CollapsingHeader("Texture Paint", ImGuiTreeNodeFlags_DefaultOpen) && beginTerrainProperties("texture_paint_properties")){
-        drawMapSettings(TerrainMapTarget::BlendMap, "Blendmap", blendMapResolution);
-        ImGui::BeginDisabled(terrain.blendMap.empty());
+        const int blendMapIndex = selectedTextureLayer / 3;
+        drawMapSettings(TerrainMapRef(TerrainMapTarget::BlendMap, blendMapIndex), "Blendmap", blendMapResolution);
+        const bool blendMapReady = blendMapIndex < static_cast<int>(terrain.blendMaps.size()) &&
+                                   !terrain.blendMaps[blendMapIndex].empty();
+        ImGui::BeginDisabled(!blendMapReady);
         drawTextureLayers(terrain);
-        terrainPropertyRow("Normalize", "Fade the other layers while painting one. Base always clears them.");
+        terrainPropertyRow("Normalize", "Fade the other layers sharing this blend map. Layers on the other maps keep their weight.");
         ImGui::BeginDisabled(brushMode == TerrainBrushMode::PaintBase);
         ImGui::Checkbox("##normalize_blend", &normalizeBlendPaint);
         ImGui::EndDisabled();

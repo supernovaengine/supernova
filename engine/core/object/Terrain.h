@@ -23,6 +23,9 @@ namespace doriax{
         void setBlendMap(const std::string& path);
         void setBlendMap(Framebuffer* framebuffer);
 
+        void setBlendMap(unsigned int index, const std::string& path);
+        void setTextureLayer(unsigned int index, const std::string& path);
+
         void setTextureDetailRed(const std::string& path);
         void setTextureDetailGreen(const std::string& path);
         void setTextureDetailBlue(const std::string& path);

@@ -1253,10 +1253,14 @@ std::string editor::Factory::createTerrainComponent(int indentSpaces, EntityRegi
     const std::string ind = indentation(indentSpaces);
     code << ind << "TerrainComponent terrain;\n";
     code << formatTexture(indentSpaces, terrain.heightMap, "terrain.heightMap", projectPath);
-    code << formatTexture(indentSpaces, terrain.blendMap, "terrain.blendMap", projectPath);
-    code << formatTexture(indentSpaces, terrain.textureDetailRed, "terrain.textureDetailRed", projectPath);
-    code << formatTexture(indentSpaces, terrain.textureDetailGreen, "terrain.textureDetailGreen", projectPath);
-    code << formatTexture(indentSpaces, terrain.textureDetailBlue, "terrain.textureDetailBlue", projectPath);
+    code << ind << "terrain.blendMaps.resize(" << terrain.blendMaps.size() << ");\n";
+    for (size_t i = 0; i < terrain.blendMaps.size(); i++){
+        code << formatTexture(indentSpaces, terrain.blendMaps[i], "terrain.blendMaps[" + std::to_string(i) + "]", projectPath);
+    }
+    code << ind << "terrain.textureLayers.resize(" << terrain.textureLayers.size() << ");\n";
+    for (size_t i = 0; i < terrain.textureLayers.size(); i++){
+        code << formatTexture(indentSpaces, terrain.textureLayers[i], "terrain.textureLayers[" + std::to_string(i) + "]", projectPath);
+    }
     code << ind << "terrain.autoSetRanges = " << formatBool(terrain.autoSetRanges) << ";\n";
     code << ind << "terrain.offset = " << formatVector2(terrain.offset) << ";\n";
     code << ind << "terrain.terrainSize = " << formatFloat(terrain.terrainSize) << ";\n";

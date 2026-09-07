@@ -149,6 +149,7 @@ uint32_t RenderSystem::pixelsBlack[64];
 uint32_t RenderSystem::pixelsNormal[64];
 
 TextureRender RenderSystem::emptyWhite;
+TextureRender RenderSystem::emptyArrayWhite;
 TextureRender RenderSystem::emptyBlack;
 TextureRender RenderSystem::emptyCubeBlack;
 TextureRender RenderSystem::emptyCubeWhite;
@@ -368,6 +369,10 @@ void RenderSystem::createEmptyTextures(){
 
         emptyWhite.createTexture(
                 "empty|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_2D, 1, data_array, size_array,
+                TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
+
+        emptyArrayWhite.createTexture(
+                "empty|array|white", 8, 8, ColorFormat::RGBA, TextureType::TEXTURE_ARRAY, 1, data_array, size_array,
                 TextureFilter::NEAREST, TextureFilter::NEAREST, TextureWrap::REPEAT, TextureWrap::REPEAT);
 
         // white cube fallback for the skybox cube sampler: a color-only sky (no
@@ -1991,7 +1996,138 @@ bool RenderSystem::loadGBufferTextures(Material& material, ShaderData& shaderDat
     return true;
 }
 
-bool RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData){
+// Read here rather than through Texture, which would upload a 2D image per layer on top
+// of the array. Rebuilt only when the set of files changes.
+RenderSystem::TerrainDetailArray* RenderSystem::getTerrainDetailArray(Entity entity, TerrainComponent& terrain){
+    // The shader reaches all three layers of any bound blend map, so slices come in threes
+    std::vector<std::string> paths;
+    for (const Texture& layer : terrain.textureLayers){
+        // The loader parses the scale back out of the suffix, and the cache key carries it
+        const std::string path = layer.getPath(0);
+        paths.push_back(TextureData::hasSvgExtension(path.c_str()) ? TextureData::buildSvgScalePath(path, layer.getSvgScale()) : path);
+    }
+    paths.resize(((paths.size() + 2) / 3) * 3);
+    if (std::all_of(paths.begin(), paths.end(), [](const std::string& path){ return path.empty(); })){
+        destroyTerrainDetailArray(entity);
+        return NULL;
+    }
+
+    // One sampler covers every slice, so the first assigned layer sets it for all of them
+    const Texture* sampled = &terrain.textureLayers[0];
+    for (size_t i = 0; i < paths.size(); i++){
+        if (!paths[i].empty()){
+            sampled = &terrain.textureLayers[i];
+            break;
+        }
+    }
+
+    auto it = terrainDetailArrays.find(entity);
+    if (it != terrainDetailArrays.end()){
+        const TerrainDetailArray& cached = it->second;
+        if (cached.paths == paths && cached.minFilter == sampled->getMinFilter() && cached.magFilter == sampled->getMagFilter() &&
+            cached.wrapU == sampled->getWrapU() && cached.wrapV == sampled->getWrapV()){
+            // A set that could not be built is remembered, not retried every frame
+            return cached.failed ? NULL : &it->second;
+        }
+        destroyTerrainDetailArray(entity);
+    }
+
+    auto remember = [&](bool failed) -> TerrainDetailArray& {
+        TerrainDetailArray& entry = terrainDetailArrays[entity];
+        entry.paths = paths;
+        entry.minFilter = sampled->getMinFilter();
+        entry.magFilter = sampled->getMagFilter();
+        entry.wrapU = sampled->getWrapU();
+        entry.wrapV = sampled->getWrapV();
+        entry.failed = failed;
+        return entry;
+    };
+
+    std::vector<TextureData> slices(paths.size());
+    int width = 0;
+    int height = 0;
+    bool anyRGBA = false;
+    for (size_t i = 0; i < paths.size(); i++){
+        if (paths[i].empty() || !slices[i].loadTextureFromFile(paths[i].c_str())){
+            continue;
+        }
+        // stb hands over the pixels, and nothing else will free them
+        slices[i].setDataOwned(true);
+        width = std::max(width, slices[i].getWidth());
+        height = std::max(height, slices[i].getHeight());
+        anyRGBA = anyRGBA || slices[i].getColorFormat() == ColorFormat::RGBA;
+    }
+    if (width == 0){
+        remember(true);
+        return NULL;
+    }
+
+    // One image holds a single format, so grayscale layers are widened instead of refused
+    const ColorFormat colorFormat = anyRGBA ? ColorFormat::RGBA : slices[0].getColorFormat();
+    std::vector<std::vector<unsigned char>> widened(paths.size());
+    size_t sliceSize = 0;
+    for (size_t i = 0; i < paths.size(); i++){
+        if (!slices[i].getData()){
+            continue;
+        }
+        if (slices[i].getWidth() != width || slices[i].getHeight() != height){
+            slices[i].resize(width, height);
+        }
+        if (slices[i].getColorFormat() == ColorFormat::RED && colorFormat == ColorFormat::RGBA){
+            const unsigned char* grey = static_cast<const unsigned char*>(slices[i].getData());
+            widened[i].resize(static_cast<size_t>(width) * height * 4);
+            for (size_t t = 0; t < static_cast<size_t>(width) * height; t++){
+                widened[i][t * 4 + 0] = grey[t];
+                widened[i][t * 4 + 1] = grey[t];
+                widened[i][t * 4 + 2] = grey[t];
+                widened[i][t * 4 + 3] = 0xFF;
+            }
+        }else if (slices[i].getColorFormat() != colorFormat){
+            Log::error("Terrain detail layer '%s' does not have the same format as the other layers", paths[i].c_str());
+            remember(true);
+            return NULL;
+        }
+        sliceSize = widened[i].empty() ? slices[i].getSize() : widened[i].size();
+    }
+
+    // An unassigned layer still needs a slice, and white is what it used to bind
+    std::vector<unsigned char> whiteSlice(sliceSize, 0xFF);
+
+    std::vector<void*> data(paths.size());
+    std::vector<size_t> size(paths.size());
+    for (size_t i = 0; i < paths.size(); i++){
+        if (!widened[i].empty()){
+            data[i] = widened[i].data();
+            size[i] = widened[i].size();
+        }else if (slices[i].getData()){
+            data[i] = slices[i].getData();
+            size[i] = slices[i].getSize();
+        }else{
+            data[i] = whiteSlice.data();
+            size[i] = sliceSize;
+        }
+    }
+
+    TerrainDetailArray& detail = remember(false);
+    if (!detail.render.createTexture("terrain|detail|" + std::to_string(entity), width, height,
+            colorFormat, TextureType::TEXTURE_ARRAY, static_cast<int>(paths.size()), data.data(), size.data(),
+            sampled->getMinFilter(), sampled->getMagFilter(), sampled->getWrapU(), sampled->getWrapV())){
+        detail.failed = true;
+        return NULL;
+    }
+
+    return &detail;
+}
+
+void RenderSystem::destroyTerrainDetailArray(Entity entity){
+    auto it = terrainDetailArrays.find(entity);
+    if (it != terrainDetailArrays.end()){
+        it->second.render.destroyTexture();
+        terrainDetailArrays.erase(it);
+    }
+}
+
+bool RenderSystem::loadTerrainTextures(Entity entity, TerrainComponent& terrain, ObjectRender& render, ShaderData& shaderData){
     TextureRender* textureRender = NULL;
     std::pair<int, int> slotTex(-1, -1);
 
@@ -1999,8 +2135,10 @@ bool RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ObjectRender& 
     // the border texels, not the REPEAT blend with the opposite edge (detail maps are tiled).
     terrain.heightMap.setWrapU(TextureWrap::CLAMP_TO_EDGE);
     terrain.heightMap.setWrapV(TextureWrap::CLAMP_TO_EDGE);
-    terrain.blendMap.setWrapU(TextureWrap::CLAMP_TO_EDGE);
-    terrain.blendMap.setWrapV(TextureWrap::CLAMP_TO_EDGE);
+    for (Texture& blendMap : terrain.blendMaps){
+        blendMap.setWrapU(TextureWrap::CLAMP_TO_EDGE);
+        blendMap.setWrapV(TextureWrap::CLAMP_TO_EDGE);
+    }
 
     textureRender = terrain.heightMap.getRender(&emptyWhite);
     slotTex = shaderData.getTextureIndex(TextureShaderType::HEIGHTMAP);
@@ -2013,48 +2151,27 @@ bool RenderSystem::loadTerrainTextures(TerrainComponent& terrain, ObjectRender& 
         render.addTexture(slotTex, ShaderStageType::VERTEX, &emptyWhite);
     }
 
-    textureRender = terrain.blendMap.getRender(&emptyBlack);
-    slotTex = shaderData.getTextureIndex(TextureShaderType::BLENDMAP);
-    if (textureRender){
-        if (!textureRender->isCreated()){
-            return false;
-        }
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-    }else{
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
-    }
+    // The array comes first: how deep it came out is what decides which blend maps may
+    // weight anything, and the white fallback is a single slice.
+    TerrainDetailArray* detail = getTerrainDetailArray(entity, terrain);
+    const bool arrayCreated = detail && detail->render.isCreated();
+    slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL);
+    render.addTexture(slotTex, ShaderStageType::FRAGMENT, arrayCreated ? &detail->render : &emptyArrayWhite);
 
-    textureRender = terrain.textureDetailRed.getRender(&emptyWhite);
-    slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_RED);
-    if (textureRender){
-        if (!textureRender->isCreated()){
-            return false;
+    // The rest bind black, which weights none of their layers
+    const int coveredMaps = arrayCreated ? static_cast<int>(detail->paths.size() / 3) : 0;
+    for (int m = 0; m < MAX_TERRAIN_BLENDMAPS; m++){
+        const bool covered = m < coveredMaps && m < static_cast<int>(terrain.blendMaps.size());
+        textureRender = covered ? terrain.blendMaps[m].getRender(&emptyBlack) : NULL;
+        slotTex = shaderData.getTextureIndex(static_cast<TextureShaderType>(static_cast<int>(TextureShaderType::BLENDMAP) + m));
+        if (textureRender){
+            if (!textureRender->isCreated()){
+                return false;
+            }
+            render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
+        }else{
+            render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyBlack);
         }
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-    }else{
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
-    }
-
-    textureRender = terrain.textureDetailGreen.getRender(&emptyWhite);
-    slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_GREEN);
-    if (textureRender){
-        if (!textureRender->isCreated()){
-            return false;
-        }
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-    }else{
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
-    }
-
-    textureRender = terrain.textureDetailBlue.getRender(&emptyWhite);
-    slotTex = shaderData.getTextureIndex(TextureShaderType::TERRAINDETAIL_BLUE);
-    if (textureRender){
-        if (!textureRender->isCreated()){
-            return false;
-        }
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, textureRender);
-    }else{
-        render.addTexture(slotTex, ShaderStageType::FRAGMENT, &emptyWhite);
     }
 
     return true;
@@ -2075,7 +2192,7 @@ bool RenderSystem::loadTerrainHeightTexture(TerrainComponent& terrain, ObjectRen
     return true;
 }
 
-bool RenderSystem::updateTerrainRenderTextures(TerrainComponent& terrain, MeshComponent& mesh){
+bool RenderSystem::updateTerrainRenderTextures(Entity entity, TerrainComponent& terrain, MeshComponent& mesh){
     if (!terrain.needUpdateTexture){
         return true;
     }
@@ -2090,7 +2207,7 @@ bool RenderSystem::updateTerrainRenderTextures(TerrainComponent& terrain, MeshCo
             continue;
         }
         ShaderData& shaderData = mesh.submeshes[s].shader.get()->shaderData;
-        if (!loadTerrainTextures(terrain, mesh.submeshes[s].render, shaderData)){
+        if (!loadTerrainTextures(entity, terrain, mesh.submeshes[s].render, shaderData)){
             texLoaded = false;
         }
         if (mesh.submeshes[s].depthShader){
@@ -2125,7 +2242,7 @@ void RenderSystem::updateAllTerrainRenderTextures(){
         Entity entity = meshes->getEntity(i);
         TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
         if (terrain){
-            updateTerrainRenderTextures(*terrain, mesh);
+            updateTerrainRenderTextures(entity, *terrain, mesh);
         }
     }
 }
@@ -2378,7 +2495,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         if (mesh.submeshes[i].hasTexCoord1 && mesh.submeshes[i].hasTexCoord2 && hasPBRTextures){
             p_hasTexture2 = true;
         }
-        if (terrain && (!terrain->blendMap.empty() || hasPBRTextures)){
+        if (terrain && (!terrain->blendMaps.empty() || hasPBRTextures)){
             p_hasTexture1 = true;
         }
         bool useIBL = (hasIBL || hasReflectionProbes) && mesh.receiveIBL;
@@ -2553,7 +2670,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint8_t pipeline
         if (terrain){
             mesh.submeshes[i].slotVSTerrain = shaderData.getUniformBlockIndex(UniformBlockType::TERRAIN_VS_PARAMS);
 
-            if (!loadTerrainTextures(*terrain, mesh.submeshes[i].render, shaderData)){
+            if (!loadTerrainTextures(entity, *terrain, mesh.submeshes[i].render, shaderData)){
                 return false;
             }
 
@@ -4244,10 +4361,13 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh, bool clearAss
             //Destroy terrain texture
             if (!preserveAssets){
                 terrain->heightMap.destroy();
-                terrain->blendMap.destroy();
-                terrain->textureDetailRed.destroy();
-                terrain->textureDetailGreen.destroy();
-                terrain->textureDetailBlue.destroy();
+                for (Texture& blendMap : terrain->blendMaps){
+                    blendMap.destroy();
+                }
+                for (Texture& layer : terrain->textureLayers){
+                    layer.destroy();
+                }
+                destroyTerrainDetailArray(entity);
             }
 
             //Destroy terrain buffer

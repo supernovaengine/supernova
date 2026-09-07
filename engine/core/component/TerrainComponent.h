@@ -18,6 +18,11 @@
 #define MAX_TERRAIN_LEVELS 20
 #define MAX_TERRAIN_NODES 2000000u
 
+// A blend map weights three layers in its RGB. Alpha is not a fourth weight: saved
+// maps are opaque, so it would read as full strength.
+#define MAX_TERRAIN_BLENDMAPS 3
+#define MAX_TERRAIN_LAYERS (MAX_TERRAIN_BLENDMAPS * 3)
+
 #include "buffer/InterleavedBuffer.h"
 #include "buffer/IndexBuffer.h"
 #include "texture/Material.h"
@@ -25,6 +30,7 @@
 #include "Engine.h"
 
 #include <string>
+#include <vector>
 
 namespace doriax{
 
@@ -84,10 +90,9 @@ namespace doriax{
         TerrainView views[MAX_TERRAIN_VIEWS];
 
         Texture heightMap;
-        Texture blendMap;
-        Texture textureDetailRed;
-        Texture textureDetailGreen;
-        Texture textureDetailBlue;
+        // blendMaps[m] channel c weights textureLayers[m * 3 + c]
+        std::vector<Texture> blendMaps;
+        std::vector<Texture> textureLayers;
 
         std::vector<TerrainFoliageLayer> foliageLayers;
 

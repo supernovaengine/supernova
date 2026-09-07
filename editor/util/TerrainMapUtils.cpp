@@ -17,7 +17,10 @@ Texture* editor::TerrainMapUtils::findTexture(TerrainComponent& terrain, const T
         return &terrain.heightMap;
     }
     if (ref.target == TerrainMapTarget::BlendMap){
-        return &terrain.blendMap;
+        if (ref.layer < 0 || ref.layer >= static_cast<int>(terrain.blendMaps.size())){
+            return NULL;
+        }
+        return &terrain.blendMaps[ref.layer];
     }
     if (ref.layer < 0 || ref.layer >= static_cast<int>(terrain.foliageLayers.size())){
         return nullptr;
@@ -30,9 +33,19 @@ std::string editor::TerrainMapUtils::getPropertyName(const TerrainMapRef& ref){
         return "heightMap";
     }
     if (ref.target == TerrainMapTarget::BlendMap){
-        return "blendMap";
+        return "blendMaps[" + std::to_string(ref.layer) + "]";
     }
     return "foliageLayers[" + std::to_string(ref.layer) + "].densityMap";
+}
+
+std::string editor::TerrainMapUtils::getContainerPropertyName(const TerrainMapRef& ref){
+    if (ref.target == TerrainMapTarget::BlendMap){
+        return "blendMaps";
+    }
+    if (ref.target == TerrainMapTarget::DensityMap){
+        return "foliageLayers";
+    }
+    return std::string();
 }
 
 bool editor::TerrainMapUtils::hasLoadedData(Texture& texture){

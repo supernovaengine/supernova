@@ -647,10 +647,12 @@ bool editor::Project::visitAssetPathsInRegistry(EntityRegistry* registry, const 
     visitComponents(registry->getComponentArray<TerrainComponent>(), [&](TerrainComponent& terrain) {
         bool heightMapChanged = visitTexturePaths(terrain.heightMap, transform);
         bool terrainChanged = heightMapChanged;
-        terrainChanged |= visitTexturePaths(terrain.blendMap, transform);
-        terrainChanged |= visitTexturePaths(terrain.textureDetailRed, transform);
-        terrainChanged |= visitTexturePaths(terrain.textureDetailGreen, transform);
-        terrainChanged |= visitTexturePaths(terrain.textureDetailBlue, transform);
+        for (Texture& blendMap : terrain.blendMaps) {
+            terrainChanged |= visitTexturePaths(blendMap, transform);
+        }
+        for (Texture& layer : terrain.textureLayers) {
+            terrainChanged |= visitTexturePaths(layer, transform);
+        }
 
         for (TerrainFoliageLayer& layer : terrain.foliageLayers) {
             if (visitTexturePaths(layer.densityMap, transform) ||
