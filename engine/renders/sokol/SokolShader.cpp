@@ -159,10 +159,16 @@ bool SokolShader::createShader(ShaderData& shaderData){
         if (stage->type == ShaderStageType::VERTEX){
             if (SG_MAX_VERTEX_ATTRIBUTES < stage->attributes.size()){
                 Log::error("Number of attributes of shader is bigger than SG_MAX_VERTEX_ATTRIBUTES");
+                return false;
             }else{
                 // attributes
                 for (int a = 0; a < stage->attributes.size(); a++) {
                     int location = stage->attributes[a].location;
+                    if (location >= SG_MAX_VERTEX_ATTRIBUTES){
+                        Log::error("Vertex attribute '%s' location %d exceeds SG_MAX_VERTEX_ATTRIBUTES (%d)",
+                            stage->attributes[a].name.c_str(), location, SG_MAX_VERTEX_ATTRIBUTES);
+                        return false;
+                    }
                     if (location >= 0){
                         shader_desc.attrs[location].glsl_name = stage->attributes[a].name.c_str();
                         shader_desc.attrs[location].hlsl_sem_name = stage->attributes[a].semanticName.c_str();

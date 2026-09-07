@@ -21,12 +21,14 @@ namespace shadercompiler{
     //  - MaxImages/MaxStorageBuffers: share SG_MAX_VIEW_BINDSLOTS (32)
     //  - MaxSamplers: SG_MAX_SAMPLER_BINDSLOTS
     //  - MaxImageSamplers: SG_MAX_TEXTURE_SAMPLER_PAIRS
+    //  - MaxVertexAttribs: SG_MAX_VERTEX_ATTRIBUTES
     //
     inline static const int MaxUniformBlocks = 8;
     inline static const int MaxImages = 16;
     inline static const int MaxSamplers = 16;
     inline static const int MaxStorageBuffers = 8;
     inline static const int MaxImageSamplers = 16;
+    inline static const int MaxVertexAttribs = 16;
 
     enum class BindingType {
         UNIFORM_BLOCK,
@@ -124,6 +126,9 @@ namespace shadercompiler{
         VERTEX_WEIGHTS,
         VERTEX_ATTRIB_COUNT
     };
+
+    // the tables below are indexed by vertex input location, bounded by MaxVertexAttribs
+    static_assert(MaxVertexAttribs <= VERTEX_ATTRIB_COUNT, "semantic tables must cover every allowed location");
 
     static const char* k_attrib_names[VERTEX_ATTRIB_COUNT] = {
         "POSITION",

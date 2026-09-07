@@ -409,8 +409,19 @@ static bool parse_stage_reflection(spirvcross_t& spirvcross, const spirv_cross::
 
         attr.location = loc;
         attr.name = res_attr.name;
-        attr.semantic_name = k_attrib_sem_names[loc];
-        attr.semantic_index = k_attrib_sem_indices[loc];
+        // Only vertex inputs use the engine's attribute semantic table.
+        if (spirvcross.stage_type == STAGE_VERTEX) {
+            if (loc >= MaxVertexAttribs) {
+                fprintf(stderr, "Vertex input '%s' location %u exceeds the vertex attribute limit %d\n",
+                    res_attr.name.c_str(), loc, MaxVertexAttribs - 1);
+                return false;
+            }
+            attr.semantic_name = k_attrib_sem_names[loc];
+            attr.semantic_index = k_attrib_sem_indices[loc];
+        } else {
+            attr.semantic_name = "TEXCOORD";
+            attr.semantic_index = loc;
+        }
         attr.type = spirtype_to_attribute_type(type);
 
         spirvcross.inputs.push_back(attr);
@@ -422,8 +433,8 @@ static bool parse_stage_reflection(spirvcross_t& spirvcross, const spirv_cross::
         
         attr.location = loc;
         attr.name = res_attr.name;
-        attr.semantic_name = k_attrib_sem_names[loc];
-        attr.semantic_index = k_attrib_sem_indices[loc];
+        attr.semantic_name = spirvcross.stage_type == STAGE_FRAGMENT ? "SV_Target" : "TEXCOORD";
+        attr.semantic_index = loc;
         attr.type = spirtype_to_attribute_type(type);
 
         spirvcross.outputs.push_back(attr);
