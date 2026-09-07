@@ -655,6 +655,12 @@ std::string terrainBrushModeToString(editor::TerrainBrushMode mode) {
         case editor::TerrainBrushMode::Lower: return "Lower";
         case editor::TerrainBrushMode::Smooth: return "Smooth";
         case editor::TerrainBrushMode::Flatten: return "Flatten";
+        case editor::TerrainBrushMode::Sharpen: return "Sharpen";
+        case editor::TerrainBrushMode::Noise: return "Noise";
+        case editor::TerrainBrushMode::Terrace: return "Terrace";
+        case editor::TerrainBrushMode::Stamp: return "Stamp";
+        case editor::TerrainBrushMode::Erode: return "Erode";
+        case editor::TerrainBrushMode::Ramp: return "Ramp";
         case editor::TerrainBrushMode::PaintBase: return "PaintBase";
         case editor::TerrainBrushMode::PaintLayer: return "PaintLayer";
         case editor::TerrainBrushMode::PaintDensity: return "PaintDensity";
@@ -670,6 +676,12 @@ editor::TerrainBrushMode stringToTerrainBrushMode(const std::string& str) {
     if (str == "Lower") return editor::TerrainBrushMode::Lower;
     if (str == "Smooth") return editor::TerrainBrushMode::Smooth;
     if (str == "Flatten") return editor::TerrainBrushMode::Flatten;
+    if (str == "Sharpen") return editor::TerrainBrushMode::Sharpen;
+    if (str == "Noise") return editor::TerrainBrushMode::Noise;
+    if (str == "Terrace") return editor::TerrainBrushMode::Terrace;
+    if (str == "Stamp") return editor::TerrainBrushMode::Stamp;
+    if (str == "Erode") return editor::TerrainBrushMode::Erode;
+    if (str == "Ramp") return editor::TerrainBrushMode::Ramp;
     if (str == "PaintBase") return editor::TerrainBrushMode::PaintBase;
     if (str == "PaintLayer") return editor::TerrainBrushMode::PaintLayer;
     // Backward compatibility: the three channel brushes became one layer brush with an
@@ -1598,7 +1610,11 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         terrainNode["brushFalloff"] = terrainBrushFalloffToString(static_cast<TerrainBrushFalloff>(ts.brushFalloff));
         encodePositiveFinite(terrainNode, "brushSize", ts.brushSize);
         encodeFinite(terrainNode, "brushStrength", ts.brushStrength);
+        encodeFinite(terrainNode, "brushRotation", ts.brushRotation);
+        terrainNode["brushMaskPath"] = ts.brushMaskPath;
         encodeFinite(terrainNode, "flattenHeight", ts.flattenHeight);
+        terrainNode["terraceSteps"] = ts.terraceSteps;
+        encodePositiveFinite(terrainNode, "noiseSize", ts.noiseSize);
         terrainNode["heightMapResolution"] = ts.heightMapResolution;
         terrainNode["blendMapResolution"] = ts.blendMapResolution;
         terrainNode["densityMapResolution"] = ts.densityMapResolution;
@@ -1801,7 +1817,11 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         if (tn["brushFalloff"].IsDefined())       ts.brushFalloff       = static_cast<int>(stringToTerrainBrushFalloff(tn["brushFalloff"].as<std::string>()));
         if (tn["brushSize"].IsDefined())          ts.brushSize          = decodePositiveFinite(tn["brushSize"], ts.brushSize);
         if (tn["brushStrength"].IsDefined())      ts.brushStrength      = decodeFinite(tn["brushStrength"], ts.brushStrength);
+        if (tn["brushRotation"].IsDefined())      ts.brushRotation      = decodeFinite(tn["brushRotation"], ts.brushRotation);
+        if (tn["brushMaskPath"].IsDefined())      ts.brushMaskPath      = tn["brushMaskPath"].as<std::string>();
         if (tn["flattenHeight"].IsDefined())      ts.flattenHeight      = decodeFinite(tn["flattenHeight"], ts.flattenHeight);
+        if (tn["terraceSteps"].IsDefined())       ts.terraceSteps       = tn["terraceSteps"].as<int>();
+        if (tn["noiseSize"].IsDefined())          ts.noiseSize          = decodePositiveFinite(tn["noiseSize"], ts.noiseSize);
         if (tn["heightMapResolution"].IsDefined()) ts.heightMapResolution = tn["heightMapResolution"].as<int>();
         if (tn["blendMapResolution"].IsDefined()) ts.blendMapResolution = tn["blendMapResolution"].as<int>();
         if (tn["densityMapResolution"].IsDefined()) ts.densityMapResolution = tn["densityMapResolution"].as<int>();

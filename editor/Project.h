@@ -134,7 +134,11 @@ namespace doriax::editor{
         int brushFalloff = 0;        // TerrainBrushFalloff::Smooth
         float brushSize = 4.0f;
         float brushStrength = 0.3f;  // normalized flow per second at full falloff
+        float brushRotation = 0.0f;  // degrees, turns the brush mask
+        std::string brushMaskPath;   // grayscale falloff, and the Stamp brush's relief
         float flattenHeight = 0.5f;
+        int terraceSteps = 8;
+        float noiseSize = 4.0f;      // width of one noise feature in world units
         int heightMapResolution = 512;
         int blendMapResolution = 512;
         int densityMapResolution = 512;

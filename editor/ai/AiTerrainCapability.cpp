@@ -8,6 +8,7 @@
 #include "pool/TextureDataPool.h"
 #include "texture/TextureData.h"
 #include "util/PngWriter.h"
+#include "util/TerrainNoise.h"
 
 #include "stb_image_write.h"
 
@@ -36,36 +37,6 @@ void encodeHeight16(std::vector<unsigned char>& pixels, size_t texelIndex, float
     pixels[byteIndex + 1] = static_cast<unsigned char>((quantized >> 8) & 0xFF);
 }
 
-float fade(float t) {
-    return t * t * (3.0f - 2.0f * t);
-}
-
-float hashNoise(int x, int y, uint32_t seed) {
-    uint32_t h = seed ^ 0x9E3779B9u;
-    h ^= static_cast<uint32_t>(x) + 0x85EBCA6Bu + (h << 6) + (h >> 2);
-    h ^= static_cast<uint32_t>(y) + 0xC2B2AE35u + (h << 6) + (h >> 2);
-    h ^= h >> 16;
-    h *= 0x7FEB352Du;
-    h ^= h >> 15;
-    h *= 0x846CA68Bu;
-    h ^= h >> 16;
-    return static_cast<float>(h & 0x00FFFFFFu) / static_cast<float>(0x00FFFFFFu);
-}
-
-float valueNoise(float x, float y, uint32_t seed) {
-    const int x0 = static_cast<int>(std::floor(x));
-    const int y0 = static_cast<int>(std::floor(y));
-    const float tx = fade(x - static_cast<float>(x0));
-    const float ty = fade(y - static_cast<float>(y0));
-    const float a = hashNoise(x0, y0, seed);
-    const float b = hashNoise(x0 + 1, y0, seed);
-    const float c = hashNoise(x0, y0 + 1, seed);
-    const float d = hashNoise(x0 + 1, y0 + 1, seed);
-    const float ab = a + (b - a) * tx;
-    const float cd = c + (d - c) * tx;
-    return ab + (cd - ab) * ty;
-}
-
 std::vector<unsigned char> makeHeightPixels(const TerrainHeightmapRequest& request) {
     const int resolution = std::max(2, request.resolution);
     const size_t texelCount = static_cast<size_t>(resolution) * static_cast<size_t>(resolution);
@@ -90,7 +61,7 @@ std::vector<unsigned char> makeHeightPixels(const TerrainHeightmapRequest& reque
                 for (int o = 0; o < octaves; ++o) {
                     const float nx = (static_cast<float>(x) / static_cast<float>(resolution - 1)) * f;
                     const float ny = (static_cast<float>(y) / static_cast<float>(resolution - 1)) * f;
-                    sum += (valueNoise(nx, ny, request.seed + static_cast<uint32_t>(o * 1013)) * 2.0f - 1.0f) * weight;
+                    sum += (TerrainNoise::value(nx, ny, request.seed + static_cast<uint32_t>(o * 1013)) * 2.0f - 1.0f) * weight;
                     weightSum += weight;
                     weight *= 0.5f;
                     f *= 2.0f;

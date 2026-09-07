@@ -21,6 +21,12 @@ namespace doriax::editor{
         Lower,
         Smooth,
         Flatten,
+        Sharpen,
+        Noise,
+        Terrace,
+        Stamp,
+        Erode,
+        Ramp,
         PaintBase,
         PaintLayer,
         PaintDensity,
@@ -80,6 +86,12 @@ namespace doriax::editor{
         TerrainBrushMode effectiveMode = TerrainBrushMode::Raise;
         // Normalized flatten target, sampled from the terrain at stroke start
         float flattenTarget = 0.5f;
+        // Ramp runs from where the stroke started to wherever it is now
+        Vector3 rampStart = Vector3::ZERO;
+        float rampStartHeight = 0.5f;
+        // Fractional droplets left over from the last stamp, so a slow frame still erodes
+        float erodeCarry = 0.0f;
+        uint32_t erodeSeed = 0;
         // Stamp pacing: previous stamp position/time for path interpolation and
         // time-based flow
         bool hasLastPoint = false;
@@ -135,7 +147,17 @@ namespace doriax::editor{
 
         float brushSize;
         float brushStrength;
+        float brushRotation;
         float flattenHeight;
+        int terraceSteps;
+        float noiseSize;
+
+        // Grayscale falloff for every brush, and the relief the Stamp brush lays down
+        std::string brushMaskPath;
+        std::string brushMaskLoadedPath;
+        std::vector<float> brushMaskPixels;
+        int brushMaskWidth;
+        int brushMaskHeight;
 
         int heightMapResolution;
         int blendMapResolution;
@@ -172,6 +194,11 @@ namespace doriax::editor{
         void drawMapSettings(const TerrainMapRef& ref, const char* label, int& resolution);
         float drawAssetThumbnail(const std::string& path, const char* id, bool selected = false, float scale = 3.0f);
         void drawTextureLayers(TerrainComponent& terrain);
+        void drawBrushMask();
+        void setBrushMask(const std::string& path);
+        bool loadBrushMask();
+        // Brush-local coordinates in [-1, 1], rotated by brushRotation
+        float sampleBrushMask(float localX, float localY) const;
         void drawFoliageMesh(const TerrainFoliageLayer& layer);
         void drawPlacementAsset();
         std::string makeEditableTextureId(uint32_t sceneId, Entity entity, const TerrainMapRef& ref);
@@ -239,6 +266,8 @@ namespace doriax::editor{
         static constexpr float MAX_BRUSH_SIZE = 50.0f;
         static constexpr float MIN_BRUSH_STRENGTH = 0.01f;
         static constexpr float MAX_BRUSH_STRENGTH = 1.0f;
+        static constexpr int MIN_TERRACE_STEPS = 2;
+        static constexpr int MAX_TERRACE_STEPS = 64;
 
         // Returns false when terrain map edits could not be persisted to disk —
         // the caller should keep the scene marked unsaved so another save (which

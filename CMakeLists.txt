@@ -536,6 +536,7 @@ set(DORIAX_EDITOR_SOURCES
     ${EDITOR_DIR}/util/PngWriter.cpp
     ${EDITOR_DIR}/util/TerrainMapFileWriter.cpp
     ${EDITOR_DIR}/util/TerrainMapUtils.cpp
+    ${EDITOR_DIR}/util/TerrainErosion.cpp
     ${EDITOR_DIR}/util/UIUtils.cpp
     ${EDITOR_DIR}/util/CommandRunner.cpp
     ${EDITOR_DIR}/util/ShellEnv.cpp

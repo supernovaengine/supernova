@@ -20,6 +20,8 @@
 #include "util/FileDialogs.h"
 #include "util/TerrainMapFileWriter.h"
 #include "util/TerrainMapUtils.h"
+#include "util/TerrainErosion.h"
+#include "util/TerrainNoise.h"
 #include "util/UIUtils.h"
 #include "util/Util.h"
 #include "window/ResourcesWindow.h"
@@ -1022,7 +1024,12 @@ editor::TerrainEditWindow::TerrainEditWindow(Project* project){
     brushFalloff  = TerrainBrushFalloff::Smooth;
     brushSize     = 4.0f;
     brushStrength = 0.3f;
+    brushRotation = 0.0f;
     flattenHeight = 0.5f;
+    terraceSteps  = 8;
+    noiseSize     = 4.0f;
+    brushMaskWidth = 0;
+    brushMaskHeight = 0;
     heightMapResolution = 512;
     blendMapResolution  = 512;
     densityMapResolution = 512;
@@ -1421,7 +1428,13 @@ bool editor::TerrainEditWindow::isHeightBrush() const{
     return brushMode == TerrainBrushMode::Raise ||
            brushMode == TerrainBrushMode::Lower ||
            brushMode == TerrainBrushMode::Smooth ||
-           brushMode == TerrainBrushMode::Flatten;
+           brushMode == TerrainBrushMode::Flatten ||
+           brushMode == TerrainBrushMode::Sharpen ||
+           brushMode == TerrainBrushMode::Noise ||
+           brushMode == TerrainBrushMode::Terrace ||
+           brushMode == TerrainBrushMode::Stamp ||
+           brushMode == TerrainBrushMode::Erode ||
+           brushMode == TerrainBrushMode::Ramp;
 }
 
 bool editor::TerrainEditWindow::isBlendBrush() const{
@@ -1496,6 +1509,14 @@ static constexpr float BRUSH_BLEND_FLOW_PER_SECOND = 10.0f;
 static constexpr float BRUSH_CLICK_SECONDS = 1.0f / 60.0f;
 // Longest interval a single event may deposit, so hitches don't cause spikes.
 static constexpr float BRUSH_MAX_STAMP_SECONDS = 0.05f;
+// Droplets released per square texel of brush area, per second at full strength.
+static constexpr float ERODE_DROPLETS_PER_SECOND = 0.4f;
+// Slope a thermal pass leaves standing, in world height units per texel of run.
+static constexpr float ERODE_TALUS = 0.7f;
+// Octaves in the noise brush: enough for a broken surface, not so many it reads as grain.
+static constexpr int NOISE_OCTAVES = 4;
+// Fixed, so going over the same ground again deepens the field instead of replacing it.
+static constexpr uint32_t NOISE_SEED = 0;
 // Objects any closer than this would stack on top of each other
 static constexpr float MIN_PLACE_SPACING = 0.05f;
 
@@ -1601,23 +1622,30 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
         stroke.workingHeight = height;
     }
 
+    const TerrainBrushMode mode = stroke.effectiveMode;
     const float halfSize = terrain.terrainSize * 0.5f;
-    const float centerX = ((localPoint.x + halfSize) / terrain.terrainSize) * static_cast<float>(width - 1);
-    const float centerY = ((localPoint.z + halfSize) / terrain.terrainSize) * static_cast<float>(height - 1);
+    auto texelOfX = [&](float local){ return ((local + halfSize) / terrain.terrainSize) * static_cast<float>(width - 1); };
+    auto texelOfY = [&](float local){ return ((local + halfSize) / terrain.terrainSize) * static_cast<float>(height - 1); };
+    const float centerX = texelOfX(localPoint.x);
+    const float centerY = texelOfY(localPoint.z);
     // Per-axis texel radii keep the brush circular in world space on non-square
     // maps, and float precision allows sub-texel radii for very small brushes.
     const float radiusX = std::max(0.01f, (brushSize / terrain.terrainSize) * static_cast<float>(width - 1));
     const float radiusY = std::max(0.01f, (brushSize / terrain.terrainSize) * static_cast<float>(height - 1));
 
-    const int minX = std::max(0, static_cast<int>(std::floor(centerX - radiusX)));
-    const int maxX = std::min(width - 1, static_cast<int>(std::ceil(centerX + radiusX)));
-    const int minY = std::max(0, static_cast<int>(std::floor(centerY - radiusY)));
-    const int maxY = std::min(height - 1, static_cast<int>(std::ceil(centerY + radiusY)));
+    // A ramp is one line from the stroke start to the cursor, so its stamp spans the segment
+    const bool rampBrush = mode == TerrainBrushMode::Ramp;
+    const float startX = rampBrush ? texelOfX(stroke.rampStart.x) : centerX;
+    const float startY = rampBrush ? texelOfY(stroke.rampStart.z) : centerY;
+
+    const int minX = std::max(0, static_cast<int>(std::floor(std::min(centerX, startX) - radiusX)));
+    const int maxX = std::min(width - 1, static_cast<int>(std::ceil(std::max(centerX, startX) + radiusX)));
+    const int minY = std::max(0, static_cast<int>(std::floor(std::min(centerY, startY) - radiusY)));
+    const int maxY = std::min(height - 1, static_cast<int>(std::ceil(std::max(centerY, startY) + radiusY)));
     if (minX > maxX || minY > maxY){
         return false;
     }
 
-    const TerrainBrushMode mode = stroke.effectiveMode;
     const float flattenTargetValue = std::clamp(flattenPickOnStroke ? stroke.flattenTarget : flattenHeight, 0.0f, 1.0f);
     const float flowRate = target == TerrainMapTarget::HeightMap ? BRUSH_FLOW_PER_SECOND : BRUSH_BLEND_FLOW_PER_SECOND;
 
@@ -1626,7 +1654,7 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
     std::vector<float> smoothSource;
     int smoothStep = 1;
     int srcMinX = 0, srcMinY = 0, srcWidth = 0, srcHeight = 0;
-    if (mode == TerrainBrushMode::Smooth && target == TerrainMapTarget::HeightMap){
+    if ((mode == TerrainBrushMode::Smooth || mode == TerrainBrushMode::Sharpen) && target == TerrainMapTarget::HeightMap){
         smoothStep = std::max(1, static_cast<int>(std::lround(std::min(radiusX, radiusY) * 0.25f)));
         srcMinX = std::max(0, minX - smoothStep);
         srcMinY = std::max(0, minY - smoothStep);
@@ -1649,6 +1677,70 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
 
     // Base owns no channel: painting it clears the others and lets the base texture back in
     const int paintChannel = (mode == TerrainBrushMode::PaintLayer) ? (selectedTextureLayer % 3) : -1;
+
+    // Both ends of the ramp are read the same way, or they disagree by a texel
+    Vector2 rampAxis(0.0f, 0.0f);
+    float rampAxisLengthSq = 0.0f;
+    float rampStartHeight = stroke.rampStartHeight;
+    float rampEndHeight = stroke.rampStartHeight;
+    if (rampBrush){
+        rampAxis = Vector2(centerX - startX, centerY - startY);
+        rampAxisLengthSq = rampAxis.x * rampAxis.x + rampAxis.y * rampAxis.y;
+        if (stroke.heightReferenceValid){
+            auto referenceHeight = [&](float localX, float localZ){
+                const float refX = ((localX + halfSize) / terrain.terrainSize) * static_cast<float>(stroke.heightReferenceWidth - 1);
+                const float refY = ((localZ + halfSize) / terrain.terrainSize) * static_cast<float>(stroke.heightReferenceHeight - 1);
+                return bilinearHeightSample(stroke.heightReferencePixels.data(), stroke.heightReferenceWidth, stroke.heightReferenceHeight,
+                                            stroke.heightReferenceChannels, stroke.heightReferenceBytesPerChannel, refX, refY);
+            };
+            rampStartHeight = referenceHeight(stroke.rampStart.x, stroke.rampStart.z);
+            rampEndHeight = referenceHeight(localPoint.x, localPoint.z);
+        }
+    }
+
+    // One noise cell every noiseSize world units, so the field stays put as the brush moves
+    const float noiseFrequency = terrain.terrainSize / (static_cast<float>(std::max(1, width - 1)) * std::max(0.01f, noiseSize));
+    // Levels include both ends of the range, so N of them leave N-1 intervals
+    const float terraceIntervals = static_cast<float>(std::clamp(terraceSteps, MIN_TERRACE_STEPS, MAX_TERRACE_STEPS) - 1);
+    // For Stamp the mask is the relief, not the falloff
+    const bool maskAsFalloff = !brushMaskPixels.empty() && mode != TerrainBrushMode::Stamp;
+
+    // How far along the ramp a texel sits, 0 for every other brush
+    auto rampAlong = [&](int x, int y){
+        if (rampAxisLengthSq <= std::numeric_limits<float>::epsilon()){
+            return 0.0f;
+        }
+        return std::clamp(((static_cast<float>(x) - startX) * rampAxis.x + (static_cast<float>(y) - startY) * rampAxis.y) / rampAxisLengthSq, 0.0f, 1.0f);
+    };
+
+    // Brush-local coordinates, so the falloff and the mask read the same frame. Measuring
+    // from the nearest point on the ramp is what makes its stamp a capsule.
+    auto brushLocal = [&](int x, int y){
+        const float along = rampAlong(x, y);
+        const float baseX = startX + rampAxis.x * along;
+        const float baseY = startY + rampAxis.y * along;
+        return Vector2((static_cast<float>(x) - baseX) / radiusX, (static_cast<float>(y) - baseY) / radiusY);
+    };
+
+    auto brushWeight = [&](int x, int y){
+        const Vector2 local = brushLocal(x, y);
+        const float distance = brushShape == TerrainBrushShape::Circle ?
+            std::sqrt(local.x * local.x + local.y * local.y) : std::max(std::abs(local.x), std::abs(local.y));
+        if (distance > 1.0f){
+            return 0.0f;
+        }
+        float falloff = 1.0f;
+        if (brushFalloff == TerrainBrushFalloff::Linear){
+            falloff = 1.0f - distance;
+        }else if (brushFalloff == TerrainBrushFalloff::Smooth){
+            const float t = 1.0f - distance;
+            falloff = t * t * (3.0f - 2.0f * t);
+        }
+        if (maskAsFalloff){
+            falloff *= sampleBrushMask(local.x, local.y);
+        }
+        return falloff;
+    };
 
     // "Rock above 40 degrees" and the like: texels outside the range keep what they had
     const bool useMask = paintUseMask && target == TerrainMapTarget::BlendMap;
@@ -1695,14 +1787,28 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
                 next = current - weight;
             }else if (mode == TerrainBrushMode::Flatten){
                 next = current + (flattenTargetValue - current) * weight;
-            }else if (mode == TerrainBrushMode::Smooth && !smoothSource.empty()){
+            }else if ((mode == TerrainBrushMode::Smooth || mode == TerrainBrushMode::Sharpen) && !smoothSource.empty()){
                 float sum = 0.0f;
                 for (int oy = -1; oy <= 1; oy++){
                     for (int ox = -1; ox <= 1; ox++){
                         sum += smoothSample(x + ox * smoothStep, y + oy * smoothStep);
                     }
                 }
-                next = current + (sum / 9.0f - current) * weight;
+                const float blurred = sum / 9.0f;
+                // Sharpen is the same kernel pushed the other way: what the blur removed is added back
+                next = (mode == TerrainBrushMode::Smooth) ? current + (blurred - current) * weight
+                                                          : current + (current - blurred) * weight;
+            }else if (mode == TerrainBrushMode::Noise){
+                next = current + TerrainNoise::fractal(static_cast<float>(x) * noiseFrequency, static_cast<float>(y) * noiseFrequency,
+                                                       NOISE_SEED, NOISE_OCTAVES) * weight;
+            }else if (mode == TerrainBrushMode::Terrace){
+                next = current + (std::round(current * terraceIntervals) / terraceIntervals - current) * weight;
+            }else if (mode == TerrainBrushMode::Stamp){
+                const Vector2 local = brushLocal(x, y);
+                next = current + sampleBrushMask(local.x, local.y) * weight;
+            }else if (mode == TerrainBrushMode::Ramp){
+                const float rampTarget = rampStartHeight + (rampEndHeight - rampStartHeight) * rampAlong(x, y);
+                next = current + (rampTarget - current) * weight;
             }
             stroke.workingPixels[texelIndex] = std::clamp(next, 0.0f, 1.0f);
         }else{
@@ -1717,39 +1823,48 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
     };
 
     bool touched = false;
-    for (int y = minY; y <= maxY; y++){
-        for (int x = minX; x <= maxX; x++){
-            const float dx = (static_cast<float>(x) - centerX) / radiusX;
-            const float dy = (static_cast<float>(y) - centerY) / radiusY;
-            const float distance = brushShape == TerrainBrushShape::Circle ? std::sqrt(dx * dx + dy * dy) : std::max(std::abs(dx), std::abs(dy));
-            if (distance > 1.0f){
-                continue;
-            }
-            if (useMask && maskedOut(x, y)){
-                continue;
-            }
+    if (mode == TerrainBrushMode::Erode){
+        // Droplets are released over time, and the leftover fraction carries to the next stamp
+        const float texelSize = terrain.terrainSize / static_cast<float>(std::max(1, width - 1));
+        const float heightScale = (texelSize > std::numeric_limits<float>::epsilon()) ? terrain.maxHeight / texelSize : 1.0f;
+        stroke.erodeCarry += radiusX * radiusY * ERODE_DROPLETS_PER_SECOND * brushStrength * deltaTime;
+        const int droplets = static_cast<int>(stroke.erodeCarry);
+        stroke.erodeCarry -= static_cast<float>(droplets);
 
-            float falloff = 1.0f;
-            if (brushFalloff == TerrainBrushFalloff::Linear){
-                falloff = 1.0f - distance;
-            }else if (brushFalloff == TerrainBrushFalloff::Smooth){
-                const float t = 1.0f - distance;
-                falloff = t * t * (3.0f - 2.0f * t);
-            }
-
-            applyTexel(x, y, std::clamp(brushStrength * falloff * flowRate * deltaTime, 0.0f, 1.0f));
-            touched = true;
+        const TerrainMapRegion region{minX, minY, maxX, maxY};
+        if (droplets > 0){
+            TerrainErosion::hydraulic(stroke.workingPixels, width, height, region, heightScale, droplets, ++stroke.erodeSeed, brushWeight);
         }
-    }
+        // Talus is time-scaled on its own, so it settles on every stamp
+        TerrainErosion::thermal(stroke.workingPixels, width, height, region, heightScale, ERODE_TALUS,
+                                std::clamp(brushStrength * flowRate * deltaTime, 0.0f, 1.0f), brushWeight);
+        touched = true;
+    }else{
+        for (int y = minY; y <= maxY; y++){
+            for (int x = minX; x <= maxX; x++){
+                const float falloff = brushWeight(x, y);
+                if (falloff <= 0.0f){
+                    continue;
+                }
+                if (useMask && maskedOut(x, y)){
+                    continue;
+                }
 
-    // Sub-texel brushes can miss every texel center; guarantee the nearest texel
-    // still receives the stamp so tiny brushes keep working.
-    if (!touched){
-        const int x = std::clamp(static_cast<int>(std::lround(centerX)), minX, maxX);
-        const int y = std::clamp(static_cast<int>(std::lround(centerY)), minY, maxY);
-        if (!useMask || !maskedOut(x, y)){
-            applyTexel(x, y, std::clamp(brushStrength * flowRate * deltaTime, 0.0f, 1.0f));
-            touched = true;
+                applyTexel(x, y, std::clamp(brushStrength * falloff * flowRate * deltaTime, 0.0f, 1.0f));
+                touched = true;
+            }
+        }
+
+        // Sub-texel brushes can miss every texel center; guarantee the nearest texel
+        // still receives the stamp so tiny brushes keep working.
+        if (!touched){
+            const int x = std::clamp(static_cast<int>(std::lround(centerX)), minX, maxX);
+            const int y = std::clamp(static_cast<int>(std::lround(centerY)), minY, maxY);
+            if (!useMask || !maskedOut(x, y)){
+                const float center = maskAsFalloff ? sampleBrushMask(0.0f, 0.0f) : 1.0f;
+                applyTexel(x, y, std::clamp(brushStrength * center * flowRate * deltaTime, 0.0f, 1.0f));
+                touched = true;
+            }
         }
     }
 
@@ -2453,6 +2568,139 @@ void editor::TerrainEditWindow::drawFoliageMesh(const TerrainFoliageLayer& layer
     }
 }
 
+void editor::TerrainEditWindow::setBrushMask(const std::string& path){
+    endStroke();
+    brushMaskPath = path;
+    brushMaskLoadedPath.clear();
+    brushMaskPixels.clear();
+    brushMaskWidth = 0;
+    brushMaskHeight = 0;
+}
+
+// Decoded once per path: the brush reads a plain float field, whatever the file was.
+bool editor::TerrainEditWindow::loadBrushMask(){
+    if (brushMaskPath.empty()){
+        return false;
+    }
+    if (brushMaskLoadedPath == brushMaskPath){
+        return !brushMaskPixels.empty();
+    }
+
+    brushMaskLoadedPath = brushMaskPath;
+    brushMaskPixels.clear();
+    brushMaskWidth = 0;
+    brushMaskHeight = 0;
+
+    TextureData data;
+    if (!loadTerrainTextureDataFromPath(project, brushMaskPath, data)){
+        Out::error("Could not load brush mask '%s'", brushMaskPath.c_str());
+        return false;
+    }
+
+    const unsigned char* pixels = static_cast<const unsigned char*>(data.getData());
+    const int channels = data.getChannels();
+    const int bytesPerChannel = TextureData::getBytesPerChannel(data.getColorFormat());
+    brushMaskWidth = data.getWidth();
+    brushMaskHeight = data.getHeight();
+    brushMaskPixels.resize(static_cast<size_t>(brushMaskWidth) * static_cast<size_t>(brushMaskHeight));
+    for (size_t i = 0; i < brushMaskPixels.size(); i++){
+        brushMaskPixels[i] = decodeHeightTexel(pixels, i, channels, bytesPerChannel);
+    }
+
+    return true;
+}
+
+float editor::TerrainEditWindow::sampleBrushMask(float localX, float localY) const{
+    if (brushMaskPixels.empty() || brushMaskWidth <= 0 || brushMaskHeight <= 0){
+        return 0.0f;
+    }
+
+    if (std::abs(brushRotation) > std::numeric_limits<float>::epsilon()){
+        const float angle = Angle::degToRad(brushRotation);
+        const float cosine = std::cos(angle);
+        const float sine = std::sin(angle);
+        const float rotatedX = localX * cosine - localY * sine;
+        localY = localX * sine + localY * cosine;
+        localX = rotatedX;
+    }
+
+    const float texelX = std::clamp((localX * 0.5f + 0.5f), 0.0f, 1.0f) * static_cast<float>(brushMaskWidth - 1);
+    const float texelY = std::clamp((localY * 0.5f + 0.5f), 0.0f, 1.0f) * static_cast<float>(brushMaskHeight - 1);
+    const int lowerX = std::clamp(static_cast<int>(std::floor(texelX)), 0, brushMaskWidth - 1);
+    const int lowerY = std::clamp(static_cast<int>(std::floor(texelY)), 0, brushMaskHeight - 1);
+    const int upperX = std::min(lowerX + 1, brushMaskWidth - 1);
+    const int upperY = std::min(lowerY + 1, brushMaskHeight - 1);
+    const float blendX = texelX - static_cast<float>(lowerX);
+    const float blendY = texelY - static_cast<float>(lowerY);
+
+    auto texel = [&](int x, int y){
+        return brushMaskPixels[static_cast<size_t>(y) * static_cast<size_t>(brushMaskWidth) + static_cast<size_t>(x)];
+    };
+
+    const float lower = texel(lowerX, lowerY) + (texel(upperX, lowerY) - texel(lowerX, lowerY)) * blendX;
+    const float upper = texel(lowerX, upperY) + (texel(upperX, upperY) - texel(lowerX, upperY)) * blendX;
+    return lower + (upper - lower) * blendY;
+}
+
+void editor::TerrainEditWindow::drawBrushMask(){
+    terrainPropertyRow("Mask", "Grayscale texture shaping the brush, and the relief the Stamp brush lays down. Drag one from Resources.");
+    ImGui::BeginGroup();
+    const float available = std::max(1.0f, ImGui::GetContentRegionAvail().x);
+    const float startY = ImGui::GetCursorPosY();
+    const float thumbSize = drawAssetThumbnail(brushMaskPath, "##brush_mask_preview");
+    if (available > thumbSize + ImGui::GetFrameHeight() * 4.0f){
+        ImGui::SameLine();
+        const float detailsHeight = ImGui::GetTextLineHeight() + ImGui::GetStyle().ItemSpacing.y + ImGui::GetFrameHeight();
+        ImGui::SetCursorPosY(startY + std::max(0.0f, (thumbSize - detailsHeight) * 0.5f));
+    }
+    ImGui::BeginGroup();
+    ImGui::PushTextWrapPos(ImGui::GetCursorPosX() + ImGui::GetContentRegionAvail().x);
+    if (brushMaskPath.empty()){
+        ImGui::TextDisabled("No mask");
+    }else{
+        ImGui::TextUnformatted(fs::path(brushMaskPath).filename().string().c_str());
+        showTooltip(brushMaskPath.c_str());
+    }
+    ImGui::PopTextWrapPos();
+
+    auto assignMask = [&](const fs::path& path){
+        if (path.empty()){
+            setBrushMask({});
+            return;
+        }
+        if (!project->isInsideAssetsPath(path)){
+            Backend::getApp().registerOutsideAssetsAlert(path.string());
+            return;
+        }
+        setBrushMask(project->normalizeToAssetsRelative(path).generic_string());
+    };
+
+    const ImVec2 buttonSize(ImGui::GetFrameHeight(), ImGui::GetFrameHeight());
+    if (iconButton(ICON_FA_FOLDER_OPEN, "browse_brush_mask", "Choose brush mask", false, buttonSize)){
+        const std::string path = FileDialogs::openFileDialog(project->getAssetsPath().string(), FILE_DIALOG_IMAGE);
+        if (!path.empty()){
+            assignMask(path);
+        }
+    }
+    ImGui::SameLine();
+    ImGui::BeginDisabled(brushMaskPath.empty());
+    if (iconButton(ICON_FA_XMARK, "clear_brush_mask", "Clear brush mask", false, buttonSize)){
+        assignMask({});
+    }
+    ImGui::EndDisabled();
+    ImGui::EndGroup();
+    ImGui::EndGroup();
+    if (ImGui::BeginDragDropTarget()){
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("resource_files")){
+            const std::vector<std::string> dropped = Util::getStringsFromPayload(payload);
+            if (!dropped.empty() && Util::isImageFile(dropped[0])){
+                assignMask(dropped[0]);
+            }
+        }
+        ImGui::EndDragDropTarget();
+    }
+}
+
 void editor::TerrainEditWindow::drawPlacementAsset(){
     terrainPropertyRow("Asset", "Model or entity bundle the placement brush drops. Drag one from Resources.");
     ImGui::BeginGroup();
@@ -2588,6 +2836,20 @@ void editor::TerrainEditWindow::show(){
         brushButton(TerrainBrushMode::Smooth, ICON_FA_WATER, "terrain_smooth", "Smooth terrain");
         ImGui::SameLine();
         brushButton(TerrainBrushMode::Flatten, ICON_FA_GRIP_LINES, "terrain_flatten", "Flatten terrain (Shift smooths)");
+
+        brushButton(TerrainBrushMode::Sharpen, ICON_FA_CHART_LINE, "terrain_sharpen", "Sharpen terrain, pulling ridges back out of a smoothed surface");
+        ImGui::SameLine();
+        brushButton(TerrainBrushMode::Noise, ICON_FA_HILL_ROCKSLIDE, "terrain_noise", "Break up the surface with fractal noise");
+        ImGui::SameLine();
+        brushButton(TerrainBrushMode::Terrace, ICON_FA_STAIRS, "terrain_terrace", "Step the terrain into flat terraces");
+        ImGui::SameLine();
+        ImGui::BeginDisabled(brushMaskPath.empty());
+        brushButton(TerrainBrushMode::Stamp, ICON_FA_STAMP, "terrain_stamp", "Stamp the brush mask into the terrain as relief");
+        ImGui::EndDisabled();
+        ImGui::SameLine();
+        brushButton(TerrainBrushMode::Erode, ICON_FA_DROPLET, "terrain_erode", "Erode with water and slope, cutting channels and settling scree");
+        ImGui::SameLine();
+        brushButton(TerrainBrushMode::Ramp, ICON_FA_ROAD, "terrain_ramp", "Drag a ramp between the height where the stroke starts and where it ends");
         ImGui::EndDisabled();
         ImGui::EndTable();
     }
@@ -2803,6 +3065,21 @@ void editor::TerrainEditWindow::show(){
             ImGui::DragFloatRange2("##paint_height", &paintMinHeight, &paintMaxHeight, 0.01f, 0.0f, 1.0f, "%.2f", "%.2f", ImGuiSliderFlags_AlwaysClamp);
             ImGui::EndDisabled();
         }
+        if (!placementBrush){
+            drawBrushMask();
+            ImGui::BeginDisabled(brushMaskPath.empty());
+            terrainPropertyRow("Mask rotation", "Turns the mask under the brush.");
+            UIUtils::sliderFloatInput("##brush_rotation", &brushRotation, 0.0f, 360.0f, "%.0f deg");
+            ImGui::EndDisabled();
+        }
+        if (brushMode == TerrainBrushMode::Noise){
+            terrainPropertyRow("Noise size", "Width of one noise feature in world units.");
+            UIUtils::sliderFloatInput("##noise_size", &noiseSize, 0.1f, 50.0f, "%.2f");
+        }
+        if (brushMode == TerrainBrushMode::Terrace){
+            terrainPropertyRow("Terrace steps", "How many flat levels the height range is cut into.");
+            ImGui::SliderInt("##terrace_steps", &terraceSteps, MIN_TERRACE_STEPS, MAX_TERRACE_STEPS);
+        }
         if (brushMode == TerrainBrushMode::Flatten){
             terrainPropertyRow("Sample height", "Pick the flatten height from the terrain at the start of each stroke.");
             ImGui::Checkbox("##flatten_pick", &flattenPickOnStroke);
@@ -2822,7 +3099,11 @@ void editor::TerrainEditWindow::show(){
     ts.brushFalloff = static_cast<int>(brushFalloff);
     ts.brushSize = brushSize;
     ts.brushStrength = brushStrength;
+    ts.brushRotation = brushRotation;
+    ts.brushMaskPath = brushMaskPath;
     ts.flattenHeight = flattenHeight;
+    ts.terraceSteps = terraceSteps;
+    ts.noiseSize = noiseSize;
     ts.heightMapResolution = heightMapResolution;
     ts.blendMapResolution = blendMapResolution;
     ts.densityMapResolution = densityMapResolution;
@@ -2881,7 +3162,11 @@ void editor::TerrainEditWindow::openForEntity(Entity entity, uint32_t sceneId){
     brushFalloff  = static_cast<TerrainBrushFalloff>(ts.brushFalloff);
     brushSize     = std::clamp(ts.brushSize, MIN_BRUSH_SIZE, MAX_BRUSH_SIZE);
     brushStrength = std::clamp(ts.brushStrength, MIN_BRUSH_STRENGTH, MAX_BRUSH_STRENGTH);
+    brushRotation = std::clamp(ts.brushRotation, 0.0f, 360.0f);
+    setBrushMask(ts.brushMaskPath);
     flattenHeight = ts.flattenHeight;
+    terraceSteps = std::clamp(ts.terraceSteps, MIN_TERRACE_STEPS, MAX_TERRACE_STEPS);
+    noiseSize = std::max(0.1f, ts.noiseSize);
     heightMapResolution = ts.heightMapResolution;
     blendMapResolution  = ts.blendMapResolution;
     densityMapResolution = ts.densityMapResolution;
@@ -2922,6 +3207,10 @@ bool editor::TerrainEditWindow::isEditingScene(Scene* scene) const{
 
     if (isPlacementBrush()){
         return isPlacementReady();
+    }
+    // Stamp lays the mask down, so without one there is nothing for a stroke to write
+    if (brushMode == TerrainBrushMode::Stamp && brushMaskPath.empty()){
+        return false;
     }
 
     Texture* texture = TerrainMapUtils::findTexture(*terrain, getBrushMapRef());
@@ -2977,6 +3266,7 @@ bool editor::TerrainEditWindow::beginStroke(Scene* scene, const Ray& ray){
     }
 
     clearStroke();
+    loadBrushMask();
     stroke.active = true;
     stroke.sceneId = sceneProject->id;
     stroke.entity = entity;
@@ -3011,6 +3301,10 @@ bool editor::TerrainEditWindow::beginStroke(Scene* scene, const Ray& ray){
         if (std::abs(terrain.maxHeight) > std::numeric_limits<float>::epsilon()){
             stroke.flattenTarget = std::clamp(localHeight / terrain.maxHeight, 0.0f, 1.0f);
         }
+
+        // A ramp runs from here to wherever the drag ends
+        stroke.rampStart = localPoint;
+        stroke.rampStartHeight = stroke.flattenTarget;
     }
 
     return applyBrush(sceneProject, entity, localPoint);
