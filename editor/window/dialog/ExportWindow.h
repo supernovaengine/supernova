@@ -62,11 +62,19 @@ namespace doriax::editor {
         };
         std::vector<BackendEntry> m_backendEntries;
         bool m_sourceBackendsConfigured = false;
+        bool m_sourcePlatformsConfigured = false;
+        bool m_sourcePlatformWindows = false;
+        bool m_sourcePlatformLinux = false;
+        bool m_sourcePlatformMacOS = false;
+        bool m_sourcePlatformIOS = false;
+        bool m_sourcePlatformAndroid = false;
+        bool m_sourcePlatformWeb = false;
 
         // Desktop backend selection. The entries themselves are host-specific
         // and live in ExportWindow.cpp.
         int m_graphicBackendIndex = 0;
         bool m_desktopBackendConfigured = false;
+        int m_desktopBuildJobs = 1;
 
         // Cached tool checks: both spawn processes, so never probe per-frame.
         std::string m_emsdkOverride;           // mirrors AppSettings::getEmsdkPath()
@@ -91,9 +99,9 @@ namespace doriax::editor {
         void drawStartSceneRow();
         void drawGraphicBackendRow();
         void drawDesktopKitRows();
-        void drawEmsdkRow();
         void drawShaderSection();
         void drawBackendSection();
+        void applySourcePlatformPresets();
         void drawProgress();
         void drawAddShaderDialog();
         void drawOverwriteConfirmDialog();

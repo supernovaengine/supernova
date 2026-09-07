@@ -3,7 +3,6 @@
 
 #include "ProjectSettingsWindow.h"
 #include "util/FileDialogs.h"
-#include "AppSettings.h"
 #include "Backend.h"
 #include "window/Widgets.h"
 #include "Theme.h"
@@ -649,6 +648,7 @@ void ProjectSettingsWindow::open(Project* project) {
     m_webCustomHtmlShell = web.customHtmlShell;
     snprintf(m_webHeadIncludeBuffer, sizeof(m_webHeadIncludeBuffer), "%s", web.headInclude.c_str());
     m_webResizeCanvasToWindow = web.resizeCanvasToWindow;
+    m_webHideEmscriptenUI = web.hideEmscriptenUI;
 
     const LinuxProjectSettings& linuxSettings = project->getLinuxProjectSettings();
     snprintf(m_linuxApplicationNameBuffer, sizeof(m_linuxApplicationNameBuffer), "%s", linuxSettings.applicationName.c_str());
@@ -711,28 +711,7 @@ void ProjectSettingsWindow::open(Project* project) {
         }
     }
 
-    m_availableKits = Generator::detectAvailableKits();
-    m_cmakeKitIndex = 0; // 0 = "Default"
-    m_cmakeOverride = AppSettings::getCMakePath();
-    m_cmakePickError.clear();
-    refreshCMakeStatus();
-    m_cmakeBuildJobs = static_cast<int>(project->getCMakeBuildJobs());
     m_packNativeResources = project->shouldPackNativeResources();
-    m_cmakeBuildJobsTooltip =
-        "Maximum number of concurrent build jobs used for C++ scripts. Set to 0 to automatically use " +
-        std::to_string(Generator::getAutomaticParallelBuildJobs()) + " detected logical CPU threads. " +
-        "Lower this on memory-constrained systems. Values above " +
-        std::to_string(Generator::getMaxParallelBuildJobs()) + " are capped at build time on this machine.";
-    std::string currentCxx = project->getCMakeCxxCompiler();
-    std::string currentGen = project->getCMakeGenerator();
-    if (!currentCxx.empty() || !currentGen.empty()) {
-        for (size_t i = 0; i < m_availableKits.size(); i++) {
-            if (m_availableKits[i].available && m_availableKits[i].cxxCompiler == currentCxx && m_availableKits[i].generator == currentGen) {
-                m_cmakeKitIndex = static_cast<int>(i + 1);
-                break;
-            }
-        }
-    }
 }
 
 void ProjectSettingsWindow::show() {
@@ -1029,88 +1008,6 @@ void ProjectSettingsWindow::drawDirectoriesSettings() {
     });
 }
 
-void ProjectSettingsWindow::refreshCMakeStatus() {
-    m_cmakeInfo = Generator::detectCMake();
-}
-
-// An editor started by a desktop launcher can see a PATH with no CMake on it,
-// so the install can be pointed at by hand here.
-void ProjectSettingsWindow::drawCMakeSetting() {
-    ImGui::TableNextRow();
-    ImGui::TableNextColumn();
-    ImGui::AlignTextToFramePadding();
-    ImGui::TextUnformatted("CMake");
-    ImGui::SameLine(0.0f, Theme::dpi(4.0f));
-    if (m_cmakeInfo.found) {
-        ImGui::TextColored(ImVec4(0.3f, 1.0f, 0.3f, 1.0f), ICON_FA_CIRCLE_CHECK);
-        if (m_cmakeInfo.version.empty()) {
-            ImGui::SetItemTooltip("CMake found %s: %s", m_cmakeInfo.source.c_str(), m_cmakeInfo.path.c_str());
-        } else {
-            ImGui::SetItemTooltip("CMake %s found %s: %s", m_cmakeInfo.version.c_str(), m_cmakeInfo.source.c_str(), m_cmakeInfo.path.c_str());
-        }
-    } else {
-        ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), ICON_FA_TRIANGLE_EXCLAMATION);
-        if (m_cmakeInfo.error.empty()) {
-            ImGui::SetItemTooltip("CMake not found on PATH. Install it, or choose the cmake executable here.");
-        } else {
-            ImGui::SetItemTooltip("%s", m_cmakeInfo.error.c_str());
-        }
-    }
-    ImGui::TableNextColumn();
-
-    const ImGuiStyle& style = ImGui::GetStyle();
-    float browseWidth = ImGui::CalcTextSize("Browse").x + style.FramePadding.x * 2.0f;
-    float autoWidth = ImGui::CalcTextSize("Auto").x + style.FramePadding.x * 2.0f;
-    float pathWidth = std::max(1.0f, ImGui::GetContentRegionAvail().x - browseWidth - autoWidth - style.ItemSpacing.x * 2.0f);
-
-    fs::path cmakeDisplay = m_cmakeOverride.empty()
-        ? fs::path(m_cmakeInfo.found ? m_cmakeInfo.path : "<Not found on PATH>")
-        : fs::path(m_cmakeOverride);
-    Widgets::pathDisplay("##CMakePath", cmakeDisplay, Vector2(pathWidth, ImGui::GetFrameHeight()));
-
-    ImGui::SameLine();
-    if (ImGui::Button("Browse##cmake")) {
-        std::string startDir = m_cmakeOverride.empty()
-            ? std::string()
-            : fs::path(m_cmakeOverride).parent_path().string();
-
-        std::string selectedPath = FileDialogs::openFileDialog(startDir, FILE_DIALOG_ALL, false);
-        if (!selectedPath.empty()) {
-            // A rejected pick leaves the current setting alone.
-            const std::string resolved = Generator::resolveCMakePath(selectedPath);
-            const std::string version = resolved.empty() ? std::string() : Generator::probeCMakeVersion(resolved);
-
-            if (version.empty()) {
-                m_cmakePickError = resolved.empty()
-                    ? "No CMake executable in: " + selectedPath
-                    : "Not a working CMake: " + resolved;
-            } else {
-                m_cmakeOverride = resolved;
-                m_cmakePickError.clear();
-                AppSettings::setCMakePath(m_cmakeOverride);
-            }
-            refreshCMakeStatus();
-        }
-    }
-
-    ImGui::SameLine();
-    ImGui::BeginDisabled(m_cmakeOverride.empty());
-    if (ImGui::Button("Auto##cmake")) {
-        m_cmakeOverride.clear();
-        m_cmakePickError.clear();
-        AppSettings::setCMakePath(m_cmakeOverride);
-        refreshCMakeStatus();
-    }
-    ImGui::EndDisabled();
-    ImGui::SetItemTooltip("Clear the override and look CMake up on PATH again.");
-
-    if (!m_cmakePickError.empty()) {
-        ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.5f, 0.0f, 1.0f));
-        ImGui::TextWrapped("%s", m_cmakePickError.c_str());
-        ImGui::PopStyleColor();
-    }
-}
-
 void ProjectSettingsWindow::drawWebSettings() {
     drawSettingsPanel("##WebSettingsPanel", [this]() {
         beginSettingsRow("App Name", "Title used by the exported web page. Empty means project name.");
@@ -1127,10 +1024,14 @@ void ProjectSettingsWindow::drawWebSettings() {
         ImGui::SetNextItemWidth(-1);
         ImGui::InputTextMultiline("##WebHeadInclude", m_webHeadIncludeBuffer, sizeof(m_webHeadIncludeBuffer), ImVec2(-1, Theme::dpi(80.0f)));
 
-        if (beginSettingsRow("Resize Canvas To Window", "Scale the exported web canvas to the browser window.", !m_webResizeCanvasToWindow)) {
+        if (beginSettingsRow("Resize Canvas To Window", "Resize the rendering surface to the browser window. Canvas Scaling Mode controls aspect ratio and stretching.", !m_webResizeCanvasToWindow)) {
             m_webResizeCanvasToWindow = true;
         }
         ImGui::Checkbox("##WebResizeCanvasToWindow", &m_webResizeCanvasToWindow);
+        if (beginSettingsRow("Hide Emscripten UI", "Hide the standard logo, status, controls and output console. Runtime scripts remain active. Custom HTML elements are not removed.", m_webHideEmscriptenUI)) {
+            m_webHideEmscriptenUI = false;
+        }
+        ImGui::Checkbox("##WebHideEmscriptenUI", &m_webHideEmscriptenUI);
     });
 }
 
@@ -1188,6 +1089,7 @@ void ProjectSettingsWindow::drawWindowsSettings() {
 
 void ProjectSettingsWindow::drawMacOSSettings() {
     drawSettingsPanel("##MacOSSettingsPanel", [this]() {
+        ImGui::TextWrapped("Bundle settings apply to Apple projects exported as source code. Desktop export produces a standalone executable, not an .app bundle.");
         beginSettingsRow("App Name", "macOS bundle display name. Empty means project name.");
         std::string appNameHint = m_project->getName().empty() ? "Doriax" : m_project->getName();
         ImGui::SetNextItemWidth(-1);
@@ -1418,6 +1320,7 @@ void ProjectSettingsWindow::applySettings() {
     web.customHtmlShell = m_webCustomHtmlShell;
     web.headInclude = m_webHeadIncludeBuffer;
     web.resizeCanvasToWindow = m_webResizeCanvasToWindow;
+    web.hideEmscriptenUI = m_webHideEmscriptenUI;
 
     LinuxProjectSettings& linuxSettings = m_project->getLinuxProjectSettings();
     linuxSettings.applicationName = m_linuxApplicationNameBuffer;
@@ -1508,15 +1411,6 @@ void ProjectSettingsWindow::applySettings() {
         m_project->setStartSceneId(NULL_PROJECT_SCENE);
     }
 
-    if (m_cmakeKitIndex > 0) {
-        const auto& kit = m_availableKits[m_cmakeKitIndex - 1];
-        m_project->setCMakeKit(kit.cCompiler, kit.cxxCompiler, kit.generator);
-        AppSettings::setLastCMakeKit(kit.cCompiler, kit.cxxCompiler, kit.generator);
-    } else {
-        m_project->setCMakeKit("", "", "");
-        AppSettings::setLastCMakeKit("", "", "");
-    }
-    m_project->setCMakeBuildJobs(static_cast<unsigned int>(m_cmakeBuildJobs));
     m_project->setPackNativeResources(m_packNativeResources);
 
     m_project->saveProjectFile();

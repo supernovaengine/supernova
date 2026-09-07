@@ -18,9 +18,9 @@ namespace doriax::editor {
 namespace {
     namespace fs = std::filesystem;
 
-    static constexpr float dialogWidth = 560.0f;
+    static constexpr float dialogWidth = 700.0f;
     static constexpr float dialogHeight = 360.0f;
-    static constexpr float settingsLabelWidth = 150.0f;
+    static constexpr float settingsLabelWidth = 190.0f;
     static constexpr float settingsPanelPadding = 12.0f;
     static constexpr float settingsButtonWidth = 120.0f;
     static constexpr ImGuiWindowFlags noScrollFlags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;

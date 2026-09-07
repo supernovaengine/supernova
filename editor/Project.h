@@ -151,11 +151,20 @@ namespace doriax::editor{
     struct SourceCodeExportSettings : ExportTargetSettings {
         std::set<ShaderBackend> graphicBackends;
         bool graphicBackendsConfigured = false;
+        bool platformsConfigured = false;
+        bool platformWindows = false;
+        bool platformLinux = false;
+        bool platformMacOS = false;
+        bool platformIOS = false;
+        bool platformAndroid = false;
+        bool platformWeb = false;
     };
 
     struct DesktopExportSettings : ExportTargetSettings {
         ShaderBackend graphicBackend = ShaderBackend::GLCore;
         bool graphicBackendConfigured = false;
+        // 0 means use the current machine's automatic maximum.
+        unsigned int buildJobs = 0;
     };
 
     struct WebExportSettings : ExportTargetSettings {
@@ -168,6 +177,7 @@ namespace doriax::editor{
         std::filesystem::path customHtmlShell;
         std::string headInclude;
         bool resizeCanvasToWindow = true;
+        bool hideEmscriptenUI = false;
     };
 
     struct LinuxProjectSettings {

@@ -43,21 +43,13 @@ namespace doriax::editor {
         fs::path m_assetsDir;
         fs::path m_luaDir;
         std::vector<fs::path> m_scriptDirs;
-        std::vector<CMakeKit> m_availableKits;
-        int m_cmakeKitIndex = 0;
-        // Editor-wide, so it is applied when picked instead of on Apply, the
-        // same way the Export dialog treats the Emscripten SDK path.
-        std::string m_cmakeOverride;
-        CMakeInfo m_cmakeInfo;
-        std::string m_cmakePickError;   // why the last pick was rejected
-        int m_cmakeBuildJobs = 0;
-        std::string m_cmakeBuildJobsTooltip;
         bool m_packNativeResources = false;
         char m_webApplicationNameBuffer[256] = {0};
         fs::path m_webFavicon;
         fs::path m_webCustomHtmlShell;
         char m_webHeadIncludeBuffer[2048] = {0};
         bool m_webResizeCanvasToWindow = true;
+        bool m_webHideEmscriptenUI = false;
         char m_linuxApplicationNameBuffer[256] = {0};
         char m_linuxCommentBuffer[512] = {0};
         char m_linuxCategoriesBuffer[256] = {0};
@@ -110,8 +102,6 @@ namespace doriax::editor {
         void drawMacOSSettings();
         void drawIOSSettings();
         void drawAndroidSettings();
-        void drawCMakeSetting();
-        void refreshCMakeStatus();
         void applySettings();
 
     public:

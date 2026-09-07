@@ -404,6 +404,18 @@ EM_BOOL DoriaxWeb::renderLoop(double time, void* userdata){
 
     pollGamepads();
 
+    // CSS size is the input coordinate space as well as the visible surface.
+    // Update the framebuffer before drawing; Engine applies the project's
+    // Scaling mode (including intentional stretching) to this actual size.
+    double cssWidth = 0, cssHeight = 0;
+    if (emscripten_get_element_css_size(canvas.c_str(), &cssWidth, &cssHeight) == EMSCRIPTEN_RESULT_SUCCESS) {
+        const int width = (int)round(cssWidth);
+        const int height = (int)round(cssHeight);
+        if (width > 0 && height > 0 && (width != screenWidth || height != screenHeight)) {
+            changeCanvasSize(width, height);
+        }
+    }
+
     doriax::Engine::systemDraw();
 
     if (syncWaitTime > 0) {

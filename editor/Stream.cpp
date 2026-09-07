@@ -1659,6 +1659,16 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         if (sourceCodeBackends.IsDefined()) {
             sourceCodeNode["graphicBackends"] = sourceCodeBackends;
         }
+        if (sourceCode.platformsConfigured) {
+            YAML::Node platforms;
+            platforms["windows"] = sourceCode.platformWindows;
+            platforms["linux"] = sourceCode.platformLinux;
+            platforms["macos"] = sourceCode.platformMacOS;
+            platforms["ios"] = sourceCode.platformIOS;
+            platforms["android"] = sourceCode.platformAndroid;
+            platforms["web"] = sourceCode.platformWeb;
+            sourceCodeNode["platforms"] = platforms;
+        }
         if (sourceCodeNode.IsDefined()) {
             exportNode["sourceCode"] = sourceCodeNode;
         }
@@ -1670,6 +1680,9 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         }
         if (desktop.graphicBackendConfigured) {
             desktopNode["graphicBackend"] = ShaderPool::getShaderBackendCliToken(desktop.graphicBackend);
+        }
+        if (desktop.buildJobs != 0) {
+            desktopNode["buildJobs"] = desktop.buildJobs;
         }
         YAML::Node desktopShaders = encodeExportShaderKeys(desktop.shaderKeys, desktop.shaderKeysConfigured);
         if (desktopShaders.IsDefined()) {
@@ -1683,9 +1696,6 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         YAML::Node webNode;
         if (!web.targetDir.empty()) {
             webNode["targetDir"] = web.targetDir.generic_string();
-        }
-        if (!web.emsdkPath.empty()) {
-            webNode["emsdkPath"] = web.emsdkPath;
         }
         YAML::Node webShaders = encodeExportShaderKeys(web.shaderKeys, web.shaderKeysConfigured);
         if (webShaders.IsDefined()) {
@@ -1709,6 +1719,7 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         if (!web.customHtmlShell.empty()) webNode["customHtmlShell"] = web.customHtmlShell.generic_string();
         if (!web.headInclude.empty()) webNode["headInclude"] = web.headInclude;
         if (web.resizeCanvasToWindow != defaultWeb.resizeCanvasToWindow) webNode["resizeCanvasToWindow"] = web.resizeCanvasToWindow;
+        if (web.hideEmscriptenUI != defaultWeb.hideEmscriptenUI) webNode["hideEmscriptenUI"] = web.hideEmscriptenUI;
         if (webNode.IsDefined()) root["web"] = webNode;
     }
 
@@ -2009,6 +2020,16 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
                 sourceCode.graphicBackends = decodeExportBackendSet(sourceCodeNode["graphicBackends"]);
                 sourceCode.graphicBackendsConfigured = true;
             }
+            if (sourceCodeNode["platforms"] && sourceCodeNode["platforms"].IsMap()) {
+                const YAML::Node& platforms = sourceCodeNode["platforms"];
+                sourceCode.platformsConfigured = true;
+                if (platforms["windows"]) sourceCode.platformWindows = platforms["windows"].as<bool>();
+                if (platforms["linux"]) sourceCode.platformLinux = platforms["linux"].as<bool>();
+                if (platforms["macos"]) sourceCode.platformMacOS = platforms["macos"].as<bool>();
+                if (platforms["ios"]) sourceCode.platformIOS = platforms["ios"].as<bool>();
+                if (platforms["android"]) sourceCode.platformAndroid = platforms["android"].as<bool>();
+                if (platforms["web"]) sourceCode.platformWeb = platforms["web"].as<bool>();
+            }
         }
 
         if (exportNode["desktop"] && exportNode["desktop"].IsMap()) {
@@ -2023,6 +2044,11 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
                     desktop.graphicBackend = backend;
                     desktop.graphicBackendConfigured = true;
                 }
+            }
+            if (desktopNode["buildJobs"]) {
+                const long long jobs = desktopNode["buildJobs"].as<long long>();
+                const long long maxJobs = static_cast<long long>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS);
+                desktop.buildJobs = static_cast<unsigned int>(std::clamp(jobs, 1LL, maxJobs));
             }
             if (desktopNode["shaders"]) {
                 desktop.shaderKeys = decodeExportShaderKeys(desktopNode["shaders"]);
@@ -2054,6 +2080,7 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         if (webNode["customHtmlShell"]) web.customHtmlShell = webNode["customHtmlShell"].as<std::string>();
         if (webNode["headInclude"]) web.headInclude = webNode["headInclude"].as<std::string>();
         if (webNode["resizeCanvasToWindow"].IsDefined()) web.resizeCanvasToWindow = webNode["resizeCanvasToWindow"].as<bool>();
+        if (webNode["hideEmscriptenUI"].IsDefined()) web.hideEmscriptenUI = webNode["hideEmscriptenUI"].as<bool>();
     }
 
     if (node["linux"] && node["linux"].IsMap()) {
