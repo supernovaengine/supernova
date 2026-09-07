@@ -99,7 +99,7 @@ static const int androidPermissionCount = sizeof(androidPermissionInfos) / sizeo
 
 static constexpr float dialogWidth = 750.0f;
 static constexpr float dialogHeight = 600.0f;
-static constexpr float settingsLabelWidth = 160.0f;
+static constexpr float settingsLabelWidth = 200.0f;
 static constexpr float settingsPanelPadding = 12.0f;
 static constexpr float settingsButtonWidth = 120.0f;
 static constexpr ImGuiWindowFlags noScrollFlags = ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse;
@@ -413,7 +413,7 @@ static void drawProjectFilePathSetting(
     fs::path& imagePath,
     int filter = FILE_DIALOG_IMAGE
 ) {
-    beginSettingsRow(label, tooltip);
+    beginSettingsRow(label);
 
     const ImGuiStyle& style = ImGui::GetStyle();
     float browseWidth = ImGui::CalcTextSize("Browse").x + style.FramePadding.x * 2.0f;
@@ -444,6 +444,7 @@ static void drawProjectFilePathSetting(
         imagePath.clear();
     }
     ImGui::EndDisabled();
+    endSettingsRow(tooltip);
 }
 
 static void showDisabledItemTooltip(const std::string& text) {
@@ -998,13 +999,12 @@ void ProjectSettingsWindow::drawWindowSettings() {
 
 void ProjectSettingsWindow::drawDirectoriesSettings() {
     drawSettingsPanel("##DirectoriesSettingsPanel", [this]() {
-        if (beginSettingsRow("Native Resource Pack",
-                "Experimental. Packs exported assets and Lua files into game.pak for Desktop and Android source exports. "
-                "Packed resources are read through Data; direct File handles cannot open them.",
-                m_packNativeResources != Project::defaultPackNativeResources)) {
+        if (beginSettingsRow("Native Resource Pack", m_packNativeResources != Project::defaultPackNativeResources)) {
             m_packNativeResources = Project::defaultPackNativeResources;
         }
         ImGui::Checkbox("##PackNativeResources", &m_packNativeResources);
+        endSettingsRow("Experimental. Packs exported assets and Lua files into resources.pak for Desktop and Android source exports. "
+            "Packed resources are read through Data; direct File handles cannot open them.");
 
         drawDirectorySetting(
             m_project, "Assets Directory", nullptr, "##AssetsPath", "Browse##assets",
@@ -1020,75 +1020,86 @@ void ProjectSettingsWindow::drawDirectoriesSettings() {
 
 void ProjectSettingsWindow::drawWebSettings() {
     drawSettingsPanel("##WebSettingsPanel", [this]() {
-        beginSettingsRow("App Name", "Title used by the exported web page. Empty means project name.");
+        beginSettingsRow("App Name");
         std::string appNameHint = m_project->getName().empty() ? "Doriax" : m_project->getName();
         ImGui::SetNextItemWidth(-1);
         ImGui::InputTextWithHint("##WebAppName", appNameHint.c_str(), m_webApplicationNameBuffer, sizeof(m_webApplicationNameBuffer));
+        endSettingsRow("Title used by the exported web page. Empty means project name.");
 
         drawProjectFilePathSetting(m_project, "Favicon", "Browser tab icon for web export.", "##WebFaviconPath",
             "Browse##webfavicon", "Clear##webfavicon", m_webFavicon);
         drawProjectFilePathSetting(m_project, "Custom HTML Shell", "Optional web HTML wrapper. The file must contain {{DORIAX_DEFAULT_HTML}} marker.", "##WebHtmlShellPath",
             "Browse##webhtmlshell", "Clear##webhtmlshell", m_webCustomHtmlShell, FILE_DIALOG_ALL);
 
-        beginSettingsRow("Head Include", "HTML inserted into the <head> section by web export when supported.");
+        beginSettingsRow("Head Include");
         ImGui::SetNextItemWidth(-1);
         ImGui::InputTextMultiline("##WebHeadInclude", m_webHeadIncludeBuffer, sizeof(m_webHeadIncludeBuffer), ImVec2(-1, Theme::dpi(80.0f)));
+        endSettingsRow("HTML inserted into the <head> section by web export when supported.");
 
-        if (beginSettingsRow("Resize Canvas To Window", "Resize the rendering surface to the browser window. Canvas Scaling Mode controls aspect ratio and stretching.", !m_webResizeCanvasToWindow)) {
+        if (beginSettingsRow("Resize Canvas To Window", !m_webResizeCanvasToWindow)) {
             m_webResizeCanvasToWindow = true;
         }
         ImGui::Checkbox("##WebResizeCanvasToWindow", &m_webResizeCanvasToWindow);
-        if (beginSettingsRow("Hide Emscripten UI", "Hide the standard logo, status, controls and output console. Runtime scripts remain active. Custom HTML elements are not removed.", m_webHideEmscriptenUI)) {
+        endSettingsRow("Resize the rendering surface to the browser window. Canvas Scaling Mode controls aspect ratio and stretching.");
+        if (beginSettingsRow("Hide Emscripten UI", m_webHideEmscriptenUI)) {
             m_webHideEmscriptenUI = false;
         }
         ImGui::Checkbox("##WebHideEmscriptenUI", &m_webHideEmscriptenUI);
+        endSettingsRow("Hide the standard logo, status, controls and output console. Runtime scripts remain active. Custom HTML elements are not removed.");
     });
 }
 
 void ProjectSettingsWindow::drawLinuxSettings() {
     drawSettingsPanel("##LinuxSettingsPanel", [this]() {
-        beginSettingsRow("App Name", "Linux desktop launcher name. Empty means window title/project name.");
+        beginSettingsRow("App Name");
         std::string appNameHint = m_project->getWindowSettings().title;
         ImGui::SetNextItemWidth(-1);
         ImGui::InputTextWithHint("##LinuxAppName", appNameHint.c_str(), m_linuxApplicationNameBuffer, sizeof(m_linuxApplicationNameBuffer));
+        endSettingsRow("Linux desktop launcher name. Empty means window title/project name.");
 
-        beginSettingsRow("Comment", "Short description written to the .desktop launcher file.");
+        beginSettingsRow("Comment");
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##LinuxComment", m_linuxCommentBuffer, sizeof(m_linuxCommentBuffer));
+        endSettingsRow("Short description written to the .desktop launcher file.");
 
-        if (beginSettingsRow("Categories", "Desktop Entry categories. Example: Game;ArcadeGame;", strcmp(m_linuxCategoriesBuffer, LinuxProjectSettings{}.categories.c_str()) != 0)) {
+        if (beginSettingsRow("Categories", strcmp(m_linuxCategoriesBuffer, LinuxProjectSettings{}.categories.c_str()) != 0)) {
             snprintf(m_linuxCategoriesBuffer, sizeof(m_linuxCategoriesBuffer), "%s", LinuxProjectSettings{}.categories.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##LinuxCategories", m_linuxCategoriesBuffer, sizeof(m_linuxCategoriesBuffer));
+        endSettingsRow("Desktop Entry categories. Example: Game;ArcadeGame;");
     });
 }
 
 void ProjectSettingsWindow::drawWindowsSettings() {
     drawSettingsPanel("##WindowsSettingsPanel", [this]() {
-        beginSettingsRow("Product Name", "Windows executable metadata. Empty means project name.");
+        beginSettingsRow("Product Name");
         std::string nameHint = m_project->getName().empty() ? "Doriax" : m_project->getName();
         ImGui::SetNextItemWidth(-1);
         ImGui::InputTextWithHint("##WindowsProductName", nameHint.c_str(), m_windowsProductNameBuffer, sizeof(m_windowsProductNameBuffer));
+        endSettingsRow("Windows executable metadata. Empty means project name.");
 
-        beginSettingsRow("Company Name", "Windows executable metadata company name.");
+        beginSettingsRow("Company Name");
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##WindowsCompanyName", m_windowsCompanyNameBuffer, sizeof(m_windowsCompanyNameBuffer));
+        endSettingsRow("Windows executable metadata company name.");
 
-        if (beginSettingsRow("File Version", "Windows numeric file version, for example 1.0.0.0.", strcmp(m_windowsFileVersionBuffer, WindowsProjectSettings{}.fileVersion.c_str()) != 0)) {
+        if (beginSettingsRow("File Version", strcmp(m_windowsFileVersionBuffer, WindowsProjectSettings{}.fileVersion.c_str()) != 0)) {
             snprintf(m_windowsFileVersionBuffer, sizeof(m_windowsFileVersionBuffer), "%s", WindowsProjectSettings{}.fileVersion.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##WindowsFileVersion", m_windowsFileVersionBuffer, sizeof(m_windowsFileVersionBuffer));
+        endSettingsRow("Windows numeric file version, for example 1.0.0.0.");
         if (!isDottedVersionValid(m_windowsFileVersionBuffer)) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Use four numbers from 0 to 65535, for example 1.0.0.0.");
         }
 
-        if (beginSettingsRow("Product Version", "Windows product version string.", strcmp(m_windowsProductVersionBuffer, WindowsProjectSettings{}.productVersion.c_str()) != 0)) {
+        if (beginSettingsRow("Product Version", strcmp(m_windowsProductVersionBuffer, WindowsProjectSettings{}.productVersion.c_str()) != 0)) {
             snprintf(m_windowsProductVersionBuffer, sizeof(m_windowsProductVersionBuffer), "%s", WindowsProjectSettings{}.productVersion.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##WindowsProductVersion", m_windowsProductVersionBuffer, sizeof(m_windowsProductVersionBuffer));
+        endSettingsRow("Windows product version string.");
         if (!isDottedVersionValid(m_windowsProductVersionBuffer)) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Use four numbers from 0 to 65535, for example 1.0.0.0.");
         }
@@ -1100,87 +1111,99 @@ void ProjectSettingsWindow::drawWindowsSettings() {
 void ProjectSettingsWindow::drawMacOSSettings() {
     drawSettingsPanel("##MacOSSettingsPanel", [this]() {
         ImGui::TextWrapped("Bundle settings apply to Apple projects exported as source code. Desktop export produces a standalone executable, not an .app bundle.");
-        beginSettingsRow("App Name", "macOS bundle display name. Empty means project name.");
+        beginSettingsRow("App Name");
         std::string appNameHint = m_project->getName().empty() ? "Doriax" : m_project->getName();
         ImGui::SetNextItemWidth(-1);
         ImGui::InputTextWithHint("##MacOSAppName", appNameHint.c_str(), m_macOSApplicationNameBuffer, sizeof(m_macOSApplicationNameBuffer));
+        endSettingsRow("macOS bundle display name. Empty means project name.");
 
-        if (beginSettingsRow("Bundle Identifier", "macOS bundle identifier, for example com.company.game.", strcmp(m_macOSBundleIdentifierBuffer, MacOSProjectSettings{}.bundleIdentifier.c_str()) != 0)) {
+        if (beginSettingsRow("Bundle Identifier", strcmp(m_macOSBundleIdentifierBuffer, MacOSProjectSettings{}.bundleIdentifier.c_str()) != 0)) {
             snprintf(m_macOSBundleIdentifierBuffer, sizeof(m_macOSBundleIdentifierBuffer), "%s", MacOSProjectSettings{}.bundleIdentifier.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##MacOSBundleIdentifier", m_macOSBundleIdentifierBuffer, sizeof(m_macOSBundleIdentifierBuffer));
+        endSettingsRow("macOS bundle identifier, for example com.company.game.");
         if (!isJavaPackageNameValid(m_macOSBundleIdentifierBuffer)) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Use a reverse-DNS id, for example com.company.game.");
         }
 
-        if (beginSettingsRow("Version Name", "CFBundleShortVersionString.", strcmp(m_macOSVersionNameBuffer, MacOSProjectSettings{}.versionName.c_str()) != 0)) {
+        if (beginSettingsRow("Version Name", strcmp(m_macOSVersionNameBuffer, MacOSProjectSettings{}.versionName.c_str()) != 0)) {
             snprintf(m_macOSVersionNameBuffer, sizeof(m_macOSVersionNameBuffer), "%s", MacOSProjectSettings{}.versionName.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##MacOSVersionName", m_macOSVersionNameBuffer, sizeof(m_macOSVersionNameBuffer));
+        endSettingsRow("CFBundleShortVersionString.");
 
-        if (beginSettingsRow("Build Number", "CFBundleVersion.", strcmp(m_macOSBuildNumberBuffer, MacOSProjectSettings{}.buildNumber.c_str()) != 0)) {
+        if (beginSettingsRow("Build Number", strcmp(m_macOSBuildNumberBuffer, MacOSProjectSettings{}.buildNumber.c_str()) != 0)) {
             snprintf(m_macOSBuildNumberBuffer, sizeof(m_macOSBuildNumberBuffer), "%s", MacOSProjectSettings{}.buildNumber.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##MacOSBuildNumber", m_macOSBuildNumberBuffer, sizeof(m_macOSBuildNumberBuffer));
+        endSettingsRow("CFBundleVersion.");
 
         drawProjectFilePathSetting(m_project, "Icon", "macOS application icon source image. Export support depends on the generated Xcode project.", "##MacOSIconPath",
             "Browse##macosicon", "Clear##macosicon", m_macOSIcon);
 
-        if (beginSettingsRow("High DPI", "Allow high-DPI rendering on macOS.", !m_macOSHighDpi)) {
+        if (beginSettingsRow("High DPI", !m_macOSHighDpi)) {
             m_macOSHighDpi = true;
         }
         ImGui::Checkbox("##MacOSHighDpi", &m_macOSHighDpi);
+        endSettingsRow("Allow high-DPI rendering on macOS.");
     });
 }
 
 void ProjectSettingsWindow::drawIOSSettings() {
     drawSettingsPanel("##IOSSettingsPanel", [this]() {
-        beginSettingsRow("App Name", "iOS bundle display name. Empty means project name.");
+        beginSettingsRow("App Name");
         std::string appNameHint = m_project->getName().empty() ? "Doriax" : m_project->getName();
         ImGui::SetNextItemWidth(-1);
         ImGui::InputTextWithHint("##IOSAppName", appNameHint.c_str(), m_iosApplicationNameBuffer, sizeof(m_iosApplicationNameBuffer));
+        endSettingsRow("iOS bundle display name. Empty means project name.");
 
-        if (beginSettingsRow("Bundle Identifier", "iOS bundle identifier, for example com.company.game.", strcmp(m_iosBundleIdentifierBuffer, IOSProjectSettings{}.bundleIdentifier.c_str()) != 0)) {
+        if (beginSettingsRow("Bundle Identifier", strcmp(m_iosBundleIdentifierBuffer, IOSProjectSettings{}.bundleIdentifier.c_str()) != 0)) {
             snprintf(m_iosBundleIdentifierBuffer, sizeof(m_iosBundleIdentifierBuffer), "%s", IOSProjectSettings{}.bundleIdentifier.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##IOSBundleIdentifier", m_iosBundleIdentifierBuffer, sizeof(m_iosBundleIdentifierBuffer));
+        endSettingsRow("iOS bundle identifier, for example com.company.game.");
         if (!isJavaPackageNameValid(m_iosBundleIdentifierBuffer)) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Use a reverse-DNS id, for example com.company.game.");
         }
 
-        if (beginSettingsRow("Version Name", "CFBundleShortVersionString.", strcmp(m_iosVersionNameBuffer, IOSProjectSettings{}.versionName.c_str()) != 0)) {
+        if (beginSettingsRow("Version Name", strcmp(m_iosVersionNameBuffer, IOSProjectSettings{}.versionName.c_str()) != 0)) {
             snprintf(m_iosVersionNameBuffer, sizeof(m_iosVersionNameBuffer), "%s", IOSProjectSettings{}.versionName.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##IOSVersionName", m_iosVersionNameBuffer, sizeof(m_iosVersionNameBuffer));
+        endSettingsRow("CFBundleShortVersionString.");
 
-        if (beginSettingsRow("Build Number", "CFBundleVersion.", strcmp(m_iosBuildNumberBuffer, IOSProjectSettings{}.buildNumber.c_str()) != 0)) {
+        if (beginSettingsRow("Build Number", strcmp(m_iosBuildNumberBuffer, IOSProjectSettings{}.buildNumber.c_str()) != 0)) {
             snprintf(m_iosBuildNumberBuffer, sizeof(m_iosBuildNumberBuffer), "%s", IOSProjectSettings{}.buildNumber.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##IOSBuildNumber", m_iosBuildNumberBuffer, sizeof(m_iosBuildNumberBuffer));
+        endSettingsRow("CFBundleVersion.");
 
         drawProjectFilePathSetting(m_project, "Icon", "iOS application icon source image. Export support depends on the generated Xcode project.", "##IOSIconPath",
             "Browse##iosicon", "Clear##iosicon", m_iosIcon);
 
-        if (beginSettingsRow("Hide Status Bar", "Hide the iOS status bar while the app runs.", !m_iosHideStatusBar)) {
+        if (beginSettingsRow("Hide Status Bar", !m_iosHideStatusBar)) {
             m_iosHideStatusBar = true;
         }
         ImGui::Checkbox("##IOSHideStatusBar", &m_iosHideStatusBar);
+        endSettingsRow("Hide the iOS status bar while the app runs.");
 
-        if (beginSettingsRow("Hide Home Indicator", "Request hiding the iOS home indicator.", !m_iosHideHomeIndicator)) {
+        if (beginSettingsRow("Hide Home Indicator", !m_iosHideHomeIndicator)) {
             m_iosHideHomeIndicator = true;
         }
         ImGui::Checkbox("##IOSHideHomeIndicator", &m_iosHideHomeIndicator);
+        endSettingsRow("Request hiding the iOS home indicator.");
 
-        if (beginSettingsRow("High Refresh Rate", "Allow 120 Hz displays when supported.", !m_iosSupportsHighRefreshRate)) {
+        if (beginSettingsRow("High Refresh Rate", !m_iosSupportsHighRefreshRate)) {
             m_iosSupportsHighRefreshRate = true;
         }
         ImGui::Checkbox("##IOSHighRefreshRate", &m_iosSupportsHighRefreshRate);
+        endSettingsRow("Allow 120 Hz displays when supported.");
     });
 }
 
@@ -1188,16 +1211,18 @@ void ProjectSettingsWindow::drawAndroidSettings() {
     drawSettingsPanel("##AndroidSettingsPanel", [this]() {
         AndroidProjectSettings defaults;
 
-        beginSettingsRow("App Name", "Android launcher label. Empty means project name.");
+        beginSettingsRow("App Name");
         std::string appNameHint = m_project->getName().empty() ? "Doriax" : m_project->getName();
         ImGui::SetNextItemWidth(-1);
         ImGui::InputTextWithHint("##AndroidAppName", appNameHint.c_str(), m_androidApplicationNameBuffer, sizeof(m_androidApplicationNameBuffer));
+        endSettingsRow("Android launcher label. Empty means project name.");
 
-        if (beginSettingsRow("Package Name", "Android applicationId, for example com.company.game.", strcmp(m_androidPackageNameBuffer, defaults.packageName.c_str()) != 0)) {
+        if (beginSettingsRow("Package Name", strcmp(m_androidPackageNameBuffer, defaults.packageName.c_str()) != 0)) {
             snprintf(m_androidPackageNameBuffer, sizeof(m_androidPackageNameBuffer), "%s", defaults.packageName.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##AndroidPackageName", m_androidPackageNameBuffer, sizeof(m_androidPackageNameBuffer));
+        endSettingsRow("Android applicationId, for example com.company.game.");
         if (!isJavaPackageNameValid(m_androidPackageNameBuffer)) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Use a Java package name, for example com.company.game.");
         }
@@ -1205,14 +1230,16 @@ void ProjectSettingsWindow::drawAndroidSettings() {
         drawIntSetting("Version Code", "##AndroidVersionCode", m_androidVersionCode, static_cast<int>(defaults.versionCode), 1,
             "Integer version used by Android and stores. Increase it for every release.");
 
-        if (beginSettingsRow("Version Name", "Visible version string, for example 1.0.3.", strcmp(m_androidVersionNameBuffer, defaults.versionName.c_str()) != 0)) {
+        if (beginSettingsRow("Version Name", strcmp(m_androidVersionNameBuffer, defaults.versionName.c_str()) != 0)) {
             snprintf(m_androidVersionNameBuffer, sizeof(m_androidVersionNameBuffer), "%s", defaults.versionName.c_str());
         }
         ImGui::SetNextItemWidth(-1);
         ImGui::InputText("##AndroidVersionName", m_androidVersionNameBuffer, sizeof(m_androidVersionNameBuffer));
+        endSettingsRow("Visible version string, for example 1.0.3.");
 
-        beginSettingsRow("Launcher Icons", "Android launcher icon resources. If adaptive foreground and background are set, the export creates an adaptive icon. Otherwise Launcher Icon is used.");
+        beginSettingsRow("Launcher Icons");
         ImGui::TextWrapped("PNG recommended. Adaptive icon requires foreground and background images.");
+        endSettingsRow("Android launcher icon resources. If adaptive foreground and background are set, the export creates an adaptive icon. Otherwise Launcher Icon is used.");
 
         drawProjectFilePathSetting(m_project, "Launcher Icon", "Fallback launcher icon. Square PNG recommended.", "##AndroidLauncherIconPath",
             "Browse##androidlaunchericon", "Clear##androidlaunchericon", m_androidLauncherIcon);
@@ -1231,17 +1258,18 @@ void ProjectSettingsWindow::drawAndroidSettings() {
             m_androidOrientationIndex, findAndroidOrientationIndex(defaults.orientation),
             "Screen orientation requested by the Android activity.");
 
-        if (beginSettingsRow("Architectures", "Native CPU architectures included in the APK.", false)) {
+        if (beginSettingsRow("Architectures", false)) {
         }
         ImGui::Checkbox("armeabi-v7a", &m_androidAbiArmeabiV7a);
         ImGui::Checkbox("arm64-v8a", &m_androidAbiArm64V8a);
         ImGui::Checkbox("x86", &m_androidAbiX86);
         ImGui::Checkbox("x86_64", &m_androidAbiX86_64);
+        endSettingsRow("Native CPU architectures included in the APK.");
         if (!hasAndroidAbiSelection(m_androidAbiArmeabiV7a, m_androidAbiArm64V8a, m_androidAbiX86, m_androidAbiX86_64)) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Select at least one architecture.");
         }
 
-        beginSettingsRow("Permissions", "Android permissions written to AndroidManifest.xml. Some permissions still require runtime approval in your Android code.");
+        beginSettingsRow("Permissions");
         if (ImGui::SmallButton("None##AndroidPermissionsNone")) {
             m_androidPermissions.clear();
         }
@@ -1267,8 +1295,9 @@ void ProjectSettingsWindow::drawAndroidSettings() {
             }
         }
         ImGui::EndChild();
+        endSettingsRow("Android permissions written to AndroidManifest.xml. Some permissions still require runtime approval in your Android code.");
 
-        beginSettingsRow("Application Options", "Android application/activity behavior.");
+        beginSettingsRow("Application Options");
 
         if (ImGui::Checkbox("Allow Backup", &m_androidAllowBackup)) {
         }
@@ -1283,8 +1312,9 @@ void ProjectSettingsWindow::drawAndroidSettings() {
             m_androidAllowBackup = defaults.allowBackup;
             m_androidKeepScreenOn = defaults.keepScreenOn;
         }
+        endSettingsRow("Android application/activity behavior.");
 
-        beginSettingsRow("Screen Options", "Android screen/window behavior.");
+        beginSettingsRow("Screen Options");
 
         if (ImGui::Checkbox("Fullscreen", &m_androidFullscreen)) {
         }
@@ -1294,6 +1324,7 @@ void ProjectSettingsWindow::drawAndroidSettings() {
         if (ImGui::SmallButton("Restore##AndroidScreenOptions")) {
             m_androidFullscreen = defaults.fullscreen;
         }
+        endSettingsRow("Android screen/window behavior.");
     });
 }
 
