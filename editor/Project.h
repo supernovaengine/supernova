@@ -143,32 +143,21 @@ namespace doriax::editor{
     };
 
     struct ExportTargetSettings {
-        std::filesystem::path targetDir;
-        std::vector<ShaderKey> shaderKeys;
-        bool shaderKeysConfigured = false;
+        std::set<ShaderKey> shaderAdditions;
+        std::set<ShaderKey> shaderExclusions;
     };
 
     struct SourceCodeExportSettings : ExportTargetSettings {
         std::set<ShaderBackend> graphicBackends;
         bool graphicBackendsConfigured = false;
-        bool platformsConfigured = false;
-        bool platformWindows = false;
-        bool platformLinux = false;
-        bool platformMacOS = false;
-        bool platformIOS = false;
-        bool platformAndroid = false;
-        bool platformWeb = false;
     };
 
     struct DesktopExportSettings : ExportTargetSettings {
         ShaderBackend graphicBackend = ShaderBackend::GLCore;
         bool graphicBackendConfigured = false;
-        // 0 means use the current machine's automatic maximum.
-        unsigned int buildJobs = 0;
     };
 
     struct WebExportSettings : ExportTargetSettings {
-        std::string emsdkPath;
     };
 
     struct WebProjectSettings {

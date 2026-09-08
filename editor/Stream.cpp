@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "Stream.h"
+#include "AppSettings.h"
 
 #include "Base64.h"
 #include "Catalog.h"
@@ -25,18 +26,6 @@
 using namespace doriax;
 
 namespace {
-    YAML::Node encodeExportShaderKeys(const std::vector<ShaderKey>& shaderKeys, bool configured) {
-        if (!configured) {
-            return YAML::Node();
-        }
-
-        YAML::Node node(YAML::NodeType::Sequence);
-        for (ShaderKey key : shaderKeys) {
-            node.push_back(key);
-        }
-        return node;
-    }
-
     std::vector<ShaderKey> decodeExportShaderKeys(const YAML::Node& node) {
         std::vector<ShaderKey> shaderKeys;
         if (!node || !node.IsSequence()) {
@@ -1648,64 +1637,41 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
 
         const SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
         YAML::Node sourceCodeNode;
-        if (!sourceCode.targetDir.empty()) {
-            sourceCodeNode["targetDir"] = sourceCode.targetDir.generic_string();
-        }
-        YAML::Node sourceCodeShaders = encodeExportShaderKeys(sourceCode.shaderKeys, sourceCode.shaderKeysConfigured);
-        if (sourceCodeShaders.IsDefined()) {
-            sourceCodeNode["shaders"] = sourceCodeShaders;
-        }
+
+        for (ShaderKey key : sourceCode.shaderAdditions) sourceCodeNode["shaderAdditions"].push_back(key);
+        for (ShaderKey key : sourceCode.shaderExclusions) sourceCodeNode["shaderExclusions"].push_back(key);
         YAML::Node sourceCodeBackends = encodeExportBackendSet(sourceCode.graphicBackends, sourceCode.graphicBackendsConfigured);
-        if (sourceCodeBackends.IsDefined()) {
+        if (sourceCode.graphicBackendsConfigured) {
             sourceCodeNode["graphicBackends"] = sourceCodeBackends;
         }
-        if (sourceCode.platformsConfigured) {
-            YAML::Node platforms;
-            platforms["windows"] = sourceCode.platformWindows;
-            platforms["linux"] = sourceCode.platformLinux;
-            platforms["macos"] = sourceCode.platformMacOS;
-            platforms["ios"] = sourceCode.platformIOS;
-            platforms["android"] = sourceCode.platformAndroid;
-            platforms["web"] = sourceCode.platformWeb;
-            sourceCodeNode["platforms"] = platforms;
-        }
-        if (sourceCodeNode.IsDefined()) {
+
+        if (sourceCodeNode.size() != 0) {
             exportNode["sourceCode"] = sourceCodeNode;
         }
 
         const DesktopExportSettings& desktop = project->getDesktopExportSettings();
         YAML::Node desktopNode;
-        if (!desktop.targetDir.empty()) {
-            desktopNode["targetDir"] = desktop.targetDir.generic_string();
-        }
+
         if (desktop.graphicBackendConfigured) {
             desktopNode["graphicBackend"] = ShaderPool::getShaderBackendCliToken(desktop.graphicBackend);
         }
-        if (desktop.buildJobs != 0) {
-            desktopNode["buildJobs"] = desktop.buildJobs;
-        }
-        YAML::Node desktopShaders = encodeExportShaderKeys(desktop.shaderKeys, desktop.shaderKeysConfigured);
-        if (desktopShaders.IsDefined()) {
-            desktopNode["shaders"] = desktopShaders;
-        }
-        if (desktopNode.IsDefined()) {
+
+        for (ShaderKey key : desktop.shaderAdditions) desktopNode["shaderAdditions"].push_back(key);
+        for (ShaderKey key : desktop.shaderExclusions) desktopNode["shaderExclusions"].push_back(key);
+        if (desktopNode.size() != 0) {
             exportNode["desktop"] = desktopNode;
         }
 
         const WebExportSettings& web = project->getWebExportSettings();
         YAML::Node webNode;
-        if (!web.targetDir.empty()) {
-            webNode["targetDir"] = web.targetDir.generic_string();
-        }
-        YAML::Node webShaders = encodeExportShaderKeys(web.shaderKeys, web.shaderKeysConfigured);
-        if (webShaders.IsDefined()) {
-            webNode["shaders"] = webShaders;
-        }
-        if (webNode.IsDefined()) {
+
+        for (ShaderKey key : web.shaderAdditions) webNode["shaderAdditions"].push_back(key);
+        for (ShaderKey key : web.shaderExclusions) webNode["shaderExclusions"].push_back(key);
+        if (webNode.size() != 0) {
             exportNode["web"] = webNode;
         }
 
-        if (exportNode.IsDefined()) {
+        if (exportNode.size() != 0) {
             root["export"] = exportNode;
         }
     }
@@ -1720,7 +1686,7 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         if (!web.headInclude.empty()) webNode["headInclude"] = web.headInclude;
         if (web.resizeCanvasToWindow != defaultWeb.resizeCanvasToWindow) webNode["resizeCanvasToWindow"] = web.resizeCanvasToWindow;
         if (web.hideEmscriptenUI != defaultWeb.hideEmscriptenUI) webNode["hideEmscriptenUI"] = web.hideEmscriptenUI;
-        if (webNode.IsDefined()) root["web"] = webNode;
+        if (webNode.size() != 0) root["web"] = webNode;
     }
 
     {
@@ -1730,7 +1696,7 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         if (!linuxSettings.applicationName.empty()) linuxNode["applicationName"] = linuxSettings.applicationName;
         if (!linuxSettings.comment.empty()) linuxNode["comment"] = linuxSettings.comment;
         if (linuxSettings.categories != defaultLinux.categories) linuxNode["categories"] = linuxSettings.categories;
-        if (linuxNode.IsDefined()) root["linux"] = linuxNode;
+        if (linuxNode.size() != 0) root["linux"] = linuxNode;
     }
 
     {
@@ -1741,7 +1707,7 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         if (!windows.companyName.empty()) windowsNode["companyName"] = windows.companyName;
         if (windows.fileVersion != defaultWindows.fileVersion) windowsNode["fileVersion"] = windows.fileVersion;
         if (windows.productVersion != defaultWindows.productVersion) windowsNode["productVersion"] = windows.productVersion;
-        if (windowsNode.IsDefined()) root["windows"] = windowsNode;
+        if (windowsNode.size() != 0) root["windows"] = windowsNode;
     }
 
     {
@@ -1754,7 +1720,7 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         if (macOS.buildNumber != defaultMacOS.buildNumber) macOSNode["buildNumber"] = macOS.buildNumber;
         if (!macOS.icon.empty()) macOSNode["icon"] = macOS.icon.generic_string();
         if (macOS.highDpi != defaultMacOS.highDpi) macOSNode["highDpi"] = macOS.highDpi;
-        if (macOSNode.IsDefined()) root["macos"] = macOSNode;
+        if (macOSNode.size() != 0) root["macos"] = macOSNode;
     }
 
     {
@@ -1769,7 +1735,7 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         if (ios.hideStatusBar != defaultIOS.hideStatusBar) iosNode["hideStatusBar"] = ios.hideStatusBar;
         if (ios.hideHomeIndicator != defaultIOS.hideHomeIndicator) iosNode["hideHomeIndicator"] = ios.hideHomeIndicator;
         if (ios.supportsHighRefreshRate != defaultIOS.supportsHighRefreshRate) iosNode["supportsHighRefreshRate"] = ios.supportsHighRefreshRate;
-        if (iosNode.IsDefined()) root["ios"] = iosNode;
+        if (iosNode.size() != 0) root["ios"] = iosNode;
     }
 
     {
@@ -1778,9 +1744,10 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         if (!android.applicationName.empty()) {
             androidNode["applicationName"] = android.applicationName;
         }
-        androidNode["packageName"] = android.packageName;
-        androidNode["versionCode"] = android.versionCode;
-        androidNode["versionName"] = android.versionName;
+        const AndroidProjectSettings defaults;
+        if (android.packageName != defaults.packageName) androidNode["packageName"] = android.packageName;
+        if (android.versionCode != defaults.versionCode) androidNode["versionCode"] = android.versionCode;
+        if (android.versionName != defaults.versionName) androidNode["versionName"] = android.versionName;
         if (!android.launcherIcon.empty()) {
             androidNode["launcherIcon"] = android.launcherIcon.string();
         }
@@ -1790,27 +1757,27 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         if (!android.adaptiveIconBackground.empty()) {
             androidNode["adaptiveIconBackground"] = android.adaptiveIconBackground.string();
         }
-        androidNode["minSdk"] = android.minSdk;
-        androidNode["targetSdk"] = android.targetSdk;
-        androidNode["orientation"] = androidOrientationToString(android.orientation);
+        if (android.minSdk != defaults.minSdk) androidNode["minSdk"] = android.minSdk;
+        if (android.targetSdk != defaults.targetSdk) androidNode["targetSdk"] = android.targetSdk;
+        if (android.orientation != defaults.orientation) androidNode["orientation"] = androidOrientationToString(android.orientation);
 
         YAML::Node abiNode;
-        abiNode["armeabi-v7a"] = android.abiArmeabiV7a;
-        abiNode["arm64-v8a"] = android.abiArm64V8a;
-        abiNode["x86"] = android.abiX86;
-        abiNode["x86_64"] = android.abiX86_64;
-        androidNode["architectures"] = abiNode;
+        if (android.abiArmeabiV7a != defaults.abiArmeabiV7a) abiNode["armeabi-v7a"] = android.abiArmeabiV7a;
+        if (android.abiArm64V8a != defaults.abiArm64V8a) abiNode["arm64-v8a"] = android.abiArm64V8a;
+        if (android.abiX86 != defaults.abiX86) abiNode["x86"] = android.abiX86;
+        if (android.abiX86_64 != defaults.abiX86_64) abiNode["x86_64"] = android.abiX86_64;
+        if (abiNode.size()) androidNode["architectures"] = abiNode;
 
         YAML::Node permissionsNode(YAML::NodeType::Sequence);
         for (const std::string& permission : android.permissions) {
             permissionsNode.push_back(permission);
         }
-        androidNode["permissions"] = permissionsNode;
+        if (android.permissions != defaults.permissions) androidNode["permissions"] = permissionsNode;
 
-        androidNode["allowBackup"] = android.allowBackup;
-        androidNode["fullscreen"] = android.fullscreen;
-        androidNode["keepScreenOn"] = android.keepScreenOn;
-        root["android"] = androidNode;
+        if (android.allowBackup != defaults.allowBackup) androidNode["allowBackup"] = android.allowBackup;
+        if (android.fullscreen != defaults.fullscreen) androidNode["fullscreen"] = android.fullscreen;
+        if (android.keepScreenOn != defaults.keepScreenOn) androidNode["keepScreenOn"] = android.keepScreenOn;
+        if (androidNode.size()) root["android"] = androidNode;
     }
 
     if (project->getStartSceneId() != NULL_PROJECT_SCENE) {
@@ -2005,39 +1972,42 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
 
     if (node["export"] && node["export"].IsMap()) {
         const YAML::Node& exportNode = node["export"];
+        bool warned = false;
+        auto migrateLocal = [&](const char* mode, const YAML::Node& entry) {
+            if (entry["shaders"] && !warned) {
+                Log::warn("Legacy export shader lists ignored; review manual shader overrides.");
+                warned = true;
+            }
+            const auto file = project->getProjectPath() / "project.yaml";
+            auto local = AppSettings::getExportSettings(file, mode);
+            if (local.targetDir.empty() && entry["targetDir"]) local.targetDir = entry["targetDir"].as<std::string>();
+            if (std::string(mode) == "desktop" && !local.buildJobs && entry["buildJobs"])
+                local.buildJobs = static_cast<unsigned int>(std::clamp(entry["buildJobs"].as<long long>(), 0LL,
+                    static_cast<long long>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS)));
+            if (!AppSettings::setExportSettings(file, mode, local))
+                throw std::runtime_error("Could not migrate local export settings");
+        };
 
         if (exportNode["sourceCode"] && exportNode["sourceCode"].IsMap()) {
             const YAML::Node& sourceCodeNode = exportNode["sourceCode"];
             SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
-            if (sourceCodeNode["targetDir"]) {
-                sourceCode.targetDir = sourceCodeNode["targetDir"].as<std::string>();
-            }
-            if (sourceCodeNode["shaders"]) {
-                sourceCode.shaderKeys = decodeExportShaderKeys(sourceCodeNode["shaders"]);
-                sourceCode.shaderKeysConfigured = true;
+            migrateLocal("sourceCode", sourceCodeNode);
+            for (auto key : decodeExportShaderKeys(sourceCodeNode["shaderAdditions"])) sourceCode.shaderAdditions.insert(key);
+            for (auto key : decodeExportShaderKeys(sourceCodeNode["shaderExclusions"])) {
+                sourceCode.shaderExclusions.insert(key);
+                sourceCode.shaderAdditions.erase(key);
             }
             if (sourceCodeNode["graphicBackends"]) {
                 sourceCode.graphicBackends = decodeExportBackendSet(sourceCodeNode["graphicBackends"]);
                 sourceCode.graphicBackendsConfigured = true;
             }
-            if (sourceCodeNode["platforms"] && sourceCodeNode["platforms"].IsMap()) {
-                const YAML::Node& platforms = sourceCodeNode["platforms"];
-                sourceCode.platformsConfigured = true;
-                if (platforms["windows"]) sourceCode.platformWindows = platforms["windows"].as<bool>();
-                if (platforms["linux"]) sourceCode.platformLinux = platforms["linux"].as<bool>();
-                if (platforms["macos"]) sourceCode.platformMacOS = platforms["macos"].as<bool>();
-                if (platforms["ios"]) sourceCode.platformIOS = platforms["ios"].as<bool>();
-                if (platforms["android"]) sourceCode.platformAndroid = platforms["android"].as<bool>();
-                if (platforms["web"]) sourceCode.platformWeb = platforms["web"].as<bool>();
-            }
+
         }
 
         if (exportNode["desktop"] && exportNode["desktop"].IsMap()) {
             const YAML::Node& desktopNode = exportNode["desktop"];
             DesktopExportSettings& desktop = project->getDesktopExportSettings();
-            if (desktopNode["targetDir"]) {
-                desktop.targetDir = desktopNode["targetDir"].as<std::string>();
-            }
+            migrateLocal("desktop", desktopNode);
             if (desktopNode["graphicBackend"]) {
                 ShaderBackend backend;
                 if (ShaderPool::parseShaderBackend(desktopNode["graphicBackend"].as<std::string>(), backend)) {
@@ -2045,29 +2015,23 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
                     desktop.graphicBackendConfigured = true;
                 }
             }
-            if (desktopNode["buildJobs"]) {
-                const long long jobs = desktopNode["buildJobs"].as<long long>();
-                const long long maxJobs = static_cast<long long>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS);
-                desktop.buildJobs = static_cast<unsigned int>(std::clamp(jobs, 0LL, maxJobs));
-            }
-            if (desktopNode["shaders"]) {
-                desktop.shaderKeys = decodeExportShaderKeys(desktopNode["shaders"]);
-                desktop.shaderKeysConfigured = true;
+
+            for (auto key : decodeExportShaderKeys(desktopNode["shaderAdditions"])) desktop.shaderAdditions.insert(key);
+            for (auto key : decodeExportShaderKeys(desktopNode["shaderExclusions"])) {
+                desktop.shaderExclusions.insert(key);
+                desktop.shaderAdditions.erase(key);
             }
         }
 
         if (exportNode["web"] && exportNode["web"].IsMap()) {
             const YAML::Node& webNode = exportNode["web"];
             WebExportSettings& web = project->getWebExportSettings();
-            if (webNode["targetDir"]) {
-                web.targetDir = webNode["targetDir"].as<std::string>();
-            }
-            if (webNode["emsdkPath"]) {
-                web.emsdkPath = webNode["emsdkPath"].as<std::string>();
-            }
-            if (webNode["shaders"]) {
-                web.shaderKeys = decodeExportShaderKeys(webNode["shaders"]);
-                web.shaderKeysConfigured = true;
+            migrateLocal("web", webNode);
+
+            for (auto key : decodeExportShaderKeys(webNode["shaderAdditions"])) web.shaderAdditions.insert(key);
+            for (auto key : decodeExportShaderKeys(webNode["shaderExclusions"])) {
+                web.shaderExclusions.insert(key);
+                web.shaderAdditions.erase(key);
             }
         }
     }

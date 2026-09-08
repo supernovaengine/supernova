@@ -644,3 +644,41 @@ void AppSettings::setAiSettings(const ai::Settings& settings) {
 }
 
 } // namespace doriax::editor
+
+namespace doriax::editor {
+
+LocalExportSettings AppSettings::getExportSettings(const std::filesystem::path& projectFile, const std::string& mode) {
+    LocalExportSettings result;
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    const YAML::Node data = settingsData;
+    const auto exports = data["project_exports"];
+    if (!exports || !exports.IsMap()) return result;
+    const auto project = exports[key];
+    if (!project || !project.IsMap()) return result;
+    const auto entry = project[mode];
+    if (!entry || !entry.IsMap()) return result;
+    if (entry["targetDir"]) result.targetDir = entry["targetDir"].as<std::string>();
+    if (entry["buildJobs"]) result.buildJobs = entry["buildJobs"].as<unsigned int>();
+    return result;
+}
+
+bool AppSettings::setExportSettings(const std::filesystem::path& projectFile, const std::string& mode, const LocalExportSettings& value) {
+    const auto previous = getExportSettings(projectFile, mode);
+    if (previous.targetDir == value.targetDir && previous.buildJobs == value.buildJobs) return true;
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    YAML::Node backup = YAML::Clone(settingsData);
+    YAML::Node entry(YAML::NodeType::Map);
+    if (!value.targetDir.empty()) entry["targetDir"] = value.targetDir.generic_string();
+    if (value.buildJobs) entry["buildJobs"] = value.buildJobs;
+    if (entry.size()) settingsData["project_exports"][key][mode] = entry;
+    else {
+        settingsData["project_exports"][key].remove(mode);
+        if (!settingsData["project_exports"][key].size()) settingsData["project_exports"].remove(key);
+        if (!settingsData["project_exports"].size()) settingsData.remove("project_exports");
+    }
+    if (saveSettings()) return true;
+    settingsData = backup;
+    return false;
+}
+
+} // namespace doriax::editor

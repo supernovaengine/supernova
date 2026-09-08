@@ -34,6 +34,7 @@ namespace doriax::editor {
         char m_targetDirBuffer[512] = "";
         fs::path m_targetDir;
         bool m_targetDirFromDefault = false;
+        bool m_projectSettingsDirty = false;
 
         // Start scene
         uint32_t m_startSceneId = NULL_PROJECT_SCENE;
@@ -47,7 +48,8 @@ namespace doriax::editor {
         };
         std::vector<ShaderEntry> m_shaderEntries;
         int m_selectedShaderIndex = -1;
-        bool m_shaderKeysConfigured = false;
+        std::set<ShaderKey> m_shaderAdditions;
+        std::set<ShaderKey> m_shaderExclusions;
 
         // Add Shader dialog state
         bool m_addShaderOpen = false;
@@ -62,7 +64,6 @@ namespace doriax::editor {
         };
         std::vector<BackendEntry> m_backendEntries;
         bool m_sourceBackendsConfigured = false;
-        bool m_sourcePlatformsConfigured = false;
         bool m_sourcePlatformWindows = false;
         bool m_sourcePlatformLinux = false;
         bool m_sourcePlatformMacOS = false;
@@ -76,6 +77,7 @@ namespace doriax::editor {
         int m_graphicBackendIndex = 0;
         bool m_desktopBackendConfigured = false;
         int m_desktopBuildJobs = 1;
+        bool m_desktopBuildJobsEdited = false;
 
         // Cached tool checks: both spawn processes, so never probe per-frame.
         std::string m_emsdkOverride;           // mirrors AppSettings::getEmsdkPath()
@@ -84,6 +86,8 @@ namespace doriax::editor {
 
         Exporter m_exporter;
 
+        const char* localExportMode() const;
+        void refreshShaderSelection();
         void populateShaderList();
         void populateShaderListFromKeys(const std::vector<ShaderKey>& shaderKeys);
         void loadShaderListFromSettings(const ExportTargetSettings& settings);
@@ -91,7 +95,7 @@ namespace doriax::editor {
         void refreshEmsdkStatus();
         void selectMode(ExportMode mode);
         void loadSettingsFromProject();
-        void saveCurrentSettingsToProject(bool saveProjectFile = true);
+        bool saveCurrentSettingsToProject(bool saveProjectFile = true);
         void drawModeSelect();
         bool drawModeCard(const char* id, const char* icon, const char* title, const char* description,
                           const ImVec2& size, const char* disabledText = nullptr);

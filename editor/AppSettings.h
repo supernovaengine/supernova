@@ -35,6 +35,11 @@ struct PanelVisibilitySettings {
     }
 };
 
+struct LocalExportSettings {
+    std::filesystem::path targetDir;
+    unsigned int buildJobs = 0; // 0 = automatic
+};
+
 class AppSettings {
 private:
     static std::filesystem::path configFilePath;
@@ -91,6 +96,9 @@ private:
     static void ensureConfigDirectory();
 
 public:
+    static LocalExportSettings getExportSettings(const std::filesystem::path& projectFile, const std::string& mode);
+    static bool setExportSettings(const std::filesystem::path& projectFile, const std::string& mode, const LocalExportSettings& value);
+
     // Initialization
     static bool initialize();
 
