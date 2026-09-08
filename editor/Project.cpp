@@ -2268,35 +2268,6 @@ void editor::Project::changeAssetRoots(const std::filesystem::path& newAssetsDir
     saveProjectFile();
 }
 
-void editor::Project::setCMakeKit(const std::string& cCompiler, const std::string& cxxCompiler, const std::string& generator){
-    this->cmakeCCompiler = cCompiler;
-    this->cmakeCxxCompiler = cxxCompiler;
-    this->cmakeGenerator = generator;
-}
-
-std::string editor::Project::getCMakeCCompiler() const{
-    return cmakeCCompiler;
-}
-
-std::string editor::Project::getCMakeCxxCompiler() const{
-    return cmakeCxxCompiler;
-}
-
-std::string editor::Project::getCMakeGenerator() const{
-    return cmakeGenerator;
-}
-
-void editor::Project::setCMakeBuildJobs(unsigned int jobs){
-    // Stored unclamped: the per-machine cap is applied at build time
-    // (Generator::build), so a value configured on a machine with more
-    // cores survives load/save round-trips on this one.
-    cmakeBuildJobs = jobs;
-}
-
-unsigned int editor::Project::getCMakeBuildJobs() const{
-    return cmakeBuildJobs;
-}
-
 void editor::Project::setPackNativeResources(bool enabled){
     packNativeResources = enabled;
 }
@@ -3550,10 +3521,6 @@ void editor::Project::resetConfigs() {
     assetsDir = defaultAssetsDir;
     luaDir = defaultLuaDir;
     scriptDirs.clear();
-    cmakeCCompiler = "";
-    cmakeCxxCompiler = "";
-    cmakeGenerator = "";
-    cmakeBuildJobs = defaultCMakeBuildJobs;
     packNativeResources = defaultPackNativeResources;
     sourceCodeExportSettings = {};
     desktopExportSettings = {};
@@ -3918,20 +3885,6 @@ bool editor::Project::createTempProject(std::string projectName, bool deleteIfEx
         // project has an empty name, producing an invalid CMakeLists.txt.
         setName(projectName);
 
-        // Inherit the compiler chosen in a previous session so new temp projects
-        // don't silently fall back to the Default toolchain every time. Drop a
-        // stale compiler path that no longer exists on disk.
-        {
-            std::string cc = AppSettings::getLastCMakeCCompiler();
-            std::string cxx = AppSettings::getLastCMakeCxxCompiler();
-            std::string gen = AppSettings::getLastCMakeGenerator();
-            if (!cxx.empty() && !fs::exists(cxx)) {
-                cc.clear(); cxx.clear(); gen.clear();
-            }
-            if (!cc.empty() || !cxx.empty() || !gen.empty()) {
-                setCMakeKit(cc, cxx, gen);
-            }
-        }
         if (deleteIfExists && fs::exists(projectPath)) {
             fs::remove_all(projectPath);
         }
@@ -3941,6 +3894,23 @@ bool editor::Project::createTempProject(std::string projectName, bool deleteIfEx
                 std::filesystem::create_directory(projectPath);
             }
             Out::info("Created project directory: \"%s\"", projectPath.string().c_str());
+
+            // Inherit the compiler chosen in a previous session so new temp projects
+            // don't silently fall back to the Default toolchain every time. Drop a
+            // stale compiler path that no longer exists on disk.
+            {
+                LocalBuildSettings build;
+                build.cCompiler = AppSettings::getLastCMakeCCompiler();
+                build.cxxCompiler = AppSettings::getLastCMakeCxxCompiler();
+                build.generator = AppSettings::getLastCMakeGenerator();
+                if (!build.cxxCompiler.empty() && !fs::exists(build.cxxCompiler)) {
+                    build = LocalBuildSettings();
+                }
+                if (!build.cCompiler.empty() || !build.cxxCompiler.empty() || !build.generator.empty()) {
+                    AppSettings::setBuildSettings(projectFile, build);
+                }
+            }
+
             saveProject();
             createNewScene("New Scene", SceneType::SCENE_3D);
             copyEngineApiToProject();
@@ -7500,7 +7470,7 @@ bool editor::Project::saveSceneForPlayStartup(SceneProject* sceneProject) {
     return saveSceneFile(sceneProject, sceneProject->filepath, false);
 }
 
-void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId) {
+void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId, const LocalBuildSettings& buildSettings) {
     auto isCancelled = [session]() {
         return session->cancelled.load(std::memory_order_acquire);
     };
@@ -7602,7 +7572,6 @@ void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session
 
         std::vector<SceneScriptSource> mergedCppScripts = collectAllSceneCppScripts();
         std::vector<BundleSceneInfo> bundleBuildInfos = collectAllBundles();
-        const unsigned int requestedBuildJobs = cmakeBuildJobs.load();
         generator.configure(scenesToGenerate, libName, mergedCppScripts, bundleBuildInfos, getProjectPath(), getProjectInternalPath(), getAssetsPath(), getLuaPath(), getScriptDirs(), scalingMode, textureStrategy, canvasWidth, canvasHeight, vsyncEnabled, getWindowSettings());
 
         // play regenerates the standalone project, so its shaders are ensured here too
@@ -7615,11 +7584,11 @@ void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session
         if (hasCppScripts) {
             // Default needs a discoverable compatible kit; explicit kits may
             // live outside PATH and are ABI-checked by the generated CMake.
-            const bool useDefaultKit = cmakeCCompiler.empty() && cmakeCxxCompiler.empty() && cmakeGenerator.empty();
+            const bool useDefaultKit = buildSettings.cCompiler.empty() && buildSettings.cxxCompiler.empty() && buildSettings.generator.empty();
             CMakeKit playKit;
-            playKit.cCompiler = cmakeCCompiler;
-            playKit.cxxCompiler = cmakeCxxCompiler;
-            playKit.generator = cmakeGenerator;
+            playKit.cCompiler = buildSettings.cCompiler;
+            playKit.cxxCompiler = buildSettings.cxxCompiler;
+            playKit.generator = buildSettings.generator;
             std::string missingTools = Generator::checkBuildTools(useDefaultKit, &playKit);
             if (!missingTools.empty()) {
                 failPlayStartup(session, sceneId, "Cannot build C++ scripts: missing build tools", "Missing Build Tools",
@@ -7629,7 +7598,7 @@ void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session
             }
 
             fs::path buildPath = getProjectInternalPath() / "build";
-            generator.build(getProjectPath(), getProjectInternalPath(), buildPath, playKit.cCompiler, playKit.cxxCompiler, playKit.generator, requestedBuildJobs);
+            generator.build(getProjectPath(), getProjectInternalPath(), buildPath, playKit.cCompiler, playKit.cxxCompiler, playKit.generator, buildSettings.buildJobs);
             generator.waitForBuildToComplete();
 
             if (isCancelled()) { markStartupDone(); return; }
@@ -8038,8 +8007,11 @@ void editor::Project::start(uint32_t sceneId) {
     editor::getEditorHost().saveAllCodeEditors();
     editor::getEditorHost().requestScenePlayFocus(sceneId);
 
-    std::thread startupThread([this, session, sceneId]() {
-        runPlayStartup(session, sceneId);
+    // Read on the UI thread: the startup thread must not race the settings dialog
+    const LocalBuildSettings buildSettings = AppSettings::getBuildSettings(getProjectPath() / "project.yaml");
+
+    std::thread startupThread([this, session, sceneId, buildSettings]() {
+        runPlayStartup(session, sceneId, buildSettings);
     });
     startupThread.detach();
 }

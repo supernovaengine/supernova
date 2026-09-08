@@ -8052,7 +8052,7 @@
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = DoriaxEngine.Doriax;
+				PRODUCT_BUNDLE_IDENTIFIER = org.doriax.doriaxengine;
 				PRODUCT_NAME = Doriax;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -8083,7 +8083,7 @@
 				);
 				OTHER_CPLUSPLUSFLAGS = "$(OTHER_CFLAGS)";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_BUNDLE_IDENTIFIER = DoriaxEngine.Doriax;
+				PRODUCT_BUNDLE_IDENTIFIER = org.doriax.doriaxengine;
 				PRODUCT_NAME = Doriax;
 				SDKROOT = iphoneos;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -8119,7 +8119,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				PRODUCT_BUNDLE_IDENTIFIER = DoriaxEngine.Doriax;
+				PRODUCT_BUNDLE_IDENTIFIER = org.doriax.doriaxengine;
 				PRODUCT_NAME = Doriax;
 				SDKROOT = macosx;
 			};
@@ -8154,7 +8154,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				PRODUCT_BUNDLE_IDENTIFIER = DoriaxEngine.Doriax;
+				PRODUCT_BUNDLE_IDENTIFIER = org.doriax.doriaxengine;
 				PRODUCT_NAME = Doriax;
 				SDKROOT = macosx;
 			};

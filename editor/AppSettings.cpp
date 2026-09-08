@@ -647,35 +647,71 @@ void AppSettings::setAiSettings(const ai::Settings& settings) {
 
 namespace doriax::editor {
 
-LocalExportSettings AppSettings::getExportSettings(const std::filesystem::path& projectFile, const std::string& mode) {
-    LocalExportSettings result;
+std::filesystem::path AppSettings::getExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode) {
     const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
     const YAML::Node data = settingsData;
     const auto exports = data["project_exports"];
-    if (!exports || !exports.IsMap()) return result;
+    if (!exports || !exports.IsMap()) return {};
     const auto project = exports[key];
-    if (!project || !project.IsMap()) return result;
+    if (!project || !project.IsMap()) return {};
     const auto entry = project[mode];
-    if (!entry || !entry.IsMap()) return result;
-    if (entry["targetDir"]) result.targetDir = entry["targetDir"].as<std::string>();
-    if (entry["buildJobs"]) result.buildJobs = entry["buildJobs"].as<unsigned int>();
-    return result;
+    if (!entry || !entry.IsMap()) return {};
+    if (entry["targetDir"]) return entry["targetDir"].as<std::string>();
+    return {};
 }
 
-bool AppSettings::setExportSettings(const std::filesystem::path& projectFile, const std::string& mode, const LocalExportSettings& value) {
-    const auto previous = getExportSettings(projectFile, mode);
-    if (previous.targetDir == value.targetDir && previous.buildJobs == value.buildJobs) return true;
+bool AppSettings::setExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode, const std::filesystem::path& targetDir) {
+    if (getExportTargetDir(projectFile, mode) == targetDir) return true;
     const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
     YAML::Node backup = YAML::Clone(settingsData);
-    YAML::Node entry(YAML::NodeType::Map);
-    if (!value.targetDir.empty()) entry["targetDir"] = value.targetDir.generic_string();
-    if (value.buildJobs) entry["buildJobs"] = value.buildJobs;
-    if (entry.size()) settingsData["project_exports"][key][mode] = entry;
-    else {
+    if (!targetDir.empty()) {
+        YAML::Node entry(YAML::NodeType::Map);
+        entry["targetDir"] = targetDir.generic_string();
+        settingsData["project_exports"][key][mode] = entry;
+    } else {
         settingsData["project_exports"][key].remove(mode);
         if (!settingsData["project_exports"][key].size()) settingsData["project_exports"].remove(key);
         if (!settingsData["project_exports"].size()) settingsData.remove("project_exports");
     }
+    if (saveSettings()) return true;
+    settingsData = backup;
+    return false;
+}
+
+LocalBuildSettings AppSettings::getBuildSettings(const std::filesystem::path& projectFile) {
+    LocalBuildSettings result;
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    const auto builds = settingsData["project_builds"];
+    if (!builds || !builds.IsMap()) return result;
+    const auto entry = builds[key];
+    if (!entry || !entry.IsMap()) return result;
+    if (entry["c_compiler"]) result.cCompiler = entry["c_compiler"].as<std::string>();
+    if (entry["cxx_compiler"]) result.cxxCompiler = entry["cxx_compiler"].as<std::string>();
+    if (entry["generator"]) result.generator = entry["generator"].as<std::string>();
+    if (entry["build_jobs"]) result.buildJobs = entry["build_jobs"].as<unsigned int>();
+    result.configured = true;
+    return result;
+}
+
+bool AppSettings::setBuildSettings(const std::filesystem::path& projectFile, const LocalBuildSettings& value) {
+    const auto previous = getBuildSettings(projectFile);
+    if (previous.configured && previous.cCompiler == value.cCompiler
+        && previous.cxxCompiler == value.cxxCompiler && previous.generator == value.generator
+        && previous.buildJobs == value.buildJobs) {
+        return true;
+    }
+
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    YAML::Node backup = YAML::Clone(settingsData);
+
+    // Written even when empty: that entry pins the project to the default toolchain
+    YAML::Node entry(YAML::NodeType::Map);
+    if (!value.cCompiler.empty()) entry["c_compiler"] = value.cCompiler;
+    if (!value.cxxCompiler.empty()) entry["cxx_compiler"] = value.cxxCompiler;
+    if (!value.generator.empty()) entry["generator"] = value.generator;
+    if (value.buildJobs) entry["build_jobs"] = value.buildJobs;
+    settingsData["project_builds"][key] = entry;
+
     if (saveSettings()) return true;
     settingsData = backup;
     return false;

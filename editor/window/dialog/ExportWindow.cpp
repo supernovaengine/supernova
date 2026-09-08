@@ -263,10 +263,13 @@ void ExportWindow::loadSettingsFromProject() {
         loadShaderListFromSettings(settings);
     }
 
-    const auto local = AppSettings::getExportSettings(m_project->getProjectPath() / "project.yaml", localExportMode());
-    m_targetDir = local.targetDir;
-    m_desktopBuildJobs = static_cast<int>(std::min(local.buildJobs ? local.buildJobs : Generator::getAutomaticParallelBuildJobs(), Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS));
-    m_desktopBuildJobsEdited = false;
+    const auto file = m_project->getProjectPath() / "project.yaml";
+    m_targetDir = AppSettings::getExportTargetDir(file, localExportMode());
+
+    m_buildSettings = AppSettings::getBuildSettings(file);
+    const unsigned int buildJobs = m_buildSettings.buildJobs;
+    m_desktopBuildJobs = static_cast<int>(std::min(
+        buildJobs ? buildJobs : Generator::getAutomaticParallelBuildJobs(), Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS));
     if (m_targetDir.empty()) {
         m_targetDir = AppSettings::getDefaultExportDirectory();
         m_targetDirFromDefault = !m_targetDir.empty();
@@ -283,13 +286,23 @@ bool ExportWindow::saveCurrentSettingsToProject(bool saveProjectFile) {
     if (!m_project) return false;
 
     const auto file = m_project->getProjectPath() / "project.yaml";
-    auto local = AppSettings::getExportSettings(file, localExportMode());
-    if (!m_targetDirFromDefault) local.targetDir = m_targetDir;
-    if (m_mode == ExportMode::Desktop && m_desktopBuildJobsEdited)
-        local.buildJobs = static_cast<unsigned int>(m_desktopBuildJobs);
-    if (!AppSettings::setExportSettings(file, localExportMode(), local)) {
+    // A directory taken from the editor-wide default is not the project's own
+    fs::path targetDir = m_targetDirFromDefault ? AppSettings::getExportTargetDir(file, localExportMode()) : m_targetDir;
+    if (!AppSettings::setExportTargetDir(file, localExportMode(), targetDir)) {
         Out::error("Could not save local export settings.");
         return false;
+    }
+
+    if (m_mode == ExportMode::Desktop) {
+        // Only the job count belongs to this dialog, so the rest is re-read: the
+        // compiler may have changed in Editor Settings since the mode was selected
+        const unsigned int jobs = static_cast<unsigned int>(m_desktopBuildJobs);
+        m_buildSettings = AppSettings::getBuildSettings(file);
+        m_buildSettings.buildJobs = jobs == Generator::getAutomaticParallelBuildJobs() ? 0 : jobs;
+        if (!AppSettings::setBuildSettings(file, m_buildSettings)) {
+            Out::error("Could not save local build settings.");
+            return false;
+        }
     }
 
     ExportTargetSettings* target = nullptr;
@@ -573,9 +586,9 @@ void ExportWindow::drawGraphicBackendRow() {
 }
 
 void ExportWindow::drawDesktopKitRows() {
-    std::string cCompiler = AppSettings::getLastCMakeCCompiler();
-    std::string cxxCompiler = AppSettings::getLastCMakeCxxCompiler();
-    std::string generator = AppSettings::getLastCMakeGenerator();
+    const std::string& cCompiler = m_buildSettings.cCompiler;
+    const std::string& cxxCompiler = m_buildSettings.cxxCompiler;
+    const std::string& generator = m_buildSettings.generator;
 
     std::string kitDisplay;
     if (cCompiler.empty() && cxxCompiler.empty() && generator.empty()) {
@@ -598,7 +611,6 @@ void ExportWindow::drawDesktopKitRows() {
     if (ImGui::InputInt("##DesktopBuildJobs", &m_desktopBuildJobs, 1, 8)) {
         m_desktopBuildJobs = std::clamp(m_desktopBuildJobs, 1, static_cast<int>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS));
         if (m_desktopBuildJobs != previousJobs) {
-            m_desktopBuildJobsEdited = true;
             saveCurrentSettingsToProject();
         }
     }
@@ -931,9 +943,10 @@ void ExportWindow::startConfiguredExport(bool overwriteTarget) {
         exportConfig.graphicBackend = Exporter::getCMakeGraphicBackend(backend);
 
         if (m_mode == ExportMode::Desktop) {
-            exportConfig.cmakeCCompiler = AppSettings::getLastCMakeCCompiler();
-            exportConfig.cmakeCxxCompiler = AppSettings::getLastCMakeCxxCompiler();
-            exportConfig.cmakeGenerator = AppSettings::getLastCMakeGenerator();
+            const LocalBuildSettings build = AppSettings::getBuildSettings(m_project->getProjectPath() / "project.yaml");
+            exportConfig.cmakeCCompiler = build.cCompiler;
+            exportConfig.cmakeCxxCompiler = build.cxxCompiler;
+            exportConfig.cmakeGenerator = build.generator;
             exportConfig.buildJobs = static_cast<unsigned int>(m_desktopBuildJobs);
             exportConfig.packNativeResources = m_project->shouldPackNativeResources();
         } else {
@@ -953,14 +966,10 @@ void ExportWindow::startConfiguredExport(bool overwriteTarget) {
         m_project->setStartSceneId(exportConfig.startSceneId);
     }
 
-    refreshShaderSelection();
-    if (m_shaderEntries.empty()) {
-        Out::error("No shaders selected. Review shader overrides before exporting.");
-        return;
-    }
-    for (const auto& entry : m_shaderEntries) {
-        exportConfig.selectedShaderKeys.insert(entry.key);
-    }
+    // Only the overrides: the exporter resolves them once every scene is loaded,
+    // so closed scenes still contribute and an exclusion cannot empty the list early
+    exportConfig.shaderAdditions = m_shaderAdditions;
+    exportConfig.shaderExclusions = m_shaderExclusions;
 
     if (!saveCurrentSettingsToProject()) return;
     m_step = Step::Progress;

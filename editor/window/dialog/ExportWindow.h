@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "AppSettings.h"
 #include "Exporter.h"
 #include "imgui.h"
 
@@ -77,7 +78,7 @@ namespace doriax::editor {
         int m_graphicBackendIndex = 0;
         bool m_desktopBackendConfigured = false;
         int m_desktopBuildJobs = 1;
-        bool m_desktopBuildJobsEdited = false;
+        LocalBuildSettings m_buildSettings;    // mirrors AppSettings::getBuildSettings()
 
         // Cached tool checks: both spawn processes, so never probe per-frame.
         std::string m_emsdkOverride;           // mirrors AppSettings::getEmsdkPath()

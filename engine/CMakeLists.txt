@@ -450,7 +450,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
             set(PLATFORM_ROOT ${DORIAX_ROOT}/platform/apple)
 
-            set(APP_BUNDLE_IDENTIFIER "org.doriaxengine.doriax")
+            set(APP_BUNDLE_IDENTIFIER "org.doriax.doriaxengine")
             set(PLATFORM_EXEC_FLAGS MACOSX_BUNDLE)
 
             include_directories(/System/Library/Frameworks)
@@ -556,7 +556,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
 
         set(PLATFORM_ROOT ${DORIAX_ROOT}/platform/apple)
 
-        set(APP_BUNDLE_IDENTIFIER "org.doriaxengine.doriax")
+        set(APP_BUNDLE_IDENTIFIER "org.doriax.doriaxengine")
 
         include_directories(/System/Library/Frameworks)
 

@@ -41,11 +41,15 @@ namespace doriax::editor {
         fs::path assetsDir;
         fs::path luaDir;
         uint32_t startSceneId = 0;
+        // Resolved from the scenes and the overrides below; CLI shader generation
+        // fills it in directly
         std::set<ShaderKey> selectedShaderKeys;
+        std::set<ShaderKey> shaderAdditions;
+        std::set<ShaderKey> shaderExclusions;
         // graphic backends the shaders are compiled for
         std::set<::doriax::ShaderBackend> selectedBackends;
         ShaderOutputFormat shaderOutputFormat = ShaderOutputFormat::Header;
-        // Desktop: compiler kit from project settings ("" = CMake default toolchain)
+        // Desktop: compiler kit from the editor settings ("" = CMake default toolchain)
         std::string cmakeCCompiler;
         std::string cmakeCxxCompiler;
         std::string cmakeGenerator;
@@ -106,7 +110,7 @@ namespace doriax::editor {
 
         bool isCancelled() const;
 
-        void collectSelectedShaderKeys(bool mergeWithExisting = false);
+        void resolveShaderKeys();
 
         fs::path getExportProjectRoot() const;
         static bool shouldSkipExportSupportFile(const fs::path& relativePath);

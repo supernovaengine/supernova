@@ -489,7 +489,6 @@ bool editor::Exporter::generateShaders(const ExportConfig& cfg) {
 
 void editor::Exporter::runExport() {
     const bool shaderGenerationOnly = (project == nullptr);
-    const bool useSceneShaderKeys = !shaderGenerationOnly && config.selectedShaderKeys.empty();
     const bool buildMode = !shaderGenerationOnly && config.mode != ExportMode::SourceCode;
 
     // Generation steps report progress in the [0,1] SourceCode range; for build
@@ -504,8 +503,6 @@ void editor::Exporter::runExport() {
     if (isCancelled()) { setError("Export cancelled"); return; }
 
     if (shaderGenerationOnly) {
-        collectSelectedShaderKeys();
-        if (isCancelled()) { setError("Export cancelled"); return; }
         if (!buildAndSaveShaders()) return;
         if (isCancelled()) { setError("Export cancelled"); return; }
 
@@ -518,12 +515,10 @@ void editor::Exporter::runExport() {
         return;
     }
 
-    if (useSceneShaderKeys) collectSelectedShaderKeys();
-    if (isCancelled()) { setError("Export cancelled"); return; }
     if (!clearGenerated()) return;
     if (isCancelled()) { setError("Export cancelled"); return; }
     if (!loadAndSaveAllScenes()) return;
-    if (useSceneShaderKeys) collectSelectedShaderKeys(true);
+    resolveShaderKeys();
     if (isCancelled()) { setError("Export cancelled"); return; }
     if (!copyGenerated()) return;
     if (isCancelled()) { setError("Export cancelled"); return; }
@@ -573,18 +568,33 @@ void editor::Exporter::runExport() {
     Out::info("Project exported successfully to: %s", config.targetDir.string().c_str());
 }
 
-void editor::Exporter::collectSelectedShaderKeys(bool mergeWithExisting) {
-    if (!mergeWithExisting && !config.selectedShaderKeys.empty()) {
-        return;
-    }
-
+// Runs after loadAndSaveAllScenes(): saving a scene refreshes its cached keys, so
+// scenes that were closed or outdated have contributed before the overrides apply.
+void editor::Exporter::resolveShaderKeys() {
     if (!project) {
         return;
     }
 
+    std::set<ShaderKey> keys;
     for (const auto& sceneProject : project->getScenes()) {
-        config.selectedShaderKeys.insert(sceneProject.shaderKeys.begin(), sceneProject.shaderKeys.end());
+        for (ShaderKey key : sceneProject.shaderKeys) {
+            // A key saved by an earlier session can carry a customShaderId this one
+            // never registered, which would build whichever fork now holds that id
+            const uint16_t customId = ShaderPool::getCustomIdFromKey(key);
+            if (customId != 0 && ShaderPool::getCustomShaderName(customId).empty()) {
+                continue;
+            }
+            keys.insert(ShaderPool::normalizeKey(key));
+        }
     }
+    for (ShaderKey key : config.shaderAdditions) {
+        keys.insert(ShaderPool::normalizeKey(key));
+    }
+    for (ShaderKey key : config.shaderExclusions) {
+        keys.erase(ShaderPool::normalizeKey(key));
+    }
+
+    config.selectedShaderKeys = std::move(keys);
 }
 
 fs::path editor::Exporter::getExportProjectRoot() const {
@@ -748,7 +758,7 @@ bool editor::Exporter::configureBuild() {
             if (config.cmakeGenerator.empty()) {
                 setError("Desktop export does not support the Xcode generator (it produces an app bundle). Unset the CMAKE_GENERATOR environment variable to use the default toolchain.");
             } else {
-                setError("Desktop export does not support the Xcode generator (it produces an app bundle). Clear the generator in Project Settings to use the default toolchain.");
+                setError("Desktop export does not support the Xcode generator (it produces an app bundle). Clear the generator in Editor Settings to use the default toolchain.");
             }
             return false;
         }
@@ -2146,7 +2156,7 @@ if(TARGET ${APP_NAME} AND (EMSCRIPTEN OR CMAKE_SYSTEM_NAME STREQUAL "Linux"))
 endif()
 )cmake";
     // CMake and the hand-maintained Xcode project must use the same IDs.
-    replaceAll(cmakeContent, "set(APP_BUNDLE_IDENTIFIER \"org.doriaxengine.doriax\")",
+    replaceAll(cmakeContent, "set(APP_BUNDLE_IDENTIFIER \"org.doriax.doriaxengine\")",
         "if(CMAKE_SYSTEM_NAME STREQUAL \"iOS\")\nset(APP_BUNDLE_IDENTIFIER " + literal(project->getIOSProjectSettings().bundleIdentifier)
         + ")\nelse()\nset(APP_BUNDLE_IDENTIFIER " + literal(project->getMacOSProjectSettings().bundleIdentifier) + ")\nendif()");
     replaceAll(cmakeContent, "MACOSX_BUNDLE_INFO_PLIST \"${DORIAX_ROOT}/workspaces/xcode/macos/Info.plist\"",

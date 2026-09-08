@@ -24,7 +24,6 @@ namespace doriax{
 
         static ShaderBuilderFn shaderBuilderFn;
 
-        static bool parseShaderTypeToken(const std::string& typeToken, ShaderType& shaderType);
         static std::string getShaderFile(const std::string& shaderStr, const std::string& extension);
         static std::string getShaderName(const std::string& shaderStr);
 
@@ -48,6 +47,7 @@ namespace doriax{
 
         static std::string getShaderStr(ShaderType shaderType, uint32_t properties, uint16_t customId = 0);
         static std::string getShaderTypeName(ShaderType shaderType, bool lowerCase = false);
+        static bool parseShaderTypeToken(const std::string& typeToken, ShaderType& shaderType);
         static int getShaderPropertyCount(ShaderType shaderType);
         static std::string getShaderPropertyName(ShaderType shaderType, int bit, bool shortName = true);
         static ShaderType getShaderTypeFromKey(ShaderKey key);

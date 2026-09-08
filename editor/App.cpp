@@ -535,7 +535,7 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
             projectSettingsWindow.open(&project);
             break;
         case AppMenuCommand::EditorSettings:
-            editorSettingsWindow.open();
+            editorSettingsWindow.open(&project);
             break;
         case AppMenuCommand::ProjectScenes:
             if (!project.isAnyScenePlaying())

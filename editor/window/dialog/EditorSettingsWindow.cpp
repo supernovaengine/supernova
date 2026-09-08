@@ -4,6 +4,7 @@
 #include "EditorSettingsWindow.h"
 
 #include "AppSettings.h"
+#include "Project.h"
 #include "Theme.h"
 #include "external/IconsFontAwesome6.h"
 #include "util/FileDialogs.h"
@@ -123,8 +124,9 @@ namespace {
     }
 }
 
-void EditorSettingsWindow::open() {
+void EditorSettingsWindow::open(Project* project) {
     m_isOpen = true;
+    m_project = project;
 
     m_availableKits = Generator::detectAvailableKits();
     m_cmakeKitIndex = 0;
@@ -132,8 +134,9 @@ void EditorSettingsWindow::open() {
     m_cmakePickError.clear();
     refreshCMakeStatus();
 
-    std::string currentCxx = AppSettings::getLastCMakeCxxCompiler();
-    std::string currentGen = AppSettings::getLastCMakeGenerator();
+    const LocalBuildSettings currentBuild = projectBuildSettings();
+    const std::string& currentCxx = currentBuild.cxxCompiler;
+    const std::string& currentGen = currentBuild.generator;
     if (!currentCxx.empty() || !currentGen.empty()) {
         for (size_t i = 0; i < m_availableKits.size(); i++) {
             if (m_availableKits[i].available && m_availableKits[i].cxxCompiler == currentCxx && m_availableKits[i].generator == currentGen) {
@@ -147,6 +150,11 @@ void EditorSettingsWindow::open() {
     m_editorVSyncEnabled = AppSettings::getEditorVSyncEnabled();
     m_defaultExportDirectory = AppSettings::getDefaultExportDirectory();
     refreshEmsdkStatus();
+}
+
+LocalBuildSettings EditorSettingsWindow::projectBuildSettings() const {
+    if (!m_project) return LocalBuildSettings();
+    return AppSettings::getBuildSettings(m_project->getProjectPath() / "project.yaml");
 }
 
 void EditorSettingsWindow::refreshCMakeStatus() {
@@ -313,7 +321,7 @@ void EditorSettingsWindow::drawCMakeSettings() {
             ImGui::PopStyleColor();
         }
 
-        if (beginSettingsRow("Default Compiler", "Default compiler kit inherited by new temporary projects.", m_cmakeKitIndex != 0)) {
+        if (beginSettingsRow("Compiler", "Compiler kit used to build C++ scripts, both when playing a scene and when exporting.", m_cmakeKitIndex != 0)) {
             m_cmakeKitIndex = 0;
         }
         if (m_cmakeKitIndex < 0 || m_cmakeKitIndex > static_cast<int>(m_availableKits.size())) {
@@ -354,6 +362,15 @@ void EditorSettingsWindow::drawCMakeSettings() {
             if (!kit.cCompiler.empty() || !kit.cxxCompiler.empty()) {
                 ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
                 ImGui::TextWrapped("C: %s\nCXX: %s", kit.cCompiler.c_str(), kit.cxxCompiler.c_str());
+                ImGui::PopStyleColor();
+            }
+        } else {
+            // The combo fell back to "Default" because the stored kit was not detected
+            const LocalBuildSettings stored = projectBuildSettings();
+            if (!stored.cxxCompiler.empty() || !stored.generator.empty()) {
+                ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(1.0f, 0.5f, 0.0f, 1.0f));
+                ImGui::TextWrapped(ICON_FA_TRIANGLE_EXCLAMATION " Builds still use \"%s\", which is no longer detected. Apply to switch to the default toolchain.",
+                    stored.cxxCompiler.empty() ? stored.generator.c_str() : stored.cxxCompiler.c_str());
                 ImGui::PopStyleColor();
             }
         }
@@ -398,12 +415,20 @@ bool EditorSettingsWindow::applySettings() {
     AppSettings::setEditorVSyncEnabled(m_editorVSyncEnabled);
     AppSettings::setDefaultExportDirectory(m_defaultExportDirectory);
     AppSettings::setCMakePath(m_cmakeOverride);
+    LocalBuildSettings build;
     if (m_cmakeKitIndex > 0) {
         const auto& kit = m_availableKits[m_cmakeKitIndex - 1];
-        AppSettings::setLastCMakeKit(kit.cCompiler, kit.cxxCompiler, kit.generator);
-    } else {
-        AppSettings::setLastCMakeKit("", "", "");
+        build.cCompiler = kit.cCompiler;
+        build.cxxCompiler = kit.cxxCompiler;
+        build.generator = kit.generator;
     }
+    if (m_project) {
+        const auto file = m_project->getProjectPath() / "project.yaml";
+        build.buildJobs = AppSettings::getBuildSettings(file).buildJobs;
+        AppSettings::setBuildSettings(file, build);
+    }
+    // Also the editor-wide default, so a new project starts from it
+    AppSettings::setLastCMakeKit(build.cCompiler, build.cxxCompiler, build.generator);
     AppSettings::setEmsdkPath(m_emsdkOverride);
     return AppSettings::saveSettings();
 }

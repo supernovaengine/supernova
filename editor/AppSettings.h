@@ -35,9 +35,14 @@ struct PanelVisibilitySettings {
     }
 };
 
-struct LocalExportSettings {
-    std::filesystem::path targetDir;
+// Compiler paths and job count are machine-specific, so they are kept per project
+// here instead of in project.yaml.
+struct LocalBuildSettings {
+    std::string cCompiler;
+    std::string cxxCompiler;
+    std::string generator;
     unsigned int buildJobs = 0; // 0 = automatic
+    bool configured = false;    // set on read: false = no entry, so default toolchain
 };
 
 class AppSettings {
@@ -49,8 +54,8 @@ private:
     static std::vector<std::filesystem::path> recentProjects;
     static std::filesystem::path lastProjectPath;
 
-    // Last compiler kit chosen in Project Settings, so new (temp) projects
-    // inherit it instead of silently defaulting each time.
+    // Last compiler kit chosen in Editor Settings, so new projects inherit it
+    // instead of silently defaulting each time.
     static std::string lastCMakeCCompiler;
     static std::string lastCMakeCxxCompiler;
     static std::string lastCMakeGenerator;
@@ -96,8 +101,11 @@ private:
     static void ensureConfigDirectory();
 
 public:
-    static LocalExportSettings getExportSettings(const std::filesystem::path& projectFile, const std::string& mode);
-    static bool setExportSettings(const std::filesystem::path& projectFile, const std::string& mode, const LocalExportSettings& value);
+    static std::filesystem::path getExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode);
+    static bool setExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode, const std::filesystem::path& targetDir);
+
+    static LocalBuildSettings getBuildSettings(const std::filesystem::path& projectFile);
+    static bool setBuildSettings(const std::filesystem::path& projectFile, const LocalBuildSettings& value);
 
     // Initialization
     static bool initialize();

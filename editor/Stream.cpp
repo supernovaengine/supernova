@@ -26,6 +26,30 @@
 using namespace doriax;
 
 namespace {
+    // The customShaderId in a key is a session-local registry index, so a fork is
+    // named by its project-relative path instead, the way scenes name theirs.
+    YAML::Node encodeExportShaderKeys(const std::set<ShaderKey>& shaderKeys) {
+        YAML::Node node(YAML::NodeType::Sequence);
+        for (ShaderKey key : shaderKeys) {
+            const uint16_t customId = ShaderPool::getCustomIdFromKey(key);
+            std::string customShader;
+            if (customId != 0) {
+                // Without a name there is nothing stable to write, and dropping only
+                // the id would turn the override into one for the built-in shader
+                customShader = ShaderPool::getCustomShaderName(customId);
+                if (customShader.empty()) continue;
+            }
+
+            const uint32_t properties = ShaderPool::getPropertiesFromKey(key);
+            YAML::Node entry(YAML::NodeType::Map);
+            entry["type"] = ShaderPool::getShaderTypeName(ShaderPool::getShaderTypeFromKey(key), true);
+            if (properties) entry["properties"] = properties;
+            if (!customShader.empty()) entry["customShader"] = customShader;
+            node.push_back(entry);
+        }
+        return node;
+    }
+
     std::vector<ShaderKey> decodeExportShaderKeys(const YAML::Node& node) {
         std::vector<ShaderKey> shaderKeys;
         if (!node || !node.IsSequence()) {
@@ -33,7 +57,21 @@ namespace {
         }
 
         for (const auto& keyNode : node) {
-            shaderKeys.push_back(ShaderPool::normalizeKey(keyNode.as<uint64_t>()));
+            ShaderType shaderType;
+            if (!keyNode.IsMap() || !keyNode["type"]) {
+                continue;
+            }
+            if (!ShaderPool::parseShaderTypeToken(keyNode["type"].as<std::string>(), shaderType)) {
+                continue;
+            }
+
+            // Keyed by name, so this returns the id the scenes resolve for it too
+            uint16_t customId = 0;
+            if (keyNode["customShader"]) {
+                customId = ShaderPool::registerCustomShader(keyNode["customShader"].as<std::string>());
+            }
+            const uint32_t properties = keyNode["properties"] ? keyNode["properties"].as<uint32_t>() : 0;
+            shaderKeys.push_back(ShaderPool::normalizeKey(ShaderPool::getShaderKey(shaderType, properties, customId)));
         }
         return shaderKeys;
     }
@@ -1637,18 +1675,6 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         }
         root["scriptDirs"] = scriptDirsNode;
     }
-    if (!project->getCMakeCCompiler().empty()) {
-        root["cmakeCCompiler"] = project->getCMakeCCompiler();
-    }
-    if (!project->getCMakeCxxCompiler().empty()) {
-        root["cmakeCxxCompiler"] = project->getCMakeCxxCompiler();
-    }
-    if (!project->getCMakeGenerator().empty()) {
-        root["cmakeGenerator"] = project->getCMakeGenerator();
-    }
-    if (project->getCMakeBuildJobs() != 0) {
-        root["cmakeBuildJobs"] = project->getCMakeBuildJobs();
-    }
     if (project->shouldPackNativeResources() != Project::defaultPackNativeResources) {
         root["packNativeResources"] = project->shouldPackNativeResources();
     }
@@ -1659,8 +1685,8 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         const SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
         YAML::Node sourceCodeNode;
 
-        for (ShaderKey key : sourceCode.shaderAdditions) sourceCodeNode["shaderAdditions"].push_back(key);
-        for (ShaderKey key : sourceCode.shaderExclusions) sourceCodeNode["shaderExclusions"].push_back(key);
+        if (!sourceCode.shaderAdditions.empty()) sourceCodeNode["shaderAdditions"] = encodeExportShaderKeys(sourceCode.shaderAdditions);
+        if (!sourceCode.shaderExclusions.empty()) sourceCodeNode["shaderExclusions"] = encodeExportShaderKeys(sourceCode.shaderExclusions);
         YAML::Node sourceCodeBackends = encodeExportBackendSet(sourceCode.graphicBackends, sourceCode.graphicBackendsConfigured);
         if (sourceCode.graphicBackendsConfigured) {
             sourceCodeNode["graphicBackends"] = sourceCodeBackends;
@@ -1677,8 +1703,8 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
             desktopNode["graphicBackend"] = ShaderPool::getShaderBackendCliToken(desktop.graphicBackend);
         }
 
-        for (ShaderKey key : desktop.shaderAdditions) desktopNode["shaderAdditions"].push_back(key);
-        for (ShaderKey key : desktop.shaderExclusions) desktopNode["shaderExclusions"].push_back(key);
+        if (!desktop.shaderAdditions.empty()) desktopNode["shaderAdditions"] = encodeExportShaderKeys(desktop.shaderAdditions);
+        if (!desktop.shaderExclusions.empty()) desktopNode["shaderExclusions"] = encodeExportShaderKeys(desktop.shaderExclusions);
         if (desktopNode.size() != 0) {
             exportNode["desktop"] = desktopNode;
         }
@@ -1686,8 +1712,8 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         const WebExportSettings& web = project->getWebExportSettings();
         YAML::Node webNode;
 
-        for (ShaderKey key : web.shaderAdditions) webNode["shaderAdditions"].push_back(key);
-        for (ShaderKey key : web.shaderExclusions) webNode["shaderExclusions"].push_back(key);
+        if (!web.shaderAdditions.empty()) webNode["shaderAdditions"] = encodeExportShaderKeys(web.shaderAdditions);
+        if (!web.shaderExclusions.empty()) webNode["shaderExclusions"] = encodeExportShaderKeys(web.shaderExclusions);
         if (webNode.size() != 0) {
             exportNode["web"] = webNode;
         }
@@ -1990,46 +2016,33 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         project->setScriptDirs(std::move(scriptDirs));
     }
 
-    if (node["cmakeCCompiler"] || node["cmakeCxxCompiler"] || node["cmakeGenerator"]) {
-        std::string cc = node["cmakeCCompiler"] ? node["cmakeCCompiler"].as<std::string>() : "";
-        std::string cxx = node["cmakeCxxCompiler"] ? node["cmakeCxxCompiler"].as<std::string>() : "";
-        std::string gen = node["cmakeGenerator"] ? node["cmakeGenerator"].as<std::string>() : "";
-        project->setCMakeKit(cc, cxx, gen);
+    // Compiler and job count moved to the editor settings, still per project.
+    // Migrated once, never over an entry this machine already has.
+    if (node["cmakeCCompiler"] || node["cmakeCxxCompiler"] || node["cmakeGenerator"] || node["cmakeBuildJobs"]) {
+        const fs::path projectFile = project->getProjectPath() / "project.yaml";
+        if (!AppSettings::getBuildSettings(projectFile).configured) {
+            LocalBuildSettings build;
+            if (node["cmakeCCompiler"]) build.cCompiler = node["cmakeCCompiler"].as<std::string>();
+            if (node["cmakeCxxCompiler"]) build.cxxCompiler = node["cmakeCxxCompiler"].as<std::string>();
+            if (node["cmakeGenerator"]) build.generator = node["cmakeGenerator"].as<std::string>();
+            if (node["cmakeBuildJobs"]) {
+                const long long jobs = node["cmakeBuildJobs"].as<long long>();
+                const long long maxJobs = static_cast<long long>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS);
+                build.buildJobs = static_cast<unsigned int>(std::clamp(jobs, 0LL, maxJobs));
+            }
+            AppSettings::setBuildSettings(projectFile, build);
+        }
     }
-    if (node["cmakeBuildJobs"]) {
-        // Only sanitized to a machine-independent range here; clamping to this
-        // machine's core count would silently rewrite a shared project file
-        // (the per-machine cap is applied at build time instead).
-        const long long jobs = node["cmakeBuildJobs"].as<long long>();
-        const long long maxJobs = static_cast<long long>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS);
-        project->setCMakeBuildJobs(static_cast<unsigned int>(std::clamp(jobs, 0LL, maxJobs)));
-    }
+
     if (node["packNativeResources"].IsDefined()) {
         project->setPackNativeResources(node["packNativeResources"].as<bool>());
     }
 
     if (node["export"] && node["export"].IsMap()) {
         const YAML::Node& exportNode = node["export"];
-        bool warned = false;
-        auto migrateLocal = [&](const char* mode, const YAML::Node& entry) {
-            if (entry["shaders"] && !warned) {
-                Log::warn("Legacy export shader lists ignored; review manual shader overrides.");
-                warned = true;
-            }
-            const auto file = project->getProjectPath() / "project.yaml";
-            auto local = AppSettings::getExportSettings(file, mode);
-            if (local.targetDir.empty() && entry["targetDir"]) local.targetDir = entry["targetDir"].as<std::string>();
-            if (std::string(mode) == "desktop" && !local.buildJobs && entry["buildJobs"])
-                local.buildJobs = static_cast<unsigned int>(std::clamp(entry["buildJobs"].as<long long>(), 0LL,
-                    static_cast<long long>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS)));
-            if (!AppSettings::setExportSettings(file, mode, local))
-                throw std::runtime_error("Could not migrate local export settings");
-        };
-
         if (exportNode["sourceCode"] && exportNode["sourceCode"].IsMap()) {
             const YAML::Node& sourceCodeNode = exportNode["sourceCode"];
             SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
-            migrateLocal("sourceCode", sourceCodeNode);
             for (auto key : decodeExportShaderKeys(sourceCodeNode["shaderAdditions"])) sourceCode.shaderAdditions.insert(key);
             for (auto key : decodeExportShaderKeys(sourceCodeNode["shaderExclusions"])) {
                 sourceCode.shaderExclusions.insert(key);
@@ -2045,7 +2058,6 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         if (exportNode["desktop"] && exportNode["desktop"].IsMap()) {
             const YAML::Node& desktopNode = exportNode["desktop"];
             DesktopExportSettings& desktop = project->getDesktopExportSettings();
-            migrateLocal("desktop", desktopNode);
             if (desktopNode["graphicBackend"]) {
                 ShaderBackend backend;
                 if (ShaderPool::parseShaderBackend(desktopNode["graphicBackend"].as<std::string>(), backend)) {
@@ -2064,7 +2076,6 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         if (exportNode["web"] && exportNode["web"].IsMap()) {
             const YAML::Node& webNode = exportNode["web"];
             WebExportSettings& web = project->getWebExportSettings();
-            migrateLocal("web", webNode);
 
             for (auto key : decodeExportShaderKeys(webNode["shaderAdditions"])) web.shaderAdditions.insert(key);
             for (auto key : decodeExportShaderKeys(webNode["shaderExclusions"])) {
@@ -2154,11 +2165,6 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
             for (const auto& permissionNode : androidNode["permissions"]) {
                 android.permissions.insert(permissionNode.as<std::string>());
             }
-        } else if (androidNode["permissions"] && androidNode["permissions"].IsMap()) {
-            const YAML::Node& permissionsNode = androidNode["permissions"];
-            if (permissionsNode["internet"].IsDefined() && permissionsNode["internet"].as<bool>()) android.permissions.insert("internet");
-            if (permissionsNode["vibrate"].IsDefined() && permissionsNode["vibrate"].as<bool>()) android.permissions.insert("vibrate");
-            if (permissionsNode["wakeLock"].IsDefined() && permissionsNode["wakeLock"].as<bool>()) android.permissions.insert("wake_lock");
         }
 
         if (androidNode["allowBackup"].IsDefined()) android.allowBackup = androidNode["allowBackup"].as<bool>();

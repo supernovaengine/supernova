@@ -29,6 +29,8 @@
 
 namespace doriax::editor{
 
+    struct LocalBuildSettings;
+
     enum class SceneType{
         SCENE_3D,
         SCENE_2D,
@@ -202,7 +204,7 @@ namespace doriax::editor{
 
     struct MacOSProjectSettings {
         std::string applicationName;
-        std::string bundleIdentifier = "DoriaxEngine.Doriax";
+        std::string bundleIdentifier = "org.doriax.doriaxengine";
         std::string versionName = "1.0";
         std::string buildNumber = "1";
         std::filesystem::path icon;
@@ -211,7 +213,7 @@ namespace doriax::editor{
 
     struct IOSProjectSettings {
         std::string applicationName;
-        std::string bundleIdentifier = "DoriaxEngine.Doriax";
+        std::string bundleIdentifier = "org.doriax.doriaxengine";
         std::string versionName = "1.0";
         std::string buildNumber = "1";
         std::filesystem::path icon;
@@ -281,12 +283,6 @@ namespace doriax::editor{
         std::filesystem::path assetsDir;
         std::filesystem::path luaDir;
         std::vector<std::filesystem::path> scriptDirs;  // extra C++ include and source roots
-        std::string cmakeCCompiler;
-        std::string cmakeCxxCompiler;
-        std::string cmakeGenerator;
-        // Atomic: read by the play-startup thread while the settings dialog can
-        // write it from the UI thread.
-        std::atomic<unsigned int> cmakeBuildJobs{0};
         bool packNativeResources;
         SourceCodeExportSettings sourceCodeExportSettings;
         DesktopExportSettings desktopExportSettings;
@@ -416,7 +412,7 @@ namespace doriax::editor{
 
         void finalizeStart(SceneProject* mainSceneProject, std::vector<PlayRuntimeScene>& runtimeScenes);
         void finalizeStop(SceneProject* mainSceneProject, std::vector<PlayRuntimeScene> runtimeScenes);
-        void runPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId);
+        void runPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId, const LocalBuildSettings& buildSettings);
         void failPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId, const std::string& message,
                      const std::string& alertTitle = "", const std::string& alertMessage = "");
         bool saveSceneFile(SceneProject* sceneProject, const std::filesystem::path& path, bool stopTransientPreviews = true);
@@ -452,7 +448,6 @@ namespace doriax::editor{
         static constexpr const char* defaultWindowTitle = "";
         static constexpr const char* defaultAssetsDir = ".";
         static constexpr const char* defaultLuaDir = ".";
-        static constexpr unsigned int defaultCMakeBuildJobs = 0;
         static constexpr bool defaultPackNativeResources = false;
 
         Project();
@@ -526,12 +521,6 @@ namespace doriax::editor{
         // layout, then every stored reference is rewritten and saved.
         void changeAssetRoots(const std::filesystem::path& newAssetsDir, const std::filesystem::path& newLuaDir);
 
-        void setCMakeKit(const std::string& cCompiler, const std::string& cxxCompiler, const std::string& generator = "");
-        std::string getCMakeCCompiler() const;
-        std::string getCMakeCxxCompiler() const;
-        std::string getCMakeGenerator() const;
-        void setCMakeBuildJobs(unsigned int jobs);
-        unsigned int getCMakeBuildJobs() const;
         void setPackNativeResources(bool enabled);
         bool shouldPackNativeResources() const;
 
