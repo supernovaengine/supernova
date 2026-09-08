@@ -1708,6 +1708,19 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
     }
 
     {
+        const ApplicationSettings& application = project->getApplicationSettings();
+        const ApplicationSettings defaultApplication;
+        YAML::Node applicationNode;
+        if (!application.name.empty()) applicationNode["name"] = application.name;
+        if (application.identifier != defaultApplication.identifier) applicationNode["identifier"] = application.identifier;
+        if (application.version != defaultApplication.version) applicationNode["version"] = application.version;
+        if (application.build != defaultApplication.build) applicationNode["build"] = application.build;
+        if (applicationNode.size() != 0) root["application"] = applicationNode;
+    }
+
+    // The platform nodes below only carry overrides; an omitted key inherits
+    // from the application block.
+    {
         const WebProjectSettings& web = project->getWebProjectSettings();
         const WebProjectSettings defaultWeb;
         YAML::Node webNode;
@@ -1732,12 +1745,11 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
 
     {
         const WindowsProjectSettings& windows = project->getWindowsProjectSettings();
-        const WindowsProjectSettings defaultWindows;
         YAML::Node windowsNode;
         if (!windows.productName.empty()) windowsNode["productName"] = windows.productName;
         if (!windows.companyName.empty()) windowsNode["companyName"] = windows.companyName;
-        if (windows.fileVersion != defaultWindows.fileVersion) windowsNode["fileVersion"] = windows.fileVersion;
-        if (windows.productVersion != defaultWindows.productVersion) windowsNode["productVersion"] = windows.productVersion;
+        if (!windows.fileVersion.empty()) windowsNode["fileVersion"] = windows.fileVersion;
+        if (!windows.productVersion.empty()) windowsNode["productVersion"] = windows.productVersion;
         if (windowsNode.size() != 0) root["windows"] = windowsNode;
     }
 
@@ -1746,9 +1758,9 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         const MacOSProjectSettings defaultMacOS;
         YAML::Node macOSNode;
         if (!macOS.applicationName.empty()) macOSNode["applicationName"] = macOS.applicationName;
-        if (macOS.bundleIdentifier != defaultMacOS.bundleIdentifier) macOSNode["bundleIdentifier"] = macOS.bundleIdentifier;
-        if (macOS.versionName != defaultMacOS.versionName) macOSNode["versionName"] = macOS.versionName;
-        if (macOS.buildNumber != defaultMacOS.buildNumber) macOSNode["buildNumber"] = macOS.buildNumber;
+        if (!macOS.bundleIdentifier.empty()) macOSNode["bundleIdentifier"] = macOS.bundleIdentifier;
+        if (!macOS.versionName.empty()) macOSNode["versionName"] = macOS.versionName;
+        if (!macOS.buildNumber.empty()) macOSNode["buildNumber"] = macOS.buildNumber;
         if (!macOS.icon.empty()) macOSNode["icon"] = macOS.icon.generic_string();
         if (macOS.highDpi != defaultMacOS.highDpi) macOSNode["highDpi"] = macOS.highDpi;
         if (macOSNode.size() != 0) root["macos"] = macOSNode;
@@ -1759,9 +1771,9 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         const IOSProjectSettings defaultIOS;
         YAML::Node iosNode;
         if (!ios.applicationName.empty()) iosNode["applicationName"] = ios.applicationName;
-        if (ios.bundleIdentifier != defaultIOS.bundleIdentifier) iosNode["bundleIdentifier"] = ios.bundleIdentifier;
-        if (ios.versionName != defaultIOS.versionName) iosNode["versionName"] = ios.versionName;
-        if (ios.buildNumber != defaultIOS.buildNumber) iosNode["buildNumber"] = ios.buildNumber;
+        if (!ios.bundleIdentifier.empty()) iosNode["bundleIdentifier"] = ios.bundleIdentifier;
+        if (!ios.versionName.empty()) iosNode["versionName"] = ios.versionName;
+        if (!ios.buildNumber.empty()) iosNode["buildNumber"] = ios.buildNumber;
         if (!ios.icon.empty()) iosNode["icon"] = ios.icon.generic_string();
         if (ios.hideStatusBar != defaultIOS.hideStatusBar) iosNode["hideStatusBar"] = ios.hideStatusBar;
         if (ios.hideHomeIndicator != defaultIOS.hideHomeIndicator) iosNode["hideHomeIndicator"] = ios.hideHomeIndicator;
@@ -1776,9 +1788,9 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
             androidNode["applicationName"] = android.applicationName;
         }
         const AndroidProjectSettings defaults;
-        if (android.packageName != defaults.packageName) androidNode["packageName"] = android.packageName;
+        if (!android.packageName.empty()) androidNode["packageName"] = android.packageName;
         if (android.versionCode != defaults.versionCode) androidNode["versionCode"] = android.versionCode;
-        if (android.versionName != defaults.versionName) androidNode["versionName"] = android.versionName;
+        if (!android.versionName.empty()) androidNode["versionName"] = android.versionName;
         if (!android.launcherIcon.empty()) {
             androidNode["launcherIcon"] = android.launcherIcon.string();
         }
@@ -2055,6 +2067,15 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         }
     }
 
+    if (node["application"] && node["application"].IsMap()) {
+        const YAML::Node& applicationNode = node["application"];
+        ApplicationSettings& application = project->getApplicationSettings();
+        if (applicationNode["name"]) application.name = applicationNode["name"].as<std::string>();
+        if (applicationNode["identifier"]) application.identifier = applicationNode["identifier"].as<std::string>();
+        if (applicationNode["version"]) application.version = applicationNode["version"].as<std::string>();
+        if (applicationNode["build"]) application.build = std::max(1u, applicationNode["build"].as<unsigned int>());
+    }
+
     if (node["web"] && node["web"].IsMap()) {
         const YAML::Node& webNode = node["web"];
         WebProjectSettings& web = project->getWebProjectSettings();
@@ -2113,7 +2134,7 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
 
         if (androidNode["applicationName"]) android.applicationName = androidNode["applicationName"].as<std::string>();
         if (androidNode["packageName"]) android.packageName = androidNode["packageName"].as<std::string>();
-        if (androidNode["versionCode"]) android.versionCode = std::max(1u, androidNode["versionCode"].as<unsigned int>());
+        if (androidNode["versionCode"]) android.versionCode = androidNode["versionCode"].as<unsigned int>();
         if (androidNode["versionName"]) android.versionName = androidNode["versionName"].as<std::string>();
         if (androidNode["launcherIcon"]) android.launcherIcon = androidNode["launcherIcon"].as<std::string>();
         if (androidNode["adaptiveIconForeground"]) android.adaptiveIconForeground = androidNode["adaptiveIconForeground"].as<std::string>();

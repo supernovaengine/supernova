@@ -104,6 +104,9 @@ public:
     static std::filesystem::path getExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode);
     static bool setExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode, const std::filesystem::path& targetDir);
 
+    // Re-keys the entries above and below when a project moves on disk.
+    static bool moveProjectLocalSettings(const std::filesystem::path& fromProjectFile, const std::filesystem::path& toProjectFile);
+
     static LocalBuildSettings getBuildSettings(const std::filesystem::path& projectFile);
     static bool setBuildSettings(const std::filesystem::path& projectFile, const LocalBuildSettings& value);
 

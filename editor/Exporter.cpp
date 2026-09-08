@@ -2072,12 +2072,11 @@ bool editor::Exporter::writeExportSettingsScript(std::string& cmakeContent) {
     auto value = [&](const char* name, const std::string& text) {
         script += "set(" + std::string(name) + " " + literal(text) + ")\n";
     };
-    value("title", escapeXmlAttribute(web.applicationName.empty()
-        ? (project->getName().empty() ? "Doriax" : project->getName()) : web.applicationName));
+    value("title", escapeXmlAttribute(project->getApplicationName(web.applicationName)));
     value("head", web.headInclude);
     value("resize", web.resizeCanvasToWindow ? "ON" : "OFF");
     value("hide_ui", web.hideEmscriptenUI ? "ON" : "OFF");
-    value("name", stripDesktopEntryControlChars(linuxSettings.applicationName.empty() ? project->getWindowSettings().title : linuxSettings.applicationName));
+    value("name", stripDesktopEntryControlChars(project->getApplicationName(linuxSettings.applicationName)));
     value("comment", stripDesktopEntryControlChars(linuxSettings.comment));
     value("categories", stripDesktopEntryControlChars(linuxSettings.categories));
     script += R"cmake(
@@ -2151,8 +2150,10 @@ endif()
 )cmake";
     // CMake and the hand-maintained Xcode project must use the same IDs.
     replaceAll(cmakeContent, "set(APP_BUNDLE_IDENTIFIER \"org.doriax.doriaxengine\")",
-        "if(CMAKE_SYSTEM_NAME STREQUAL \"iOS\")\nset(APP_BUNDLE_IDENTIFIER " + literal(project->getIOSProjectSettings().bundleIdentifier)
-        + ")\nelse()\nset(APP_BUNDLE_IDENTIFIER " + literal(project->getMacOSProjectSettings().bundleIdentifier) + ")\nendif()");
+        "if(CMAKE_SYSTEM_NAME STREQUAL \"iOS\")\nset(APP_BUNDLE_IDENTIFIER "
+        + literal(project->getApplicationIdentifier(project->getIOSProjectSettings().bundleIdentifier))
+        + ")\nelse()\nset(APP_BUNDLE_IDENTIFIER "
+        + literal(project->getApplicationIdentifier(project->getMacOSProjectSettings().bundleIdentifier)) + ")\nendif()");
     replaceAll(cmakeContent, "MACOSX_BUNDLE_INFO_PLIST \"${DORIAX_ROOT}/workspaces/xcode/macos/Info.plist\"",
         "MACOSX_BUNDLE_INFO_PLIST \"${DORIAX_ROOT}/workspaces/xcode/macos/Info.plist\"\n"
         "                XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER ${APP_BUNDLE_IDENTIFIER}");
@@ -2255,9 +2256,7 @@ bool editor::Exporter::writeAndroidProjectSettings() {
     const fs::path adaptiveIconDir = androidAppDir / "src" / "main" / "res" / "mipmap-anydpi-v26";
     const fs::path mainActivityPath = config.targetDir / "platform" / "android" / "java" / "org" / "doriaxengine" / "doriax" / "MainActivity.java";
 
-    const std::string appName = android.applicationName.empty()
-        ? (project->getName().empty() ? "Doriax" : project->getName())
-        : android.applicationName;
+    const std::string appName = project->getApplicationName(android.applicationName);
 
     std::string gradle;
     if (!readText(buildGradlePath, gradle)) return false;
@@ -2274,11 +2273,13 @@ bool editor::Exporter::writeAndroidProjectSettings() {
     }
 
     replaceAll(gradle, "compileSdk 33", "compileSdk " + std::to_string(android.targetSdk));
-    replaceAll(gradle, "applicationId \"com.yourcompany.project\"", "applicationId \"" + escapeGradleString(android.packageName) + "\"");
+    replaceAll(gradle, "applicationId \"com.yourcompany.project\"",
+        "applicationId \"" + escapeGradleString(project->getApplicationIdentifier(android.packageName)) + "\"");
     replaceAll(gradle, "minSdkVersion 21", "minSdkVersion " + std::to_string(android.minSdk));
     replaceAll(gradle, "targetSdkVersion 33", "targetSdkVersion " + std::to_string(android.targetSdk));
-    replaceAll(gradle, "versionCode 1", "versionCode " + std::to_string(android.versionCode));
-    replaceAll(gradle, "versionName \"1.0\"", "versionName \"" + escapeGradleString(android.versionName) + "\"");
+    replaceAll(gradle, "versionCode 1", "versionCode " + std::to_string(project->getApplicationVersionCode(android.versionCode)));
+    replaceAll(gradle, "versionName \"1.0\"",
+        "versionName \"" + escapeGradleString(project->getApplicationVersion(android.versionName)) + "\"");
 
     std::vector<std::string> abis;
     if (android.abiArm64V8a) abis.push_back("\"arm64-v8a\"");
@@ -2476,14 +2477,14 @@ bool editor::Exporter::writeAppleProjectSettings() {
         return false;
     }
     if (!macOSPlist.empty()) {
-        const std::string appName = macOS.applicationName.empty()
-            ? (project->getName().empty() ? "Doriax" : project->getName())
-            : macOS.applicationName;
+        const std::string appName = project->getApplicationName(macOS.applicationName);
         replacePlistStringValue(macOSPlist, "CFBundleName", appName);
         replacePlistStringValue(macOSPlist, "CFBundleDisplayName", appName);
-        replacePlistStringValue(macOSPlist, "CFBundleIdentifier", macOS.bundleIdentifier);
-        replacePlistStringValue(macOSPlist, "CFBundleShortVersionString", macOS.versionName);
-        replacePlistStringValue(macOSPlist, "CFBundleVersion", macOS.buildNumber);
+        replacePlistStringValue(macOSPlist, "CFBundleIdentifier", project->getApplicationIdentifier(macOS.bundleIdentifier));
+        replacePlistStringValue(macOSPlist, "CFBundleShortVersionString",
+            Project::toAppleVersion(project->getApplicationVersion(macOS.versionName)));
+        replacePlistStringValue(macOSPlist, "CFBundleVersion",
+            Project::toAppleVersion(project->getApplicationBuild(macOS.buildNumber)));
         replacePlistBoolValue(macOSPlist, "NSHighResolutionCapable", macOS.highDpi);
         FileUtils::writeIfChanged(macOSPlistPath, macOSPlist);
     }
@@ -2509,7 +2510,7 @@ bool editor::Exporter::writeAppleProjectSettings() {
                 return false;
             }
             block.replace(start + key.size(), end - start - key.size(),
-                "\"" + (isIOS ? ios.bundleIdentifier : macOS.bundleIdentifier) + "\"");
+                "\"" + project->getApplicationIdentifier(isIOS ? ios.bundleIdentifier : macOS.bundleIdentifier) + "\"");
             xcodeProject.replace(blockStart, blockEnd - blockStart, block);
         }
         blockStart += block.size() + 2;
@@ -2520,14 +2521,14 @@ bool editor::Exporter::writeAppleProjectSettings() {
         return false;
     }
     if (!iosPlist.empty()) {
-        const std::string appName = ios.applicationName.empty()
-            ? (project->getName().empty() ? "Doriax" : project->getName())
-            : ios.applicationName;
+        const std::string appName = project->getApplicationName(ios.applicationName);
         replacePlistStringValue(iosPlist, "CFBundleName", appName);
         replacePlistStringValue(iosPlist, "CFBundleDisplayName", appName);
-        replacePlistStringValue(iosPlist, "CFBundleIdentifier", ios.bundleIdentifier);
-        replacePlistStringValue(iosPlist, "CFBundleShortVersionString", ios.versionName);
-        replacePlistStringValue(iosPlist, "CFBundleVersion", ios.buildNumber);
+        replacePlistStringValue(iosPlist, "CFBundleIdentifier", project->getApplicationIdentifier(ios.bundleIdentifier));
+        replacePlistStringValue(iosPlist, "CFBundleShortVersionString",
+            Project::toAppleVersion(project->getApplicationVersion(ios.versionName)));
+        replacePlistStringValue(iosPlist, "CFBundleVersion",
+            Project::toAppleVersion(project->getApplicationBuild(ios.buildNumber)));
         replacePlistBoolValue(iosPlist, "UIStatusBarHidden", ios.hideStatusBar);
         replacePlistBoolValue(iosPlist, "CADisableMinimumFrameDurationOnPhone", ios.supportsHighRefreshRate);
         FileUtils::writeIfChanged(iosPlistPath, iosPlist);
@@ -2611,13 +2612,12 @@ bool editor::Exporter::writeAppleProjectSettings() {
 
 bool editor::Exporter::writeWindowsResourceFile(bool includeIcon) {
     const WindowsProjectSettings& windows = project->getWindowsProjectSettings();
-    const WindowSettings window = project->getWindowSettings();
-    const std::string productName = windows.productName.empty()
-        ? (project->getName().empty() ? window.title : project->getName())
-        : windows.productName;
+    const std::string productName = project->getApplicationName(windows.productName);
     const std::string companyName = windows.companyName;
-    const std::array<int, 4> fileVersion = parseWindowsVersion(windows.fileVersion);
-    const std::array<int, 4> productVersion = parseWindowsVersion(windows.productVersion);
+    const std::string fileVersionText = project->getApplicationFileVersion(windows.fileVersion);
+    const std::string productVersionText = project->getApplicationFileVersion(windows.productVersion);
+    const std::array<int, 4> fileVersion = parseWindowsVersion(fileVersionText);
+    const std::array<int, 4> productVersion = parseWindowsVersion(productVersionText);
 
     const fs::path projectRoot = getExportProjectRoot();
     std::error_code ec;
@@ -2655,11 +2655,11 @@ bool editor::Exporter::writeWindowsResourceFile(bool includeIcon) {
         f << "            VALUE \"CompanyName\", \"" << escapeWindowsRcString(companyName) << "\\0\"\n";
     }
     f << "            VALUE \"FileDescription\", \"" << escapeWindowsRcString(productName) << "\\0\"\n";
-    f << "            VALUE \"FileVersion\", \"" << escapeWindowsRcString(windows.fileVersion) << "\\0\"\n";
+    f << "            VALUE \"FileVersion\", \"" << escapeWindowsRcString(fileVersionText) << "\\0\"\n";
     f << "            VALUE \"InternalName\", \"" << escapeWindowsRcString(getAppName()) << "\\0\"\n";
     f << "            VALUE \"OriginalFilename\", \"" << escapeWindowsRcString(getAppName()) << ".exe\\0\"\n";
     f << "            VALUE \"ProductName\", \"" << escapeWindowsRcString(productName) << "\\0\"\n";
-    f << "            VALUE \"ProductVersion\", \"" << escapeWindowsRcString(windows.productVersion) << "\\0\"\n";
+    f << "            VALUE \"ProductVersion\", \"" << escapeWindowsRcString(productVersionText) << "\\0\"\n";
     f << "        END\n";
     f << "    END\n";
     f << "    BLOCK \"VarFileInfo\"\n";

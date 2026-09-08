@@ -10,6 +10,7 @@
 #include "window/ImageViewerWindow.h"
 #include "window/TerrainEditWindow.h"
 
+#include <cctype>
 #include <cmath>
 #include <fstream>
 #include <system_error>
@@ -2300,6 +2301,94 @@ const editor::DesktopExportSettings& editor::Project::getDesktopExportSettings()
     return desktopExportSettings;
 }
 
+// Leading numeric parts of a version, stopping at the first part that is not a
+// number. Saturates instead of dropping digits, so date-stamped build numbers
+// keep every digit that separates one release from the next.
+static std::vector<unsigned int> versionParts(const std::string& source, size_t maxParts) {
+    std::vector<unsigned int> parts;
+    size_t start = 0;
+    while (parts.size() < maxParts && start <= source.size()) {
+        const size_t dot = source.find('.', start);
+        const size_t end = dot == std::string::npos ? source.size() : dot;
+
+        unsigned long long part = 0;
+        size_t digits = 0;
+        for (size_t i = start; i < end && std::isdigit(static_cast<unsigned char>(source[i])); i++) {
+            part = std::min(part * 10 + static_cast<unsigned>(source[i] - '0'), 0xFFFFFFFFull);
+            digits++;
+        }
+        if (digits == 0) break;
+
+        parts.push_back(static_cast<unsigned int>(part));
+        if (dot == std::string::npos) break;
+        start = dot + 1;
+    }
+    return parts;
+}
+
+editor::ApplicationSettings& editor::Project::getApplicationSettings(){
+    return applicationSettings;
+}
+
+const editor::ApplicationSettings& editor::Project::getApplicationSettings() const{
+    return applicationSettings;
+}
+
+std::string editor::Project::getApplicationName(const std::string& platformOverride) const{
+    if (!platformOverride.empty()) return platformOverride;
+    if (!applicationSettings.name.empty()) return applicationSettings.name;
+    if (!name.empty()) return name;
+    return "Doriax";
+}
+
+std::string editor::Project::getApplicationIdentifier(const std::string& platformOverride) const{
+    if (!platformOverride.empty()) return platformOverride;
+    if (!applicationSettings.identifier.empty()) return applicationSettings.identifier;
+    return ApplicationSettings{}.identifier;
+}
+
+std::string editor::Project::getApplicationVersion(const std::string& platformOverride) const{
+    if (!platformOverride.empty()) return platformOverride;
+    if (!applicationSettings.version.empty()) return applicationSettings.version;
+    return ApplicationSettings{}.version;
+}
+
+std::string editor::Project::getApplicationBuild(const std::string& platformOverride) const{
+    if (!platformOverride.empty()) return platformOverride;
+    return std::to_string(std::max(1u, applicationSettings.build));
+}
+
+unsigned int editor::Project::getApplicationVersionCode(unsigned int platformOverride) const{
+    if (platformOverride > 0) return platformOverride;
+    return std::max(1u, applicationSettings.build);
+}
+
+std::string editor::Project::getApplicationFileVersion(const std::string& platformOverride) const{
+    return toFourPartVersion(platformOverride.empty() ? getApplicationVersion() : platformOverride);
+}
+
+std::string editor::Project::toAppleVersion(const std::string& source){
+    const std::vector<unsigned int> parts = versionParts(source, 3);
+    if (parts.empty()) return "1";
+
+    std::string result = std::to_string(parts[0]);
+    for (size_t i = 1; i < parts.size(); i++) {
+        result += "." + std::to_string(parts[i]);
+    }
+    return result;
+}
+
+std::string editor::Project::toFourPartVersion(const std::string& source){
+    const std::vector<unsigned int> parts = versionParts(source, 4);
+
+    std::string result;
+    for (size_t i = 0; i < 4; i++) {
+        if (i > 0) result += ".";
+        result += std::to_string(i < parts.size() ? std::min(65535u, parts[i]) : 0u);
+    }
+    return result;
+}
+
 editor::WebProjectSettings& editor::Project::getWebProjectSettings(){
     return webProjectSettings;
 }
@@ -3525,6 +3614,7 @@ void editor::Project::resetConfigs() {
     shaderOverrides = {};
     sourceCodeExportSettings = {};
     desktopExportSettings = {};
+    applicationSettings = {};
     webProjectSettings = {};
     linuxProjectSettings = {};
     windowsProjectSettings = {};
@@ -4036,6 +4126,14 @@ bool editor::Project::saveProjectToPath(const std::filesystem::path& path) {
 
             // Delete the temp directory after moving all files
             std::filesystem::remove_all(oldPath);
+
+            // Keyed by absolute path, so the move has to carry them over
+            if (!AppSettings::moveProjectLocalSettings(oldPath / "project.yaml", path / "project.yaml")) {
+                Out::warning("Failed to write the moved build settings to the editor configuration");
+                editor::getEditorHost().registerAlert("Warning",
+                    "Build settings could not be saved to the editor configuration.\n"
+                    "They still apply to this session. Set the compiler again in Editor Settings if a build uses the wrong toolchain.");
+            }
 
         } catch (const std::exception& e) {
             Out::error("Failed to move project files: %s", e.what());

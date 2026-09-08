@@ -35,6 +35,10 @@ namespace doriax::editor {
         char m_windowTitleBuffer[256] = {0};
         std::string m_windowTitleOriginal;
         fs::path m_windowIcon;
+        char m_applicationNameBuffer[256] = {0};
+        char m_applicationIdentifierBuffer[256] = {0};
+        char m_applicationVersionBuffer[64] = {0};
+        int m_applicationBuild = 1;
 
         // Per-frame preview textures over the pool-cached thumbnails, cleared
         // at the end of each draw (same lifecycle as Properties).
@@ -77,7 +81,7 @@ namespace doriax::editor {
         fs::path m_androidLauncherIcon;
         fs::path m_androidAdaptiveIconForeground;
         fs::path m_androidAdaptiveIconBackground;
-        int m_androidVersionCode = 1;
+        char m_androidVersionCodeBuffer[16] = {0};
         int m_androidMinSdk = 21;
         int m_androidTargetSdk = 33;
         int m_androidOrientationIndex = 0;
@@ -96,12 +100,22 @@ namespace doriax::editor {
         void drawWindowSettings();
         Texture* findThumbnail(const std::string& path);
         void drawDirectoriesSettings();
+
+        // Each platform section draws rows into the table its header opens.
+        void drawPlatformsSettings();
         void drawWebSettings();
         void drawLinuxSettings();
         void drawWindowsSettings();
         void drawMacOSSettings();
         void drawIOSSettings();
         void drawAndroidSettings();
+
+        // What an empty override resolves to, read from the buffers so hints follow typing.
+        std::string inheritedApplicationName() const;
+        std::string inheritedApplicationIdentifier() const;
+        std::string inheritedApplicationVersion() const;
+        std::string inheritedApplicationBuild() const;
+
         bool applySettings();
 
     public:

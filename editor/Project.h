@@ -178,6 +178,16 @@ namespace doriax::editor{
         bool graphicBackendConfigured = false;
     };
 
+    struct ApplicationSettings {
+        std::string name;  // empty = project name
+        std::string identifier = "com.yourcompany.project";
+        std::string version = "1.0";
+        unsigned int build = 1;  // Apple build number and Android version code
+    };
+
+    // Name, identifier, version and build below are overrides: empty (or 0)
+    // means the ApplicationSettings value.
+
     struct WebProjectSettings {
         std::string applicationName;
         std::filesystem::path favicon;
@@ -196,24 +206,24 @@ namespace doriax::editor{
     struct WindowsProjectSettings {
         std::string productName;
         std::string companyName;
-        std::string fileVersion = "1.0.0.0";
-        std::string productVersion = "1.0.0.0";
+        std::string fileVersion;
+        std::string productVersion;
     };
 
     struct MacOSProjectSettings {
         std::string applicationName;
-        std::string bundleIdentifier = "org.doriax.doriaxengine";
-        std::string versionName = "1.0";
-        std::string buildNumber = "1";
+        std::string bundleIdentifier;
+        std::string versionName;
+        std::string buildNumber;
         std::filesystem::path icon;
         bool highDpi = true;
     };
 
     struct IOSProjectSettings {
         std::string applicationName;
-        std::string bundleIdentifier = "org.doriax.doriaxengine";
-        std::string versionName = "1.0";
-        std::string buildNumber = "1";
+        std::string bundleIdentifier;
+        std::string versionName;
+        std::string buildNumber;
         std::filesystem::path icon;
         bool hideStatusBar = true;
         bool hideHomeIndicator = true;
@@ -231,9 +241,9 @@ namespace doriax::editor{
 
     struct AndroidProjectSettings {
         std::string applicationName;
-        std::string packageName = "com.yourcompany.project";
-        unsigned int versionCode = 1;
-        std::string versionName = "1.0";
+        std::string packageName;
+        unsigned int versionCode = 0;
+        std::string versionName;
         std::filesystem::path launcherIcon;
         std::filesystem::path adaptiveIconForeground;
         std::filesystem::path adaptiveIconBackground;
@@ -285,6 +295,7 @@ namespace doriax::editor{
         ShaderOverrides shaderOverrides;
         SourceCodeExportSettings sourceCodeExportSettings;
         DesktopExportSettings desktopExportSettings;
+        ApplicationSettings applicationSettings;
         WebProjectSettings webProjectSettings;
         LinuxProjectSettings linuxProjectSettings;
         WindowsProjectSettings windowsProjectSettings;
@@ -528,6 +539,21 @@ namespace doriax::editor{
         const SourceCodeExportSettings& getSourceCodeExportSettings() const;
         DesktopExportSettings& getDesktopExportSettings();
         const DesktopExportSettings& getDesktopExportSettings() const;
+        ApplicationSettings& getApplicationSettings();
+        const ApplicationSettings& getApplicationSettings() const;
+
+        // The platform override when set, otherwise the shared block.
+        std::string getApplicationName(const std::string& platformOverride = {}) const;
+        std::string getApplicationIdentifier(const std::string& platformOverride = {}) const;
+        std::string getApplicationVersion(const std::string& platformOverride = {}) const;
+        std::string getApplicationBuild(const std::string& platformOverride = {}) const;
+        unsigned int getApplicationVersionCode(unsigned int platformOverride = 0) const;
+        std::string getApplicationFileVersion(const std::string& platformOverride = {}) const;
+
+        // Version shapes each platform requires, also used by the settings UI.
+        static std::string toFourPartVersion(const std::string& version);
+        static std::string toAppleVersion(const std::string& version);
+
         WebProjectSettings& getWebProjectSettings();
         const WebProjectSettings& getWebProjectSettings() const;
         LinuxProjectSettings& getLinuxProjectSettings();

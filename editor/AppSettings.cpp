@@ -678,6 +678,28 @@ bool AppSettings::setExportTargetDir(const std::filesystem::path& projectFile, c
     return false;
 }
 
+bool AppSettings::moveProjectLocalSettings(const std::filesystem::path& fromProjectFile, const std::filesystem::path& toProjectFile) {
+    const auto fromKey = std::filesystem::absolute(fromProjectFile).lexically_normal().generic_string();
+    const auto toKey = std::filesystem::absolute(toProjectFile).lexically_normal().generic_string();
+    if (fromKey == toKey) return true;
+
+    bool moved = false;
+    for (const char* section : {"project_builds", "project_exports"}) {
+        YAML::Node root = settingsData[section];
+        if (!root || !root.IsMap() || !root[fromKey]) continue;
+
+        root[toKey] = YAML::Clone(root[fromKey]);
+        root.remove(fromKey);
+        moved = true;
+    }
+
+    if (!moved) return true;
+
+    // No rollback here: the project already moved, so restoring the old key would
+    // point this session at settings it can no longer reach.
+    return saveSettings();
+}
+
 LocalBuildSettings AppSettings::getBuildSettings(const std::filesystem::path& projectFile) {
     LocalBuildSettings result;
     const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
