@@ -2305,6 +2305,78 @@ bool editor::Project::shouldPackNativeResources() const{
     return packNativeResources;
 }
 
+editor::SourceCodeExportSettings& editor::Project::getSourceCodeExportSettings(){
+    return sourceCodeExportSettings;
+}
+
+const editor::SourceCodeExportSettings& editor::Project::getSourceCodeExportSettings() const{
+    return sourceCodeExportSettings;
+}
+
+editor::DesktopExportSettings& editor::Project::getDesktopExportSettings(){
+    return desktopExportSettings;
+}
+
+const editor::DesktopExportSettings& editor::Project::getDesktopExportSettings() const{
+    return desktopExportSettings;
+}
+
+editor::WebExportSettings& editor::Project::getWebExportSettings(){
+    return webExportSettings;
+}
+
+const editor::WebExportSettings& editor::Project::getWebExportSettings() const{
+    return webExportSettings;
+}
+
+editor::WebProjectSettings& editor::Project::getWebProjectSettings(){
+    return webProjectSettings;
+}
+
+const editor::WebProjectSettings& editor::Project::getWebProjectSettings() const{
+    return webProjectSettings;
+}
+
+editor::LinuxProjectSettings& editor::Project::getLinuxProjectSettings(){
+    return linuxProjectSettings;
+}
+
+const editor::LinuxProjectSettings& editor::Project::getLinuxProjectSettings() const{
+    return linuxProjectSettings;
+}
+
+editor::WindowsProjectSettings& editor::Project::getWindowsProjectSettings(){
+    return windowsProjectSettings;
+}
+
+const editor::WindowsProjectSettings& editor::Project::getWindowsProjectSettings() const{
+    return windowsProjectSettings;
+}
+
+editor::MacOSProjectSettings& editor::Project::getMacOSProjectSettings(){
+    return macOSProjectSettings;
+}
+
+const editor::MacOSProjectSettings& editor::Project::getMacOSProjectSettings() const{
+    return macOSProjectSettings;
+}
+
+editor::IOSProjectSettings& editor::Project::getIOSProjectSettings(){
+    return iosProjectSettings;
+}
+
+const editor::IOSProjectSettings& editor::Project::getIOSProjectSettings() const{
+    return iosProjectSettings;
+}
+
+editor::AndroidProjectSettings& editor::Project::getAndroidProjectSettings(){
+    return androidProjectSettings;
+}
+
+const editor::AndroidProjectSettings& editor::Project::getAndroidProjectSettings() const{
+    return androidProjectSettings;
+}
+
 uint32_t editor::Project::getStartSceneId() const{
     return startSceneId;
 }
@@ -3483,6 +3555,15 @@ void editor::Project::resetConfigs() {
     cmakeGenerator = "";
     cmakeBuildJobs = defaultCMakeBuildJobs;
     packNativeResources = defaultPackNativeResources;
+    sourceCodeExportSettings = {};
+    desktopExportSettings = {};
+    webExportSettings = {};
+    webProjectSettings = {};
+    linuxProjectSettings = {};
+    windowsProjectSettings = {};
+    macOSProjectSettings = {};
+    iosProjectSettings = {};
+    androidProjectSettings = {};
     selectedScene = NULL_PROJECT_SCENE;
     selectedSceneForProperties = NULL_PROJECT_SCENE;
     nextSceneId = 0;
@@ -3851,7 +3932,6 @@ bool editor::Project::createTempProject(std::string projectName, bool deleteIfEx
                 setCMakeKit(cc, cxx, gen);
             }
         }
-
         if (deleteIfExists && fs::exists(projectPath)) {
             fs::remove_all(projectPath);
         }
@@ -3914,6 +3994,11 @@ bool editor::Project::saveProjectFile() {
 
         fout << YAML::Dump(root);
         fout.close();
+
+        if (!fout) {
+            Out::error("Failed to write project file: %s", projectFile.string().c_str());
+            return false;
+        }
 
         return true;
     } catch (const std::exception& e) {

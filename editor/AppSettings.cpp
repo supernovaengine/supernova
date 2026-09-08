@@ -83,6 +83,7 @@ std::string AppSettings::lastCMakeCxxCompiler;
 std::string AppSettings::lastCMakeGenerator;
 std::string AppSettings::emsdkPath;
 std::string AppSettings::cmakePath;
+std::filesystem::path AppSettings::defaultExportDirectory;
 int AppSettings::windowWidth = 1280;
 int AppSettings::windowHeight = 720;
 bool AppSettings::isMaximized = false;
@@ -173,6 +174,9 @@ bool AppSettings::loadSettings() {
         // Load cmake executable override
         if (settingsData["cmake"] && settingsData["cmake"]["path"]) {
             cmakePath = settingsData["cmake"]["path"].as<std::string>();
+        }
+        if (settingsData["export"] && settingsData["export"]["default_dir"]) {
+            defaultExportDirectory = settingsData["export"]["default_dir"].as<std::string>();
         }
 
         // Load recent projects
@@ -335,6 +339,14 @@ bool AppSettings::saveSettings() {
         } else {
             settingsData.remove("cmake");
         }
+
+        if (!defaultExportDirectory.empty()) {
+            YAML::Node exportNode;
+            exportNode["default_dir"] = defaultExportDirectory.string();
+            settingsData["export"] = exportNode;
+        } else {
+            settingsData.remove("export");
+        }
         
         // Window settings
         YAML::Node windowNode;
@@ -400,8 +412,16 @@ bool AppSettings::saveSettings() {
 
         // Save to file
         std::ofstream fout(configFilePath.string());
+        if (!fout) {
+            Out::error("Failed to open editor settings for writing: %s", configFilePath.string().c_str());
+            return false;
+        }
         fout << YAML::Dump(settingsData);
         fout.close();
+        if (!fout) {
+            Out::error("Failed to write editor settings: %s", configFilePath.string().c_str());
+            return false;
+        }
         
         return true;
     } catch (const std::exception& e) {
@@ -456,6 +476,15 @@ std::string AppSettings::getCMakePath() {
 
 void AppSettings::setCMakePath(const std::string& path) {
     cmakePath = path;
+    saveSettings();
+}
+
+std::filesystem::path AppSettings::getDefaultExportDirectory() {
+    return defaultExportDirectory;
+}
+
+void AppSettings::setDefaultExportDirectory(const std::filesystem::path& path) {
+    defaultExportDirectory = path;
     saveSettings();
 }
 
@@ -612,6 +641,44 @@ void AppSettings::setAiSettings(const ai::Settings& settings) {
         aiSettings.model = ai::defaultModelForProvider(aiSettings.provider);
     }
     saveSettings();
+}
+
+} // namespace doriax::editor
+
+namespace doriax::editor {
+
+LocalExportSettings AppSettings::getExportSettings(const std::filesystem::path& projectFile, const std::string& mode) {
+    LocalExportSettings result;
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    const YAML::Node data = settingsData;
+    const auto exports = data["project_exports"];
+    if (!exports || !exports.IsMap()) return result;
+    const auto project = exports[key];
+    if (!project || !project.IsMap()) return result;
+    const auto entry = project[mode];
+    if (!entry || !entry.IsMap()) return result;
+    if (entry["targetDir"]) result.targetDir = entry["targetDir"].as<std::string>();
+    if (entry["buildJobs"]) result.buildJobs = entry["buildJobs"].as<unsigned int>();
+    return result;
+}
+
+bool AppSettings::setExportSettings(const std::filesystem::path& projectFile, const std::string& mode, const LocalExportSettings& value) {
+    const auto previous = getExportSettings(projectFile, mode);
+    if (previous.targetDir == value.targetDir && previous.buildJobs == value.buildJobs) return true;
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    YAML::Node backup = YAML::Clone(settingsData);
+    YAML::Node entry(YAML::NodeType::Map);
+    if (!value.targetDir.empty()) entry["targetDir"] = value.targetDir.generic_string();
+    if (value.buildJobs) entry["buildJobs"] = value.buildJobs;
+    if (entry.size()) settingsData["project_exports"][key][mode] = entry;
+    else {
+        settingsData["project_exports"][key].remove(mode);
+        if (!settingsData["project_exports"][key].size()) settingsData["project_exports"].remove(key);
+        if (!settingsData["project_exports"].size()) settingsData.remove("project_exports");
+    }
+    if (saveSettings()) return true;
+    settingsData = backup;
+    return false;
 }
 
 } // namespace doriax::editor

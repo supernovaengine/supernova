@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "Stream.h"
+#include "AppSettings.h"
 
 #include "Base64.h"
 #include "Catalog.h"
@@ -23,6 +24,68 @@
 #include <set>
 
 using namespace doriax;
+
+namespace {
+    std::vector<ShaderKey> decodeExportShaderKeys(const YAML::Node& node) {
+        std::vector<ShaderKey> shaderKeys;
+        if (!node || !node.IsSequence()) {
+            return shaderKeys;
+        }
+
+        for (const auto& keyNode : node) {
+            shaderKeys.push_back(ShaderPool::normalizeKey(keyNode.as<uint64_t>()));
+        }
+        return shaderKeys;
+    }
+
+    YAML::Node encodeExportBackendSet(const std::set<ShaderBackend>& backends, bool configured) {
+        if (!configured) {
+            return YAML::Node();
+        }
+
+        YAML::Node node(YAML::NodeType::Sequence);
+        for (ShaderBackend backend : backends) {
+            node.push_back(ShaderPool::getShaderBackendCliToken(backend));
+        }
+        return node;
+    }
+
+    std::set<ShaderBackend> decodeExportBackendSet(const YAML::Node& node) {
+        std::set<ShaderBackend> backends;
+        if (!node || !node.IsSequence()) {
+            return backends;
+        }
+
+        for (const auto& backendNode : node) {
+            ShaderBackend backend;
+            if (ShaderPool::parseShaderBackend(backendNode.as<std::string>(), backend)) {
+                backends.insert(backend);
+            }
+        }
+        return backends;
+    }
+
+    std::string androidOrientationToString(editor::AndroidOrientation orientation) {
+        switch (orientation) {
+            case editor::AndroidOrientation::Portrait: return "portrait";
+            case editor::AndroidOrientation::Landscape: return "landscape";
+            case editor::AndroidOrientation::SensorPortrait: return "sensorPortrait";
+            case editor::AndroidOrientation::SensorLandscape: return "sensorLandscape";
+            case editor::AndroidOrientation::FullSensor: return "fullSensor";
+            case editor::AndroidOrientation::Unspecified:
+            default: return "unspecified";
+        }
+    }
+
+    editor::AndroidOrientation stringToAndroidOrientation(const std::string& value) {
+        if (value == "portrait") return editor::AndroidOrientation::Portrait;
+        if (value == "landscape") return editor::AndroidOrientation::Landscape;
+        if (value == "sensorPortrait") return editor::AndroidOrientation::SensorPortrait;
+        if (value == "sensorLandscape") return editor::AndroidOrientation::SensorLandscape;
+        if (value == "fullSensor") return editor::AndroidOrientation::FullSensor;
+        return editor::AndroidOrientation::Unspecified;
+    }
+}
 
 std::string editor::Stream::makeEmbeddedTextureId(){
     static uint64_t embeddedTextureCounter = 1;
@@ -1590,6 +1653,154 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         root["packNativeResources"] = project->shouldPackNativeResources();
     }
 
+    {
+        YAML::Node exportNode;
+
+        const SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
+        YAML::Node sourceCodeNode;
+
+        for (ShaderKey key : sourceCode.shaderAdditions) sourceCodeNode["shaderAdditions"].push_back(key);
+        for (ShaderKey key : sourceCode.shaderExclusions) sourceCodeNode["shaderExclusions"].push_back(key);
+        YAML::Node sourceCodeBackends = encodeExportBackendSet(sourceCode.graphicBackends, sourceCode.graphicBackendsConfigured);
+        if (sourceCode.graphicBackendsConfigured) {
+            sourceCodeNode["graphicBackends"] = sourceCodeBackends;
+        }
+
+        if (sourceCodeNode.size() != 0) {
+            exportNode["sourceCode"] = sourceCodeNode;
+        }
+
+        const DesktopExportSettings& desktop = project->getDesktopExportSettings();
+        YAML::Node desktopNode;
+
+        if (desktop.graphicBackendConfigured) {
+            desktopNode["graphicBackend"] = ShaderPool::getShaderBackendCliToken(desktop.graphicBackend);
+        }
+
+        for (ShaderKey key : desktop.shaderAdditions) desktopNode["shaderAdditions"].push_back(key);
+        for (ShaderKey key : desktop.shaderExclusions) desktopNode["shaderExclusions"].push_back(key);
+        if (desktopNode.size() != 0) {
+            exportNode["desktop"] = desktopNode;
+        }
+
+        const WebExportSettings& web = project->getWebExportSettings();
+        YAML::Node webNode;
+
+        for (ShaderKey key : web.shaderAdditions) webNode["shaderAdditions"].push_back(key);
+        for (ShaderKey key : web.shaderExclusions) webNode["shaderExclusions"].push_back(key);
+        if (webNode.size() != 0) {
+            exportNode["web"] = webNode;
+        }
+
+        if (exportNode.size() != 0) {
+            root["export"] = exportNode;
+        }
+    }
+
+    {
+        const WebProjectSettings& web = project->getWebProjectSettings();
+        const WebProjectSettings defaultWeb;
+        YAML::Node webNode;
+        if (!web.applicationName.empty()) webNode["applicationName"] = web.applicationName;
+        if (!web.favicon.empty()) webNode["favicon"] = web.favicon.generic_string();
+        if (!web.customHtmlShell.empty()) webNode["customHtmlShell"] = web.customHtmlShell.generic_string();
+        if (!web.headInclude.empty()) webNode["headInclude"] = web.headInclude;
+        if (web.resizeCanvasToWindow != defaultWeb.resizeCanvasToWindow) webNode["resizeCanvasToWindow"] = web.resizeCanvasToWindow;
+        if (web.hideEmscriptenUI != defaultWeb.hideEmscriptenUI) webNode["hideEmscriptenUI"] = web.hideEmscriptenUI;
+        if (webNode.size() != 0) root["web"] = webNode;
+    }
+
+    {
+        const LinuxProjectSettings& linuxSettings = project->getLinuxProjectSettings();
+        const LinuxProjectSettings defaultLinux;
+        YAML::Node linuxNode;
+        if (!linuxSettings.applicationName.empty()) linuxNode["applicationName"] = linuxSettings.applicationName;
+        if (!linuxSettings.comment.empty()) linuxNode["comment"] = linuxSettings.comment;
+        if (linuxSettings.categories != defaultLinux.categories) linuxNode["categories"] = linuxSettings.categories;
+        if (linuxNode.size() != 0) root["linux"] = linuxNode;
+    }
+
+    {
+        const WindowsProjectSettings& windows = project->getWindowsProjectSettings();
+        const WindowsProjectSettings defaultWindows;
+        YAML::Node windowsNode;
+        if (!windows.productName.empty()) windowsNode["productName"] = windows.productName;
+        if (!windows.companyName.empty()) windowsNode["companyName"] = windows.companyName;
+        if (windows.fileVersion != defaultWindows.fileVersion) windowsNode["fileVersion"] = windows.fileVersion;
+        if (windows.productVersion != defaultWindows.productVersion) windowsNode["productVersion"] = windows.productVersion;
+        if (windowsNode.size() != 0) root["windows"] = windowsNode;
+    }
+
+    {
+        const MacOSProjectSettings& macOS = project->getMacOSProjectSettings();
+        const MacOSProjectSettings defaultMacOS;
+        YAML::Node macOSNode;
+        if (!macOS.applicationName.empty()) macOSNode["applicationName"] = macOS.applicationName;
+        if (macOS.bundleIdentifier != defaultMacOS.bundleIdentifier) macOSNode["bundleIdentifier"] = macOS.bundleIdentifier;
+        if (macOS.versionName != defaultMacOS.versionName) macOSNode["versionName"] = macOS.versionName;
+        if (macOS.buildNumber != defaultMacOS.buildNumber) macOSNode["buildNumber"] = macOS.buildNumber;
+        if (!macOS.icon.empty()) macOSNode["icon"] = macOS.icon.generic_string();
+        if (macOS.highDpi != defaultMacOS.highDpi) macOSNode["highDpi"] = macOS.highDpi;
+        if (macOSNode.size() != 0) root["macos"] = macOSNode;
+    }
+
+    {
+        const IOSProjectSettings& ios = project->getIOSProjectSettings();
+        const IOSProjectSettings defaultIOS;
+        YAML::Node iosNode;
+        if (!ios.applicationName.empty()) iosNode["applicationName"] = ios.applicationName;
+        if (ios.bundleIdentifier != defaultIOS.bundleIdentifier) iosNode["bundleIdentifier"] = ios.bundleIdentifier;
+        if (ios.versionName != defaultIOS.versionName) iosNode["versionName"] = ios.versionName;
+        if (ios.buildNumber != defaultIOS.buildNumber) iosNode["buildNumber"] = ios.buildNumber;
+        if (!ios.icon.empty()) iosNode["icon"] = ios.icon.generic_string();
+        if (ios.hideStatusBar != defaultIOS.hideStatusBar) iosNode["hideStatusBar"] = ios.hideStatusBar;
+        if (ios.hideHomeIndicator != defaultIOS.hideHomeIndicator) iosNode["hideHomeIndicator"] = ios.hideHomeIndicator;
+        if (ios.supportsHighRefreshRate != defaultIOS.supportsHighRefreshRate) iosNode["supportsHighRefreshRate"] = ios.supportsHighRefreshRate;
+        if (iosNode.size() != 0) root["ios"] = iosNode;
+    }
+
+    {
+        const AndroidProjectSettings& android = project->getAndroidProjectSettings();
+        YAML::Node androidNode;
+        if (!android.applicationName.empty()) {
+            androidNode["applicationName"] = android.applicationName;
+        }
+        const AndroidProjectSettings defaults;
+        if (android.packageName != defaults.packageName) androidNode["packageName"] = android.packageName;
+        if (android.versionCode != defaults.versionCode) androidNode["versionCode"] = android.versionCode;
+        if (android.versionName != defaults.versionName) androidNode["versionName"] = android.versionName;
+        if (!android.launcherIcon.empty()) {
+            androidNode["launcherIcon"] = android.launcherIcon.string();
+        }
+        if (!android.adaptiveIconForeground.empty()) {
+            androidNode["adaptiveIconForeground"] = android.adaptiveIconForeground.string();
+        }
+        if (!android.adaptiveIconBackground.empty()) {
+            androidNode["adaptiveIconBackground"] = android.adaptiveIconBackground.string();
+        }
+        if (android.minSdk != defaults.minSdk) androidNode["minSdk"] = android.minSdk;
+        if (android.targetSdk != defaults.targetSdk) androidNode["targetSdk"] = android.targetSdk;
+        if (android.orientation != defaults.orientation) androidNode["orientation"] = androidOrientationToString(android.orientation);
+
+        YAML::Node abiNode;
+        if (android.abiArmeabiV7a != defaults.abiArmeabiV7a) abiNode["armeabi-v7a"] = android.abiArmeabiV7a;
+        if (android.abiArm64V8a != defaults.abiArm64V8a) abiNode["arm64-v8a"] = android.abiArm64V8a;
+        if (android.abiX86 != defaults.abiX86) abiNode["x86"] = android.abiX86;
+        if (android.abiX86_64 != defaults.abiX86_64) abiNode["x86_64"] = android.abiX86_64;
+        if (abiNode.size()) androidNode["architectures"] = abiNode;
+
+        YAML::Node permissionsNode(YAML::NodeType::Sequence);
+        for (const std::string& permission : android.permissions) {
+            permissionsNode.push_back(permission);
+        }
+        if (android.permissions != defaults.permissions) androidNode["permissions"] = permissionsNode;
+
+        if (android.allowBackup != defaults.allowBackup) androidNode["allowBackup"] = android.allowBackup;
+        if (android.fullscreen != defaults.fullscreen) androidNode["fullscreen"] = android.fullscreen;
+        if (android.keepScreenOn != defaults.keepScreenOn) androidNode["keepScreenOn"] = android.keepScreenOn;
+        if (androidNode.size()) root["android"] = androidNode;
+    }
+
     if (project->getStartSceneId() != NULL_PROJECT_SCENE) {
         root["startSceneId"] = project->getStartSceneId();
     }
@@ -1795,6 +2006,164 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
     }
     if (node["packNativeResources"].IsDefined()) {
         project->setPackNativeResources(node["packNativeResources"].as<bool>());
+    }
+
+    if (node["export"] && node["export"].IsMap()) {
+        const YAML::Node& exportNode = node["export"];
+        bool warned = false;
+        auto migrateLocal = [&](const char* mode, const YAML::Node& entry) {
+            if (entry["shaders"] && !warned) {
+                Log::warn("Legacy export shader lists ignored; review manual shader overrides.");
+                warned = true;
+            }
+            const auto file = project->getProjectPath() / "project.yaml";
+            auto local = AppSettings::getExportSettings(file, mode);
+            if (local.targetDir.empty() && entry["targetDir"]) local.targetDir = entry["targetDir"].as<std::string>();
+            if (std::string(mode) == "desktop" && !local.buildJobs && entry["buildJobs"])
+                local.buildJobs = static_cast<unsigned int>(std::clamp(entry["buildJobs"].as<long long>(), 0LL,
+                    static_cast<long long>(Generator::MAX_SUPPORTED_PARALLEL_BUILD_JOBS)));
+            if (!AppSettings::setExportSettings(file, mode, local))
+                throw std::runtime_error("Could not migrate local export settings");
+        };
+
+        if (exportNode["sourceCode"] && exportNode["sourceCode"].IsMap()) {
+            const YAML::Node& sourceCodeNode = exportNode["sourceCode"];
+            SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
+            migrateLocal("sourceCode", sourceCodeNode);
+            for (auto key : decodeExportShaderKeys(sourceCodeNode["shaderAdditions"])) sourceCode.shaderAdditions.insert(key);
+            for (auto key : decodeExportShaderKeys(sourceCodeNode["shaderExclusions"])) {
+                sourceCode.shaderExclusions.insert(key);
+                sourceCode.shaderAdditions.erase(key);
+            }
+            if (sourceCodeNode["graphicBackends"]) {
+                sourceCode.graphicBackends = decodeExportBackendSet(sourceCodeNode["graphicBackends"]);
+                sourceCode.graphicBackendsConfigured = true;
+            }
+
+        }
+
+        if (exportNode["desktop"] && exportNode["desktop"].IsMap()) {
+            const YAML::Node& desktopNode = exportNode["desktop"];
+            DesktopExportSettings& desktop = project->getDesktopExportSettings();
+            migrateLocal("desktop", desktopNode);
+            if (desktopNode["graphicBackend"]) {
+                ShaderBackend backend;
+                if (ShaderPool::parseShaderBackend(desktopNode["graphicBackend"].as<std::string>(), backend)) {
+                    desktop.graphicBackend = backend;
+                    desktop.graphicBackendConfigured = true;
+                }
+            }
+
+            for (auto key : decodeExportShaderKeys(desktopNode["shaderAdditions"])) desktop.shaderAdditions.insert(key);
+            for (auto key : decodeExportShaderKeys(desktopNode["shaderExclusions"])) {
+                desktop.shaderExclusions.insert(key);
+                desktop.shaderAdditions.erase(key);
+            }
+        }
+
+        if (exportNode["web"] && exportNode["web"].IsMap()) {
+            const YAML::Node& webNode = exportNode["web"];
+            WebExportSettings& web = project->getWebExportSettings();
+            migrateLocal("web", webNode);
+
+            for (auto key : decodeExportShaderKeys(webNode["shaderAdditions"])) web.shaderAdditions.insert(key);
+            for (auto key : decodeExportShaderKeys(webNode["shaderExclusions"])) {
+                web.shaderExclusions.insert(key);
+                web.shaderAdditions.erase(key);
+            }
+        }
+    }
+
+    if (node["web"] && node["web"].IsMap()) {
+        const YAML::Node& webNode = node["web"];
+        WebProjectSettings& web = project->getWebProjectSettings();
+        if (webNode["applicationName"]) web.applicationName = webNode["applicationName"].as<std::string>();
+        if (webNode["favicon"]) web.favicon = webNode["favicon"].as<std::string>();
+        if (webNode["customHtmlShell"]) web.customHtmlShell = webNode["customHtmlShell"].as<std::string>();
+        if (webNode["headInclude"]) web.headInclude = webNode["headInclude"].as<std::string>();
+        if (webNode["resizeCanvasToWindow"].IsDefined()) web.resizeCanvasToWindow = webNode["resizeCanvasToWindow"].as<bool>();
+        if (webNode["hideEmscriptenUI"].IsDefined()) web.hideEmscriptenUI = webNode["hideEmscriptenUI"].as<bool>();
+    }
+
+    if (node["linux"] && node["linux"].IsMap()) {
+        const YAML::Node& linuxNode = node["linux"];
+        LinuxProjectSettings& linuxSettings = project->getLinuxProjectSettings();
+        if (linuxNode["applicationName"]) linuxSettings.applicationName = linuxNode["applicationName"].as<std::string>();
+        if (linuxNode["comment"]) linuxSettings.comment = linuxNode["comment"].as<std::string>();
+        if (linuxNode["categories"]) linuxSettings.categories = linuxNode["categories"].as<std::string>();
+    }
+
+    if (node["windows"] && node["windows"].IsMap()) {
+        const YAML::Node& windowsNode = node["windows"];
+        WindowsProjectSettings& windows = project->getWindowsProjectSettings();
+        if (windowsNode["productName"]) windows.productName = windowsNode["productName"].as<std::string>();
+        if (windowsNode["companyName"]) windows.companyName = windowsNode["companyName"].as<std::string>();
+        if (windowsNode["fileVersion"]) windows.fileVersion = windowsNode["fileVersion"].as<std::string>();
+        if (windowsNode["productVersion"]) windows.productVersion = windowsNode["productVersion"].as<std::string>();
+    }
+
+    if (node["macos"] && node["macos"].IsMap()) {
+        const YAML::Node& macOSNode = node["macos"];
+        MacOSProjectSettings& macOS = project->getMacOSProjectSettings();
+        if (macOSNode["applicationName"]) macOS.applicationName = macOSNode["applicationName"].as<std::string>();
+        if (macOSNode["bundleIdentifier"]) macOS.bundleIdentifier = macOSNode["bundleIdentifier"].as<std::string>();
+        if (macOSNode["versionName"]) macOS.versionName = macOSNode["versionName"].as<std::string>();
+        if (macOSNode["buildNumber"]) macOS.buildNumber = macOSNode["buildNumber"].as<std::string>();
+        if (macOSNode["icon"]) macOS.icon = macOSNode["icon"].as<std::string>();
+        if (macOSNode["highDpi"].IsDefined()) macOS.highDpi = macOSNode["highDpi"].as<bool>();
+    }
+
+    if (node["ios"] && node["ios"].IsMap()) {
+        const YAML::Node& iosNode = node["ios"];
+        IOSProjectSettings& ios = project->getIOSProjectSettings();
+        if (iosNode["applicationName"]) ios.applicationName = iosNode["applicationName"].as<std::string>();
+        if (iosNode["bundleIdentifier"]) ios.bundleIdentifier = iosNode["bundleIdentifier"].as<std::string>();
+        if (iosNode["versionName"]) ios.versionName = iosNode["versionName"].as<std::string>();
+        if (iosNode["buildNumber"]) ios.buildNumber = iosNode["buildNumber"].as<std::string>();
+        if (iosNode["icon"]) ios.icon = iosNode["icon"].as<std::string>();
+        if (iosNode["hideStatusBar"].IsDefined()) ios.hideStatusBar = iosNode["hideStatusBar"].as<bool>();
+        if (iosNode["hideHomeIndicator"].IsDefined()) ios.hideHomeIndicator = iosNode["hideHomeIndicator"].as<bool>();
+        if (iosNode["supportsHighRefreshRate"].IsDefined()) ios.supportsHighRefreshRate = iosNode["supportsHighRefreshRate"].as<bool>();
+    }
+
+    if (node["android"] && node["android"].IsMap()) {
+        const YAML::Node& androidNode = node["android"];
+        AndroidProjectSettings& android = project->getAndroidProjectSettings();
+
+        if (androidNode["applicationName"]) android.applicationName = androidNode["applicationName"].as<std::string>();
+        if (androidNode["packageName"]) android.packageName = androidNode["packageName"].as<std::string>();
+        if (androidNode["versionCode"]) android.versionCode = std::max(1u, androidNode["versionCode"].as<unsigned int>());
+        if (androidNode["versionName"]) android.versionName = androidNode["versionName"].as<std::string>();
+        if (androidNode["launcherIcon"]) android.launcherIcon = androidNode["launcherIcon"].as<std::string>();
+        if (androidNode["adaptiveIconForeground"]) android.adaptiveIconForeground = androidNode["adaptiveIconForeground"].as<std::string>();
+        if (androidNode["adaptiveIconBackground"]) android.adaptiveIconBackground = androidNode["adaptiveIconBackground"].as<std::string>();
+        if (androidNode["minSdk"]) android.minSdk = std::max(1u, androidNode["minSdk"].as<unsigned int>());
+        if (androidNode["targetSdk"]) android.targetSdk = std::max(android.minSdk, androidNode["targetSdk"].as<unsigned int>());
+        if (androidNode["orientation"]) android.orientation = stringToAndroidOrientation(androidNode["orientation"].as<std::string>());
+
+        if (androidNode["architectures"] && androidNode["architectures"].IsMap()) {
+            const YAML::Node& abiNode = androidNode["architectures"];
+            if (abiNode["armeabi-v7a"].IsDefined()) android.abiArmeabiV7a = abiNode["armeabi-v7a"].as<bool>();
+            if (abiNode["arm64-v8a"].IsDefined()) android.abiArm64V8a = abiNode["arm64-v8a"].as<bool>();
+            if (abiNode["x86"].IsDefined()) android.abiX86 = abiNode["x86"].as<bool>();
+            if (abiNode["x86_64"].IsDefined()) android.abiX86_64 = abiNode["x86_64"].as<bool>();
+        }
+
+        if (androidNode["permissions"] && androidNode["permissions"].IsSequence()) {
+            android.permissions.clear();
+            for (const auto& permissionNode : androidNode["permissions"]) {
+                android.permissions.insert(permissionNode.as<std::string>());
+            }
+        } else if (androidNode["permissions"] && androidNode["permissions"].IsMap()) {
+            const YAML::Node& permissionsNode = androidNode["permissions"];
+            if (permissionsNode["internet"].IsDefined() && permissionsNode["internet"].as<bool>()) android.permissions.insert("internet");
+            if (permissionsNode["vibrate"].IsDefined() && permissionsNode["vibrate"].as<bool>()) android.permissions.insert("vibrate");
+            if (permissionsNode["wakeLock"].IsDefined() && permissionsNode["wakeLock"].as<bool>()) android.permissions.insert("wake_lock");
+        }
+
+        if (androidNode["allowBackup"].IsDefined()) android.allowBackup = androidNode["allowBackup"].as<bool>();
+        if (androidNode["fullscreen"].IsDefined()) android.fullscreen = androidNode["fullscreen"].as<bool>();
+        if (androidNode["keepScreenOn"].IsDefined()) android.keepScreenOn = androidNode["keepScreenOn"].as<bool>();
     }
 
     if (node["startSceneId"]) {

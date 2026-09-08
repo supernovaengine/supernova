@@ -168,6 +168,7 @@ enum class AppMenuCommand : uint32_t {
     Save,
     SaveAll,
     ExportProject,
+    EditorSettings,
     Exit,
     Undo,
     Redo,
@@ -179,7 +180,6 @@ enum class AppMenuCommand : uint32_t {
     ToggleTerrain,
     ToggleAiChat,
     ToggleDetachableWindows,
-    ToggleEditorVSync,
     ResetLayout,
     ProjectSettings,
     ProjectScenes,
@@ -328,6 +328,7 @@ editor::PlatformMenuModel editor::App::buildMenuModel(){
         menuCommand(AppMenuCommand::SaveAll, "Save All", canSaveAll),
         menuSeparator(),
         menuCommand(AppMenuCommand::ExportProject, "Export Project..."),
+        menuCommand(AppMenuCommand::EditorSettings, "Editor Settings..."),
         menuSeparator(),
         menuCommand(AppMenuCommand::Exit, "Exit")
     }));
@@ -355,8 +356,6 @@ editor::PlatformMenuModel editor::App::buildMenuModel(){
         menuSeparator(),
         menuToggle(AppMenuCommand::ToggleDetachableWindows, "Detachable Windows",
                    AppSettings::getMultiViewportEnabled()),
-        menuToggle(AppMenuCommand::ToggleEditorVSync, "Editor VSync",
-                   AppSettings::getEditorVSyncEnabled()),
         menuSeparator(),
         menuCommand(AppMenuCommand::ResetLayout, "Reset Layout")
     }));
@@ -522,10 +521,6 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
 #endif
             break;
         }
-        case AppMenuCommand::ToggleEditorVSync:
-            AppSettings::setEditorVSyncEnabled(!AppSettings::getEditorVSyncEnabled());
-            AppSettings::saveSettings();
-            break;
         case AppMenuCommand::ResetLayout:
             structureWindow->setOpen(true);
             propertiesWindow->setOpen(true);
@@ -538,6 +533,9 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
             break;
         case AppMenuCommand::ProjectSettings:
             projectSettingsWindow.open(&project);
+            break;
+        case AppMenuCommand::EditorSettings:
+            editorSettingsWindow.open();
             break;
         case AppMenuCommand::ProjectScenes:
             if (!project.isAnyScenePlaying())
@@ -1533,6 +1531,7 @@ void editor::App::show(){
     sceneSaveDialog.show();
     projectSaveDialog.show();
     exportWindow.show();
+    editorSettingsWindow.show();
     projectSettingsWindow.show();
     bundlesWindow.show();
     scenesWindow.show();

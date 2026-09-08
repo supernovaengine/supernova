@@ -18,6 +18,7 @@
 #include "stb_image_write.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cstdint>
 #include <cstdlib>
@@ -133,6 +134,243 @@ namespace {
         data.resize(static_cast<size_t>(size));
         return data.empty() || static_cast<bool>(in.read(reinterpret_cast<char*>(data.data()), size));
     }
+
+    void replaceAll(std::string& value, const std::string& from, const std::string& to) {
+        if (from.empty()) return;
+
+        size_t pos = 0;
+        while ((pos = value.find(from, pos)) != std::string::npos) {
+            value.replace(pos, from.size(), to);
+            pos += to.size();
+        }
+    }
+
+    std::string escapeGradleString(const std::string& value) {
+        std::string out;
+        out.reserve(value.size());
+        for (char c : value) {
+            if (c == '\\' || c == '"' || c == '$') {
+                out += '\\';
+                out += c;
+            } else if (c == '\n') {
+                out += "\\n";
+            } else if (c == '\r') {
+                out += "\\r";
+            } else if (c == '\t') {
+                out += "\\t";
+            } else {
+                out += c;
+            }
+        }
+        return out;
+    }
+
+    std::string escapeXmlAttribute(const std::string& value) {
+        std::string out;
+        out.reserve(value.size());
+        for (char c : value) {
+            switch (c) {
+                case '&': out += "&amp;"; break;
+                case '<': out += "&lt;"; break;
+                case '>': out += "&gt;"; break;
+                case '"': out += "&quot;"; break;
+                case '\'': out += "&apos;"; break;
+                default: out += c; break;
+            }
+        }
+        return out;
+    }
+
+    // Android parses string-resource escapes after decoding XML entities.
+    // Quoting preserves whitespace and literal @/? prefixes in application names.
+    std::string escapeAndroidStringResource(const std::string& value) {
+        std::string out = "\"";
+        for (char c : value) {
+            switch (c) {
+                case '\\': out += "\\\\"; break;
+                case '"': out += "\\\""; break;
+                case '\n': out += "\\n"; break;
+                case '\r': out += "\\r"; break;
+                case '\t': out += "\\t"; break;
+                default: out += c; break;
+            }
+        }
+        return escapeXmlAttribute(out + '"');
+    }
+
+    std::string androidOrientationManifestValue(editor::AndroidOrientation orientation) {
+        switch (orientation) {
+            case editor::AndroidOrientation::Portrait: return "portrait";
+            case editor::AndroidOrientation::Landscape: return "landscape";
+            case editor::AndroidOrientation::SensorPortrait: return "sensorPortrait";
+            case editor::AndroidOrientation::SensorLandscape: return "sensorLandscape";
+            case editor::AndroidOrientation::FullSensor: return "fullSensor";
+            case editor::AndroidOrientation::Unspecified:
+            default: return "";
+        }
+    }
+
+    const char* androidPermissionManifestName(const std::string& key) {
+        struct PermissionMap {
+            const char* key;
+            const char* manifestName;
+        };
+        static const PermissionMap permissions[] = {
+            { "internet", "INTERNET" },
+            { "access_network_state", "ACCESS_NETWORK_STATE" },
+            { "access_wifi_state", "ACCESS_WIFI_STATE" },
+            { "change_network_state", "CHANGE_NETWORK_STATE" },
+            { "change_wifi_state", "CHANGE_WIFI_STATE" },
+            { "vibrate", "VIBRATE" },
+            { "wake_lock", "WAKE_LOCK" },
+            { "post_notifications", "POST_NOTIFICATIONS" },
+            { "camera", "CAMERA" },
+            { "record_audio", "RECORD_AUDIO" },
+            { "access_coarse_location", "ACCESS_COARSE_LOCATION" },
+            { "access_fine_location", "ACCESS_FINE_LOCATION" },
+            { "access_location_extra_commands", "ACCESS_LOCATION_EXTRA_COMMANDS" },
+            { "access_media_location", "ACCESS_MEDIA_LOCATION" },
+            { "read_external_storage", "READ_EXTERNAL_STORAGE" },
+            { "write_external_storage", "WRITE_EXTERNAL_STORAGE" },
+            { "manage_external_storage", "MANAGE_EXTERNAL_STORAGE" },
+            { "read_media_audio", "READ_MEDIA_AUDIO" },
+            { "read_media_images", "READ_MEDIA_IMAGES" },
+            { "read_media_video", "READ_MEDIA_VIDEO" },
+            { "read_media_visual_user_selected", "READ_MEDIA_VISUAL_USER_SELECTED" },
+            { "bluetooth", "BLUETOOTH" },
+            { "bluetooth_admin", "BLUETOOTH_ADMIN" },
+            { "bluetooth_connect", "BLUETOOTH_CONNECT" },
+            { "bluetooth_scan", "BLUETOOTH_SCAN" },
+            { "nfc", "NFC" },
+            { "transmit_ir", "TRANSMIT_IR" },
+            { "use_biometric", "USE_BIOMETRIC" },
+            { "use_fingerprint", "USE_FINGERPRINT" },
+            { "read_contacts", "READ_CONTACTS" },
+            { "write_contacts", "WRITE_CONTACTS" },
+            { "get_accounts", "GET_ACCOUNTS" },
+            { "read_calendar", "READ_CALENDAR" },
+            { "write_calendar", "WRITE_CALENDAR" },
+            { "read_call_log", "READ_CALL_LOG" },
+            { "write_call_log", "WRITE_CALL_LOG" },
+            { "read_phone_state", "READ_PHONE_STATE" },
+            { "call_phone", "CALL_PHONE" },
+            { "read_sms", "READ_SMS" },
+            { "write_sms", "WRITE_SMS" },
+            { "send_sms", "SEND_SMS" },
+            { "receive_sms", "RECEIVE_SMS" },
+            { "receive_mms", "RECEIVE_MMS" },
+            { "receive_wap_push", "RECEIVE_WAP_PUSH" },
+            { "receive_boot_completed", "RECEIVE_BOOT_COMPLETED" },
+            { "kill_background_processes", "KILL_BACKGROUND_PROCESSES" },
+            { "modify_audio_settings", "MODIFY_AUDIO_SETTINGS" },
+            { "set_wallpaper", "SET_WALLPAPER" },
+            { "set_wallpaper_hints", "SET_WALLPAPER_HINTS" },
+            { "write_settings", "WRITE_SETTINGS" },
+        };
+        for (const PermissionMap& permission : permissions) {
+            if (key == permission.key) return permission.manifestName;
+        }
+        return nullptr;
+    }
+
+    fs::path resolveProjectFile(editor::Project* project, const fs::path& path) {
+        if (path.empty() || path.is_absolute()) return path;
+        return project->getProjectPath() / path;
+    }
+
+    bool copyAndroidResourceFile(editor::Project* project, const fs::path& sourcePath, const fs::path& targetPath, std::string& error) {
+        if (sourcePath.empty()) return true;
+
+        std::error_code ec;
+        fs::create_directories(targetPath.parent_path(), ec);
+        if (ec) {
+            error = "Failed to create Android resource directory: " + ec.message();
+            return false;
+        }
+
+        fs::path source = resolveProjectFile(project, sourcePath);
+        fs::copy_file(source, targetPath, fs::copy_options::overwrite_existing, ec);
+        if (ec) {
+            error = "Failed to copy Android icon " + source.string() + ": " + ec.message();
+            return false;
+        }
+        return true;
+    }
+
+    std::string stripDesktopEntryControlChars(const std::string& value) {
+        std::string out;
+        out.reserve(value.size());
+        for (char c : value) {
+            out += (c == '\n' || c == '\r') ? ' ' : c;
+        }
+        return out;
+    }
+
+    void replacePlistStringValue(std::string& plist, const std::string& key, const std::string& value) {
+        const std::string keyTag = "\t<key>" + key + "</key>";
+        size_t keyPos = plist.find(keyTag);
+        if (keyPos == std::string::npos) {
+            const size_t dictEnd = plist.rfind("</dict>");
+            if (dictEnd == std::string::npos) return;
+            plist.insert(dictEnd, "\t<key>" + key + "</key>\n\t<string>" + escapeXmlAttribute(value) + "</string>\n");
+            return;
+        }
+
+        size_t stringStart = plist.find("<string>", keyPos);
+        size_t stringEnd = plist.find("</string>", stringStart);
+        if (stringStart == std::string::npos || stringEnd == std::string::npos) return;
+        stringStart += std::string("<string>").size();
+        plist.replace(stringStart, stringEnd - stringStart, escapeXmlAttribute(value));
+    }
+
+    void replacePlistBoolValue(std::string& plist, const std::string& key, bool value) {
+        const std::string keyTag = "\t<key>" + key + "</key>";
+        const std::string boolTag = value ? "\t<true/>\n" : "\t<false/>\n";
+        size_t keyPos = plist.find(keyTag);
+        if (keyPos == std::string::npos) {
+            const size_t dictEnd = plist.rfind("</dict>");
+            if (dictEnd == std::string::npos) return;
+            plist.insert(dictEnd, keyTag + "\n" + boolTag);
+            return;
+        }
+
+        size_t valueStart = plist.find_first_not_of(" \t\r\n", keyPos + keyTag.size());
+        if (valueStart == std::string::npos) return;
+        if (plist.compare(valueStart, 7, "<true/>") == 0) {
+            plist.replace(valueStart, 7, value ? "<true/>" : "<false/>");
+        } else if (plist.compare(valueStart, 8, "<false/>") == 0) {
+            plist.replace(valueStart, 8, value ? "<true/>" : "<false/>");
+        }
+    }
+
+    std::array<int, 4> parseWindowsVersion(const std::string& value) {
+        std::array<int, 4> parts{1, 0, 0, 0};
+        size_t start = 0;
+        for (int i = 0; i < 4 && start <= value.size(); i++) {
+            size_t dot = value.find('.', start);
+            std::string token = value.substr(start, dot == std::string::npos ? std::string::npos : dot - start);
+            try {
+                parts[i] = std::clamp(std::stoi(token), 0, 65535);
+            } catch (...) {
+                parts[i] = 0;
+            }
+            if (dot == std::string::npos) break;
+            start = dot + 1;
+        }
+        return parts;
+    }
+
+    std::string escapeWindowsRcString(const std::string& value) {
+        std::string out;
+        out.reserve(value.size());
+        for (char c : value) {
+            if (c == '\\' || c == '"') out += '\\';
+            if (c == '\n' || c == '\r') out += ' ';
+            else out += c;
+        }
+        return out;
+    }
+
 }
 
 editor::Exporter::Exporter() {
@@ -494,7 +732,7 @@ bool editor::Exporter::configureBuild() {
     if (config.mode == ExportMode::Web) {
         EmsdkInfo emsdk = detectEmsdk(config.emsdkPath);
         if (!emsdk.found) {
-            setError("Emscripten SDK not found. Set the EMSDK environment variable, add emcmake to PATH, or choose the emsdk folder in the export settings.");
+            setError("Emscripten SDK not found. Configure it in Editor Settings > Web, set EMSDK, or add emcmake to PATH.");
             return false;
         }
         emcmake = emsdk.emcmake;
@@ -555,6 +793,9 @@ bool editor::Exporter::configureBuild() {
         // The emcmake wrapper injects the Emscripten toolchain file; the
         // subsequent cmake --build needs no wrapper. emcmake resolves the cmake
         // it wraps itself, so the editor override does not apply here.
+        // Keep the SDK wrapper: it selects Python using the SDK environment.
+        // Calling emcmake.py with an arbitrary system python3 can break a
+        // correctly configured SDK and does not fix an outdated interpreter.
         cmd = "\"" + toCMakePath(emcmake) + "\" cmake ";
     } else {
         cmd = Generator::cmakeExecutable() + " ";
@@ -583,7 +824,11 @@ bool editor::Exporter::configureBuild() {
     }
 
     Out::info("Configuring export build: %s", cmd.c_str());
-    bool ok = commandRunner.run(cmd, config.targetDir, [this](const std::string& line) {
+    bool incompatiblePython = false;
+    bool ok = commandRunner.run(cmd, config.targetDir, [this, &incompatiblePython](const std::string& line) {
+        if (line.find("TypeError: 'type' object is not subscriptable") != std::string::npos) {
+            incompatiblePython = true;
+        }
         Out::build("%s", line.c_str());
         setDetail(line);
     });
@@ -591,6 +836,8 @@ bool editor::Exporter::configureBuild() {
     if (!ok) {
         if (isCancelled()) {
             setError("Export cancelled");
+        } else if (config.mode == ExportMode::Web && incompatiblePython) {
+            setError("Emscripten failed with an incompatible Python interpreter. Activate the SDK environment and restart the editor from that terminal. Check EMSDK_PYTHON and use a Python version supported by your installed SDK. See Output for the traceback.");
         } else {
             setError("Build configuration failed. See the Output window for details.");
         }
@@ -746,63 +993,12 @@ bool editor::Exporter::collectDesktopArtifacts() {
     }
 
 #if defined(__linux__)
-    // Linux executables cannot embed icons, and Wayland windows only get one
-    // through an installed .desktop entry matched by app_id. When the project
-    // has an icon, ship it as icon.png plus a ready-made launcher entry.
-    fs::path launcherPng = projectRoot / "app_icon.png";
-    const std::string appName = getAppName();
-    if (!fs::exists(launcherPng, ec)) {
-        // Icon removed from the project (or generation failed): drop launcher
-        // files from a previous export so a stale .desktop can't keep pointing
-        // at an icon the project no longer has.
-        fs::remove(config.destinationDir / "icon.png", ec);
-        fs::remove(config.destinationDir / (appName + ".desktop"), ec);
-    } else {
-        const fs::path destAbs = fs::absolute(config.destinationDir, ec);
-
-        fs::copy_file(launcherPng, config.destinationDir / "icon.png", fs::copy_options::overwrite_existing, ec);
-        if (ec) {
-            setError("Failed to copy icon.png: " + ec.message());
-            return false;
-        }
-
-        // Exec strings are quoted per the Desktop Entry spec: escape the
-        // characters that are special inside double quotes.
-        auto quoteExec = [](const std::string& value) {
-            std::string out = "\"";
-            for (char c : value) {
-                if (c == '"' || c == '\\' || c == '`' || c == '$') out += '\\';
-                out += c;
-            }
-            out += "\"";
-            return out;
-        };
-
-        // getWindowSettings() applies the window-title fallback chain AND
-        // strips control characters (a newline in a hand-edited title would
-        // split the desktop entry and break parsing).
-        std::string displayName = project->getWindowSettings().title;
-
-        std::string entry;
-        entry += "# Generated by the Doriax editor export.\n";
-        entry += "# Install with: cp \"" + appName + ".desktop\" ~/.local/share/applications/\n";
-        entry += "# to add the game to your launcher and give its window an icon on Wayland.\n";
-        entry += "[Desktop Entry]\n";
-        entry += "Type=Application\n";
-        entry += "Name=" + displayName + "\n";
-        entry += "Exec=" + quoteExec((destAbs / exeName).string()) + "\n";
-        entry += "Path=" + destAbs.string() + "\n";
-        entry += "Icon=" + (destAbs / "icon.png").string() + "\n";
-        entry += "Terminal=false\n";
-        entry += "Categories=Game;\n";
-        entry += "StartupWMClass=" + appName + "\n";
-
-        std::ofstream f(config.destinationDir / (appName + ".desktop"), std::ios::binary);
-        if (!f) {
-            setError("Failed to write " + appName + ".desktop");
-            return false;
-        }
-        f << entry;
+    const std::string settingsCommand = Generator::cmakeExecutable() + " -DAPP_FILE=\""
+        + (fs::absolute(config.destinationDir) / exeName).string() + "\" -DWEB=OFF -P \""
+        + (projectRoot / "export-settings" / "apply.cmake").string() + "\"";
+    if (!commandRunner.run(settingsCommand, config.targetDir, [](const std::string& line) { Out::build("%s", line.c_str()); })) {
+        setError("Failed to generate Linux launcher");
+        return false;
     }
 #endif
 
@@ -1076,7 +1272,7 @@ bool editor::Exporter::collectWebArtifacts() {
     }
 
     for (const char* ext : {".html", ".js", ".wasm"}) {
-        fs::path src = buildDir / (appName + ext);
+        fs::path src = buildDir / (appName + (std::string(ext) == ".html" ? ".export.html" : ext));
         if (!fs::exists(src, ec)) {
             setError("Built web output not found: " + src.string());
             return false;
@@ -1087,6 +1283,14 @@ bool editor::Exporter::collectWebArtifacts() {
             return false;
         }
     }
+
+    const fs::path favicon = buildDir / "favicon.png";
+    if (fs::exists(favicon, ec)) {
+        fs::copy_file(favicon, config.destinationDir / "favicon.png", fs::copy_options::overwrite_existing, ec);
+    } else {
+        fs::remove(config.destinationDir / "favicon.png", ec);
+    }
+    if (ec) { setError("Failed to update web favicon: " + ec.message()); return false; }
 
     // The .data preload bundle exists only when the project has assets or lua.
     fs::path dataSrc = buildDir / (appName + ".data");
@@ -1695,6 +1899,10 @@ bool editor::Exporter::copyEngine() {
     if (!copyDir("renders", true)) return false;
     //if (!copyDir("tools")) return false;
     if (!copyDir("workspaces", true)) return false;
+    if (config.mode == ExportMode::SourceCode) {
+        if (!writeAndroidProjectSettings()) return false;
+        if (!writeAppleProjectSettings()) return false;
+    }
 
     // The SDK "shaders" dir holds only stub headers (getBase64Shader returning
     // "") under the exact names buildAndSaveShaders generates into. Copy them
@@ -1760,6 +1968,15 @@ bool editor::Exporter::copyEngine() {
     if (!project->getWindowIcon().empty()) {
         iconGenerated = writeAppIcon();
     }
+    if (!iconGenerated) {
+        for (const char* name : {"app_icon.h", "app_icon.ico", "app_icon.png"}) {
+            fs::remove(getExportProjectRoot() / name, ec);
+            if (ec) { setError("Failed to remove previous export icon: " + ec.message()); return false; }
+        }
+    }
+    if (!writeWindowsResourceFile(iconGenerated)) {
+        return false;
+    }
 
     const std::string projectSettingsMarker = "# @DORIAX_PROJECT_SETTINGS@";
     const size_t projectSettingsPos = cmakeContent.find(projectSettingsMarker);
@@ -1819,8 +2036,122 @@ bool editor::Exporter::copyEngine() {
         Out::warning("Exported CMakeLists.txt is missing the SceneMaxValues marker; using engine default capacities");
     }
 
+    if (!writeExportSettingsScript(cmakeContent)) return false;
     FileUtils::writeIfChanged(cmakeDst, cmakeContent);
 
+    return true;
+}
+
+bool editor::Exporter::writeExportSettingsScript(std::string& cmakeContent) {
+    // Bracket arguments preserve user text without CMake variable expansion.
+    auto literal = [](const std::string& value) {
+        std::string equals = "=";
+        while (value.find("]" + equals + "]") != std::string::npos) equals += "=";
+        return "[" + equals + "[" + value + "]" + equals + "]";
+    };
+    const WebProjectSettings& web = project->getWebProjectSettings();
+    const LinuxProjectSettings& linuxSettings = project->getLinuxProjectSettings();
+    const fs::path settingsDir = getExportProjectRoot() / "export-settings";
+    std::error_code ec;
+    fs::create_directories(settingsDir, ec);
+    if (ec) { setError("Cannot create export settings directory: " + ec.message()); return false; }
+    auto copySettingFile = [&](const fs::path& source, const char* name) {
+        const fs::path target = settingsDir / name;
+        if (source.empty()) fs::remove(target, ec);
+        else fs::copy_file(resolveProjectFile(project, source), target, fs::copy_options::overwrite_existing, ec);
+        if (ec) { setError("Cannot prepare export setting file: " + ec.message()); return false; }
+        return true;
+    };
+    if (config.mode != ExportMode::Desktop
+            && (!copySettingFile(web.favicon, "favicon.png") || !copySettingFile(web.customHtmlShell, "shell.html"))) return false;
+    std::string script;
+    auto value = [&](const char* name, const std::string& text) {
+        script += "set(" + std::string(name) + " " + literal(text) + ")\n";
+    };
+    value("title", escapeXmlAttribute(web.applicationName.empty()
+        ? (project->getName().empty() ? "Doriax" : project->getName()) : web.applicationName));
+    value("head", web.headInclude);
+    value("resize", web.resizeCanvasToWindow ? "ON" : "OFF");
+    value("hide_ui", web.hideEmscriptenUI ? "ON" : "OFF");
+    value("name", stripDesktopEntryControlChars(linuxSettings.applicationName.empty() ? project->getWindowSettings().title : linuxSettings.applicationName));
+    value("comment", stripDesktopEntryControlChars(linuxSettings.comment));
+    value("categories", stripDesktopEntryControlChars(linuxSettings.categories));
+    script += R"cmake(
+get_filename_component(output "${APP_FILE}" DIRECTORY)
+get_filename_component(app "${APP_FILE}" NAME_WE)
+if(WEB)
+    # Keep the linker output untouched; repeated builds cannot duplicate inserts.
+    file(READ "${APP_FILE}" html)
+    if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/shell.html")
+        file(READ "${CMAKE_CURRENT_LIST_DIR}/shell.html" shell)
+        string(FIND "${shell}" "{{DORIAX_DEFAULT_HTML}}" marker)
+        if(marker EQUAL -1)
+            message(FATAL_ERROR "Custom web HTML shell must contain {{DORIAX_DEFAULT_HTML}}")
+        endif()
+        string(REPLACE "{{DORIAX_DEFAULT_HTML}}" "${html}" html "${shell}")
+    endif()
+    string(FIND "${html}" "<title>" first)
+    string(FIND "${html}" "</title>" last)
+    if(first GREATER_EQUAL 0 AND last GREATER first)
+        math(EXPR first "${first} + 7")
+        string(SUBSTRING "${html}" 0 ${first} prefix)
+        string(SUBSTRING "${html}" ${last} -1 suffix)
+        set(html "${prefix}${title}${suffix}")
+    endif()
+    set(extra "${head}\n")
+    if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/favicon.png")
+        file(COPY "${CMAKE_CURRENT_LIST_DIR}/favicon.png" DESTINATION "${output}")
+        string(APPEND extra "<link rel=\"icon\" href=\"favicon.png\">\n")
+    else()
+        file(REMOVE "${output}/favicon.png")
+    endif()
+    if(resize)
+        string(APPEND extra "<style>html, body { margin: 0; width: 100%; min-height: 100%; } #canvas { width: 100% !important; height: 100vh !important; height: 100dvh !important; display: block; border: 0; padding: 0; }</style>\n")
+    endif()
+    if(hide_ui)
+        # Keep nodes alive: the SDK's status/print callbacks reference them.
+        string(APPEND extra "<style>#emscripten_logo, .emscripten_logo, #status, #progress, #spinner, .spinner, #controls, #output, body > a[href='http://emscripten.org'], body > a[href='https://emscripten.org'] { display: none !important; } .emscripten_border { border: 0 !important; } body > hr { display: none; }</style>\n")
+    endif()
+    string(REPLACE "{{DORIAX_TITLE}}" "${title}" html "${html}")
+    string(FIND "${html}" "{{DORIAX_HEAD_INCLUDE}}" marker)
+    if(marker EQUAL -1)
+        string(REPLACE "</head>" "${extra}</head>" html "${html}")
+    else()
+        string(REPLACE "{{DORIAX_HEAD_INCLUDE}}" "${extra}" html "${html}")
+    endif()
+    file(WRITE "${output}/${app}.export.html" "${html}")
+else()
+    set(executable "${APP_FILE}")
+    foreach(character IN ITEMS "\\" "\"" "`" "$")
+        string(REPLACE "${character}" "\\${character}" executable "${executable}")
+    endforeach()
+    set(entry "[Desktop Entry]\nType=Application\nName=${name}\nComment=${comment}\nCategories=${categories}\nExec=\"${executable}\"\nPath=${output}\nTerminal=false\nStartupWMClass=${app}\n")
+    if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/../app_icon.png")
+        file(COPY "${CMAKE_CURRENT_LIST_DIR}/../app_icon.png" DESTINATION "${output}")
+        string(APPEND entry "Icon=${output}/app_icon.png\n")
+    else()
+        file(REMOVE "${output}/app_icon.png")
+    endif()
+    file(WRITE "${output}/${app}.desktop" "${entry}")
+endif()
+)cmake";
+    FileUtils::writeIfChanged(settingsDir / "apply.cmake", script);
+    cmakeContent += R"cmake(
+if(TARGET ${APP_NAME} AND (EMSCRIPTEN OR CMAKE_SYSTEM_NAME STREQUAL "Linux"))
+    add_custom_target(doriax-export-settings ALL
+        COMMAND "${CMAKE_COMMAND}" "-DAPP_FILE=$<TARGET_FILE:${APP_NAME}>" "-DWEB=${EMSCRIPTEN}"
+            -P "${PROJECT_ROOT}/export-settings/apply.cmake"
+        DEPENDS ${APP_NAME}
+        VERBATIM)
+endif()
+)cmake";
+    // CMake and the hand-maintained Xcode project must use the same IDs.
+    replaceAll(cmakeContent, "set(APP_BUNDLE_IDENTIFIER \"org.doriaxengine.doriax\")",
+        "if(CMAKE_SYSTEM_NAME STREQUAL \"iOS\")\nset(APP_BUNDLE_IDENTIFIER " + literal(project->getIOSProjectSettings().bundleIdentifier)
+        + ")\nelse()\nset(APP_BUNDLE_IDENTIFIER " + literal(project->getMacOSProjectSettings().bundleIdentifier) + ")\nendif()");
+    replaceAll(cmakeContent, "MACOSX_BUNDLE_INFO_PLIST \"${DORIAX_ROOT}/workspaces/xcode/macos/Info.plist\"",
+        "MACOSX_BUNDLE_INFO_PLIST \"${DORIAX_ROOT}/workspaces/xcode/macos/Info.plist\"\n"
+        "                XCODE_ATTRIBUTE_PRODUCT_BUNDLE_IDENTIFIER ${APP_BUNDLE_IDENTIFIER}");
     return true;
 }
 
@@ -1892,6 +2223,448 @@ std::string editor::Exporter::buildSceneMaxValuesDefinitions() const {
     out += indent + define("MAX_EXTERNAL_BUFFERS", agg.maxExternalBuffers, MAX_EXTERNAL_BUFFERS);
     out += indent + define("MAX_BONES", agg.maxBones, MAX_BONES);
     return out;
+}
+
+bool editor::Exporter::writeAndroidProjectSettings() {
+    const AndroidProjectSettings& android = project->getAndroidProjectSettings();
+    if (!android.abiArmeabiV7a && !android.abiArm64V8a && !android.abiX86 && !android.abiX86_64) {
+        setError("Android export needs at least one selected architecture");
+        return false;
+    }
+
+    auto readText = [&](const fs::path& path, std::string& out) -> bool {
+        std::ifstream ifs(path, std::ios::in | std::ios::binary);
+        if (!ifs) {
+            setError("Failed to read Android export file: " + path.string());
+            return false;
+        }
+        out.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+        return true;
+    };
+
+    const fs::path androidAppDir = config.targetDir / "workspaces" / "androidstudio" / "app";
+    const fs::path buildGradlePath = androidAppDir / "build.gradle";
+    const fs::path manifestPath = androidAppDir / "src" / "main" / "AndroidManifest.xml";
+    const fs::path stringsPath = androidAppDir / "src" / "main" / "res" / "values" / "strings.xml";
+    const fs::path stylesPath = androidAppDir / "src" / "main" / "res" / "values" / "styles.xml";
+    const fs::path drawableDir = androidAppDir / "src" / "main" / "res" / "drawable";
+    const fs::path adaptiveIconDir = androidAppDir / "src" / "main" / "res" / "mipmap-anydpi-v26";
+    const fs::path mainActivityPath = config.targetDir / "platform" / "android" / "java" / "org" / "doriaxengine" / "doriax" / "MainActivity.java";
+
+    const std::string appName = android.applicationName.empty()
+        ? (project->getName().empty() ? "Doriax" : project->getName())
+        : android.applicationName;
+
+    std::string gradle;
+    if (!readText(buildGradlePath, gradle)) return false;
+    for (const char* marker : {"compileSdk 33", "applicationId \"com.yourcompany.project\"",
+            "minSdkVersion 21", "targetSdkVersion 33", "versionCode 1", "versionName \"1.0\"",
+            "                abiFilters \"arm64-v8a\"\n"
+            "                abiFilters \"x86\"\n"
+            "                abiFilters \"armeabi-v7a\"\n"
+            "                abiFilters \"x86_64\""}) {
+        if (gradle.find(marker) == std::string::npos) {
+            setError("Incompatible Android Gradle export template: missing " + std::string(marker));
+            return false;
+        }
+    }
+
+    replaceAll(gradle, "compileSdk 33", "compileSdk " + std::to_string(android.targetSdk));
+    replaceAll(gradle, "applicationId \"com.yourcompany.project\"", "applicationId \"" + escapeGradleString(android.packageName) + "\"");
+    replaceAll(gradle, "minSdkVersion 21", "minSdkVersion " + std::to_string(android.minSdk));
+    replaceAll(gradle, "targetSdkVersion 33", "targetSdkVersion " + std::to_string(android.targetSdk));
+    replaceAll(gradle, "versionCode 1", "versionCode " + std::to_string(android.versionCode));
+    replaceAll(gradle, "versionName \"1.0\"", "versionName \"" + escapeGradleString(android.versionName) + "\"");
+
+    std::vector<std::string> abis;
+    if (android.abiArm64V8a) abis.push_back("\"arm64-v8a\"");
+    if (android.abiX86) abis.push_back("\"x86\"");
+    if (android.abiArmeabiV7a) abis.push_back("\"armeabi-v7a\"");
+    if (android.abiX86_64) abis.push_back("\"x86_64\"");
+    std::string abiLine = "                abiFilters ";
+    for (size_t i = 0; i < abis.size(); i++) {
+        if (i > 0) abiLine += ", ";
+        abiLine += abis[i];
+    }
+    replaceAll(gradle,
+        "                abiFilters \"arm64-v8a\"\n"
+        "                abiFilters \"x86\"\n"
+        "                abiFilters \"armeabi-v7a\"\n"
+        "                abiFilters \"x86_64\"",
+        abiLine);
+    FileUtils::writeIfChanged(buildGradlePath, gradle);
+
+    const bool hasLauncherIcon = !android.launcherIcon.empty();
+    const bool hasAdaptiveIcon = !android.adaptiveIconForeground.empty() && !android.adaptiveIconBackground.empty();
+    std::string iconReference = "@mipmap/ic_launcher";
+
+    if (hasLauncherIcon) {
+        std::string copyError;
+        if (!copyAndroidResourceFile(project, android.launcherIcon, drawableDir / "ic_launcher.png", copyError)) {
+            setError(copyError);
+            return false;
+        }
+        iconReference = "@drawable/ic_launcher";
+    }
+
+    if (hasAdaptiveIcon) {
+        std::string copyError;
+        if (!copyAndroidResourceFile(project, android.adaptiveIconForeground, drawableDir / "ic_launcher_foreground.png", copyError)) {
+            setError(copyError);
+            return false;
+        }
+        if (!copyAndroidResourceFile(project, android.adaptiveIconBackground, drawableDir / "ic_launcher_background.png", copyError)) {
+            setError(copyError);
+            return false;
+        }
+
+        std::string adaptiveIcon;
+        adaptiveIcon += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+        adaptiveIcon += "<adaptive-icon xmlns:android=\"http://schemas.android.com/apk/res/android\">\n";
+        adaptiveIcon += "    <background android:drawable=\"@drawable/ic_launcher_background\" />\n";
+        adaptiveIcon += "    <foreground android:drawable=\"@drawable/ic_launcher_foreground\" />\n";
+        adaptiveIcon += "</adaptive-icon>\n";
+        FileUtils::writeIfChanged(adaptiveIconDir / "ic_launcher.xml", adaptiveIcon);
+        iconReference = "@mipmap/ic_launcher";
+    }
+
+    std::string manifest;
+    manifest += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n";
+    manifest += "<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\">\n\n";
+    bool wrotePermission = false;
+    for (const std::string& permission : android.permissions) {
+        const char* manifestName = androidPermissionManifestName(permission);
+        if (!manifestName) continue;
+        manifest += "    <uses-permission android:name=\"android.permission.";
+        manifest += manifestName;
+        manifest += "\" />\n";
+        wrotePermission = true;
+    }
+    if (wrotePermission) manifest += "\n";
+    manifest += "    <application\n";
+    manifest += std::string("        android:allowBackup=\"") + (android.allowBackup ? "true" : "false") + "\"\n";
+    manifest += "        android:icon=\"" + iconReference + "\"\n";
+    manifest += "        android:label=\"@string/app_name\">\n\n";
+    manifest += "        <meta-data\n";
+    manifest += "            android:name=\"com.google.android.gms.ads.APPLICATION_ID\"\n";
+    manifest += "            android:value=\"ca-app-pub-3940256099942544~3347511713\"/>\n\n";
+    manifest += "        <activity android:name=\".MainActivity\"\n";
+    manifest += "            android:label=\"@string/app_name\"\n";
+    manifest += "            android:configChanges=\"orientation|keyboardHidden|keyboard|screenSize\"\n";
+    manifest += "            android:theme=\"@style/AppTheme\"\n";
+    const std::string orientation = androidOrientationManifestValue(android.orientation);
+    if (!orientation.empty()) {
+        manifest += "            android:screenOrientation=\"" + orientation + "\"\n";
+    }
+    manifest += "            android:exported=\"true\">\n";
+    manifest += "            <meta-data android:name=\"android.app.lib_name\" android:value=\"doriax-android\" />\n";
+    manifest += "            <intent-filter>\n";
+    manifest += "                <action android:name=\"android.intent.action.MAIN\" />\n";
+    manifest += "                <category android:name=\"android.intent.category.LAUNCHER\" />\n";
+    manifest += "            </intent-filter>\n";
+    manifest += "        </activity>\n";
+    manifest += "    </application>\n\n";
+    manifest += "    <uses-feature android:glEsVersion=\"0x00030000\" android:required=\"true\" />\n\n";
+    manifest += "</manifest>";
+    FileUtils::writeIfChanged(manifestPath, manifest);
+
+    std::string strings;
+    strings += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n";
+    strings += "<resources>\n";
+    strings += "    <string name=\"app_name\" formatted=\"false\">" + escapeAndroidStringResource(appName) + "</string>\n";
+    strings += "</resources>";
+    FileUtils::writeIfChanged(stringsPath, strings);
+
+    std::string styles;
+    styles += "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n\n";
+    styles += "<resources xmlns:android=\"http://schemas.android.com/apk/res/android\">\n";
+    styles += "    <style name=\"AppTheme\" parent=\"Theme.AppCompat.Light.NoActionBar\">\n";
+    styles += std::string("        <item name=\"android:windowFullscreen\">") + (android.fullscreen ? "true" : "false") + "</item>\n";
+    styles += "    </style>\n";
+    styles += "</resources>";
+    FileUtils::writeIfChanged(stylesPath, styles);
+
+    std::string activity;
+    if (!readText(mainActivityPath, activity)) return false;
+    if ((!android.fullscreen && (activity.find("WindowCompat.setDecorFitsSystemWindows(getWindow(), false);") == std::string::npos
+            || activity.find("\t\thideSystemUI();\n") == std::string::npos))
+            || (android.keepScreenOn && activity.find("\t\tsuper.onCreate(savedInstanceState);") == std::string::npos)) {
+        setError("Incompatible Android Activity export template");
+        return false;
+    }
+    if (!android.fullscreen) {
+        replaceAll(activity,
+            "\t\t// When true, the app will fit inside any system UI windows.\n"
+            "\t\t// When false, we render behind any system UI windows.\n"
+            "\t\tWindowCompat.setDecorFitsSystemWindows(getWindow(), false);\n"
+            "\t\thideSystemUI();",
+            "\t\t// When true, the app will fit inside any system UI windows.\n"
+            "\t\t// When false, we render behind any system UI windows.\n"
+            "\t\tWindowCompat.setDecorFitsSystemWindows(getWindow(), true);");
+        replaceAll(activity, "\t\thideSystemUI();\n", "");
+    }
+    const std::string superOnCreate = "\t\tsuper.onCreate(savedInstanceState);";
+    if (android.keepScreenOn && activity.find("FLAG_KEEP_SCREEN_ON") == std::string::npos) {
+        replaceAll(activity, superOnCreate, "\t\tgetWindow().addFlags(LayoutParams.FLAG_KEEP_SCREEN_ON);\n\n" + superOnCreate);
+    }
+    FileUtils::writeIfChanged(mainActivityPath, activity);
+
+    return true;
+}
+
+bool editor::Exporter::writeAppleProjectSettings() {
+    const fs::path xcodeDir = config.targetDir / "workspaces" / "xcode";
+    const fs::path iosPlistPath = xcodeDir / "ios" / "Info.plist";
+    const fs::path macOSPlistPath = xcodeDir / "macos" / "Info.plist";
+    const fs::path appIconSetDir = xcodeDir / "Assets.xcassets" / "AppIcon.appiconset";
+
+    auto readText = [&](const fs::path& path, std::string& out) -> bool {
+        std::error_code ec;
+        if (!fs::exists(path, ec)) {
+            out.clear();
+            return true;
+        }
+        std::ifstream ifs(path, std::ios::binary);
+        if (!ifs) {
+            setError("Failed to read Apple export file: " + path.string());
+            return false;
+        }
+        out.assign(std::istreambuf_iterator<char>(ifs), std::istreambuf_iterator<char>());
+        return true;
+    };
+
+    auto writeAppleIconPng = [&](const fs::path& sourcePath, const fs::path& outputPath, int size) -> bool {
+        if (sourcePath.empty()) return true;
+
+        fs::path source = resolveProjectFile(project, sourcePath);
+        int srcWidth = 0, srcHeight = 0, srcChannels = 0;
+        unsigned char* srcPixels = stbi_load(source.string().c_str(), &srcWidth, &srcHeight, &srcChannels, 4);
+        if (!srcPixels) {
+            setError("Apple icon could not be loaded: " + source.string());
+            return false;
+        }
+
+        std::vector<unsigned char> pixels((size_t)size * size * 4);
+        if (srcWidth == size && srcHeight == size) {
+            memcpy(pixels.data(), srcPixels, pixels.size());
+        } else {
+            stbir_resize_uint8_srgb(srcPixels, srcWidth, srcHeight, 0,
+                                    pixels.data(), size, size, 0, STBIR_RGBA);
+        }
+        stbi_image_free(srcPixels);
+
+        std::error_code ec;
+        fs::create_directories(outputPath.parent_path(), ec);
+        if (ec) {
+            setError("Failed to create Apple icon directory: " + ec.message());
+            return false;
+        }
+        if (!stbi_write_png(outputPath.string().c_str(), size, size, 4, pixels.data(), size * 4)) {
+            setError("Failed to write Apple icon: " + outputPath.string());
+            return false;
+        }
+        return true;
+    };
+
+    const MacOSProjectSettings& macOS = project->getMacOSProjectSettings();
+    std::string macOSPlist;
+    if (!readText(macOSPlistPath, macOSPlist)) {
+        return false;
+    }
+    if (!macOSPlist.empty()) {
+        const std::string appName = macOS.applicationName.empty()
+            ? (project->getName().empty() ? "Doriax" : project->getName())
+            : macOS.applicationName;
+        replacePlistStringValue(macOSPlist, "CFBundleName", appName);
+        replacePlistStringValue(macOSPlist, "CFBundleDisplayName", appName);
+        replacePlistStringValue(macOSPlist, "CFBundleIdentifier", macOS.bundleIdentifier);
+        replacePlistStringValue(macOSPlist, "CFBundleShortVersionString", macOS.versionName);
+        replacePlistStringValue(macOSPlist, "CFBundleVersion", macOS.buildNumber);
+        replacePlistBoolValue(macOSPlist, "NSHighResolutionCapable", macOS.highDpi);
+        FileUtils::writeIfChanged(macOSPlistPath, macOSPlist);
+    }
+
+    const IOSProjectSettings& ios = project->getIOSProjectSettings();
+    // Keep signing/build settings consistent with the generated Info.plist.
+    const fs::path projectFile = xcodeDir / "Doriax.xcodeproj" / "project.pbxproj";
+    std::string xcodeProject;
+    if (!readText(projectFile, xcodeProject)) return false;
+    size_t blockStart = 0;
+    while ((blockStart = xcodeProject.find("buildSettings = {", blockStart)) != std::string::npos) {
+        const size_t blockEnd = xcodeProject.find("};", blockStart);
+        if (blockEnd == std::string::npos) break;
+        std::string block = xcodeProject.substr(blockStart, blockEnd - blockStart);
+        const bool isIOS = block.find("INFOPLIST_FILE = ios/Info.plist;") != std::string::npos;
+        const bool isMacOS = block.find("INFOPLIST_FILE = macos/Info.plist;") != std::string::npos;
+        if (isIOS || isMacOS) {
+            const std::string key = "PRODUCT_BUNDLE_IDENTIFIER = ";
+            const size_t start = block.find(key);
+            const size_t end = block.find(';', start);
+            if (start == std::string::npos || end == std::string::npos) {
+                setError("Apple export template is missing PRODUCT_BUNDLE_IDENTIFIER");
+                return false;
+            }
+            block.replace(start + key.size(), end - start - key.size(),
+                "\"" + (isIOS ? ios.bundleIdentifier : macOS.bundleIdentifier) + "\"");
+            xcodeProject.replace(blockStart, blockEnd - blockStart, block);
+        }
+        blockStart += block.size() + 2;
+    }
+    FileUtils::writeIfChanged(projectFile, xcodeProject);
+    std::string iosPlist;
+    if (!readText(iosPlistPath, iosPlist)) {
+        return false;
+    }
+    if (!iosPlist.empty()) {
+        const std::string appName = ios.applicationName.empty()
+            ? (project->getName().empty() ? "Doriax" : project->getName())
+            : ios.applicationName;
+        replacePlistStringValue(iosPlist, "CFBundleName", appName);
+        replacePlistStringValue(iosPlist, "CFBundleDisplayName", appName);
+        replacePlistStringValue(iosPlist, "CFBundleIdentifier", ios.bundleIdentifier);
+        replacePlistStringValue(iosPlist, "CFBundleShortVersionString", ios.versionName);
+        replacePlistStringValue(iosPlist, "CFBundleVersion", ios.buildNumber);
+        replacePlistBoolValue(iosPlist, "UIStatusBarHidden", ios.hideStatusBar);
+        replacePlistBoolValue(iosPlist, "CADisableMinimumFrameDurationOnPhone", ios.supportsHighRefreshRate);
+        FileUtils::writeIfChanged(iosPlistPath, iosPlist);
+    }
+
+    const fs::path iosViewControllerPath = config.targetDir / "platform" / "apple" / "ios" / "ViewController.m";
+    std::string viewController;
+    if (!readText(iosViewControllerPath, viewController)) {
+        return false;
+    }
+    if (!viewController.empty()) {
+        if (viewController.find("prefersHomeIndicatorAutoHidden") == std::string::npos) {
+            const std::string method = std::string("\n- (BOOL)prefersHomeIndicatorAutoHidden\n{\n    return ")
+                + (ios.hideHomeIndicator ? "YES" : "NO") + ";\n}\n";
+            const size_t endPos = viewController.rfind("@end");
+            if (endPos != std::string::npos) {
+                viewController.insert(endPos, method);
+                FileUtils::writeIfChanged(iosViewControllerPath, viewController);
+            }
+        } else {
+            replaceAll(viewController, "return YES;\n}\n\n@end", std::string("return ") + (ios.hideHomeIndicator ? "YES" : "NO") + ";\n}\n\n@end");
+            replaceAll(viewController, "return NO;\n}\n\n@end", std::string("return ") + (ios.hideHomeIndicator ? "YES" : "NO") + ";\n}\n\n@end");
+            FileUtils::writeIfChanged(iosViewControllerPath, viewController);
+        }
+    }
+
+    if (!ios.icon.empty() || !macOS.icon.empty()) {
+        struct AppleIconSlot {
+            const char* filename;
+            const char* idiom;
+            const char* platform;
+            const char* sizeText;
+            const char* scale;
+            int pixelSize;
+            bool ios;
+        };
+        const AppleIconSlot slots[] = {
+            {"AppIcon-iOS-1024.png", "universal", "ios", "1024x1024", nullptr, 1024, true},
+            {"AppIcon-mac-16.png", "mac", nullptr, "16x16", "1x", 16, false},
+            {"AppIcon-mac-16@2x.png", "mac", nullptr, "16x16", "2x", 32, false},
+            {"AppIcon-mac-32.png", "mac", nullptr, "32x32", "1x", 32, false},
+            {"AppIcon-mac-32@2x.png", "mac", nullptr, "32x32", "2x", 64, false},
+            {"AppIcon-mac-128.png", "mac", nullptr, "128x128", "1x", 128, false},
+            {"AppIcon-mac-128@2x.png", "mac", nullptr, "128x128", "2x", 256, false},
+            {"AppIcon-mac-256.png", "mac", nullptr, "256x256", "1x", 256, false},
+            {"AppIcon-mac-256@2x.png", "mac", nullptr, "256x256", "2x", 512, false},
+            {"AppIcon-mac-512.png", "mac", nullptr, "512x512", "1x", 512, false},
+            {"AppIcon-mac-512@2x.png", "mac", nullptr, "512x512", "2x", 1024, false},
+        };
+
+        std::string contents;
+        contents += "{\n";
+        contents += "  \"images\" : [\n";
+        bool first = true;
+        for (const AppleIconSlot& slot : slots) {
+            const fs::path source = slot.ios ? ios.icon : macOS.icon;
+            if (!source.empty() && !writeAppleIconPng(source, appIconSetDir / slot.filename, slot.pixelSize)) {
+                return false;
+            }
+            if (!first) contents += ",\n";
+            first = false;
+            contents += "    {\n";
+            if (!source.empty()) contents += "      \"filename\" : \"" + std::string(slot.filename) + "\",\n";
+            contents += "      \"idiom\" : \"" + std::string(slot.idiom) + "\",\n";
+            if (slot.platform) contents += "      \"platform\" : \"" + std::string(slot.platform) + "\",\n";
+            if (slot.scale) contents += "      \"scale\" : \"" + std::string(slot.scale) + "\",\n";
+            contents += "      \"size\" : \"" + std::string(slot.sizeText) + "\"\n";
+            contents += "    }";
+        }
+        contents += "\n  ],\n";
+        contents += "  \"info\" : {\n";
+        contents += "    \"author\" : \"xcode\",\n";
+        contents += "    \"version\" : 1\n";
+        contents += "  }\n";
+        contents += "}\n";
+        FileUtils::writeIfChanged(appIconSetDir / "Contents.json", contents);
+    }
+
+    return true;
+}
+
+bool editor::Exporter::writeWindowsResourceFile(bool includeIcon) {
+    const WindowsProjectSettings& windows = project->getWindowsProjectSettings();
+    const WindowSettings window = project->getWindowSettings();
+    const std::string productName = windows.productName.empty()
+        ? (project->getName().empty() ? window.title : project->getName())
+        : windows.productName;
+    const std::string companyName = windows.companyName;
+    const std::array<int, 4> fileVersion = parseWindowsVersion(windows.fileVersion);
+    const std::array<int, 4> productVersion = parseWindowsVersion(windows.productVersion);
+
+    const fs::path projectRoot = getExportProjectRoot();
+    std::error_code ec;
+    fs::create_directories(projectRoot, ec);
+    if (ec) {
+        setError("Failed to create Windows resource directory: " + ec.message());
+        return false;
+    }
+
+    std::ofstream f(projectRoot / "app_icon.rc", std::ios::binary);
+    if (!f) {
+        setError("Failed to write app_icon.rc");
+        return false;
+    }
+
+    if (includeIcon) {
+        f << "1 ICON \"app_icon.ico\"\n\n";
+    }
+
+    f << "#include <windows.h>\n\n";
+    f << "1 VERSIONINFO\n";
+    f << "FILEVERSION " << fileVersion[0] << "," << fileVersion[1] << "," << fileVersion[2] << "," << fileVersion[3] << "\n";
+    f << "PRODUCTVERSION " << productVersion[0] << "," << productVersion[1] << "," << productVersion[2] << "," << productVersion[3] << "\n";
+    f << "FILEFLAGSMASK 0x3fL\n";
+    f << "FILEFLAGS 0x0L\n";
+    f << "FILEOS 0x40004L\n";
+    f << "FILETYPE 0x1L\n";
+    f << "FILESUBTYPE 0x0L\n";
+    f << "BEGIN\n";
+    f << "    BLOCK \"StringFileInfo\"\n";
+    f << "    BEGIN\n";
+    f << "        BLOCK \"040904b0\"\n";
+    f << "        BEGIN\n";
+    if (!companyName.empty()) {
+        f << "            VALUE \"CompanyName\", \"" << escapeWindowsRcString(companyName) << "\\0\"\n";
+    }
+    f << "            VALUE \"FileDescription\", \"" << escapeWindowsRcString(productName) << "\\0\"\n";
+    f << "            VALUE \"FileVersion\", \"" << escapeWindowsRcString(windows.fileVersion) << "\\0\"\n";
+    f << "            VALUE \"InternalName\", \"" << escapeWindowsRcString(getAppName()) << "\\0\"\n";
+    f << "            VALUE \"OriginalFilename\", \"" << escapeWindowsRcString(getAppName()) << ".exe\\0\"\n";
+    f << "            VALUE \"ProductName\", \"" << escapeWindowsRcString(productName) << "\\0\"\n";
+    f << "            VALUE \"ProductVersion\", \"" << escapeWindowsRcString(windows.productVersion) << "\\0\"\n";
+    f << "        END\n";
+    f << "    END\n";
+    f << "    BLOCK \"VarFileInfo\"\n";
+    f << "    BEGIN\n";
+    f << "        VALUE \"Translation\", 0x409, 1200\n";
+    f << "    END\n";
+    f << "END\n";
+
+    return true;
 }
 
 bool editor::Exporter::writeAppIcon() {
@@ -2039,15 +2812,6 @@ bool editor::Exporter::writeAppIcon() {
             return false;
         }
         f.write(ico.data(), (std::streamsize)ico.size());
-    }
-    {
-        // Resource paths are relative to the .rc file, which sits next to the .ico.
-        std::ofstream f(projectRoot / "app_icon.rc", std::ios::binary);
-        if (!f) {
-            Out::warning("Failed to write app_icon.rc, exporting without icon");
-            return false;
-        }
-        f << "1 ICON \"app_icon.ico\"\n";
     }
     {
         std::ofstream f(projectRoot / "app_icon.png", std::ios::binary);

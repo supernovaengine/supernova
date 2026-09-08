@@ -160,6 +160,96 @@ namespace doriax::editor{
         float paintMaxHeight = 1.0f;
     };
 
+    struct ExportTargetSettings {
+        std::set<ShaderKey> shaderAdditions;
+        std::set<ShaderKey> shaderExclusions;
+    };
+
+    struct SourceCodeExportSettings : ExportTargetSettings {
+        std::set<ShaderBackend> graphicBackends;
+        bool graphicBackendsConfigured = false;
+    };
+
+    struct DesktopExportSettings : ExportTargetSettings {
+        ShaderBackend graphicBackend = ShaderBackend::GLCore;
+        bool graphicBackendConfigured = false;
+    };
+
+    struct WebExportSettings : ExportTargetSettings {
+    };
+
+    struct WebProjectSettings {
+        std::string applicationName;
+        std::filesystem::path favicon;
+        std::filesystem::path customHtmlShell;
+        std::string headInclude;
+        bool resizeCanvasToWindow = true;
+        bool hideEmscriptenUI = false;
+    };
+
+    struct LinuxProjectSettings {
+        std::string applicationName;
+        std::string comment;
+        std::string categories = "Game;";
+    };
+
+    struct WindowsProjectSettings {
+        std::string productName;
+        std::string companyName;
+        std::string fileVersion = "1.0.0.0";
+        std::string productVersion = "1.0.0.0";
+    };
+
+    struct MacOSProjectSettings {
+        std::string applicationName;
+        std::string bundleIdentifier = "DoriaxEngine.Doriax";
+        std::string versionName = "1.0";
+        std::string buildNumber = "1";
+        std::filesystem::path icon;
+        bool highDpi = true;
+    };
+
+    struct IOSProjectSettings {
+        std::string applicationName;
+        std::string bundleIdentifier = "DoriaxEngine.Doriax";
+        std::string versionName = "1.0";
+        std::string buildNumber = "1";
+        std::filesystem::path icon;
+        bool hideStatusBar = true;
+        bool hideHomeIndicator = true;
+        bool supportsHighRefreshRate = true;
+    };
+
+    enum class AndroidOrientation {
+        Unspecified,
+        Portrait,
+        Landscape,
+        SensorPortrait,
+        SensorLandscape,
+        FullSensor
+    };
+
+    struct AndroidProjectSettings {
+        std::string applicationName;
+        std::string packageName = "com.yourcompany.project";
+        unsigned int versionCode = 1;
+        std::string versionName = "1.0";
+        std::filesystem::path launcherIcon;
+        std::filesystem::path adaptiveIconForeground;
+        std::filesystem::path adaptiveIconBackground;
+        unsigned int minSdk = 21;
+        unsigned int targetSdk = 33;
+        AndroidOrientation orientation = AndroidOrientation::Unspecified;
+        bool abiArmeabiV7a = true;
+        bool abiArm64V8a = true;
+        bool abiX86 = true;
+        bool abiX86_64 = true;
+        std::set<std::string> permissions;
+        bool allowBackup = true;
+        bool fullscreen = true;
+        bool keepScreenOn = false;
+    };
+
     using SharedMoveRecovery = std::map<std::string, SharedMoveRecoveryEntry>;
 
     struct ComponentRecoveryEntry {
@@ -198,6 +288,15 @@ namespace doriax::editor{
         // write it from the UI thread.
         std::atomic<unsigned int> cmakeBuildJobs{0};
         bool packNativeResources;
+        SourceCodeExportSettings sourceCodeExportSettings;
+        DesktopExportSettings desktopExportSettings;
+        WebExportSettings webExportSettings;
+        WebProjectSettings webProjectSettings;
+        LinuxProjectSettings linuxProjectSettings;
+        WindowsProjectSettings windowsProjectSettings;
+        MacOSProjectSettings macOSProjectSettings;
+        IOSProjectSettings iosProjectSettings;
+        AndroidProjectSettings androidProjectSettings;
         CommandHistory projectHistory;
 
         uint32_t startSceneId;
@@ -435,6 +534,25 @@ namespace doriax::editor{
         unsigned int getCMakeBuildJobs() const;
         void setPackNativeResources(bool enabled);
         bool shouldPackNativeResources() const;
+
+        SourceCodeExportSettings& getSourceCodeExportSettings();
+        const SourceCodeExportSettings& getSourceCodeExportSettings() const;
+        DesktopExportSettings& getDesktopExportSettings();
+        const DesktopExportSettings& getDesktopExportSettings() const;
+        WebExportSettings& getWebExportSettings();
+        const WebExportSettings& getWebExportSettings() const;
+        WebProjectSettings& getWebProjectSettings();
+        const WebProjectSettings& getWebProjectSettings() const;
+        LinuxProjectSettings& getLinuxProjectSettings();
+        const LinuxProjectSettings& getLinuxProjectSettings() const;
+        WindowsProjectSettings& getWindowsProjectSettings();
+        const WindowsProjectSettings& getWindowsProjectSettings() const;
+        MacOSProjectSettings& getMacOSProjectSettings();
+        const MacOSProjectSettings& getMacOSProjectSettings() const;
+        IOSProjectSettings& getIOSProjectSettings();
+        const IOSProjectSettings& getIOSProjectSettings() const;
+        AndroidProjectSettings& getAndroidProjectSettings();
+        const AndroidProjectSettings& getAndroidProjectSettings() const;
 
         uint32_t getStartSceneId() const;
         void setStartSceneId(uint32_t sceneId);

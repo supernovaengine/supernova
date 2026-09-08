@@ -35,6 +35,11 @@ struct PanelVisibilitySettings {
     }
 };
 
+struct LocalExportSettings {
+    std::filesystem::path targetDir;
+    unsigned int buildJobs = 0; // 0 = automatic
+};
+
 class AppSettings {
 private:
     static std::filesystem::path configFilePath;
@@ -57,6 +62,7 @@ private:
     // cmake executable override ("" = look it up on PATH). Machine-specific,
     // stored editor-wide like emsdkPath.
     static std::string cmakePath;
+    static std::filesystem::path defaultExportDirectory;
     
     // Window settings. The size is physical pixels, only meaningful again at the
     // scale it was captured at; 0 marks a file from before that was tracked.
@@ -90,6 +96,9 @@ private:
     static void ensureConfigDirectory();
 
 public:
+    static LocalExportSettings getExportSettings(const std::filesystem::path& projectFile, const std::string& mode);
+    static bool setExportSettings(const std::filesystem::path& projectFile, const std::string& mode, const LocalExportSettings& value);
+
     // Initialization
     static bool initialize();
 
@@ -117,6 +126,8 @@ public:
     // cmake executable override ("" = look it up on PATH)
     static std::string getCMakePath();
     static void setCMakePath(const std::string& path);
+    static std::filesystem::path getDefaultExportDirectory();
+    static void setDefaultExportDirectory(const std::filesystem::path& path);
     
     // Window settings
     static int getWindowWidth();
