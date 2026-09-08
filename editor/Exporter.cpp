@@ -578,12 +578,6 @@ void editor::Exporter::resolveShaderKeys() {
     std::set<ShaderKey> keys;
     for (const auto& sceneProject : project->getScenes()) {
         for (ShaderKey key : sceneProject.shaderKeys) {
-            // A key saved by an earlier session can carry a customShaderId this one
-            // never registered, which would build whichever fork now holds that id
-            const uint16_t customId = ShaderPool::getCustomIdFromKey(key);
-            if (customId != 0 && ShaderPool::getCustomShaderName(customId).empty()) {
-                continue;
-            }
             keys.insert(ShaderPool::normalizeKey(key));
         }
     }

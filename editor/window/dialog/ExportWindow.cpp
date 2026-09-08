@@ -160,12 +160,6 @@ void ExportWindow::refreshShaderSelection() {
     m_selectedShaderIndex = -1;
 }
 
-void ExportWindow::loadShaderListFromSettings(const ExportTargetSettings& settings) {
-    m_shaderAdditions = settings.shaderAdditions;
-    m_shaderExclusions = settings.shaderExclusions;
-    refreshShaderSelection();
-}
-
 void ExportWindow::populateBackendList() {
     m_backendEntries.clear();
 
@@ -201,8 +195,6 @@ void ExportWindow::loadSettingsFromProject() {
     m_targetDirFromDefault = false;
     m_targetDirBuffer[0] = '\0';
     m_selectedShaderIndex = -1;
-    m_shaderAdditions.clear();
-    m_shaderExclusions.clear();
     m_sourceBackendsConfigured = false;
     m_sourcePlatformWindows = false;
     m_sourcePlatformLinux = false;
@@ -213,10 +205,13 @@ void ExportWindow::loadSettingsFromProject() {
     m_sourcePresetBackends.clear();
     m_desktopBackendConfigured = false;
 
+    const ShaderOverrides& shaders = m_project->getShaderOverrides();
+    m_shaderAdditions = shaders.additions;
+    m_shaderExclusions = shaders.exclusions;
+    refreshShaderSelection();
+
     if (m_mode == ExportMode::SourceCode) {
         const SourceCodeExportSettings& settings = m_project->getSourceCodeExportSettings();
-        loadShaderListFromSettings(settings);
-
         populateBackendList();
         m_sourceBackendsConfigured = settings.graphicBackendsConfigured;
         if (!settings.graphicBackendsConfigured) {
@@ -244,9 +239,6 @@ void ExportWindow::loadSettingsFromProject() {
         }
     } else if (m_mode == ExportMode::Desktop) {
         const DesktopExportSettings& settings = m_project->getDesktopExportSettings();
-        loadShaderListFromSettings(settings);
-
-
         m_graphicBackendIndex = 0;
         m_desktopBackendConfigured = settings.graphicBackendConfigured;
         if (settings.graphicBackendConfigured) {
@@ -258,9 +250,7 @@ void ExportWindow::loadSettingsFromProject() {
             }
         }
     } else if (m_mode == ExportMode::Web) {
-        const WebExportSettings& settings = m_project->getWebExportSettings();
         m_emsdkOverride = AppSettings::getEmsdkPath();
-        loadShaderListFromSettings(settings);
     }
 
     const auto file = m_project->getProjectPath() / "project.yaml";
@@ -305,33 +295,26 @@ bool ExportWindow::saveCurrentSettingsToProject(bool saveProjectFile) {
         }
     }
 
-    ExportTargetSettings* target = nullptr;
     bool changed = false;
-    if (m_mode == ExportMode::SourceCode) {
+    if (m_mode == ExportMode::SourceCode && m_sourceBackendsConfigured) {
         auto& settings = m_project->getSourceCodeExportSettings();
-        target = &settings;
         std::set<ShaderBackend> backends;
         for (const auto& entry : m_backendEntries) if (entry.selected) backends.insert(entry.backend);
-        if (m_sourceBackendsConfigured) {
-            changed = !settings.graphicBackendsConfigured || settings.graphicBackends != backends;
-            settings.graphicBackends = backends;
-            settings.graphicBackendsConfigured = true;
-        }
-    } else if (m_mode == ExportMode::Desktop) {
+        changed = !settings.graphicBackendsConfigured || settings.graphicBackends != backends;
+        settings.graphicBackends = backends;
+        settings.graphicBackendsConfigured = true;
+    } else if (m_mode == ExportMode::Desktop && m_desktopBackendConfigured) {
         auto& settings = m_project->getDesktopExportSettings();
-        target = &settings;
-        if (m_desktopBackendConfigured) {
-            const auto backend = desktopGraphicBackends[m_graphicBackendIndex];
-            changed = !settings.graphicBackendConfigured || settings.graphicBackend != backend;
-            settings.graphicBackend = backend;
-            settings.graphicBackendConfigured = true;
-        }
-    } else {
-        target = &m_project->getWebExportSettings();
+        const auto backend = desktopGraphicBackends[m_graphicBackendIndex];
+        changed = !settings.graphicBackendConfigured || settings.graphicBackend != backend;
+        settings.graphicBackend = backend;
+        settings.graphicBackendConfigured = true;
     }
-    changed = changed || target->shaderAdditions != m_shaderAdditions || target->shaderExclusions != m_shaderExclusions;
-    target->shaderAdditions = m_shaderAdditions;
-    target->shaderExclusions = m_shaderExclusions;
+
+    ShaderOverrides& shaders = m_project->getShaderOverrides();
+    changed = changed || shaders.additions != m_shaderAdditions || shaders.exclusions != m_shaderExclusions;
+    shaders.additions = m_shaderAdditions;
+    shaders.exclusions = m_shaderExclusions;
     m_projectSettingsDirty = m_projectSettingsDirty || changed;
     if (saveProjectFile && m_projectSettingsDirty) {
         if (!m_project->saveProjectFile()) {

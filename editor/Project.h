@@ -162,22 +162,20 @@ namespace doriax::editor{
         float paintMaxHeight = 1.0f;
     };
 
-    struct ExportTargetSettings {
-        std::set<ShaderKey> shaderAdditions;
-        std::set<ShaderKey> shaderExclusions;
+    // Manual picks on top of the shaders every export mode collects from the scenes
+    struct ShaderOverrides {
+        std::set<ShaderKey> additions;
+        std::set<ShaderKey> exclusions;
     };
 
-    struct SourceCodeExportSettings : ExportTargetSettings {
+    struct SourceCodeExportSettings {
         std::set<ShaderBackend> graphicBackends;
         bool graphicBackendsConfigured = false;
     };
 
-    struct DesktopExportSettings : ExportTargetSettings {
+    struct DesktopExportSettings {
         ShaderBackend graphicBackend = ShaderBackend::GLCore;
         bool graphicBackendConfigured = false;
-    };
-
-    struct WebExportSettings : ExportTargetSettings {
     };
 
     struct WebProjectSettings {
@@ -284,9 +282,9 @@ namespace doriax::editor{
         std::filesystem::path luaDir;
         std::vector<std::filesystem::path> scriptDirs;  // extra C++ include and source roots
         bool packNativeResources;
+        ShaderOverrides shaderOverrides;
         SourceCodeExportSettings sourceCodeExportSettings;
         DesktopExportSettings desktopExportSettings;
-        WebExportSettings webExportSettings;
         WebProjectSettings webProjectSettings;
         LinuxProjectSettings linuxProjectSettings;
         WindowsProjectSettings windowsProjectSettings;
@@ -524,12 +522,12 @@ namespace doriax::editor{
         void setPackNativeResources(bool enabled);
         bool shouldPackNativeResources() const;
 
+        ShaderOverrides& getShaderOverrides();
+        const ShaderOverrides& getShaderOverrides() const;
         SourceCodeExportSettings& getSourceCodeExportSettings();
         const SourceCodeExportSettings& getSourceCodeExportSettings() const;
         DesktopExportSettings& getDesktopExportSettings();
         const DesktopExportSettings& getDesktopExportSettings() const;
-        WebExportSettings& getWebExportSettings();
-        const WebExportSettings& getWebExportSettings() const;
         WebProjectSettings& getWebProjectSettings();
         const WebProjectSettings& getWebProjectSettings() const;
         LinuxProjectSettings& getLinuxProjectSettings();

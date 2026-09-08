@@ -91,7 +91,6 @@ namespace doriax::editor {
         void refreshShaderSelection();
         void populateShaderList();
         void populateShaderListFromKeys(const std::vector<ShaderKey>& shaderKeys);
-        void loadShaderListFromSettings(const ExportTargetSettings& settings);
         void populateBackendList();
         void refreshEmsdkStatus();
         void selectMode(ExportMode mode);

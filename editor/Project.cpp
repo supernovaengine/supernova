@@ -2276,6 +2276,14 @@ bool editor::Project::shouldPackNativeResources() const{
     return packNativeResources;
 }
 
+editor::ShaderOverrides& editor::Project::getShaderOverrides(){
+    return shaderOverrides;
+}
+
+const editor::ShaderOverrides& editor::Project::getShaderOverrides() const{
+    return shaderOverrides;
+}
+
 editor::SourceCodeExportSettings& editor::Project::getSourceCodeExportSettings(){
     return sourceCodeExportSettings;
 }
@@ -2290,14 +2298,6 @@ editor::DesktopExportSettings& editor::Project::getDesktopExportSettings(){
 
 const editor::DesktopExportSettings& editor::Project::getDesktopExportSettings() const{
     return desktopExportSettings;
-}
-
-editor::WebExportSettings& editor::Project::getWebExportSettings(){
-    return webExportSettings;
-}
-
-const editor::WebExportSettings& editor::Project::getWebExportSettings() const{
-    return webExportSettings;
 }
 
 editor::WebProjectSettings& editor::Project::getWebProjectSettings(){
@@ -3522,9 +3522,9 @@ void editor::Project::resetConfigs() {
     luaDir = defaultLuaDir;
     scriptDirs.clear();
     packNativeResources = defaultPackNativeResources;
+    shaderOverrides = {};
     sourceCodeExportSettings = {};
     desktopExportSettings = {};
-    webExportSettings = {};
     webProjectSettings = {};
     linuxProjectSettings = {};
     windowsProjectSettings = {};

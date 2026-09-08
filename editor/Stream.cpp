@@ -28,9 +28,11 @@ using namespace doriax;
 namespace {
     // The customShaderId in a key is a session-local registry index, so a fork is
     // named by its project-relative path instead, the way scenes name theirs.
-    YAML::Node encodeExportShaderKeys(const std::set<ShaderKey>& shaderKeys) {
+    // Both directions normalize, keeping a since-retired property bit out of the file.
+    YAML::Node encodeShaderKeys(const std::set<ShaderKey>& shaderKeys) {
         YAML::Node node(YAML::NodeType::Sequence);
-        for (ShaderKey key : shaderKeys) {
+        for (ShaderKey rawKey : shaderKeys) {
+            const ShaderKey key = ShaderPool::normalizeKey(rawKey);
             const uint16_t customId = ShaderPool::getCustomIdFromKey(key);
             std::string customShader;
             if (customId != 0) {
@@ -50,18 +52,22 @@ namespace {
         return node;
     }
 
-    std::vector<ShaderKey> decodeExportShaderKeys(const YAML::Node& node) {
+    std::vector<ShaderKey> decodeShaderKeys(const YAML::Node& node) {
         std::vector<ShaderKey> shaderKeys;
         if (!node || !node.IsSequence()) {
             return shaderKeys;
         }
 
         for (const auto& keyNode : node) {
-            ShaderType shaderType;
-            if (!keyNode.IsMap() || !keyNode["type"]) {
+            if (!keyNode.IsMap()) {
+                // Backward compatibility: scenes saved before forks were named by path
+                // stored the packed key, so only its stable half survives and the fork
+                // is re-paired on the next save. Remove this branch with support for them.
+                shaderKeys.push_back(ShaderPool::normalizeKey(ShaderPool::getStorageKey(keyNode.as<uint64_t>())));
                 continue;
             }
-            if (!ShaderPool::parseShaderTypeToken(keyNode["type"].as<std::string>(), shaderType)) {
+            ShaderType shaderType;
+            if (!keyNode["type"] || !ShaderPool::parseShaderTypeToken(keyNode["type"].as<std::string>(), shaderType)) {
                 continue;
             }
 
@@ -76,11 +82,7 @@ namespace {
         return shaderKeys;
     }
 
-    YAML::Node encodeExportBackendSet(const std::set<ShaderBackend>& backends, bool configured) {
-        if (!configured) {
-            return YAML::Node();
-        }
-
+    YAML::Node encodeExportBackendSet(const std::set<ShaderBackend>& backends) {
         YAML::Node node(YAML::NodeType::Sequence);
         for (ShaderBackend backend : backends) {
             node.push_back(ShaderPool::getShaderBackendCliToken(backend));
@@ -1682,40 +1684,22 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
     {
         YAML::Node exportNode;
 
+        const ShaderOverrides& shaders = project->getShaderOverrides();
+        if (!shaders.additions.empty()) exportNode["shaderAdditions"] = encodeShaderKeys(shaders.additions);
+        if (!shaders.exclusions.empty()) exportNode["shaderExclusions"] = encodeShaderKeys(shaders.exclusions);
+
         const SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
-        YAML::Node sourceCodeNode;
-
-        if (!sourceCode.shaderAdditions.empty()) sourceCodeNode["shaderAdditions"] = encodeExportShaderKeys(sourceCode.shaderAdditions);
-        if (!sourceCode.shaderExclusions.empty()) sourceCodeNode["shaderExclusions"] = encodeExportShaderKeys(sourceCode.shaderExclusions);
-        YAML::Node sourceCodeBackends = encodeExportBackendSet(sourceCode.graphicBackends, sourceCode.graphicBackendsConfigured);
         if (sourceCode.graphicBackendsConfigured) {
-            sourceCodeNode["graphicBackends"] = sourceCodeBackends;
-        }
-
-        if (sourceCodeNode.size() != 0) {
+            YAML::Node sourceCodeNode;
+            sourceCodeNode["graphicBackends"] = encodeExportBackendSet(sourceCode.graphicBackends);
             exportNode["sourceCode"] = sourceCodeNode;
         }
 
         const DesktopExportSettings& desktop = project->getDesktopExportSettings();
-        YAML::Node desktopNode;
-
         if (desktop.graphicBackendConfigured) {
+            YAML::Node desktopNode;
             desktopNode["graphicBackend"] = ShaderPool::getShaderBackendCliToken(desktop.graphicBackend);
-        }
-
-        if (!desktop.shaderAdditions.empty()) desktopNode["shaderAdditions"] = encodeExportShaderKeys(desktop.shaderAdditions);
-        if (!desktop.shaderExclusions.empty()) desktopNode["shaderExclusions"] = encodeExportShaderKeys(desktop.shaderExclusions);
-        if (desktopNode.size() != 0) {
             exportNode["desktop"] = desktopNode;
-        }
-
-        const WebExportSettings& web = project->getWebExportSettings();
-        YAML::Node webNode;
-
-        if (!web.shaderAdditions.empty()) webNode["shaderAdditions"] = encodeExportShaderKeys(web.shaderAdditions);
-        if (!web.shaderExclusions.empty()) webNode["shaderExclusions"] = encodeExportShaderKeys(web.shaderExclusions);
-        if (webNode.size() != 0) {
-            exportNode["web"] = webNode;
         }
 
         if (exportNode.size() != 0) {
@@ -2016,8 +2000,9 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
         project->setScriptDirs(std::move(scriptDirs));
     }
 
-    // Compiler and job count moved to the editor settings, still per project.
-    // Migrated once, never over an entry this machine already has.
+    // Backward compatibility: the compiler and job count used to live here before
+    // moving to the editor settings, still per project. Migrated once, never over an
+    // entry this machine already has. Remove this block with support for them.
     if (node["cmakeCCompiler"] || node["cmakeCxxCompiler"] || node["cmakeGenerator"] || node["cmakeBuildJobs"]) {
         const fs::path projectFile = project->getProjectPath() / "project.yaml";
         if (!AppSettings::getBuildSettings(projectFile).configured) {
@@ -2040,19 +2025,21 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
 
     if (node["export"] && node["export"].IsMap()) {
         const YAML::Node& exportNode = node["export"];
+
+        ShaderOverrides& shaders = project->getShaderOverrides();
+        for (ShaderKey key : decodeShaderKeys(exportNode["shaderAdditions"])) shaders.additions.insert(key);
+        for (ShaderKey key : decodeShaderKeys(exportNode["shaderExclusions"])) {
+            shaders.exclusions.insert(key);
+            shaders.additions.erase(key);
+        }
+
         if (exportNode["sourceCode"] && exportNode["sourceCode"].IsMap()) {
             const YAML::Node& sourceCodeNode = exportNode["sourceCode"];
             SourceCodeExportSettings& sourceCode = project->getSourceCodeExportSettings();
-            for (auto key : decodeExportShaderKeys(sourceCodeNode["shaderAdditions"])) sourceCode.shaderAdditions.insert(key);
-            for (auto key : decodeExportShaderKeys(sourceCodeNode["shaderExclusions"])) {
-                sourceCode.shaderExclusions.insert(key);
-                sourceCode.shaderAdditions.erase(key);
-            }
             if (sourceCodeNode["graphicBackends"]) {
                 sourceCode.graphicBackends = decodeExportBackendSet(sourceCodeNode["graphicBackends"]);
                 sourceCode.graphicBackendsConfigured = true;
             }
-
         }
 
         if (exportNode["desktop"] && exportNode["desktop"].IsMap()) {
@@ -2064,23 +2051,6 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
                     desktop.graphicBackend = backend;
                     desktop.graphicBackendConfigured = true;
                 }
-            }
-
-            for (auto key : decodeExportShaderKeys(desktopNode["shaderAdditions"])) desktop.shaderAdditions.insert(key);
-            for (auto key : decodeExportShaderKeys(desktopNode["shaderExclusions"])) {
-                desktop.shaderExclusions.insert(key);
-                desktop.shaderAdditions.erase(key);
-            }
-        }
-
-        if (exportNode["web"] && exportNode["web"].IsMap()) {
-            const YAML::Node& webNode = exportNode["web"];
-            WebExportSettings& web = project->getWebExportSettings();
-
-            for (auto key : decodeExportShaderKeys(webNode["shaderAdditions"])) web.shaderAdditions.insert(key);
-            for (auto key : decodeExportShaderKeys(webNode["shaderExclusions"])) {
-                web.shaderExclusions.insert(key);
-                web.shaderAdditions.erase(key);
             }
         }
     }
@@ -2326,11 +2296,8 @@ YAML::Node editor::Stream::encodeSceneProject(const Project* project, const Scen
     maxValuesNode["maxBones"] = sceneProject->maxValues.maxBones;
     root["maxValues"] = maxValuesNode;
 
-    if (!sceneProject->shaderKeys.empty()) {
-        YAML::Node shaderKeysNode;
-        for (const auto& key : sceneProject->shaderKeys) {
-            shaderKeysNode.push_back(key);
-        }
+    YAML::Node shaderKeysNode = encodeShaderKeys(sceneProject->shaderKeys);
+    if (shaderKeysNode.size()) {
         root["shaderKeys"] = shaderKeysNode;
     }
 
@@ -2432,13 +2399,8 @@ void editor::Stream::decodeSceneProject(SceneProject* sceneProject, const YAML::
     }
 
     sceneProject->shaderKeys.clear();
-    if (node["shaderKeys"]) {
-        for (const auto& keyNode : node["shaderKeys"]) {
-            // Normalize on load so keys persisted by older editor versions (carrying
-            // retired property bits like MESH bit 5) collapse onto their current
-            // equivalent instead of producing stale duplicate shader variants at export.
-            sceneProject->shaderKeys.insert(ShaderPool::normalizeKey(keyNode.as<uint64_t>()));
-        }
+    for (ShaderKey key : decodeShaderKeys(node["shaderKeys"])) {
+        sceneProject->shaderKeys.insert(key);
     }
 
     sceneProject->childScenes.clear();
