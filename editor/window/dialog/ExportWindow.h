@@ -40,12 +40,13 @@ namespace doriax::editor {
         // Start scene
         uint32_t m_startSceneId = NULL_PROJECT_SCENE;
 
-        // Shader list: each entry is a shader to export
+        // Shader list includes excluded entries so they can be restored.
         struct ShaderEntry {
             ShaderKey key;
             ShaderType type;
             uint32_t properties;
             std::string displayName;
+            bool fromScene = false;
         };
         std::vector<ShaderEntry> m_shaderEntries;
         int m_selectedShaderIndex = -1;
@@ -90,6 +91,7 @@ namespace doriax::editor {
 
         const char* localExportMode() const;
         void refreshShaderSelection();
+        void includeShader(ShaderKey key);
         void populateShaderList();
         void populateShaderListFromKeys(const std::vector<ShaderKey>& shaderKeys);
         void populateBackendList();

@@ -153,11 +153,24 @@ const char* ExportWindow::localExportMode() const {
 
 void ExportWindow::refreshShaderSelection() {
     populateShaderList();
-    std::set<ShaderKey> keys = m_shaderAdditions;
-    for (const auto& entry : m_shaderEntries) keys.insert(entry.key);
-    for (auto key : m_shaderExclusions) keys.erase(key);
+    std::set<ShaderKey> sceneKeys;
+    for (const auto& entry : m_shaderEntries) sceneKeys.insert(ShaderPool::normalizeKey(entry.key));
+    std::set<ShaderKey> keys = sceneKeys;
+    keys.insert(m_shaderAdditions.begin(), m_shaderAdditions.end());
+    keys.insert(m_shaderExclusions.begin(), m_shaderExclusions.end());
     populateShaderListFromKeys(std::vector<ShaderKey>(keys.begin(), keys.end()));
+    for (auto& entry : m_shaderEntries) entry.fromScene = sceneKeys.count(entry.key) > 0;
     m_selectedShaderIndex = -1;
+}
+
+void ExportWindow::includeShader(ShaderKey key) {
+    m_shaderExclusions.erase(key);
+    const bool fromScene = std::any_of(m_shaderEntries.begin(), m_shaderEntries.end(), [key](const ShaderEntry& entry) {
+        return entry.key == key && entry.fromScene;
+    });
+    if (!fromScene) m_shaderAdditions.insert(key);
+    refreshShaderSelection();
+    saveCurrentSettingsToProject();
 }
 
 void ExportWindow::populateBackendList() {
@@ -606,7 +619,9 @@ void ExportWindow::drawShaderSection() {
     ImGui::SameLine();
 
     const char* addLabel = ICON_FA_PLUS " Add";
-    const char* deleteLabel = ICON_FA_TRASH " Delete";
+    const bool hasSelection = m_selectedShaderIndex >= 0 && m_selectedShaderIndex < (int)m_shaderEntries.size();
+    const bool selectionExcluded = hasSelection && m_shaderExclusions.count(m_shaderEntries[m_selectedShaderIndex].key) > 0;
+    const char* deleteLabel = selectionExcluded ? ICON_FA_ROTATE_LEFT " Restore" : ICON_FA_TRASH " Delete";
     float buttonsGroupWidth = textButtonWidth(addLabel) + textButtonWidth(deleteLabel) + ImGui::GetStyle().ItemSpacing.x;
     ImGui::SetCursorPosX(ImGui::GetWindowContentRegionMax().x - buttonsGroupWidth);
 
@@ -616,13 +631,17 @@ void ExportWindow::drawShaderSection() {
         memset(m_addShaderProps, 0, sizeof(m_addShaderProps));
     }
     ImGui::SameLine();
-    ImGui::BeginDisabled(m_selectedShaderIndex < 0 || m_selectedShaderIndex >= (int)m_shaderEntries.size());
+    ImGui::BeginDisabled(!hasSelection);
     if (ImGui::Button(deleteLabel)) {
         const auto key = m_shaderEntries[m_selectedShaderIndex].key;
-        if (!m_shaderAdditions.erase(key)) m_shaderExclusions.insert(key);
-        refreshShaderSelection();
-        m_selectedShaderIndex = -1;
-        saveCurrentSettingsToProject();
+        if (selectionExcluded) {
+            includeShader(key);
+        } else {
+            m_shaderAdditions.erase(key);
+            m_shaderExclusions.insert(key);
+            refreshShaderSelection();
+            saveCurrentSettingsToProject();
+        }
     }
     ImGui::EndDisabled();
 
@@ -633,10 +652,21 @@ void ExportWindow::drawShaderSection() {
         for (int i = 0; i < (int)m_shaderEntries.size(); i++) {
             const auto& entry = m_shaderEntries[i];
             bool isSelected = (m_selectedShaderIndex == i);
+            const bool isOverride = m_shaderAdditions.count(entry.key) > 0;
+            const bool isExcluded = m_shaderExclusions.count(entry.key) > 0;
+            const char* icon = isExcluded ? ICON_FA_TRASH : isOverride ? ICON_FA_CIRCLE_PLUS : ICON_FA_CUBES;
+            const std::string label = std::string(icon) + "  " + entry.displayName +
+                                      (isExcluded ? " (Excluded)" : "") + "###shader_" + std::to_string(entry.key);
 
-            if (ImGui::Selectable(entry.displayName.c_str(), isSelected)) {
+            // Excluded shaders remain selectable for Restore, but use disabled text.
+            if (isExcluded) ImGui::PushStyleColor(ImGuiCol_Text, ImGui::GetStyleColorVec4(ImGuiCol_TextDisabled));
+            if (ImGui::Selectable(label.c_str(), isSelected)) {
                 m_selectedShaderIndex = i;
             }
+            if (isExcluded) ImGui::PopStyleColor();
+            ImGui::SetItemTooltip("%s", isExcluded ? "Excluded from the export. Select this shader and click Restore to include it again."
+                                       : isOverride ? "Shader override: manually added to the export."
+                                                    : "Collected from project scenes.");
         }
     }
     ImGui::EndChild();
@@ -821,8 +851,10 @@ void ExportWindow::drawSettings() {
     if (!hasSavedScenes) {
         ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), ICON_FA_TRIANGLE_EXCLAMATION " No saved scenes in project");
         canExport = false;
-    } else if (m_shaderEntries.empty()) {
-        ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), ICON_FA_TRIANGLE_EXCLAMATION " No shaders in list");
+    } else if (std::none_of(m_shaderEntries.begin(), m_shaderEntries.end(), [this](const ShaderEntry& entry) {
+        return m_shaderExclusions.count(entry.key) == 0;
+    })) {
+        ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), ICON_FA_TRIANGLE_EXCLAMATION " No shaders selected for export");
     }
 
     if (m_mode == ExportMode::SourceCode) {
@@ -1075,7 +1107,7 @@ void ExportWindow::drawAddShaderDialog() {
         ShaderKey newKey = ShaderPool::getShaderKey(selectedType, props);
         bool isDuplicate = false;
         for (const auto& entry : m_shaderEntries) {
-            if (entry.key == newKey) { isDuplicate = true; break; }
+            if (entry.key == newKey && m_shaderExclusions.count(newKey) == 0) { isDuplicate = true; break; }
         }
         if (isDuplicate) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "This shader already exists in the list");
@@ -1089,9 +1121,7 @@ void ExportWindow::drawAddShaderDialog() {
 
         ImGui::BeginDisabled(isDuplicate);
         if (ImGui::Button("Add", ImVec2(actionWidth, 0))) {
-            if (!m_shaderExclusions.erase(newKey)) m_shaderAdditions.insert(newKey);
-            refreshShaderSelection();
-            saveCurrentSettingsToProject();
+            includeShader(newKey);
             m_addShaderOpen = false;
             ImGui::CloseCurrentPopup();
         }
