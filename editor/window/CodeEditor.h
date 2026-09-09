@@ -94,7 +94,7 @@ namespace doriax::editor {
 
         bool save(const std::string& filepath);
         bool save(EditorInstance& instance);
-        void saveLastFocused();
+        bool saveLastFocused();
         void saveAll();
         void undoLastFocused();
         void redoLastFocused();

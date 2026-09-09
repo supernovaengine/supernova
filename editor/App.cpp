@@ -108,22 +108,49 @@ editor::App::App(){
 }
 
 void editor::App::saveFunc(){
+    if (saveDialogInProgress) return;
+    if (project.isTempProject()) {
+        saveAllFunc();
+        return;
+    }
     if (lastFocusedWindow == LastFocusedWindow::Code) {
-        codeEditor->saveLastFocused();
-    }else{
+        if (!codeEditor->saveLastFocused()) {
+            registerAlert("Save Failed", "The script could not be saved. Check its file permissions and try again.");
+        }
+    }else if (!project.isAnyScenePlaying()) {
         project.saveLastSelectedScene();
     }
 }
 
 void editor::App::saveAllFunc(std::function<void(bool)> callback){
+    if (project.isAnyScenePlaying() || saveDialogInProgress) {
+        if (callback) callback(false);
+        return;
+    }
     codeEditor->saveAll();
-    project.saveAllScenes(callback);
+    if (codeEditor->hasUnsavedChanges()) {
+        registerAlert("Save Failed", "Some scripts could not be saved. Check their file permissions and try again.");
+        if (callback) callback(false);
+        return;
+    }
+    project.saveAllScenes([this, callback](bool success) {
+        if (!success) {
+            if (callback) callback(false);
+            return;
+        }
+        if (project.isTempProject()) {
+            registerProjectSaveDialog([callback]() { if (callback) callback(true); });
+        } else {
+            const bool saved = project.saveProject(true);
+            if (!saved) registerAlert("Save Failed", "The project could not be saved. Check its directory and try again.");
+            if (callback) callback(saved);
+        }
+    });
 }
 
 void editor::App::saveAllAndProject(std::function<void()> onSuccess){
-    saveAllFunc([this, onSuccess](bool success) {
-        if (!success) return;
-        project.saveProject(true, onSuccess);
+    saveAllFunc([onSuccess](bool success) {
+        if (success && onSuccess) onSuccess();
     });
 }
 
@@ -163,7 +190,6 @@ enum class AppMenuCommand : uint32_t {
     OpenProject,
     OpenRecentProject,
     ClearRecentProjects,
-    SaveProject,
     SaveProjectAs,
     Save,
     SaveAll,
@@ -172,6 +198,8 @@ enum class AppMenuCommand : uint32_t {
     Exit,
     Undo,
     Redo,
+    DuplicateSelection,
+    DeleteSelection,
     ToggleStructure,
     ToggleProperties,
     ToggleResources,
@@ -185,13 +213,15 @@ enum class AppMenuCommand : uint32_t {
     ProjectScenes,
     ProjectBundles,
     ClearTrash,
-    ClearShaderCache,
     RunScene,
     PauseScene,
     ResumeScene,
     StopScene,
     RemoveScene,
-    About
+    About,
+    Documentation,
+    KeyboardShortcuts,
+    ReportIssue
 };
 
 editor::PlatformMenuItem menuCommand(AppMenuCommand command,
@@ -202,6 +232,9 @@ editor::PlatformMenuItem menuCommand(AppMenuCommand command,
     item.label = std::move(label);
     item.command.id = static_cast<uint32_t>(command);
     item.enabled = enabled;
+    if (command == AppMenuCommand::About) item.role = editor::PlatformMenuRole::About;
+    if (command == AppMenuCommand::EditorSettings) item.role = editor::PlatformMenuRole::Settings;
+    if (command == AppMenuCommand::Exit) item.role = editor::PlatformMenuRole::Quit;
     return item;
 }
 
@@ -273,23 +306,32 @@ editor::PlatformMenuModel editor::App::buildMenuModel(){
     bool canStop = hasSelectedScene && !isSaving && (isPlaying || isPaused || isLoading);
     bool canRemove = hasSelectedScene && !isProjectBusy && project.getScenes().size() > 1;
 
-    bool canSave = lastFocusedWindow == LastFocusedWindow::Code
-        ? codeEditor->hasLastFocusedUnsavedChanges()
-        : !isProjectBusy && project.hasSelectedSceneUnsavedChanges();
-    bool canSaveAll = !isProjectBusy &&
-        (project.hasScenesUnsavedChanges() || codeEditor->hasUnsavedChanges());
+    bool canSave = false;
+    if (!saveDialogInProgress) {
+        if (project.isTempProject()) {
+            canSave = !isProjectBusy;
+        } else if (lastFocusedWindow == LastFocusedWindow::Code) {
+            canSave = codeEditor->hasLastFocusedUnsavedChanges();
+        } else {
+            canSave = !isProjectBusy && project.hasSelectedSceneUnsavedChanges();
+        }
+    }
+    // Project settings are not tracked by the scene and script dirty flags.
+    bool canSaveAll = !isProjectBusy && !saveDialogInProgress;
 
     bool canUndo = false;
     bool canRedo = false;
-    if (lastFocusedWindow == LastFocusedWindow::Resources) {
-        canUndo = project.getProjectCommandHistory()->canUndo();
-        canRedo = project.getProjectCommandHistory()->canRedo();
-    } else if (lastFocusedWindow == LastFocusedWindow::Code) {
-        canUndo = codeEditor->canUndoLastFocused();
-        canRedo = codeEditor->canRedoLastFocused();
-    } else if (lastFocusedWindow != LastFocusedWindow::AI && hasSelectedScene) {
-        canUndo = CommandHandle::get(selectedSceneId)->canUndo();
-        canRedo = CommandHandle::get(selectedSceneId)->canRedo();
+    if (!ImGui::GetIO().WantTextInput) {
+        if (lastFocusedWindow == LastFocusedWindow::Resources) {
+            canUndo = project.getProjectCommandHistory()->canUndo();
+            canRedo = project.getProjectCommandHistory()->canRedo();
+        } else if (lastFocusedWindow == LastFocusedWindow::Code) {
+            canUndo = codeEditor->canUndoLastFocused();
+            canRedo = codeEditor->canRedoLastFocused();
+        } else if (lastFocusedWindow != LastFocusedWindow::AI && hasSelectedScene) {
+            canUndo = CommandHandle::get(selectedSceneId)->canUndo();
+            canRedo = CommandHandle::get(selectedSceneId)->canRedo();
+        }
     }
 
     std::vector<PlatformMenuItem> recentItems;
@@ -312,30 +354,27 @@ editor::PlatformMenuModel editor::App::buildMenuModel(){
     PlatformMenuModel menu;
     menu.menus.push_back(menuSubmenu("File", {
         menuCommand(AppMenuCommand::NewProject, "New Project", !isProjectBusy),
-        menuSubmenu("New Scene", {
-            menuCommand(AppMenuCommand::NewScene3D, "3D Scene"),
-            menuCommand(AppMenuCommand::NewScene2D, "2D Scene"),
-            menuCommand(AppMenuCommand::NewSceneUI, "UI Scene")
-        }, !isProjectBusy),
-        menuSeparator(),
         menuShortcut(AppMenuCommand::OpenProject, "Open Project...", "Ctrl+O",
                      !isProjectBusy),
         menuSubmenu("Recent Projects", std::move(recentItems), !isProjectBusy),
-        menuCommand(AppMenuCommand::SaveProject, "Save Project"),
-        menuCommand(AppMenuCommand::SaveProjectAs, "Save Project As..."),
         menuSeparator(),
-        menuCommand(AppMenuCommand::Save, "Save", canSave),
-        menuCommand(AppMenuCommand::SaveAll, "Save All", canSaveAll),
+        menuShortcut(AppMenuCommand::Save, "Save", "Ctrl+S", canSave),
+        menuShortcut(AppMenuCommand::SaveAll, "Save All", "Ctrl+Shift+S", canSaveAll),
+        menuCommand(AppMenuCommand::SaveProjectAs, "Save Project As...", canSaveAll),
         menuSeparator(),
         menuCommand(AppMenuCommand::ExportProject, "Export Project..."),
-        menuCommand(AppMenuCommand::EditorSettings, "Editor Settings..."),
         menuSeparator(),
         menuCommand(AppMenuCommand::Exit, "Exit")
     }));
 
     menu.menus.push_back(menuSubmenu("Edit", {
-        menuCommand(AppMenuCommand::Undo, "Undo", canUndo),
-        menuCommand(AppMenuCommand::Redo, "Redo", canRedo)
+        menuShortcut(AppMenuCommand::Undo, "Undo", "Ctrl+Z", canUndo),
+        menuShortcut(AppMenuCommand::Redo, "Redo", "Ctrl+Shift+Z", canRedo),
+        menuSeparator(),
+        menuShortcut(AppMenuCommand::DuplicateSelection, "Duplicate", "Ctrl+D", canEditSelection(true)),
+        menuShortcut(AppMenuCommand::DeleteSelection, "Delete", "Delete", canEditSelection(false)),
+        menuSeparator(),
+        menuCommand(AppMenuCommand::EditorSettings, "Editor Settings...")
     }));
 
     menu.menus.push_back(menuSubmenu("View", {
@@ -362,23 +401,32 @@ editor::PlatformMenuModel editor::App::buildMenuModel(){
 
     menu.menus.push_back(menuSubmenu("Project", {
         menuCommand(AppMenuCommand::ProjectSettings, "Project Settings..."),
-        menuCommand(AppMenuCommand::ProjectScenes, "Scenes...", !isProjectBusy),
+        menuCommand(AppMenuCommand::ProjectScenes, "Manage Scenes...", !isProjectBusy),
         menuCommand(AppMenuCommand::ProjectBundles, "Bundles..."),
         menuSeparator(),
-        menuCommand(AppMenuCommand::ClearTrash, "Clear Trash"),
-        menuCommand(AppMenuCommand::ClearShaderCache, "Clear Shader Cache")
+        menuCommand(AppMenuCommand::ClearTrash, "Empty Project Trash...", !isProjectBusy)
     }));
 
     menu.menus.push_back(menuSubmenu("Scene", {
-        menuShortcut(AppMenuCommand::RunScene, "Run", "F5", canRun),
+        menuSubmenu("New Scene", {
+            menuCommand(AppMenuCommand::NewScene3D, "3D Scene"),
+            menuCommand(AppMenuCommand::NewScene2D, "2D Scene"),
+            menuCommand(AppMenuCommand::NewSceneUI, "UI Scene")
+        }, !isProjectBusy),
+        menuSeparator(),
+        menuShortcut(AppMenuCommand::RunScene, "Run Current Scene", "F5", canRun),
         menuShortcut(AppMenuCommand::PauseScene, "Pause", "F6", canPause),
         menuShortcut(AppMenuCommand::ResumeScene, "Resume", "F5", canResume),
         menuShortcut(AppMenuCommand::StopScene, "Stop", "F7", canStop),
         menuSeparator(),
-        menuCommand(AppMenuCommand::RemoveScene, "Remove", canRemove)
+        menuCommand(AppMenuCommand::RemoveScene, "Remove Scene from Project", canRemove)
     }));
 
     menu.menus.push_back(menuSubmenu("Help", {
+        menuShortcut(AppMenuCommand::Documentation, "Documentation", "F1"),
+        menuCommand(AppMenuCommand::KeyboardShortcuts, "Keyboard Shortcuts"),
+        menuCommand(AppMenuCommand::ReportIssue, "Report an Issue..."),
+        menuSeparator(),
         menuCommand(AppMenuCommand::About, "About Doriax")
     }));
     return menu;
@@ -440,10 +488,8 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
         case AppMenuCommand::ClearRecentProjects:
             AppSettings::clearRecentProjects();
             break;
-        case AppMenuCommand::SaveProject:
-            project.saveProject(true);
-            break;
         case AppMenuCommand::SaveProjectAs:
+            if (project.isAnyScenePlaying() || saveDialogInProgress) return;
             registerProjectSaveDialog([](){});
             break;
         case AppMenuCommand::Save:
@@ -544,12 +590,14 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
         case AppMenuCommand::ProjectBundles:
             bundlesWindow.open(&project);
             break;
-        case AppMenuCommand::ClearTrash:
-            project.clearTrash();
-            break;
-        case AppMenuCommand::ClearShaderCache: {
-            const std::filesystem::path cacheDir = getUserShaderCacheDir();
-            if (std::filesystem::exists(cacheDir)) std::filesystem::remove_all(cacheDir);
+        case AppMenuCommand::ClearTrash: {
+            if (project.isAnyScenePlaying()) return;
+            const auto projectPath = project.getProjectPath();
+            registerConfirmAlert("Empty Project Trash",
+                "Permanently delete all files in this project's trash?\nThis cannot be undone.",
+                [this, projectPath]() {
+                    if (project.getProjectPath() == projectPath && !project.isAnyScenePlaying()) project.clearTrash();
+                });
             break;
         }
         case AppMenuCommand::RunScene:
@@ -587,6 +635,43 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
         case AppMenuCommand::About:
             registerAlert("About Doriax",
                 "Doriax Engine\n\nVersion: " DORIAX_EDITOR_VERSION "\n\nDeveloped by Eduardo Doria");
+            break;
+        case AppMenuCommand::DuplicateSelection:
+            duplicateSelection();
+            break;
+        case AppMenuCommand::DeleteSelection:
+            deleteSelection();
+            break;
+        case AppMenuCommand::Documentation:
+        case AppMenuCommand::ReportIssue: {
+            const char* url = action == AppMenuCommand::Documentation
+                ? "https://docs.doriax.org/" : "https://github.com/doriaxengine/doriax/issues";
+            auto openInShell = ImGui::GetPlatformIO().Platform_OpenInShellFn;
+            if (!openInShell || !openInShell(ImGui::GetCurrentContext(), url)) {
+                registerAlert("Open in Browser", std::string("Could not open your browser. Visit:\n") + url);
+            }
+            break;
+        }
+        case AppMenuCommand::KeyboardShortcuts:
+            registerAlert("Keyboard Shortcuts",
+                "PROJECT AND EDITING\n"
+                "Ctrl+O    Open project\n"
+                "Ctrl+S    Save current scene or script\n"
+                "Ctrl+Shift+S    Save all scenes, scripts, and project\n"
+                "Ctrl+Z    Undo\n"
+                "Ctrl+Shift+Z    Redo\n"
+                "Ctrl+D    Duplicate selection\n"
+                "Delete    Delete selection\n\n"
+                "PLAYBACK\n"
+                "F5    Run current scene / Resume\n"
+                "F6    Pause\n"
+                "F7    Stop\n\n"
+                "SCENE VIEW\n"
+                "W / E / R    Move / Rotate / Scale\n"
+                "T    Toggle local / global transforms\n"
+                "F / Home    Frame selection / all objects (3D)\n\n"
+                "F1    Documentation",
+                "On macOS, menu shortcuts use Command instead of Ctrl.");
             break;
     }
 }
@@ -1320,6 +1405,116 @@ void editor::App::setup() {
     Theme::applyDpiScale(dpiScale);
 }
 
+bool editor::App::canEditSelection(bool duplicate) {
+    // Enabled items keep their native key equivalent, stealing it from a focused text field.
+    if (ImGui::GetIO().WantTextInput) return false;
+    if (lastFocusedWindow != LastFocusedWindow::AnySceneWindow || project.isAnyScenePlaying()) return false;
+    const uint32_t sceneId = project.getSelectedSceneId();
+    uint32_t targetSceneId = sceneId;
+    const uint32_t propertiesSceneId = project.getSelectedSceneForProperties();
+    if (!duplicate && propertiesSceneId != NULL_PROJECT_SCENE &&
+        (propertiesSceneId == sceneId || project.hasChildScene(sceneId, propertiesSceneId))) {
+        targetSceneId = propertiesSceneId;
+    }
+    SceneProject* scene = project.getScene(targetSceneId);
+    if (!scene) return false;
+    if (scene->sceneRender && (scene->sceneRender->getSelectedTileIndex() >= 0 ||
+        (!duplicate && scene->sceneRender->getSelectedInstanceIndex() >= 0))) return true;
+    if (!project.getSelectedEntities(targetSceneId).empty()) return true;
+    return !duplicate && propertiesSceneId != NULL_PROJECT_SCENE && propertiesSceneId != sceneId &&
+        project.hasChildScene(sceneId, propertiesSceneId);
+}
+
+void editor::App::deleteSelection() {
+    if (!canEditSelection(false)) return;
+    const uint32_t sceneId = project.getSelectedSceneId();
+    uint32_t selectedSceneForProperties = project.getSelectedSceneForProperties();
+    uint32_t targetSceneId = sceneId;
+    if (selectedSceneForProperties != NULL_PROJECT_SCENE &&
+        (selectedSceneForProperties == sceneId || project.hasChildScene(sceneId, selectedSceneForProperties))) {
+        targetSceneId = selectedSceneForProperties;
+    }
+
+    // Check if a tile is selected — delete it instead of the entity
+    SceneProject* sp = project.getScene(targetSceneId);
+    bool tileDeleted = false;
+    bool instanceDeleted = false;
+    if (sp && sp->sceneRender) {
+        int tileIdx = sp->sceneRender->getSelectedTileIndex();
+        Entity tileEntity = sp->sceneRender->getSelectedTileEntity();
+        if (tileIdx >= 0) {
+            Command* deleteCmd = ProjectUtils::buildDeleteTileCmd(&project, targetSceneId, tileEntity, (unsigned int)tileIdx);
+            if (deleteCmd) {
+                CommandHandle::get(sceneId)->addCommand(deleteCmd);
+                sp->sceneRender->clearTileSelection();
+                tileDeleted = true;
+            }
+        }
+
+        int instIdx = sp->sceneRender->getSelectedInstanceIndex();
+        Entity instEntity = sp->sceneRender->getSelectedInstanceEntity();
+        if (!tileDeleted && instIdx >= 0) {
+            Command* deleteCmd = ProjectUtils::buildDeleteInstanceCmd(&project, targetSceneId, instEntity, (unsigned int)instIdx);
+            if (deleteCmd) {
+                CommandHandle::get(sceneId)->addCommand(deleteCmd);
+                sp->sceneRender->clearInstanceSelection();
+                instanceDeleted = true;
+            }
+        }
+    }
+
+    if (!tileDeleted && !instanceDeleted) {
+        const std::vector<Entity>& selectedEntities = project.getSelectedEntities(targetSceneId);
+
+        Command* lastCmd = nullptr;
+        if (!selectedEntities.empty()) {
+            for (const Entity& entity : selectedEntities){
+                lastCmd = new DeleteEntityCmd(&project, targetSceneId, entity);
+                CommandHandle::get(sceneId)->addCommand(lastCmd);
+            }
+        } else {
+            if (selectedSceneForProperties != NULL_PROJECT_SCENE &&
+                selectedSceneForProperties != sceneId &&
+                project.hasChildScene(sceneId, selectedSceneForProperties)) {
+                    lastCmd = new RemoveChildSceneCmd(&project, sceneId, selectedSceneForProperties);
+                    CommandHandle::get(sceneId)->addCommand(lastCmd);
+            }
+        }
+        if (lastCmd) {
+            lastCmd->setNoMerge();
+        }
+    }
+}
+
+void editor::App::duplicateSelection() {
+    if (!canEditSelection(true)) return;
+    const uint32_t sceneId = project.getSelectedSceneId();
+    uint32_t targetSceneId = sceneId;
+    SceneProject* sp = project.getScene(targetSceneId);
+    bool tileDuplicated = false;
+    if (sp && sp->sceneRender) {
+        int tileIdx = sp->sceneRender->getSelectedTileIndex();
+        Entity tileEntity = sp->sceneRender->getSelectedTileEntity();
+        if (tileIdx >= 0) {
+            Command* dupCmd = ProjectUtils::buildDuplicateTileCmd(&project, targetSceneId, tileEntity, (unsigned int)tileIdx);
+            if (dupCmd) {
+                CommandHandle::get(sceneId)->addCommand(dupCmd);
+                TilemapComponent* tilemap = sp->scene->findComponent<TilemapComponent>(tileEntity);
+                if (tilemap) {
+                    sp->sceneRender->selectTile(tileEntity, (int)tilemap->numTiles - 1);
+                }
+                tileDuplicated = true;
+            }
+        }
+    }
+    if (!tileDuplicated) {
+        const std::vector<Entity>& selectedEntities = project.getSelectedEntities(targetSceneId);
+        if (!selectedEntities.empty()){
+            CommandHandle::get(sceneId)->addCommandNoMerge(new DuplicateEntityCmd(&project, targetSceneId, selectedEntities));
+        }
+    }
+}
+
 void editor::App::show(){
     float dpiScale = 1.0f;
     if (const ImGuiViewport* mainViewport = ImGui::GetMainViewport()) {
@@ -1327,60 +1522,66 @@ void editor::App::show(){
     }
     Theme::applyDpiScale(dpiScale);
 
-    if (resourcesWindow->isFocused()) {
-        lastFocusedWindow = LastFocusedWindow::Resources;
-    } else if (codeEditor->isFocused()) {
-        lastFocusedWindow = LastFocusedWindow::Code;
-    } else if (aiChatWindow->isFocused()) {
-        lastFocusedWindow = LastFocusedWindow::AI;
-    }else{
-        lastFocusedWindow = LastFocusedWindow::AnySceneWindow;
+    if (!ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel)) {
+        if (resourcesWindow->isFocused()) {
+            lastFocusedWindow = LastFocusedWindow::Resources;
+        } else if (codeEditor->isFocused()) {
+            lastFocusedWindow = LastFocusedWindow::Code;
+        } else if (aiChatWindow->isFocused()) {
+            lastFocusedWindow = LastFocusedWindow::AI;
+        }else{
+            lastFocusedWindow = LastFocusedWindow::AnySceneWindow;
+        }
     }
 
     ImGuiIO& io = ImGui::GetIO();
-    bool isUndo = (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z) && !io.KeyShift);
-    bool isRedo = (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Y)) || (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z) && io.KeyShift);
+    bool isUndo = !io.WantTextInput && (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z) && !io.KeyShift);
+    bool isRedo = !io.WantTextInput && ((io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Y)) || (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_Z) && io.KeyShift));
 
-    if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_S)) {
-        if (ImGui::GetIO().KeyShift) {
-            // CTRL+SHIFT+S saves all files
-            saveAllFunc();
-        } else {
-            saveFunc();
-        }
-    }
-
-    if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_O)) {
-        // CTRL+O opens a project
-        openProjectFunc();
-    }
-
-    // Play/Pause/Stop shortcuts
-    {
-        SceneProject* selectedScene = project.getSelectedScene();
-        uint32_t selectedSceneId = project.getSelectedSceneId();
-        bool hasSelectedScene = selectedScene != nullptr;
-        bool isPlaying = hasSelectedScene && selectedScene->playState == ScenePlayState::PLAYING;
-        bool isPaused = hasSelectedScene && selectedScene->playState == ScenePlayState::PAUSED;
-        bool isLoading = hasSelectedScene && selectedScene->playState == ScenePlayState::LOADING;
-
-        if (ImGui::IsKeyPressed(ImGuiKey_F5)) {
-            if (hasSelectedScene && !project.isAnyScenePlaying()) {
-                project.start(selectedSceneId);
-            } else if (isPaused) {
-                project.resume(selectedSceneId);
+    const bool popupOpen = ImGui::IsPopupOpen(nullptr, ImGuiPopupFlags_AnyPopupId | ImGuiPopupFlags_AnyPopupLevel);
+    if (!popupOpen) {
+        if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_S)) {
+            if (ImGui::GetIO().KeyShift) {
+                // Save scenes, scripts, and project configuration together.
+                saveAllFunc();
+            } else {
+                saveFunc();
             }
         }
-        if (ImGui::IsKeyPressed(ImGuiKey_F6)) {
-            if (isPlaying) {
-                project.pause(selectedSceneId);
+
+        if (ImGui::GetIO().KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_O)) {
+            // CTRL+O opens a project
+            openProjectFunc();
+        }
+
+        // Play/Pause/Stop shortcuts
+        {
+            SceneProject* selectedScene = project.getSelectedScene();
+            uint32_t selectedSceneId = project.getSelectedSceneId();
+            bool hasSelectedScene = selectedScene != nullptr;
+            bool isPlaying = hasSelectedScene && selectedScene->playState == ScenePlayState::PLAYING;
+            bool isPaused = hasSelectedScene && selectedScene->playState == ScenePlayState::PAUSED;
+            bool isLoading = hasSelectedScene && selectedScene->playState == ScenePlayState::LOADING;
+
+            if (ImGui::IsKeyPressed(ImGuiKey_F5)) {
+                if (hasSelectedScene && !project.isAnyScenePlaying()) {
+                    project.start(selectedSceneId);
+                } else if (isPaused) {
+                    project.resume(selectedSceneId);
+                }
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_F6)) {
+                if (isPlaying) {
+                    project.pause(selectedSceneId);
+                }
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_F7)) {
+                if (isPlaying || isPaused || isLoading) {
+                    project.stop(selectedSceneId);
+                }
             }
         }
-        if (ImGui::IsKeyPressed(ImGuiKey_F7)) {
-            if (isPlaying || isPaused || isLoading) {
-                project.stop(selectedSceneId);
-            }
-        }
+        if (ImGui::IsKeyPressed(ImGuiKey_F1)) executeMenuCommand({static_cast<uint32_t>(AppMenuCommand::Documentation), {}});
     }
 
     if (isDroppedExternalPaths) {
@@ -1396,7 +1597,7 @@ void editor::App::show(){
         // space to keys events
     }
 
-    if (!resourcesWindow->isFocused() && !codeEditor->isFocused() && !aiChatWindow->isFocused()){
+    if (!popupOpen && !resourcesWindow->isFocused() && !codeEditor->isFocused() && !aiChatWindow->isFocused()){
         uint32_t sceneId = project.getSelectedSceneId();
 
         // Update the Undo and Redo button logic:
@@ -1407,94 +1608,12 @@ void editor::App::show(){
             CommandHandle::get(sceneId)->redo();
         }
 
-        if (ImGui::IsKeyPressed(ImGuiKey_Delete)){
-            uint32_t selectedSceneForProperties = project.getSelectedSceneForProperties();
-            uint32_t targetSceneId = sceneId;
-            if (selectedSceneForProperties != NULL_PROJECT_SCENE &&
-                (selectedSceneForProperties == sceneId || project.hasChildScene(sceneId, selectedSceneForProperties))) {
-                targetSceneId = selectedSceneForProperties;
-            }
+        if (ImGui::IsKeyPressed(ImGuiKey_Delete)) deleteSelection();
 
-            // Check if a tile is selected — delete it instead of the entity
-            SceneProject* sp = project.getScene(targetSceneId);
-            bool tileDeleted = false;
-            bool instanceDeleted = false;
-            if (sp && sp->sceneRender) {
-                int tileIdx = sp->sceneRender->getSelectedTileIndex();
-                Entity tileEntity = sp->sceneRender->getSelectedTileEntity();
-                if (tileIdx >= 0) {
-                    Command* deleteCmd = ProjectUtils::buildDeleteTileCmd(&project, targetSceneId, tileEntity, (unsigned int)tileIdx);
-                    if (deleteCmd) {
-                        CommandHandle::get(sceneId)->addCommand(deleteCmd);
-                        sp->sceneRender->clearTileSelection();
-                        tileDeleted = true;
-                    }
-                }
-
-                int instIdx = sp->sceneRender->getSelectedInstanceIndex();
-                Entity instEntity = sp->sceneRender->getSelectedInstanceEntity();
-                if (!tileDeleted && instIdx >= 0) {
-                    Command* deleteCmd = ProjectUtils::buildDeleteInstanceCmd(&project, targetSceneId, instEntity, (unsigned int)instIdx);
-                    if (deleteCmd) {
-                        CommandHandle::get(sceneId)->addCommand(deleteCmd);
-                        sp->sceneRender->clearInstanceSelection();
-                        instanceDeleted = true;
-                    }
-                }
-            }
-
-            if (!tileDeleted && !instanceDeleted) {
-            const std::vector<Entity>& selectedEntities = project.getSelectedEntities(targetSceneId);
-
-            Command* lastCmd = nullptr;
-            if (!selectedEntities.empty()) {
-                for (const Entity& entity : selectedEntities){
-                    lastCmd = new DeleteEntityCmd(&project, targetSceneId, entity);
-                    CommandHandle::get(sceneId)->addCommand(lastCmd);
-                }
-            } else {
-                if (selectedSceneForProperties != NULL_PROJECT_SCENE &&
-                    selectedSceneForProperties != sceneId &&
-                    project.hasChildScene(sceneId, selectedSceneForProperties)) {
-                        lastCmd = new RemoveChildSceneCmd(&project, sceneId, selectedSceneForProperties);
-                        CommandHandle::get(sceneId)->addCommand(lastCmd);
-                }
-            }
-            if (lastCmd) {
-                lastCmd->setNoMerge();
-            }
-            }
-        }
-
-        if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_D)){
-            uint32_t targetSceneId = sceneId;
-            SceneProject* sp = project.getScene(targetSceneId);
-            bool tileDuplicated = false;
-            if (sp && sp->sceneRender) {
-                int tileIdx = sp->sceneRender->getSelectedTileIndex();
-                Entity tileEntity = sp->sceneRender->getSelectedTileEntity();
-                if (tileIdx >= 0) {
-                    Command* dupCmd = ProjectUtils::buildDuplicateTileCmd(&project, targetSceneId, tileEntity, (unsigned int)tileIdx);
-                    if (dupCmd) {
-                        CommandHandle::get(sceneId)->addCommand(dupCmd);
-                        TilemapComponent* tilemap = sp->scene->findComponent<TilemapComponent>(tileEntity);
-                        if (tilemap) {
-                            sp->sceneRender->selectTile(tileEntity, (int)tilemap->numTiles - 1);
-                        }
-                        tileDuplicated = true;
-                    }
-                }
-            }
-            if (!tileDuplicated) {
-                const std::vector<Entity>& selectedEntities = project.getSelectedEntities(targetSceneId);
-                if (!selectedEntities.empty()){
-                    CommandHandle::get(sceneId)->addCommandNoMerge(new DuplicateEntityCmd(&project, targetSceneId, selectedEntities));
-                }
-            }
-        }
+        if (io.KeyCtrl && ImGui::IsKeyPressed(ImGuiKey_D)) duplicateSelection();
     }
 
-    if (resourcesWindow->isFocused()) {
+    if (!popupOpen && resourcesWindow->isFocused()) {
         if (isUndo) {
             project.getProjectCommandHistory()->undo();
             resourcesWindow->refreshCurrentDirectory();
@@ -2279,14 +2398,15 @@ void editor::App::processNextSaveDialog() {
                 }
 
                 // Save the project to the selected path
-                project.saveProjectToPath(projectPath);
+                const bool saved = project.saveProjectToPath(projectPath);
+                if (!saved) registerAlert("Save Failed", "The project could not be saved. Check its directory and try again.");
 
                 // Remove this item from the queue
                 saveDialogInProgress = false;
                 popSaveDialogQueueItem();
 
                 // Execute the completion callback if provided
-                if (completionCallback) {
+                if (saved && completionCallback) {
                     completionCallback();
                 }
 

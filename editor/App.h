@@ -157,6 +157,9 @@ namespace doriax::editor{
         void saveAllFunc(std::function<void(bool)> callback = nullptr);
         void saveAllAndProject(std::function<void()> onSuccess);
         void openProjectFunc();
+        bool canEditSelection(bool duplicate);
+        void deleteSelection();
+        void duplicateSelection();
 
         PlatformMenuModel buildMenuModel();
         void executeMenuCommand(const PlatformMenuCommand& command);

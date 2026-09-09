@@ -16,6 +16,9 @@ enum class PlatformMenuItemType {
     Submenu
 };
 
+// Native backends can place these commands in the application's standard menu.
+enum class PlatformMenuRole { None, About, Settings, Quit };
+
 struct PlatformMenuCommand {
     uint32_t id = 0;
     std::string payload;
@@ -27,6 +30,7 @@ struct PlatformMenuCommand {
 
 struct PlatformMenuItem {
     PlatformMenuItemType type = PlatformMenuItemType::Command;
+    PlatformMenuRole role = PlatformMenuRole::None;
     std::string label;
     std::string shortcut;
     PlatformMenuCommand command;
@@ -36,6 +40,7 @@ struct PlatformMenuItem {
 
     bool operator==(const PlatformMenuItem& other) const {
         return type == other.type
+            && role == other.role
             && label == other.label
             && shortcut == other.shortcut
             && command == other.command

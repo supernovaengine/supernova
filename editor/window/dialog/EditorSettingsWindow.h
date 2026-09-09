@@ -33,6 +33,7 @@ namespace doriax::editor {
         EmsdkInfo m_emsdkInfo;
         bool m_editorVSyncEnabled = true;
         std::filesystem::path m_defaultExportDirectory;
+        std::string m_cacheStatus;
 
         LocalBuildSettings projectBuildSettings() const;
         void refreshCMakeStatus();
@@ -41,6 +42,7 @@ namespace doriax::editor {
         void drawGeneralSettings();
         void drawCMakeSettings();
         void drawWebSettings();
+        void drawAdvancedSettings();
         bool applySettings();
 
     public:

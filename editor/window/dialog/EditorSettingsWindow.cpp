@@ -4,6 +4,7 @@
 #include "EditorSettingsWindow.h"
 
 #include "AppSettings.h"
+#include "App.h"
 #include "Project.h"
 #include "Theme.h"
 #include "external/IconsFontAwesome6.h"
@@ -127,6 +128,7 @@ namespace {
 void EditorSettingsWindow::open(Project* project) {
     m_isOpen = true;
     m_project = project;
+    m_cacheStatus.clear();
 
     m_availableKits = Generator::detectAvailableKits();
     m_cmakeKitIndex = 0;
@@ -221,6 +223,11 @@ void EditorSettingsWindow::drawSettings() {
 
         if (ImGui::BeginTabItem("Web")) {
             drawWebSettings();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Advanced")) {
+            drawAdvancedSettings();
             ImGui::EndTabItem();
         }
 
@@ -407,6 +414,22 @@ void EditorSettingsWindow::drawWebSettings() {
             ImGui::TextColored(ImVec4(0.3f, 1.0f, 0.3f, 1.0f), ICON_FA_CIRCLE_CHECK " Found %s", m_emsdkInfo.description.c_str());
         } else {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), ICON_FA_TRIANGLE_EXCLAMATION " Not found");
+        }
+    });
+}
+
+void EditorSettingsWindow::drawAdvancedSettings() {
+    drawSettingsPanel("##EditorAdvancedSettingsPanel", [this]() {
+        beginSettingsRow("Shader Cache", "Shared by projects for this editor version. Shaders are rebuilt when needed.");
+        ImGui::BeginDisabled(m_project && m_project->isAnyScenePlaying());
+        if (ImGui::Button("Clear Shader Cache")) {
+            std::error_code ec;
+            std::filesystem::remove_all(App::getUserShaderCacheDir(), ec);
+            m_cacheStatus = ec ? "Could not clear the shader cache: " + ec.message() : "Shader cache cleared.";
+        }
+        ImGui::EndDisabled();
+        if (!m_cacheStatus.empty()) {
+            ImGui::TextWrapped("%s", m_cacheStatus.c_str());
         }
     });
 }
