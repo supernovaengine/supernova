@@ -4,7 +4,7 @@
 #ifndef DORIAX_EXPORT_H
 #define DORIAX_EXPORT_H
 
-#if defined(_MSC_VER)
+#if defined(_WIN32)
     #ifdef DORIAX_SHARED
         #ifdef DORIAX_EXPORTS
             #define DORIAX_API __declspec(dllexport)

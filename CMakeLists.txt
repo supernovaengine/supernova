@@ -96,10 +96,21 @@ if(WIN32)
         else()
             set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
         endif()
-    endif()
+    elseif(MINGW)
+        # Same call as the CRT above: a shared engine means one GCC runtime for
+        # the editor, the DLL and the plugins, shipped beside the binaries.
+        get_filename_component(DORIAX_MINGW_BIN "${CMAKE_CXX_COMPILER}" DIRECTORY)
+        find_file(DORIAX_MINGW_STDCXX libstdc++-6.dll PATHS ${DORIAX_MINGW_BIN} NO_DEFAULT_PATH)
+        find_file(DORIAX_MINGW_PTHREAD libwinpthread-1.dll PATHS ${DORIAX_MINGW_BIN} NO_DEFAULT_PATH)
+        # The unwind DLL is named after the toolchain's exception model
+        find_file(DORIAX_MINGW_GCC NAMES libgcc_s_seh-1.dll libgcc_s_dw2-1.dll libgcc_s_sjlj-1.dll
+                  PATHS ${DORIAX_MINGW_BIN} NO_DEFAULT_PATH)
 
-    if(MINGW)
-        set(MINGW_STATIC_FLAGS -static -static-libgcc -static-libstdc++)
+        if(DORIAX_MINGW_STDCXX AND DORIAX_MINGW_PTHREAD AND DORIAX_MINGW_GCC)
+            set(DORIAX_MINGW_RUNTIME ${DORIAX_MINGW_STDCXX} ${DORIAX_MINGW_PTHREAD} ${DORIAX_MINGW_GCC})
+        else()
+            message(WARNING "Incomplete GCC runtime next to ${CMAKE_CXX_COMPILER}: the editor will only start from a shell that has it on PATH.")
+        endif()
     endif()
 endif()
 
@@ -653,7 +664,6 @@ function(configure_doriax_editor_target target_name)
 
         ${BACKEND_LIBS}
         ${OPENGL_LIBRARIES}
-        ${MINGW_STATIC_FLAGS}
         Threads::Threads
         doriax
         shadercompiler
@@ -858,6 +868,13 @@ else()
             LIBRARY DESTINATION bin
             ARCHIVE DESTINATION bin
     )
+
+    if(DORIAX_MINGW_RUNTIME)
+        install(FILES ${DORIAX_MINGW_RUNTIME}
+                CONFIGURATIONS Release MinSizeRel
+                DESTINATION bin
+        )
+    endif()
 
     install(DIRECTORY ${CMAKE_SOURCE_DIR}/engine
             DESTINATION bin

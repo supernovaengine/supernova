@@ -29,9 +29,6 @@ jobs:
     name: Build for ${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
     timeout-minutes: 120
-    # MinGW is not part of a release, so it fails on its own: a job marked
-    # continue-on-error does not hold back the jobs that need it.
-    continue-on-error: ${{ matrix.config.artifact == 'doriax_windows_mingw' }}
     # Must resolve to null and not "" on the other entries: an empty container
     # is still a container job, which Windows and macOS runners reject.
     container: ${{ matrix.config.container || fromJSON('null') }}
@@ -52,12 +49,13 @@ jobs:
             generators: "Visual Studio 18 2026"
           }
         - {
-            name: "Windows Latest MinGW",
+            name: "Windows Latest MinGW (UCRT64)",
             os: windows-latest,
             artifact: "doriax_windows_mingw",
             cc: "gcc",
             cxx: "g++",
-            generators: "Ninja"
+            generators: "Ninja",
+            shell: "msys2 {0}"
           }
         # The container pins the glibc floor to 22.04 instead of the runner
         # image's. Moving it also moves the distros AppRun's refusal names.
@@ -100,8 +98,21 @@ jobs:
           echo github.event.action: ${{ github.event.action }}
           echo github.event_name: ${{ github.event_name }}
 
+      - name: Set up MSYS2 UCRT64
+        if: matrix.config.artifact == 'doriax_windows_mingw'
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          # The toolchain README.md documents for a source build
+          install: >-
+            mingw-w64-ucrt-x86_64-toolchain
+            mingw-w64-ucrt-x86_64-cmake
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-python
+
       - name: Install dependencies on Windows
-        if: startsWith(matrix.config.os, 'windows')
+        if: matrix.config.cc == 'cl'
         run: |
           choco install ninja cmake
           ninja --version
@@ -155,7 +166,7 @@ jobs:
           echo "DORIAX_VERSION=$VERSION" >> $GITHUB_ENV
           
       - name: Configure
-        shell: bash
+        shell: ${{ matrix.config.shell || 'bash' }}
         env:
           CC: ${{ matrix.config.cc }}
           CXX: ${{ matrix.config.cxx }}
@@ -172,7 +183,7 @@ jobs:
             -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 
       - name: Build
-        shell: bash
+        shell: ${{ matrix.config.shell || 'bash' }}
         env:
           CC: ${{ matrix.config.cc }}
           CXX: ${{ matrix.config.cxx }}
@@ -184,13 +195,21 @@ jobs:
           cmake --build build --config ${{env.BUILD_TYPE}} --target "${targets[@]}"
 
       - name: Install Strip
-        shell: bash
+        shell: ${{ matrix.config.shell || 'bash' }}
         run: cmake --install build --config ${{env.BUILD_TYPE}} --strip
         
       - name: List directories
         shell: bash
         working-directory: instdir
         run: ls -laR
+
+      - name: Check the GCC runtime was packaged
+        if: matrix.config.artifact == 'doriax_windows_mingw'
+        shell: bash
+        run: |
+          for dll in libstdc++-6.dll libgcc_s_seh-1.dll libwinpthread-1.dll; do
+            test -f "instdir/bin/$dll" || { echo "missing instdir/bin/$dll"; exit 1; }
+          done
 
       - name: Collect Windows binaries for signing
         if: env.SIGN_WINDOWS == 'true'
