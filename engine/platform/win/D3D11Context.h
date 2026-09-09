@@ -1,4 +1,4 @@
-// (c) Eduardo Doria
+// (c) Eduardo Doria and contributors
 // SPDX-License-Identifier: MIT
 // Direct3D 11 device and swapchain for the Win32 backend. Shaped like
 // VulkanContext so DoriaxWin drives every graphics backend the same way.

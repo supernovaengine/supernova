@@ -1,4 +1,4 @@
-// (c) Eduardo Doria
+// (c) Eduardo Doria and contributors
 // SPDX-License-Identifier: MIT
 
 unsigned char doriax_logo_png[] = {

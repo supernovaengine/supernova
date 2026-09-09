@@ -1,4 +1,4 @@
-// (c) Eduardo Doria
+// (c) Eduardo Doria and contributors
 // SPDX-License-Identifier: MIT
 // The macOS window, shared by the editor and by exported games: NSApplication
 // setup, the NSWindow, cursor and MouseMode, fullscreen, sizing and the title.

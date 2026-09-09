@@ -2,7 +2,7 @@
 // Based on: https://github.com/oviano/sokol-multithread
 // ---------------------------------------
 
-// (c) Eduardo Doria
+// (c) Eduardo Doria and contributors
 // SPDX-License-Identifier: MIT
 
 // not using 'semaphore.h' file name to avoid errors when building Android with Mac

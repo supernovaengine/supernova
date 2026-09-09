@@ -1,6 +1,6 @@
 #include "Rect.h"
 
-// (c) Eduardo Doria
+// (c) Eduardo Doria and contributors
 // SPDX-License-Identifier: MIT
 
 using namespace doriax;

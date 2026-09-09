@@ -1,4 +1,4 @@
-// (c) Eduardo Doria
+// (c) Eduardo Doria and contributors
 // SPDX-License-Identifier: MIT
 // Vulkan device and swapchain for the native desktop backends. The window system
 // is the only part that differs per platform, so the backend passes in the

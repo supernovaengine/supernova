@@ -1,5 +1,5 @@
 //
-// (c) Eduardo Doria
+// (c) Eduardo Doria and contributors
 // SPDX-License-Identifier: MIT
 // Based on LihO implementation:
 // https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c

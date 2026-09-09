@@ -1,4 +1,4 @@
-// (c) Eduardo Doria
+// (c) Eduardo Doria and contributors
 // SPDX-License-Identifier: MIT
 // doriax::System over WindowMac. It keeps no state of its own, so the editor
 // driving WindowMac directly and a game going through here stay in agreement.

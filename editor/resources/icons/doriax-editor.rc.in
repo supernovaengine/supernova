@@ -33,7 +33,7 @@ BEGIN
             VALUE "FileDescription",  "@DORIAX_FILE_DESCRIPTION@\0"
             VALUE "FileVersion",      "@DORIAXEDITOR_VERSION@\0"
             VALUE "InternalName",     "@DORIAX_INTERNAL_NAME@\0"
-            VALUE "LegalCopyright",   "Copyright (C) 2026 Eduardo Doria Lima. MIT License.\0"
+            VALUE "LegalCopyright",   "Copyright (C) 2026 Eduardo Doria and contributors. MIT License.\0"
             VALUE "OriginalFilename", "@DORIAX_ORIGINAL_FILENAME@\0"
             VALUE "ProductName",      "Doriax Engine\0"
             VALUE "ProductVersion",   "@DORIAXEDITOR_VERSION@\0"
