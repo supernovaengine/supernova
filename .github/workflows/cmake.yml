@@ -32,6 +32,9 @@ jobs:
     # Must resolve to null and not "" on the other entries: an empty container
     # is still a container job, which Windows and macOS runners reject.
     container: ${{ matrix.config.container || fromJSON('null') }}
+    defaults:
+      run:
+        shell: ${{ matrix.config.shell || 'bash' }}
     env:
       # Do not sign yet
       #SIGN_WINDOWS: ${{ matrix.config.cc == 'cl' && secrets.SIGNPATH_API_TOKEN != '' && (github.event_name == 'release' || github.ref == 'refs/heads/test-signing') }}
@@ -94,6 +97,7 @@ jobs:
           fetch-depth: 0
 
       - name: Print env
+        shell: bash
         run: |
           echo github.event.action: ${{ github.event.action }}
           echo github.event_name: ${{ github.event_name }}
@@ -166,7 +170,6 @@ jobs:
           echo "DORIAX_VERSION=$VERSION" >> $GITHUB_ENV
           
       - name: Configure
-        shell: ${{ matrix.config.shell || 'bash' }}
         env:
           CC: ${{ matrix.config.cc }}
           CXX: ${{ matrix.config.cxx }}
@@ -183,7 +186,6 @@ jobs:
             -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64"
 
       - name: Build
-        shell: ${{ matrix.config.shell || 'bash' }}
         env:
           CC: ${{ matrix.config.cc }}
           CXX: ${{ matrix.config.cxx }}
@@ -195,7 +197,6 @@ jobs:
           cmake --build build --config ${{env.BUILD_TYPE}} --target "${targets[@]}"
 
       - name: Install Strip
-        shell: ${{ matrix.config.shell || 'bash' }}
         run: cmake --install build --config ${{env.BUILD_TYPE}} --strip
         
       - name: List directories
