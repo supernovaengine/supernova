@@ -1463,30 +1463,24 @@ void ProjectSettingsWindow::drawAndroidSettings() {
     ImGui::EndChild();
     endSettingsRow("Android permissions written to AndroidManifest.xml. Some permissions still require runtime approval in your Android code.");
 
-    beginSettingsRow("Application Options");
+    if (beginSettingsRow("Application Options", m_androidAllowBackup != defaults.allowBackup || m_androidKeepScreenOn != defaults.keepScreenOn)) {
+        m_androidAllowBackup = defaults.allowBackup;
+        m_androidKeepScreenOn = defaults.keepScreenOn;
+    }
 
     ImGui::Checkbox("Allow Backup", &m_androidAllowBackup);
     ImGui::SetItemTooltip("Maps to android:allowBackup.");
 
     ImGui::Checkbox("Keep Screen On", &m_androidKeepScreenOn);
     ImGui::SetItemTooltip("Adds FLAG_KEEP_SCREEN_ON to the Android activity.");
-
-    ImGui::SameLine();
-    if (ImGui::SmallButton("Restore##AndroidApplicationOptions")) {
-        m_androidAllowBackup = defaults.allowBackup;
-        m_androidKeepScreenOn = defaults.keepScreenOn;
-    }
     endSettingsRow("Android application/activity behavior.");
 
-    beginSettingsRow("Screen Options");
+    if (beginSettingsRow("Screen Options", m_androidFullscreen != defaults.fullscreen)) {
+        m_androidFullscreen = defaults.fullscreen;
+    }
 
     ImGui::Checkbox("Fullscreen", &m_androidFullscreen);
     ImGui::SetItemTooltip("Uses the fullscreen Android theme and hides system bars in MainActivity.");
-
-    ImGui::SameLine();
-    if (ImGui::SmallButton("Restore##AndroidScreenOptions")) {
-        m_androidFullscreen = defaults.fullscreen;
-    }
     endSettingsRow("Android screen/window behavior.");
 }
 
