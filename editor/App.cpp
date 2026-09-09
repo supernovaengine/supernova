@@ -633,8 +633,7 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
             break;
         }
         case AppMenuCommand::About:
-            registerAlert("About Doriax",
-                "Doriax Engine\n\nVersion: " DORIAX_EDITOR_VERSION "\n\nDeveloped by Eduardo Doria");
+            aboutWindow.open();
             break;
         case AppMenuCommand::DuplicateSelection:
             duplicateSelection();
@@ -1651,6 +1650,7 @@ void editor::App::show(){
     projectSaveDialog.show();
     exportWindow.show();
     editorSettingsWindow.show();
+    aboutWindow.show();
     projectSettingsWindow.show();
     bundlesWindow.show();
     scenesWindow.show();

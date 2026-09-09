@@ -28,6 +28,7 @@
 #include "window/dialog/EditorSettingsWindow.h"
 #include "window/dialog/ProjectSettingsWindow.h"
 #include "window/dialog/BundlesWindow.h"
+#include "window/dialog/AboutWindow.h"
 #include "window/dialog/ScenesWindow.h"
 
 #include "render/SceneRender.h"
@@ -133,6 +134,7 @@ namespace doriax::editor{
         EditorSettingsWindow editorSettingsWindow;
         ProjectSettingsWindow projectSettingsWindow;
         BundlesWindow bundlesWindow;
+        AboutWindow aboutWindow;
         ScenesWindow scenesWindow;
 
         std::queue<SaveDialogQueueItem> saveDialogQueue;
