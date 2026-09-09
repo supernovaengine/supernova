@@ -35,6 +35,16 @@ struct PanelVisibilitySettings {
     }
 };
 
+// Compiler paths and job count are machine-specific, so they are kept per project
+// here instead of in project.yaml.
+struct LocalBuildSettings {
+    std::string cCompiler;
+    std::string cxxCompiler;
+    std::string generator;
+    unsigned int buildJobs = 0; // 0 = automatic
+    bool configured = false;    // set on read: false = no entry, so default toolchain
+};
+
 class AppSettings {
 private:
     static std::filesystem::path configFilePath;
@@ -44,8 +54,8 @@ private:
     static std::vector<std::filesystem::path> recentProjects;
     static std::filesystem::path lastProjectPath;
 
-    // Last compiler kit chosen in Project Settings, so new (temp) projects
-    // inherit it instead of silently defaulting each time.
+    // Last compiler kit chosen in Editor Settings, so new projects inherit it
+    // instead of silently defaulting each time.
     static std::string lastCMakeCCompiler;
     static std::string lastCMakeCxxCompiler;
     static std::string lastCMakeGenerator;
@@ -57,6 +67,7 @@ private:
     // cmake executable override ("" = look it up on PATH). Machine-specific,
     // stored editor-wide like emsdkPath.
     static std::string cmakePath;
+    static std::filesystem::path defaultExportDirectory;
     
     // Window settings. The size is physical pixels, only meaningful again at the
     // scale it was captured at; 0 marks a file from before that was tracked.
@@ -90,6 +101,15 @@ private:
     static void ensureConfigDirectory();
 
 public:
+    static std::filesystem::path getExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode);
+    static bool setExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode, const std::filesystem::path& targetDir);
+
+    // Re-keys the entries above and below when a project moves on disk.
+    static bool moveProjectLocalSettings(const std::filesystem::path& fromProjectFile, const std::filesystem::path& toProjectFile);
+
+    static LocalBuildSettings getBuildSettings(const std::filesystem::path& projectFile);
+    static bool setBuildSettings(const std::filesystem::path& projectFile, const LocalBuildSettings& value);
+
     // Initialization
     static bool initialize();
 
@@ -117,6 +137,8 @@ public:
     // cmake executable override ("" = look it up on PATH)
     static std::string getCMakePath();
     static void setCMakePath(const std::string& path);
+    static std::filesystem::path getDefaultExportDirectory();
+    static void setDefaultExportDirectory(const std::filesystem::path& path);
     
     // Window settings
     static int getWindowWidth();

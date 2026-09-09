@@ -83,6 +83,7 @@ std::string AppSettings::lastCMakeCxxCompiler;
 std::string AppSettings::lastCMakeGenerator;
 std::string AppSettings::emsdkPath;
 std::string AppSettings::cmakePath;
+std::filesystem::path AppSettings::defaultExportDirectory;
 int AppSettings::windowWidth = 1280;
 int AppSettings::windowHeight = 720;
 bool AppSettings::isMaximized = false;
@@ -173,6 +174,9 @@ bool AppSettings::loadSettings() {
         // Load cmake executable override
         if (settingsData["cmake"] && settingsData["cmake"]["path"]) {
             cmakePath = settingsData["cmake"]["path"].as<std::string>();
+        }
+        if (settingsData["export"] && settingsData["export"]["default_dir"]) {
+            defaultExportDirectory = settingsData["export"]["default_dir"].as<std::string>();
         }
 
         // Load recent projects
@@ -335,6 +339,14 @@ bool AppSettings::saveSettings() {
         } else {
             settingsData.remove("cmake");
         }
+
+        if (!defaultExportDirectory.empty()) {
+            YAML::Node exportNode;
+            exportNode["default_dir"] = defaultExportDirectory.string();
+            settingsData["export"] = exportNode;
+        } else {
+            settingsData.remove("export");
+        }
         
         // Window settings
         YAML::Node windowNode;
@@ -400,8 +412,16 @@ bool AppSettings::saveSettings() {
 
         // Save to file
         std::ofstream fout(configFilePath.string());
+        if (!fout) {
+            Out::error("Failed to open editor settings for writing: %s", configFilePath.string().c_str());
+            return false;
+        }
         fout << YAML::Dump(settingsData);
         fout.close();
+        if (!fout) {
+            Out::error("Failed to write editor settings: %s", configFilePath.string().c_str());
+            return false;
+        }
         
         return true;
     } catch (const std::exception& e) {
@@ -456,6 +476,15 @@ std::string AppSettings::getCMakePath() {
 
 void AppSettings::setCMakePath(const std::string& path) {
     cmakePath = path;
+    saveSettings();
+}
+
+std::filesystem::path AppSettings::getDefaultExportDirectory() {
+    return defaultExportDirectory;
+}
+
+void AppSettings::setDefaultExportDirectory(const std::filesystem::path& path) {
+    defaultExportDirectory = path;
     saveSettings();
 }
 
@@ -612,6 +641,102 @@ void AppSettings::setAiSettings(const ai::Settings& settings) {
         aiSettings.model = ai::defaultModelForProvider(aiSettings.provider);
     }
     saveSettings();
+}
+
+} // namespace doriax::editor
+
+namespace doriax::editor {
+
+std::filesystem::path AppSettings::getExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode) {
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    const YAML::Node data = settingsData;
+    const auto exports = data["project_exports"];
+    if (!exports || !exports.IsMap()) return {};
+    const auto project = exports[key];
+    if (!project || !project.IsMap()) return {};
+    const auto entry = project[mode];
+    if (!entry || !entry.IsMap()) return {};
+    if (entry["targetDir"]) return entry["targetDir"].as<std::string>();
+    return {};
+}
+
+bool AppSettings::setExportTargetDir(const std::filesystem::path& projectFile, const std::string& mode, const std::filesystem::path& targetDir) {
+    if (getExportTargetDir(projectFile, mode) == targetDir) return true;
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    YAML::Node backup = YAML::Clone(settingsData);
+    if (!targetDir.empty()) {
+        YAML::Node entry(YAML::NodeType::Map);
+        entry["targetDir"] = targetDir.generic_string();
+        settingsData["project_exports"][key][mode] = entry;
+    } else {
+        settingsData["project_exports"][key].remove(mode);
+        if (!settingsData["project_exports"][key].size()) settingsData["project_exports"].remove(key);
+        if (!settingsData["project_exports"].size()) settingsData.remove("project_exports");
+    }
+    if (saveSettings()) return true;
+    settingsData = backup;
+    return false;
+}
+
+bool AppSettings::moveProjectLocalSettings(const std::filesystem::path& fromProjectFile, const std::filesystem::path& toProjectFile) {
+    const auto fromKey = std::filesystem::absolute(fromProjectFile).lexically_normal().generic_string();
+    const auto toKey = std::filesystem::absolute(toProjectFile).lexically_normal().generic_string();
+    if (fromKey == toKey) return true;
+
+    bool moved = false;
+    for (const char* section : {"project_builds", "project_exports"}) {
+        YAML::Node root = settingsData[section];
+        if (!root || !root.IsMap() || !root[fromKey]) continue;
+
+        root[toKey] = YAML::Clone(root[fromKey]);
+        root.remove(fromKey);
+        moved = true;
+    }
+
+    if (!moved) return true;
+
+    // No rollback here: the project already moved, so restoring the old key would
+    // point this session at settings it can no longer reach.
+    return saveSettings();
+}
+
+LocalBuildSettings AppSettings::getBuildSettings(const std::filesystem::path& projectFile) {
+    LocalBuildSettings result;
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    const auto builds = settingsData["project_builds"];
+    if (!builds || !builds.IsMap()) return result;
+    const auto entry = builds[key];
+    if (!entry || !entry.IsMap()) return result;
+    if (entry["c_compiler"]) result.cCompiler = entry["c_compiler"].as<std::string>();
+    if (entry["cxx_compiler"]) result.cxxCompiler = entry["cxx_compiler"].as<std::string>();
+    if (entry["generator"]) result.generator = entry["generator"].as<std::string>();
+    if (entry["build_jobs"]) result.buildJobs = entry["build_jobs"].as<unsigned int>();
+    result.configured = true;
+    return result;
+}
+
+bool AppSettings::setBuildSettings(const std::filesystem::path& projectFile, const LocalBuildSettings& value) {
+    const auto previous = getBuildSettings(projectFile);
+    if (previous.configured && previous.cCompiler == value.cCompiler
+        && previous.cxxCompiler == value.cxxCompiler && previous.generator == value.generator
+        && previous.buildJobs == value.buildJobs) {
+        return true;
+    }
+
+    const auto key = std::filesystem::absolute(projectFile).lexically_normal().generic_string();
+    YAML::Node backup = YAML::Clone(settingsData);
+
+    // Written even when empty: that entry pins the project to the default toolchain
+    YAML::Node entry(YAML::NodeType::Map);
+    if (!value.cCompiler.empty()) entry["c_compiler"] = value.cCompiler;
+    if (!value.cxxCompiler.empty()) entry["cxx_compiler"] = value.cxxCompiler;
+    if (!value.generator.empty()) entry["generator"] = value.generator;
+    if (value.buildJobs) entry["build_jobs"] = value.buildJobs;
+    settingsData["project_builds"][key] = entry;
+
+    if (saveSettings()) return true;
+    settingsData = backup;
+    return false;
 }
 
 } // namespace doriax::editor

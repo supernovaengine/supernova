@@ -25,8 +25,10 @@
 #include "window/dialog/ProjectSaveDialog.h"
 #include "window/dialog/SceneSaveDialog.h"
 #include "window/dialog/ExportWindow.h"
+#include "window/dialog/EditorSettingsWindow.h"
 #include "window/dialog/ProjectSettingsWindow.h"
 #include "window/dialog/BundlesWindow.h"
+#include "window/dialog/AboutWindow.h"
 #include "window/dialog/ScenesWindow.h"
 
 #include "render/SceneRender.h"
@@ -129,8 +131,10 @@ namespace doriax::editor{
         ProjectSaveDialog projectSaveDialog;
         SceneSaveDialog sceneSaveDialog;
         ExportWindow exportWindow;
+        EditorSettingsWindow editorSettingsWindow;
         ProjectSettingsWindow projectSettingsWindow;
         BundlesWindow bundlesWindow;
+        AboutWindow aboutWindow;
         ScenesWindow scenesWindow;
 
         std::queue<SaveDialogQueueItem> saveDialogQueue;
@@ -155,6 +159,9 @@ namespace doriax::editor{
         void saveAllFunc(std::function<void(bool)> callback = nullptr);
         void saveAllAndProject(std::function<void()> onSuccess);
         void openProjectFunc();
+        bool canEditSelection(bool duplicate);
+        void deleteSelection();
+        void duplicateSelection();
 
         PlatformMenuModel buildMenuModel();
         void executeMenuCommand(const PlatformMenuCommand& command);
@@ -279,4 +286,3 @@ namespace doriax::editor{
     };
 
 }
-

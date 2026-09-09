@@ -35,6 +35,7 @@ using doriax::editor::PlatformMenuCallback;
 using doriax::editor::PlatformMenuCommand;
 using doriax::editor::PlatformMenuItem;
 using doriax::editor::PlatformMenuItemType;
+using doriax::editor::PlatformMenuRole;
 using doriax::editor::PlatformMenuModel;
 
 @class DoriaxEditorApplicationDelegate;
@@ -372,6 +373,10 @@ void applyShortcut(NSMenuItem* menuItem, const std::string& shortcut) {
     if (key.size() > 1 && key[0] == 'F') {
         const int number = std::atoi(key.c_str() + 1);
         equivalent = functionKeyEquivalent(number);
+    } else if (key == "Delete") {
+        // The Mac Delete key sends backspace, not forward delete.
+        const unichar deleteKey = NSDeleteCharacter;
+        equivalent = [NSString stringWithCharacters:&deleteKey length:1];
     } else if (!key.empty()) {
         equivalent = [stringFromUtf8(key) lowercaseString];
     }
@@ -380,11 +385,18 @@ void applyShortcut(NSMenuItem* menuItem, const std::string& shortcut) {
 }
 
 bool appendMenuItems(NSMenu* menu,
-                     const std::vector<PlatformMenuItem>& items) {
+                     const std::vector<PlatformMenuItem>& items,
+                     bool applicationMenu = false) {
+    bool separatorPending = false;
     for (const PlatformMenuItem& item : items) {
+        if (!applicationMenu && item.role != PlatformMenuRole::None) continue;
         if (item.type == PlatformMenuItemType::Separator) {
-            [menu addItem:NSMenuItem.separatorItem];
+            separatorPending = menu.numberOfItems > 0;
             continue;
+        }
+        if (separatorPending) {
+            [menu addItem:NSMenuItem.separatorItem];
+            separatorPending = false;
         }
 
         NSMenuItem* menuItem = [[NSMenuItem alloc]
@@ -414,12 +426,21 @@ bool appendMenuItems(NSMenu* menu,
 
 #endif
 
-void appendApplicationMenu(NSMenu* mainMenu) {
+void appendApplicationMenu(NSMenu* mainMenu, const std::vector<PlatformMenuItem>& applicationItems = {}) {
     NSString* applicationName = @"Doriax Engine";
     NSMenuItem* root = [[NSMenuItem alloc]
         initWithTitle:applicationName action:nil keyEquivalent:@""];
     NSMenu* menu = [[NSMenu alloc] initWithTitle:applicationName];
     menu.autoenablesItems = NO;
+
+#if defined(DORIAX_NATIVE_MENU)
+    if (!applicationItems.empty()) {
+        appendMenuItems(menu, applicationItems, true);
+        [menu addItem:NSMenuItem.separatorItem];
+    }
+#else
+    (void)applicationItems;
+#endif
 
     NSMenuItem* hide = [[NSMenuItem alloc]
         initWithTitle:[@"Hide " stringByAppendingString:applicationName]
@@ -467,7 +488,27 @@ bool rebuildNativeMenu(const PlatformMenuModel& model) {
 
     NSMenu* mainMenu = [[NSMenu alloc] initWithTitle:@"Main Menu"];
     mainMenu.autoenablesItems = NO;
-    appendApplicationMenu(mainMenu);
+    std::vector<PlatformMenuItem> applicationItems;
+    // The model retains the normal File/Edit/Help placement for ImGui backends.
+    for (PlatformMenuRole role : {PlatformMenuRole::About, PlatformMenuRole::Settings}) {
+        for (const PlatformMenuItem& topLevel : model.menus) {
+            for (const PlatformMenuItem& item : topLevel.children) {
+                if (item.role != role) continue;
+                if (!applicationItems.empty()) {
+                    PlatformMenuItem separator;
+                    separator.type = PlatformMenuItemType::Separator;
+                    applicationItems.push_back(separator);
+                }
+                PlatformMenuItem applicationItem = item;
+                if (role == PlatformMenuRole::Settings) {
+                    applicationItem.label = "Settings...";
+                    applicationItem.shortcut = "Cmd+,";
+                }
+                applicationItems.push_back(std::move(applicationItem));
+            }
+        }
+    }
+    appendApplicationMenu(mainMenu, applicationItems);
     for (const PlatformMenuItem& topLevel : model.menus) {
         NSMenuItem* root = [[NSMenuItem alloc]
             initWithTitle:stringFromUtf8(topLevel.label)

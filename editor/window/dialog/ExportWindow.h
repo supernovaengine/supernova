@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "AppSettings.h"
 #include "Exporter.h"
 #include "imgui.h"
 
@@ -33,19 +34,24 @@ namespace doriax::editor {
         // UI state
         char m_targetDirBuffer[512] = "";
         fs::path m_targetDir;
+        bool m_targetDirFromDefault = false;
+        bool m_projectSettingsDirty = false;
 
         // Start scene
         uint32_t m_startSceneId = NULL_PROJECT_SCENE;
 
-        // Shader list: each entry is a shader to export
+        // Shader list includes excluded entries so they can be restored.
         struct ShaderEntry {
             ShaderKey key;
             ShaderType type;
             uint32_t properties;
             std::string displayName;
+            bool fromScene = false;
         };
         std::vector<ShaderEntry> m_shaderEntries;
         int m_selectedShaderIndex = -1;
+        std::set<ShaderKey> m_shaderAdditions;
+        std::set<ShaderKey> m_shaderExclusions;
 
         // Add Shader dialog state
         bool m_addShaderOpen = false;
@@ -59,10 +65,22 @@ namespace doriax::editor {
             bool selected;
         };
         std::vector<BackendEntry> m_backendEntries;
+        bool m_sourceBackendsConfigured = false;
+        bool m_selectSourceBackendTab = true;
+        bool m_sourcePlatformWindows = false;
+        bool m_sourcePlatformLinux = false;
+        bool m_sourcePlatformMacOS = false;
+        bool m_sourcePlatformIOS = false;
+        bool m_sourcePlatformAndroid = false;
+        bool m_sourcePlatformWeb = false;
+        std::set<ShaderBackend> m_sourcePresetBackends;
 
         // Desktop backend selection. The entries themselves are host-specific
         // and live in ExportWindow.cpp.
         int m_graphicBackendIndex = 0;
+        bool m_desktopBackendConfigured = false;
+        int m_desktopBuildJobs = 1;
+        LocalBuildSettings m_buildSettings;    // mirrors AppSettings::getBuildSettings()
 
         // Cached tool checks: both spawn processes, so never probe per-frame.
         std::string m_emsdkOverride;           // mirrors AppSettings::getEmsdkPath()
@@ -71,10 +89,16 @@ namespace doriax::editor {
 
         Exporter m_exporter;
 
+        const char* localExportMode() const;
+        void refreshShaderSelection();
+        void includeShader(ShaderKey key);
         void populateShaderList();
+        void populateShaderListFromKeys(const std::vector<ShaderKey>& shaderKeys);
         void populateBackendList();
         void refreshEmsdkStatus();
         void selectMode(ExportMode mode);
+        void loadSettingsFromProject();
+        bool saveCurrentSettingsToProject(bool saveProjectFile = true);
         void drawModeSelect();
         bool drawModeCard(const char* id, const char* icon, const char* title, const char* description,
                           const ImVec2& size, const char* disabledText = nullptr);
@@ -83,9 +107,9 @@ namespace doriax::editor {
         void drawStartSceneRow();
         void drawGraphicBackendRow();
         void drawDesktopKitRows();
-        void drawEmsdkRow();
         void drawShaderSection();
         void drawBackendSection();
+        void applySourcePlatformPresets();
         void drawProgress();
         void drawAddShaderDialog();
         void drawOverwriteConfirmDialog();

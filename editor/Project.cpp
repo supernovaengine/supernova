@@ -10,6 +10,7 @@
 #include "window/ImageViewerWindow.h"
 #include "window/TerrainEditWindow.h"
 
+#include <cctype>
 #include <cmath>
 #include <fstream>
 #include <system_error>
@@ -2268,41 +2269,172 @@ void editor::Project::changeAssetRoots(const std::filesystem::path& newAssetsDir
     saveProjectFile();
 }
 
-void editor::Project::setCMakeKit(const std::string& cCompiler, const std::string& cxxCompiler, const std::string& generator){
-    this->cmakeCCompiler = cCompiler;
-    this->cmakeCxxCompiler = cxxCompiler;
-    this->cmakeGenerator = generator;
-}
-
-std::string editor::Project::getCMakeCCompiler() const{
-    return cmakeCCompiler;
-}
-
-std::string editor::Project::getCMakeCxxCompiler() const{
-    return cmakeCxxCompiler;
-}
-
-std::string editor::Project::getCMakeGenerator() const{
-    return cmakeGenerator;
-}
-
-void editor::Project::setCMakeBuildJobs(unsigned int jobs){
-    // Stored unclamped: the per-machine cap is applied at build time
-    // (Generator::build), so a value configured on a machine with more
-    // cores survives load/save round-trips on this one.
-    cmakeBuildJobs = jobs;
-}
-
-unsigned int editor::Project::getCMakeBuildJobs() const{
-    return cmakeBuildJobs;
-}
-
 void editor::Project::setPackNativeResources(bool enabled){
     packNativeResources = enabled;
 }
 
 bool editor::Project::shouldPackNativeResources() const{
     return packNativeResources;
+}
+
+editor::ShaderOverrides& editor::Project::getShaderOverrides(){
+    return shaderOverrides;
+}
+
+const editor::ShaderOverrides& editor::Project::getShaderOverrides() const{
+    return shaderOverrides;
+}
+
+editor::SourceCodeExportSettings& editor::Project::getSourceCodeExportSettings(){
+    return sourceCodeExportSettings;
+}
+
+const editor::SourceCodeExportSettings& editor::Project::getSourceCodeExportSettings() const{
+    return sourceCodeExportSettings;
+}
+
+editor::DesktopExportSettings& editor::Project::getDesktopExportSettings(){
+    return desktopExportSettings;
+}
+
+const editor::DesktopExportSettings& editor::Project::getDesktopExportSettings() const{
+    return desktopExportSettings;
+}
+
+// Leading numeric parts of a version, stopping at the first part that is not a
+// number. Saturates instead of dropping digits, so date-stamped build numbers
+// keep every digit that separates one release from the next.
+static std::vector<unsigned int> versionParts(const std::string& source, size_t maxParts) {
+    std::vector<unsigned int> parts;
+    size_t start = 0;
+    while (parts.size() < maxParts && start <= source.size()) {
+        const size_t dot = source.find('.', start);
+        const size_t end = dot == std::string::npos ? source.size() : dot;
+
+        unsigned long long part = 0;
+        size_t digits = 0;
+        for (size_t i = start; i < end && std::isdigit(static_cast<unsigned char>(source[i])); i++) {
+            part = std::min(part * 10 + static_cast<unsigned>(source[i] - '0'), 0xFFFFFFFFull);
+            digits++;
+        }
+        if (digits == 0) break;
+
+        parts.push_back(static_cast<unsigned int>(part));
+        if (dot == std::string::npos) break;
+        start = dot + 1;
+    }
+    return parts;
+}
+
+editor::ApplicationSettings& editor::Project::getApplicationSettings(){
+    return applicationSettings;
+}
+
+const editor::ApplicationSettings& editor::Project::getApplicationSettings() const{
+    return applicationSettings;
+}
+
+std::string editor::Project::getApplicationName(const std::string& platformOverride) const{
+    if (!platformOverride.empty()) return platformOverride;
+    if (!applicationSettings.name.empty()) return applicationSettings.name;
+    if (!name.empty()) return name;
+    return "Doriax";
+}
+
+std::string editor::Project::getApplicationIdentifier(const std::string& platformOverride) const{
+    if (!platformOverride.empty()) return platformOverride;
+    if (!applicationSettings.identifier.empty()) return applicationSettings.identifier;
+    return ApplicationSettings{}.identifier;
+}
+
+std::string editor::Project::getApplicationVersion(const std::string& platformOverride) const{
+    if (!platformOverride.empty()) return platformOverride;
+    if (!applicationSettings.version.empty()) return applicationSettings.version;
+    return ApplicationSettings{}.version;
+}
+
+std::string editor::Project::getApplicationBuild(const std::string& platformOverride) const{
+    if (!platformOverride.empty()) return platformOverride;
+    return std::to_string(std::max(1u, applicationSettings.build));
+}
+
+unsigned int editor::Project::getApplicationVersionCode(unsigned int platformOverride) const{
+    if (platformOverride > 0) return platformOverride;
+    return std::max(1u, applicationSettings.build);
+}
+
+std::string editor::Project::getApplicationFileVersion(const std::string& platformOverride) const{
+    return toFourPartVersion(platformOverride.empty() ? getApplicationVersion() : platformOverride);
+}
+
+std::string editor::Project::toAppleVersion(const std::string& source){
+    const std::vector<unsigned int> parts = versionParts(source, 3);
+    if (parts.empty()) return "1";
+
+    std::string result = std::to_string(parts[0]);
+    for (size_t i = 1; i < parts.size(); i++) {
+        result += "." + std::to_string(parts[i]);
+    }
+    return result;
+}
+
+std::string editor::Project::toFourPartVersion(const std::string& source){
+    const std::vector<unsigned int> parts = versionParts(source, 4);
+
+    std::string result;
+    for (size_t i = 0; i < 4; i++) {
+        if (i > 0) result += ".";
+        result += std::to_string(i < parts.size() ? std::min(65535u, parts[i]) : 0u);
+    }
+    return result;
+}
+
+editor::WebProjectSettings& editor::Project::getWebProjectSettings(){
+    return webProjectSettings;
+}
+
+const editor::WebProjectSettings& editor::Project::getWebProjectSettings() const{
+    return webProjectSettings;
+}
+
+editor::LinuxProjectSettings& editor::Project::getLinuxProjectSettings(){
+    return linuxProjectSettings;
+}
+
+const editor::LinuxProjectSettings& editor::Project::getLinuxProjectSettings() const{
+    return linuxProjectSettings;
+}
+
+editor::WindowsProjectSettings& editor::Project::getWindowsProjectSettings(){
+    return windowsProjectSettings;
+}
+
+const editor::WindowsProjectSettings& editor::Project::getWindowsProjectSettings() const{
+    return windowsProjectSettings;
+}
+
+editor::MacOSProjectSettings& editor::Project::getMacOSProjectSettings(){
+    return macOSProjectSettings;
+}
+
+const editor::MacOSProjectSettings& editor::Project::getMacOSProjectSettings() const{
+    return macOSProjectSettings;
+}
+
+editor::IOSProjectSettings& editor::Project::getIOSProjectSettings(){
+    return iosProjectSettings;
+}
+
+const editor::IOSProjectSettings& editor::Project::getIOSProjectSettings() const{
+    return iosProjectSettings;
+}
+
+editor::AndroidProjectSettings& editor::Project::getAndroidProjectSettings(){
+    return androidProjectSettings;
+}
+
+const editor::AndroidProjectSettings& editor::Project::getAndroidProjectSettings() const{
+    return androidProjectSettings;
 }
 
 uint32_t editor::Project::getStartSceneId() const{
@@ -3478,11 +3610,17 @@ void editor::Project::resetConfigs() {
     assetsDir = defaultAssetsDir;
     luaDir = defaultLuaDir;
     scriptDirs.clear();
-    cmakeCCompiler = "";
-    cmakeCxxCompiler = "";
-    cmakeGenerator = "";
-    cmakeBuildJobs = defaultCMakeBuildJobs;
     packNativeResources = defaultPackNativeResources;
+    shaderOverrides = {};
+    sourceCodeExportSettings = {};
+    desktopExportSettings = {};
+    applicationSettings = {};
+    webProjectSettings = {};
+    linuxProjectSettings = {};
+    windowsProjectSettings = {};
+    macOSProjectSettings = {};
+    iosProjectSettings = {};
+    androidProjectSettings = {};
     selectedScene = NULL_PROJECT_SCENE;
     selectedSceneForProperties = NULL_PROJECT_SCENE;
     nextSceneId = 0;
@@ -3837,21 +3975,6 @@ bool editor::Project::createTempProject(std::string projectName, bool deleteIfEx
         // project has an empty name, producing an invalid CMakeLists.txt.
         setName(projectName);
 
-        // Inherit the compiler chosen in a previous session so new temp projects
-        // don't silently fall back to the Default toolchain every time. Drop a
-        // stale compiler path that no longer exists on disk.
-        {
-            std::string cc = AppSettings::getLastCMakeCCompiler();
-            std::string cxx = AppSettings::getLastCMakeCxxCompiler();
-            std::string gen = AppSettings::getLastCMakeGenerator();
-            if (!cxx.empty() && !fs::exists(cxx)) {
-                cc.clear(); cxx.clear(); gen.clear();
-            }
-            if (!cc.empty() || !cxx.empty() || !gen.empty()) {
-                setCMakeKit(cc, cxx, gen);
-            }
-        }
-
         if (deleteIfExists && fs::exists(projectPath)) {
             fs::remove_all(projectPath);
         }
@@ -3861,6 +3984,23 @@ bool editor::Project::createTempProject(std::string projectName, bool deleteIfEx
                 std::filesystem::create_directory(projectPath);
             }
             Out::info("Created project directory: \"%s\"", projectPath.string().c_str());
+
+            // Inherit the compiler chosen in a previous session so new temp projects
+            // don't silently fall back to the Default toolchain every time. Drop a
+            // stale compiler path that no longer exists on disk.
+            {
+                LocalBuildSettings build;
+                build.cCompiler = AppSettings::getLastCMakeCCompiler();
+                build.cxxCompiler = AppSettings::getLastCMakeCxxCompiler();
+                build.generator = AppSettings::getLastCMakeGenerator();
+                if (!build.cxxCompiler.empty() && !fs::exists(build.cxxCompiler)) {
+                    build = LocalBuildSettings();
+                }
+                if (!build.cCompiler.empty() || !build.cxxCompiler.empty() || !build.generator.empty()) {
+                    AppSettings::setBuildSettings(projectFile, build);
+                }
+            }
+
             saveProject();
             createNewScene("New Scene", SceneType::SCENE_3D);
             copyEngineApiToProject();
@@ -3914,6 +4054,11 @@ bool editor::Project::saveProjectFile() {
 
         fout << YAML::Dump(root);
         fout.close();
+
+        if (!fout) {
+            Out::error("Failed to write project file: %s", projectFile.string().c_str());
+            return false;
+        }
 
         return true;
     } catch (const std::exception& e) {
@@ -3981,6 +4126,14 @@ bool editor::Project::saveProjectToPath(const std::filesystem::path& path) {
 
             // Delete the temp directory after moving all files
             std::filesystem::remove_all(oldPath);
+
+            // Keyed by absolute path, so the move has to carry them over
+            if (!AppSettings::moveProjectLocalSettings(oldPath / "project.yaml", path / "project.yaml")) {
+                Out::warning("Failed to write the moved build settings to the editor configuration");
+                editor::getEditorHost().registerAlert("Warning",
+                    "Build settings could not be saved to the editor configuration.\n"
+                    "They still apply to this session. Set the compiler again in Editor Settings if a build uses the wrong toolchain.");
+            }
 
         } catch (const std::exception& e) {
             Out::error("Failed to move project files: %s", e.what());
@@ -7415,7 +7568,7 @@ bool editor::Project::saveSceneForPlayStartup(SceneProject* sceneProject) {
     return saveSceneFile(sceneProject, sceneProject->filepath, false);
 }
 
-void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId) {
+void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId, const LocalBuildSettings& buildSettings) {
     auto isCancelled = [session]() {
         return session->cancelled.load(std::memory_order_acquire);
     };
@@ -7517,7 +7670,6 @@ void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session
 
         std::vector<SceneScriptSource> mergedCppScripts = collectAllSceneCppScripts();
         std::vector<BundleSceneInfo> bundleBuildInfos = collectAllBundles();
-        const unsigned int requestedBuildJobs = cmakeBuildJobs.load();
         generator.configure(scenesToGenerate, libName, mergedCppScripts, bundleBuildInfos, getProjectPath(), getProjectInternalPath(), getAssetsPath(), getLuaPath(), getScriptDirs(), scalingMode, textureStrategy, canvasWidth, canvasHeight, vsyncEnabled, getWindowSettings());
 
         // play regenerates the standalone project, so its shaders are ensured here too
@@ -7530,11 +7682,11 @@ void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session
         if (hasCppScripts) {
             // Default needs a discoverable compatible kit; explicit kits may
             // live outside PATH and are ABI-checked by the generated CMake.
-            const bool useDefaultKit = cmakeCCompiler.empty() && cmakeCxxCompiler.empty() && cmakeGenerator.empty();
+            const bool useDefaultKit = buildSettings.cCompiler.empty() && buildSettings.cxxCompiler.empty() && buildSettings.generator.empty();
             CMakeKit playKit;
-            playKit.cCompiler = cmakeCCompiler;
-            playKit.cxxCompiler = cmakeCxxCompiler;
-            playKit.generator = cmakeGenerator;
+            playKit.cCompiler = buildSettings.cCompiler;
+            playKit.cxxCompiler = buildSettings.cxxCompiler;
+            playKit.generator = buildSettings.generator;
             std::string missingTools = Generator::checkBuildTools(useDefaultKit, &playKit);
             if (!missingTools.empty()) {
                 failPlayStartup(session, sceneId, "Cannot build C++ scripts: missing build tools", "Missing Build Tools",
@@ -7544,7 +7696,7 @@ void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session
             }
 
             fs::path buildPath = getProjectInternalPath() / "build";
-            generator.build(getProjectPath(), getProjectInternalPath(), buildPath, playKit.cCompiler, playKit.cxxCompiler, playKit.generator, requestedBuildJobs);
+            generator.build(getProjectPath(), getProjectInternalPath(), buildPath, playKit.cCompiler, playKit.cxxCompiler, playKit.generator, buildSettings.buildJobs);
             generator.waitForBuildToComplete();
 
             if (isCancelled()) { markStartupDone(); return; }
@@ -7953,8 +8105,11 @@ void editor::Project::start(uint32_t sceneId) {
     editor::getEditorHost().saveAllCodeEditors();
     editor::getEditorHost().requestScenePlayFocus(sceneId);
 
-    std::thread startupThread([this, session, sceneId]() {
-        runPlayStartup(session, sceneId);
+    // Read on the UI thread: the startup thread must not race the settings dialog
+    const LocalBuildSettings buildSettings = AppSettings::getBuildSettings(getProjectPath() / "project.yaml");
+
+    std::thread startupThread([this, session, sceneId, buildSettings]() {
+        runPlayStartup(session, sceneId, buildSettings);
     });
     startupThread.detach();
 }

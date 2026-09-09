@@ -29,6 +29,8 @@
 
 namespace doriax::editor{
 
+    struct LocalBuildSettings;
+
     enum class SceneType{
         SCENE_3D,
         SCENE_2D,
@@ -160,6 +162,104 @@ namespace doriax::editor{
         float paintMaxHeight = 1.0f;
     };
 
+    // Manual picks on top of the shaders every export mode collects from the scenes
+    struct ShaderOverrides {
+        std::set<ShaderKey> additions;
+        std::set<ShaderKey> exclusions;
+    };
+
+    struct SourceCodeExportSettings {
+        std::set<ShaderBackend> graphicBackends;
+        bool graphicBackendsConfigured = false;
+    };
+
+    struct DesktopExportSettings {
+        ShaderBackend graphicBackend = ShaderBackend::GLCore;
+        bool graphicBackendConfigured = false;
+    };
+
+    struct ApplicationSettings {
+        std::string name;  // empty = project name
+        std::string identifier = "com.yourcompany.project";
+        std::string version = "1.0";
+        unsigned int build = 1;  // Apple build number and Android version code
+    };
+
+    // Name, identifier, version and build below are overrides: empty (or 0)
+    // means the ApplicationSettings value.
+
+    struct WebProjectSettings {
+        std::string applicationName;
+        std::filesystem::path favicon;
+        std::filesystem::path customHtmlShell;
+        std::string headInclude;
+        bool resizeCanvasToWindow = true;
+        bool hideEmscriptenUI = false;
+    };
+
+    struct LinuxProjectSettings {
+        std::string applicationName;
+        std::string comment;
+        std::string categories = "Game;";
+    };
+
+    struct WindowsProjectSettings {
+        std::string productName;
+        std::string companyName;
+        std::string fileVersion;
+        std::string productVersion;
+    };
+
+    struct MacOSProjectSettings {
+        std::string applicationName;
+        std::string bundleIdentifier;
+        std::string versionName;
+        std::string buildNumber;
+        std::filesystem::path icon;
+        bool highDpi = true;
+    };
+
+    struct IOSProjectSettings {
+        std::string applicationName;
+        std::string bundleIdentifier;
+        std::string versionName;
+        std::string buildNumber;
+        std::filesystem::path icon;
+        bool hideStatusBar = true;
+        bool hideHomeIndicator = true;
+        bool supportsHighRefreshRate = true;
+    };
+
+    enum class AndroidOrientation {
+        Unspecified,
+        Portrait,
+        Landscape,
+        SensorPortrait,
+        SensorLandscape,
+        FullSensor
+    };
+
+    struct AndroidProjectSettings {
+        std::string applicationName;
+        std::string packageName;
+        unsigned int versionCode = 0;
+        std::string versionName;
+        std::filesystem::path launcherIcon;
+        std::filesystem::path adaptiveIconForeground;
+        std::filesystem::path adaptiveIconBackground;
+        unsigned int minSdk = 21;
+        unsigned int targetSdk = 33;
+        AndroidOrientation orientation = AndroidOrientation::Unspecified;
+        bool abiArmeabiV7a = true;
+        bool abiArm64V8a = true;
+        bool abiX86 = true;
+        bool abiX86_64 = true;
+        std::set<std::string> permissions;
+        bool allowBackup = true;
+        bool fullscreen = true;
+        bool keepScreenOn = false;
+    };
+
     using SharedMoveRecovery = std::map<std::string, SharedMoveRecoveryEntry>;
 
     struct ComponentRecoveryEntry {
@@ -191,13 +291,17 @@ namespace doriax::editor{
         std::filesystem::path assetsDir;
         std::filesystem::path luaDir;
         std::vector<std::filesystem::path> scriptDirs;  // extra C++ include and source roots
-        std::string cmakeCCompiler;
-        std::string cmakeCxxCompiler;
-        std::string cmakeGenerator;
-        // Atomic: read by the play-startup thread while the settings dialog can
-        // write it from the UI thread.
-        std::atomic<unsigned int> cmakeBuildJobs{0};
         bool packNativeResources;
+        ShaderOverrides shaderOverrides;
+        SourceCodeExportSettings sourceCodeExportSettings;
+        DesktopExportSettings desktopExportSettings;
+        ApplicationSettings applicationSettings;
+        WebProjectSettings webProjectSettings;
+        LinuxProjectSettings linuxProjectSettings;
+        WindowsProjectSettings windowsProjectSettings;
+        MacOSProjectSettings macOSProjectSettings;
+        IOSProjectSettings iosProjectSettings;
+        AndroidProjectSettings androidProjectSettings;
         CommandHistory projectHistory;
 
         uint32_t startSceneId;
@@ -317,7 +421,7 @@ namespace doriax::editor{
 
         void finalizeStart(SceneProject* mainSceneProject, std::vector<PlayRuntimeScene>& runtimeScenes);
         void finalizeStop(SceneProject* mainSceneProject, std::vector<PlayRuntimeScene> runtimeScenes);
-        void runPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId);
+        void runPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId, const LocalBuildSettings& buildSettings);
         void failPlayStartup(const std::shared_ptr<PlaySession>& session, uint32_t sceneId, const std::string& message,
                      const std::string& alertTitle = "", const std::string& alertMessage = "");
         bool saveSceneFile(SceneProject* sceneProject, const std::filesystem::path& path, bool stopTransientPreviews = true);
@@ -353,7 +457,6 @@ namespace doriax::editor{
         static constexpr const char* defaultWindowTitle = "";
         static constexpr const char* defaultAssetsDir = ".";
         static constexpr const char* defaultLuaDir = ".";
-        static constexpr unsigned int defaultCMakeBuildJobs = 0;
         static constexpr bool defaultPackNativeResources = false;
 
         Project();
@@ -427,14 +530,42 @@ namespace doriax::editor{
         // layout, then every stored reference is rewritten and saved.
         void changeAssetRoots(const std::filesystem::path& newAssetsDir, const std::filesystem::path& newLuaDir);
 
-        void setCMakeKit(const std::string& cCompiler, const std::string& cxxCompiler, const std::string& generator = "");
-        std::string getCMakeCCompiler() const;
-        std::string getCMakeCxxCompiler() const;
-        std::string getCMakeGenerator() const;
-        void setCMakeBuildJobs(unsigned int jobs);
-        unsigned int getCMakeBuildJobs() const;
         void setPackNativeResources(bool enabled);
         bool shouldPackNativeResources() const;
+
+        ShaderOverrides& getShaderOverrides();
+        const ShaderOverrides& getShaderOverrides() const;
+        SourceCodeExportSettings& getSourceCodeExportSettings();
+        const SourceCodeExportSettings& getSourceCodeExportSettings() const;
+        DesktopExportSettings& getDesktopExportSettings();
+        const DesktopExportSettings& getDesktopExportSettings() const;
+        ApplicationSettings& getApplicationSettings();
+        const ApplicationSettings& getApplicationSettings() const;
+
+        // The platform override when set, otherwise the shared block.
+        std::string getApplicationName(const std::string& platformOverride = {}) const;
+        std::string getApplicationIdentifier(const std::string& platformOverride = {}) const;
+        std::string getApplicationVersion(const std::string& platformOverride = {}) const;
+        std::string getApplicationBuild(const std::string& platformOverride = {}) const;
+        unsigned int getApplicationVersionCode(unsigned int platformOverride = 0) const;
+        std::string getApplicationFileVersion(const std::string& platformOverride = {}) const;
+
+        // Version shapes each platform requires, also used by the settings UI.
+        static std::string toFourPartVersion(const std::string& version);
+        static std::string toAppleVersion(const std::string& version);
+
+        WebProjectSettings& getWebProjectSettings();
+        const WebProjectSettings& getWebProjectSettings() const;
+        LinuxProjectSettings& getLinuxProjectSettings();
+        const LinuxProjectSettings& getLinuxProjectSettings() const;
+        WindowsProjectSettings& getWindowsProjectSettings();
+        const WindowsProjectSettings& getWindowsProjectSettings() const;
+        MacOSProjectSettings& getMacOSProjectSettings();
+        const MacOSProjectSettings& getMacOSProjectSettings() const;
+        IOSProjectSettings& getIOSProjectSettings();
+        const IOSProjectSettings& getIOSProjectSettings() const;
+        AndroidProjectSettings& getAndroidProjectSettings();
+        const AndroidProjectSettings& getAndroidProjectSettings() const;
 
         uint32_t getStartSceneId() const;
         void setStartSceneId(uint32_t sceneId);

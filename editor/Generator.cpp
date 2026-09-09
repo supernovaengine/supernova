@@ -181,7 +181,7 @@ bool editor::Generator::resolveDefaultKit(std::string& cCompiler, std::string& c
     // Windows-only: a bare cmake lets CMake auto-detect a toolchain that may not
     // match the editor's C++ ABI (e.g. a MinGW editor would get MSVC and fail to
     // link). Resolve Default to the best ABI-compatible detected kit so it obeys
-    // the same ABI check as the Project Settings dropdown. Other platforms have a
+    // the same ABI check as the Editor Settings dropdown. Other platforms have a
     // single C++ ABI, so CMake's auto-detection is always safe and left alone.
     bool resolveDefault = false;
 #ifdef _WIN32
@@ -202,7 +202,7 @@ bool editor::Generator::resolveDefaultKit(std::string& cCompiler, std::string& c
         }
         return true;
     }
-    Out::error("No compatible C++ build toolchain was found for this editor. Select an available compiler in Project Settings > Build.");
+    Out::error("No compatible C++ build toolchain was found for this editor. Select an available compiler in Editor Settings > Desktop.");
     return false;
 }
 
@@ -321,7 +321,7 @@ bool editor::Generator::configureCMake(const fs::path& projectPath, const fs::pa
     if (generator.empty() && (!cCompiler.empty() || !cxxCompiler.empty())) {
         const char* envGenerator = std::getenv("CMAKE_GENERATOR");
         if (!envGenerator || !*envGenerator) {
-            Out::error("The selected compiler '%s' cannot be used with the default Visual Studio generator. Install Ninja (https://ninja-build.org), add it to PATH and re-select the compiler in Project Settings, or switch to the MSVC compiler.",
+            Out::error("The selected compiler '%s' cannot be used with the default Visual Studio generator. Install Ninja (https://ninja-build.org), add it to PATH and re-select the compiler in Editor Settings, or switch to the MSVC compiler.",
                 (!cxxCompiler.empty() ? cxxCompiler : cCompiler).c_str());
             return false;
         }
@@ -773,11 +773,11 @@ std::string editor::Generator::getEditorPluginAbiCheck() {
     cmakeContent += "        message(FATAL_ERROR \"This Doriax editor requires MinGW/GNU C++ plugins. Use the same MinGW toolchain that built the editor and engine.\")\n";
 #else
     cmakeContent += "    if(NOT WIN32 OR NOT (MSVC OR CMAKE_CXX_SIMULATE_ID STREQUAL \"MSVC\"))\n";
-    cmakeContent += "        message(FATAL_ERROR \"This Doriax editor requires MSVC-compatible C++ plugins. MSYS2/MinGW GCC cannot link its engine library. Select an MSVC-compatible compiler in Project Settings > Build, or rebuild the editor and engine with your MinGW toolchain.\")\n";
+    cmakeContent += "        message(FATAL_ERROR \"This Doriax editor requires MSVC-compatible C++ plugins. MSYS2/MinGW GCC cannot link its engine library. Select an MSVC-compatible compiler in Editor Settings > Desktop, or rebuild the editor and engine with your MinGW toolchain.\")\n";
 #endif
     cmakeContent += "    endif()\n";
     cmakeContent += "    if(NOT CMAKE_SIZEOF_VOID_P EQUAL " + std::to_string(sizeof(void*)) + ")\n";
-    cmakeContent += "        message(FATAL_ERROR \"C++ plugins must match this Doriax editor's " + std::to_string(sizeof(void*) * 8) + "-bit architecture. Select a matching compiler in Project Settings > Build.\")\n";
+    cmakeContent += "        message(FATAL_ERROR \"C++ plugins must match this Doriax editor's " + std::to_string(sizeof(void*) * 8) + "-bit architecture. Select a matching compiler in Editor Settings > Desktop.\")\n";
     cmakeContent += "    endif()\n";
     cmakeContent += "endif()\n\n";
 #endif
@@ -1784,14 +1784,14 @@ std::string editor::Generator::checkBuildTools(bool requireEditorCompatibility, 
 
     const CMakeInfo cmakeInfo = detectCMake();
     if (!cmakeInfo.error.empty()) {
-        missing += "- CMake: " + cmakeInfo.error + ". Choose it again in Project Settings > Build.\n";
+        missing += "- CMake: " + cmakeInfo.error + ". Choose it again in Editor Settings > Desktop.\n";
     } else if (!cmakeInfo.found) {
 #ifdef _WIN32
         missing += "- CMake: not found. Download from https://cmake.org/download/ and ensure it is added to PATH during installation.\n";
 #elif defined(__APPLE__)
-        missing += "- CMake: not found. Install with: brew install cmake, or choose an existing install in Project Settings > Build.\n";
+        missing += "- CMake: not found. Install with: brew install cmake, or choose an existing install in Editor Settings > Desktop.\n";
 #else
-        missing += "- CMake: not found. Install with: sudo apt install cmake (Debian/Ubuntu) or sudo dnf install cmake (Fedora), or choose an existing install in Project Settings > Build.\n";
+        missing += "- CMake: not found. Install with: sudo apt install cmake (Debian/Ubuntu) or sudo dnf install cmake (Fedora), or choose an existing install in Editor Settings > Desktop.\n";
 #endif
     }
 
@@ -1806,7 +1806,7 @@ std::string editor::Generator::checkBuildTools(bool requireEditorCompatibility, 
             Out::info("Default compiler resolved to: %s", chosen->displayName.c_str());
         }
         if (!hasCompiler) {
-            missing += "- C++ toolchain compatible with this editor: not found. Select an available compiler in Project Settings > Build.\n";
+            missing += "- C++ toolchain compatible with this editor: not found. Select an available compiler in Editor Settings > Desktop.\n";
             for (const auto& kit : kits) {
                 missing += "  " + kit.displayName + ": " + kit.unavailableReason + "\n";
             }

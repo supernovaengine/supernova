@@ -1257,6 +1257,7 @@ bool editor::CodeEditor::save(EditorInstance& instance) {
 
         file << instance.editor->GetText();
         file.close();
+        if (!file) return false;
 
         instance.savedUndoIndex = instance.editor->GetUndoIndex();
         instance.isModified = false;
@@ -1273,10 +1274,11 @@ bool editor::CodeEditor::save(EditorInstance& instance) {
     }
 }
 
-void editor::CodeEditor::saveLastFocused(){
+bool editor::CodeEditor::saveLastFocused(){
     if (lastFocused){
-        save(*lastFocused);
+        return save(*lastFocused);
     }
+    return true;
 }
 
 bool editor::CodeEditor::save(const std::string& filepath) {
