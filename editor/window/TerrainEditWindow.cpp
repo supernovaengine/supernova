@@ -72,6 +72,12 @@ void editor::TerrainEditWindow::showTooltip(const char* text, ImGuiHoveredFlags 
     }
 }
 
+// Brush and command buttons carry only an icon, so they get a step above the frame height to stay readable.
+static ImVec2 commandButtonSize(){
+    const float size = ImGui::GetFrameHeight() * 1.5f;
+    return ImVec2(size, size);
+}
+
 bool editor::TerrainEditWindow::iconButton(const char* icon, const char* id, const char* tooltip, bool selected, const ImVec2& size){
     std::string label = "##" + std::string(id);
 
@@ -2488,8 +2494,9 @@ void editor::TerrainEditWindow::drawTextureLayers(TerrainComponent& terrain){
     }
 
     terrainPropertyRow("Layers", "Up to nine, three per blend map.");
+    const ImVec2 commandSize = commandButtonSize();
     ImGui::BeginDisabled(layerCount >= MAX_TERRAIN_LAYERS);
-    if (iconButton(ICON_FA_PLUS, "add_texture_layer", "Add texture layer", false, buttonSize)){
+    if (iconButton(ICON_FA_PLUS, "add_texture_layer", "Add texture layer", false, commandSize)){
         endStroke();
         std::vector<Texture> layers = terrain.textureLayers;
         layers.resize(layers.size() + 1);
@@ -2498,7 +2505,7 @@ void editor::TerrainEditWindow::drawTextureLayers(TerrainComponent& terrain){
     ImGui::EndDisabled();
     ImGui::SameLine();
     ImGui::BeginDisabled(layerCount == 0);
-    if (iconButton(ICON_FA_TRASH_CAN, "remove_texture_layer", "Remove the last texture layer", false, buttonSize)){
+    if (iconButton(ICON_FA_TRASH_CAN, "remove_texture_layer", "Remove the last texture layer", false, commandSize)){
         endStroke();
         std::vector<Texture> layers = terrain.textureLayers;
         layers.pop_back();
@@ -2814,11 +2821,12 @@ void editor::TerrainEditWindow::show(){
     selectedFoliageLayer = std::clamp(selectedFoliageLayer, 0, std::max(0, layerCount - 1));
     selectedTextureLayer = std::clamp(selectedTextureLayer, 0, std::max(0, static_cast<int>(terrain.textureLayers.size()) - 1));
     const ImVec2 buttonSize(ImGui::GetFrameHeight(), ImGui::GetFrameHeight());
+    const ImVec2 commandSize = commandButtonSize();
     const float spacing = ImGui::GetStyle().ItemSpacing.x;
 
     auto brushButton = [&](TerrainBrushMode mode, const char* icon, const char* id, const char* tooltip){
         const bool selected = brushActive && brushMode == mode;
-        if (iconButton(icon, id, tooltip, selected, buttonSize)){
+        if (iconButton(icon, id, tooltip, selected, commandSize)){
             endStroke();
             brushMode = mode;
             brushActive = !selected;
@@ -3028,11 +3036,11 @@ void editor::TerrainEditWindow::show(){
     if (ImGui::CollapsingHeader("Brush", ImGuiTreeNodeFlags_DefaultOpen) && beginTerrainProperties("brush_properties")){
         ImGui::BeginDisabled(!brushTargetAvailable);
         terrainPropertyRow("Shape");
-        if (iconButton(ICON_FA_CIRCLE, "shape_circle", "Circle brush", brushShape == TerrainBrushShape::Circle, buttonSize)){
+        if (iconButton(ICON_FA_CIRCLE, "shape_circle", "Circle brush", brushShape == TerrainBrushShape::Circle, commandSize)){
             brushShape = TerrainBrushShape::Circle;
         }
         ImGui::SameLine();
-        if (iconButton(ICON_FA_SQUARE, "shape_square", "Square brush", brushShape == TerrainBrushShape::Square, buttonSize)){
+        if (iconButton(ICON_FA_SQUARE, "shape_square", "Square brush", brushShape == TerrainBrushShape::Square, commandSize)){
             brushShape = TerrainBrushShape::Square;
         }
         ImGui::BeginDisabled(placementBrush);
