@@ -196,6 +196,7 @@ void ExportWindow::loadSettingsFromProject() {
     m_targetDirBuffer[0] = '\0';
     m_selectedShaderIndex = -1;
     m_sourceBackendsConfigured = false;
+    m_selectSourceBackendTab = true;
     m_sourcePlatformWindows = false;
     m_sourcePlatformLinux = false;
     m_sourcePlatformMacOS = false;
@@ -678,45 +679,73 @@ void ExportWindow::applySourcePlatformPresets() {
 }
 
 void ExportWindow::drawBackendSection() {
-    ImGui::Text(ICON_FA_LAYER_GROUP "  Platform Presets");
-    ImGui::Spacing();
-    if (ImGui::BeginTable("source_platforms_table", 3, ImGuiTableFlags_SizingStretchSame)) {
-        auto platformCheck = [&](const char* label, bool& value) {
-            ImGui::TableNextColumn();
-            if (ImGui::Checkbox(label, &value)) {
-                applySourcePlatformPresets();
-                saveCurrentSettingsToProject();
-            }
-        };
-        platformCheck("Windows", m_sourcePlatformWindows);
-        platformCheck("Linux", m_sourcePlatformLinux);
-        platformCheck("macOS", m_sourcePlatformMacOS);
-        platformCheck("iOS", m_sourcePlatformIOS);
-        platformCheck("Android", m_sourcePlatformAndroid);
-        platformCheck("Web", m_sourcePlatformWeb);
-        ImGui::EndTable();
-    }
-    ImGui::TextDisabled("A preset selects all compatible shader backends. You can still adjust individual backends below.");
-    ImGui::Spacing();
-
     ImGui::Text(ICON_FA_MICROCHIP "  Graphic Backends");
+    ImGui::SameLine();
+    ImGui::TextDisabled("(?)");
+    if (ImGui::BeginItemTooltip()) {
+        ImGui::PushTextWrapPos(ImGui::GetFontSize() * 35.0f);
+        ImGui::TextUnformatted("Use platform presets to select compatible shader backends, "
+                               "then fine-tune the selection in Custom Backends. "
+                               "Switching tabs keeps your current selection. "
+                               "The selected backends below are included in the export.");
+        ImGui::PopTextWrapPos();
+        ImGui::EndTooltip();
+    }
     ImGui::Spacing();
 
-    if (ImGui::BeginTable("backends_table", 3, ImGuiTableFlags_SizingStretchSame)) {
-        ImGui::TableSetupColumn("BackendCol1", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn("BackendCol2", ImGuiTableColumnFlags_WidthStretch);
-        ImGui::TableSetupColumn("BackendCol3", ImGuiTableColumnFlags_WidthStretch);
-        for (auto& entry : m_backendEntries) {
-            ImGui::TableNextColumn();
-            std::string checkboxId = "##backend_" + entry.name;
-            if (ImGui::Checkbox((entry.name + checkboxId).c_str(), &entry.selected)) {
-                m_sourceBackendsConfigured = true;
-                saveCurrentSettingsToProject();
+    if (ImGui::BeginTabBar("source_backend_tabs")) {
+        // Only backend choices are persisted, so show those directly when reloading.
+        const bool selectPresets = m_selectSourceBackendTab && !m_sourceBackendsConfigured;
+        const bool selectCustom = m_selectSourceBackendTab && m_sourceBackendsConfigured;
+        m_selectSourceBackendTab = false;
+        if (ImGui::BeginTabItem("Platform Presets", nullptr, selectPresets ? ImGuiTabItemFlags_SetSelected : 0)) {
+            if (ImGui::BeginTable("source_platforms_table", 3, ImGuiTableFlags_SizingStretchSame)) {
+                auto platformCheck = [&](const char* label, bool& value) {
+                    ImGui::TableNextColumn();
+                    if (ImGui::Checkbox(label, &value)) {
+                        applySourcePlatformPresets();
+                        saveCurrentSettingsToProject();
+                    }
+                };
+                platformCheck("Windows", m_sourcePlatformWindows);
+                platformCheck("Linux", m_sourcePlatformLinux);
+                platformCheck("macOS", m_sourcePlatformMacOS);
+                platformCheck("iOS", m_sourcePlatformIOS);
+                platformCheck("Android", m_sourcePlatformAndroid);
+                platformCheck("Web", m_sourcePlatformWeb);
+                ImGui::EndTable();
             }
-            ImGui::SetItemTooltip("%s", ShaderPool::getShaderLangStr(entry.backend).c_str());
+            ImGui::EndTabItem();
         }
-        ImGui::EndTable();
+        if (ImGui::BeginTabItem("Custom Backends", nullptr, selectCustom ? ImGuiTabItemFlags_SetSelected : 0)) {
+            if (ImGui::BeginTable("backends_table", 3, ImGuiTableFlags_SizingStretchSame)) {
+                ImGui::TableSetupColumn("BackendCol1", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("BackendCol2", ImGuiTableColumnFlags_WidthStretch);
+                ImGui::TableSetupColumn("BackendCol3", ImGuiTableColumnFlags_WidthStretch);
+                for (auto& entry : m_backendEntries) {
+                    ImGui::TableNextColumn();
+                    std::string checkboxId = "##backend_" + entry.name;
+                    if (ImGui::Checkbox((entry.name + checkboxId).c_str(), &entry.selected)) {
+                        m_sourceBackendsConfigured = true;
+                        saveCurrentSettingsToProject();
+                    }
+                    ImGui::SetItemTooltip("%s", ShaderPool::getShaderLangStr(entry.backend).c_str());
+                }
+                ImGui::EndTable();
+            }
+            ImGui::EndTabItem();
+        }
+        ImGui::EndTabBar();
     }
+
+    std::string selectedBackends;
+    for (const auto& entry : m_backendEntries) {
+        if (!entry.selected) continue;
+        if (!selectedBackends.empty()) selectedBackends += ", ";
+        selectedBackends += entry.name;
+    }
+    ImGui::Spacing();
+    ImGui::TextWrapped("Selected backends: %s", selectedBackends.empty() ? "None" : selectedBackends.c_str());
 
     ImGui::Spacing();
     ImGui::Separator();

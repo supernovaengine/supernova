@@ -65,6 +65,7 @@ namespace doriax::editor {
         };
         std::vector<BackendEntry> m_backendEntries;
         bool m_sourceBackendsConfigured = false;
+        bool m_selectSourceBackendTab = true;
         bool m_sourcePlatformWindows = false;
         bool m_sourcePlatformLinux = false;
         bool m_sourcePlatformMacOS = false;
