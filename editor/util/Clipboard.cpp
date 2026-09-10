@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "util/Clipboard.h"
+#include "util/FileUtils.h"
 
 #include <algorithm>
 #include <cctype>
@@ -118,12 +119,12 @@ std::vector<std::string> parseFileUriList(const std::string& text) {
             if (line.rfind("file://", 0) != 0) {
                 return {};
             }
-            fs::path path = fs::u8path(decodeFileUri(line));
+            fs::path path = FileUtils::pathFromUtf8(decodeFileUri(line));
             std::error_code ec;
             if (!fs::is_regular_file(path, ec) || ec) {
                 return {};
             }
-            paths.push_back(path.u8string());
+            paths.push_back(FileUtils::pathToUtf8(path));
         }
         if (end == std::string::npos) break;
         start = end + 1;

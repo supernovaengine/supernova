@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "MsBuildProgress.h"
+#include "util/FileUtils.h"
 
 #include <algorithm>
 #include <cctype>
@@ -49,7 +50,7 @@ namespace {
     }
 
     fs::path resolve(const fs::path& projectFile, const std::string& value) {
-        fs::path path = fs::u8path(value);
+        fs::path path = FileUtils::pathFromUtf8(value);
         return (path.is_relative() ? projectFile.parent_path() / path : path).lexically_normal();
     }
 

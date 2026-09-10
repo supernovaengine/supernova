@@ -1,4 +1,10 @@
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
+# Mirrored by cxxStandards in editor/util/CxxStandards.h. Covers the engine, the editor
+# and the exported game; Play plugins read the project setting (editor/Generator.cpp).
+set(DORIAX_CXX_STANDARDS 17 20 23)
+if(NOT DEFINED DORIAX_CXX_STANDARD)
+    set(DORIAX_CXX_STANDARD 17 CACHE STRING "C++ standard for the engine, editor and project")
+    set_property(CACHE DORIAX_CXX_STANDARD PROPERTY STRINGS ${DORIAX_CXX_STANDARDS})
+endif()
 
 # =============================================================
 # STANDALONE PROJECT SETUP
@@ -6,7 +12,7 @@
 # (i.e. building doriax-project outside the editor).
 # =============================================================
 if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
-    cmake_minimum_required(VERSION 3.15)
+    cmake_minimum_required(VERSION 3.20)
 
     if(NOT DEFINED APP_NAME)
         set(APP_NAME doriax-project)
@@ -902,6 +908,13 @@ target_link_libraries(
     sokol lua stb tinyobjloader tinygltf tinyxml2 soloud box2d joltphysics harfbuzz sheenbidi
 )
 
+# Checked after the marker above, so the value the Exporter injects is validated too
+if(NOT DORIAX_CXX_STANDARD IN_LIST DORIAX_CXX_STANDARDS)
+    string(REPLACE ";" ", " DORIAX_CXX_STANDARDS_TEXT "${DORIAX_CXX_STANDARDS}")
+    message(FATAL_ERROR "DORIAX_CXX_STANDARD must be one of: ${DORIAX_CXX_STANDARDS_TEXT} (got '${DORIAX_CXX_STANDARD}')")
+endif()
+message(STATUS "C++ standard is set to ${DORIAX_CXX_STANDARD}")
+
 set_target_properties(
     doriax
 
@@ -910,8 +923,10 @@ set_target_properties(
     RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
     ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}"
-    CXX_STANDARD 17
+    CXX_STANDARD ${DORIAX_CXX_STANDARD}
     CXX_STANDARD_REQUIRED ON
+    OBJCXX_STANDARD ${DORIAX_CXX_STANDARD}
+    OBJCXX_STANDARD_REQUIRED ON
 )
 
 if(DORIAX_SHARED)
@@ -995,7 +1010,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
         PROPERTIES
         ${PLATFORM_PROPERTIES}
         RESOURCE "${PLATFORM_RESOURCES}"
-        CXX_STANDARD 17
+        CXX_STANDARD ${DORIAX_CXX_STANDARD}
+        CXX_STANDARD_REQUIRED ON
+        OBJCXX_STANDARD ${DORIAX_CXX_STANDARD}
+        OBJCXX_STANDARD_REQUIRED ON
     )
 
     # Generated sources embed UTF-8 literals and carry no BOM, so MSVC would

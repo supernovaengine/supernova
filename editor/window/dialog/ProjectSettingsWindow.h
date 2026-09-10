@@ -47,6 +47,7 @@ namespace doriax::editor {
         fs::path m_assetsDir;
         fs::path m_luaDir;
         std::vector<fs::path> m_scriptDirs;
+        int m_cxxStandardIndex = 0;
         bool m_packNativeResources = false;
         char m_webApplicationNameBuffer[256] = {0};
         fs::path m_webFavicon;
@@ -100,6 +101,7 @@ namespace doriax::editor {
         void drawWindowSettings();
         Texture* findThumbnail(const std::string& path);
         void drawDirectoriesSettings();
+        void drawBuildSettings();
 
         // Each platform section draws rows into the table its header opens.
         void drawPlatformsSettings();

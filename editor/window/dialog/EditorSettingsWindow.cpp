@@ -328,7 +328,8 @@ void EditorSettingsWindow::drawCMakeSettings() {
             ImGui::PopStyleColor();
         }
 
-        if (beginSettingsRow("Compiler", "Compiler kit used to build C++ scripts, both when playing a scene and when exporting.", m_cmakeKitIndex != 0)) {
+        if (beginSettingsRow("Compiler", "Compiler kit used to build C++ scripts, both when playing a scene and when exporting. "
+                "Set the language standard in Project Settings > Build > C++ Standard.", m_cmakeKitIndex != 0)) {
             m_cmakeKitIndex = 0;
         }
         if (m_cmakeKitIndex < 0 || m_cmakeKitIndex > static_cast<int>(m_availableKits.size())) {

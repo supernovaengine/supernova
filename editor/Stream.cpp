@@ -1677,6 +1677,9 @@ YAML::Node editor::Stream::encodeProject(Project* project) {
         }
         root["scriptDirs"] = scriptDirsNode;
     }
+    if (project->getCxxStandard() != Project::defaultCxxStandard) {
+        root["cxxStandard"] = project->getCxxStandard();
+    }
     if (project->shouldPackNativeResources() != Project::defaultPackNativeResources) {
         root["packNativeResources"] = project->shouldPackNativeResources();
     }
@@ -2010,6 +2013,10 @@ void editor::Stream::decodeProject(Project* project, const YAML::Node& node) {
             scriptDirs.push_back(dirNode.as<std::string>());
         }
         project->setScriptDirs(std::move(scriptDirs));
+    }
+
+    if (node["cxxStandard"]) {
+        project->setCxxStandard(node["cxxStandard"].as<int>());
     }
 
     // Backward compatibility: the compiler and job count used to live here before

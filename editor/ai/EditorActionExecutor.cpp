@@ -14,6 +14,7 @@
 #include "Catalog.h"
 #include "Exporter.h"
 #include "Stream.h"
+#include "util/CxxStandards.h"
 #include "util/ProjectUtils.h"
 #include "util/FileUtils.h"
 #include "util/ScriptParser.h"
@@ -2049,6 +2050,7 @@ ActionResult EditorActionExecutor::dispatch(const std::string& name,
     if (name == "update_script_file") return updateScriptFile(arguments);
     if (name == "create_source_file") return createSourceFile(arguments);
     if (name == "set_project_script_dirs") return setProjectScriptDirs(arguments);
+    if (name == "set_project_cxx_standard") return setProjectCxxStandard(arguments);
     if (name == "update_project_build_file") return updateProjectBuildFile(arguments);
     if (name == "create_bundle_from_entity") return createBundleFromEntity(arguments);
     if (name == "import_bundle_instance") return importBundleInstance(arguments);
@@ -2101,6 +2103,7 @@ ActionResult EditorActionExecutor::getProjectSummary() {
     for (const fs::path& scriptDir : project->getScriptDirs()) {
         data["script_dirs"].push_back(scriptDir.generic_string());
     }
+    data["cxx_standard"] = project->getCxxStandard();
     data["standalone_bundles"] = Json::array();
     for (const fs::path& bundlePath : project->getStandaloneBundles()) {
         data["standalone_bundles"].push_back(bundlePath.generic_string());
@@ -3901,6 +3904,29 @@ ActionResult EditorActionExecutor::setProjectScriptDirs(const Json& arguments) {
                         ? "Cleared the project script directories."
                         : "Set the project script directories. The next play or export builds with them.",
                     Json{{"script_dirs", scriptDirs}});
+}
+
+ActionResult EditorActionExecutor::setProjectCxxStandard(const Json& arguments) {
+    if (!arguments.contains("cxx_standard") || !arguments["cxx_standard"].is_number_integer()) {
+        return failResult("set_project_cxx_standard requires cxx_standard (" + cxxStandardList() + ").");
+    }
+
+    const Json& value = arguments["cxx_standard"];
+    if (value < cxxStandards[0] || value > cxxStandards[std::size(cxxStandards) - 1]
+            || !isSupportedCxxStandard(value.get<int>())) {
+        return failResult("cxx_standard must be " + cxxStandardList() + ".");
+    }
+
+    const int previousStandard = project->getCxxStandard();
+    project->setCxxStandard(value.get<int>());
+    if (!project->saveProjectFile()) {
+        project->setCxxStandard(previousStandard);
+        return failResult("Failed to save the project with the new C++ standard.");
+    }
+
+    return okResult("Set the project C++ standard to C++" + std::to_string(project->getCxxStandard())
+                        + ". The next play or export builds with it.",
+                    Json{{"cxx_standard", project->getCxxStandard()}});
 }
 
 ActionResult EditorActionExecutor::updateProjectBuildFile(const Json& arguments) {

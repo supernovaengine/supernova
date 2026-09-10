@@ -699,9 +699,9 @@ function(configure_doriax_editor_target target_name)
 
         PROPERTIES
 
-        CXX_STANDARD 17
+        CXX_STANDARD ${DORIAX_CXX_STANDARD}
         CXX_STANDARD_REQUIRED ON
-        OBJCXX_STANDARD 17
+        OBJCXX_STANDARD ${DORIAX_CXX_STANDARD}
         OBJCXX_STANDARD_REQUIRED ON
     )
 

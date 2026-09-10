@@ -15,6 +15,7 @@
 #include "util/Clipboard.h"
 #include "util/EntityPayload.h"
 #include "util/FileDialogs.h"
+#include "util/FileUtils.h"
 #include "util/Util.h"
 #include "window/CodeEditor.h"
 #include "window/Widgets.h"
@@ -2142,7 +2143,7 @@ bool AiChatWindow::attachExternalFile(const fs::path& path) {
     file.read(reinterpret_cast<char*>(data.data()), static_cast<std::streamsize>(data.size()));
     if (!file) return false;
 
-    const std::string name = path.filename().u8string();
+    const std::string name = FileUtils::pathToUtf8(path.filename());
     const std::vector<unsigned char> nameBytes(name.begin(), name.end());
     if (!validUtf8Text(nameBytes)) {
         Backend::getApp().registerAlert("Unsupported attachment",
@@ -2177,7 +2178,7 @@ bool AiChatWindow::attachExternalFile(const fs::path& path) {
 
 void AiChatWindow::attachExternalFiles(const std::vector<std::string>& paths) {
     for (const std::string& path : paths) {
-        attachExternalFile(fs::u8path(path));
+        attachExternalFile(FileUtils::pathFromUtf8(path));
     }
 }
 

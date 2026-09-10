@@ -156,6 +156,21 @@ public:
         ofs.write(newContent.data(), static_cast<std::streamsize>(newContent.size()));
         return static_cast<bool>(ofs);
     }
+
+    // path's UTF-8 conversions changed shape in C++20: u8string() returns std::u8string
+    // and u8path() is deprecated. These keep the call sites on std::string either way.
+    static std::filesystem::path pathFromUtf8(const std::string& text) {
+#ifdef __cpp_lib_char8_t
+        return std::filesystem::path(std::u8string(text.begin(), text.end()));
+#else
+        return std::filesystem::u8path(text);
+#endif
+    }
+
+    static std::string pathToUtf8(const std::filesystem::path& path) {
+        const auto utf8 = path.u8string();
+        return std::string(utf8.begin(), utf8.end());
+    }
 };
 
 } // namespace doriax::editor

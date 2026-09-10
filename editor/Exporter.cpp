@@ -2015,6 +2015,7 @@ bool editor::Exporter::copyEngine() {
         if (iconGenerated) {
             projectSettings += indent + "set(DORIAX_WINDOW_ICON ON)";
         }
+        projectSettings += indent + "set(DORIAX_CXX_STANDARD " + std::to_string(project->getCxxStandard()) + ")";
         cmakeContent.replace(projectSettingsPos, projectSettingsMarker.size(), projectSettings);
     } else {
         Out::warning("Exported CMakeLists.txt is missing the project settings marker; using platform defaults");

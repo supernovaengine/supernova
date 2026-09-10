@@ -14,6 +14,7 @@
 #include "util/EntityBundle.h"
 #include "util/ScriptParser.h"
 #include "util/ScopedDefaultEntityPool.h"
+#include "util/CxxStandards.h"
 
 #include "yaml-cpp/yaml.h"
 
@@ -291,6 +292,7 @@ namespace doriax::editor{
         std::filesystem::path assetsDir;
         std::filesystem::path luaDir;
         std::vector<std::filesystem::path> scriptDirs;  // extra C++ include and source roots
+        int cxxStandard;  // C++ standard for Play and exported builds
         bool packNativeResources;
         ShaderOverrides shaderOverrides;
         SourceCodeExportSettings sourceCodeExportSettings;
@@ -458,6 +460,7 @@ namespace doriax::editor{
         static constexpr const char* defaultAssetsDir = ".";
         static constexpr const char* defaultLuaDir = ".";
         static constexpr bool defaultPackNativeResources = false;
+        static constexpr int defaultCxxStandard = cxxStandards[0];
 
         Project();
 
@@ -512,6 +515,9 @@ namespace doriax::editor{
         // sources under it compile without a script component referencing them.
         void setScriptDirs(std::vector<std::filesystem::path> scriptDirs);
         const std::vector<std::filesystem::path>& getScriptDirs() const;
+
+        void setCxxStandard(int standard);
+        int getCxxStandard() const;
 
         // Absolute roots stored references are relative to: assets for textures, models,
         // sounds and fonts ("asset://"), Lua for script entries ("lua://").

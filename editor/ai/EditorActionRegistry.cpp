@@ -4,6 +4,7 @@
 #include "EditorActionRegistry.h"
 
 #include "AiPathUtils.h"
+#include "util/CxxStandards.h"
 
 #include <cctype>
 #include <filesystem>
@@ -144,7 +145,7 @@ const std::vector<ToolDefinition>& cachedTools() {
     static const std::vector<ToolDefinition> definitions = {
         {
             "get_project_summary",
-            "Read a compact summary of the current project, selected scene, selected entities, and resource roots.",
+            "Read a compact summary of the current project, selected scene, selected entities, resource roots, and cxx_standard (" + cxxStandardList() + ").",
             objectSchema({}),
             true
         },
@@ -735,6 +736,15 @@ const std::vector<ToolDefinition>& cachedTools() {
                     {"items", {{"type", "string"}}}
                 }}
             }, {"directories"}),
+            false
+        },
+        {
+            "set_project_cxx_standard",
+            "Set the project's C++ language standard (" + cxxStandardList() + "). The next play or export builds with it, and an export compiles the engine with it too. Read the current value from get_project_summary (cxx_standard). Do not edit CMAKE_CXX_STANDARD in the generated CMakeLists.txt.",
+            objectSchema({
+                {"cxx_standard", {{"type", "integer"}, {"enum", cxxStandards},
+                    {"description", "C++ standard year: " + cxxStandardList()}}}
+            }, {"cxx_standard"}),
             false
         },
         {
@@ -1462,6 +1472,17 @@ ValidationResult EditorActionRegistry::validate(const std::string& name, const J
         }
         return ok();
     }
+    if (name == "set_project_cxx_standard") {
+        if (!arguments.contains("cxx_standard") || !arguments["cxx_standard"].is_number_integer()) {
+            return fail("set_project_cxx_standard requires cxx_standard (" + cxxStandardList() + ").");
+        }
+        const Json& standard = arguments["cxx_standard"];
+        if (standard < cxxStandards[0] || standard > cxxStandards[std::size(cxxStandards) - 1]
+                || !isSupportedCxxStandard(standard.get<int>())) {
+            return fail("cxx_standard must be " + cxxStandardList() + ".");
+        }
+        return ok();
+    }
     if (name == "update_project_build_file") {
         if (!arguments.contains("content") || !arguments["content"].is_string()) {
             return fail("update_project_build_file requires string content.");
@@ -1824,6 +1845,12 @@ std::string EditorActionRegistry::describe(const std::string& name, const Json& 
         }
         return list.empty() ? "Set project script directories"
                             : "Set project script directories: " + list;
+    }
+    if (name == "set_project_cxx_standard") {
+        if (arguments.contains("cxx_standard") && arguments["cxx_standard"].is_number_integer()) {
+            return "Set project C++ standard to C++" + std::to_string(arguments["cxx_standard"].get<int>());
+        }
+        return "Set project C++ standard";
     }
     if (name == "update_project_build_file") {
         return "Update ProjectBuild.cmake";

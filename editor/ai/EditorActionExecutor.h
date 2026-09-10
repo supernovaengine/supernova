@@ -87,6 +87,7 @@ private:
     ActionResult updateScriptFile(const Json& arguments);
     ActionResult createSourceFile(const Json& arguments);
     ActionResult setProjectScriptDirs(const Json& arguments);
+    ActionResult setProjectCxxStandard(const Json& arguments);
     ActionResult updateProjectBuildFile(const Json& arguments);
     ActionResult createBundleFromEntity(const Json& arguments);
     ActionResult importBundleInstance(const Json& arguments);

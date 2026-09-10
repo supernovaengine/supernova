@@ -26,6 +26,10 @@ static const char* windowModeNames[] = { "Windowed", "Maximized", "Fullscreen" }
 static const WindowMode windowModeValues[] = { WindowMode::WINDOWED, WindowMode::MAXIMIZED, WindowMode::FULLSCREEN };
 static const int windowModeCount = sizeof(windowModeValues) / sizeof(windowModeValues[0]);
 
+static const char* cxxStandardNames[] = { "C++17", "C++20", "C++23" };
+static const int cxxStandardCount = sizeof(cxxStandardNames) / sizeof(cxxStandardNames[0]);
+static_assert(std::size(cxxStandardNames) == std::size(cxxStandards));
+
 static const char* androidOrientationNames[] = { "Unspecified", "Portrait", "Landscape", "Sensor Portrait", "Sensor Landscape", "Full Sensor" };
 static const AndroidOrientation androidOrientationValues[] = {
     AndroidOrientation::Unspecified,
@@ -121,6 +125,13 @@ static int findTextureStrategyIndex(TextureStrategy strategy) {
 static int findWindowModeIndex(WindowMode mode) {
     for (int i = 0; i < windowModeCount; i++) {
         if (windowModeValues[i] == mode) return i;
+    }
+    return 0;
+}
+
+static int findCxxStandardIndex(int standard) {
+    for (int i = 0; i < cxxStandardCount; i++) {
+        if (cxxStandards[i] == standard) return i;
     }
     return 0;
 }
@@ -794,6 +805,7 @@ void ProjectSettingsWindow::open(Project* project) {
     m_assetsDir = project->getAssetsDir();
     m_luaDir = project->getLuaDir();
     m_scriptDirs = project->getScriptDirs();
+    m_cxxStandardIndex = findCxxStandardIndex(project->getCxxStandard());
 
     const ApplicationSettings& application = project->getApplicationSettings();
     snprintf(m_applicationNameBuffer, sizeof(m_applicationNameBuffer), "%s", application.name.c_str());
@@ -938,6 +950,11 @@ void ProjectSettingsWindow::drawSettings() {
 
         if (ImGui::BeginTabItem("Directories")) {
             drawDirectoriesSettings();
+            ImGui::EndTabItem();
+        }
+
+        if (ImGui::BeginTabItem("Build")) {
+            drawBuildSettings();
             ImGui::EndTabItem();
         }
 
@@ -1201,6 +1218,16 @@ void ProjectSettingsWindow::drawDirectoriesSettings() {
             m_luaDir, fs::path(Project::defaultLuaDir), true
         );
         drawScriptDirsSetting(m_project, m_scriptDirs);
+    });
+}
+
+void ProjectSettingsWindow::drawBuildSettings() {
+    drawSettingsPanel("##BuildSettingsPanel", [this]() {
+        drawComboSetting("C++ Standard", "##CxxStandard", cxxStandardNames, cxxStandardCount, m_cxxStandardIndex,
+            findCxxStandardIndex(Project::defaultCxxStandard),
+            "Language standard for C++ scripts in Play and exported games. Saved with the project. "
+            "Exports also compile the engine with this standard. "
+            "Choose a compatible compiler in Editor Settings > Desktop.");
     });
 }
 
@@ -1525,6 +1552,10 @@ bool ProjectSettingsWindow::applySettings() {
     // Moves the referenced files in and rewrites every reference to the new roots
     m_project->changeAssetRoots(m_assetsDir, m_luaDir);
     m_project->setScriptDirs(m_scriptDirs);
+    if (m_cxxStandardIndex < 0 || m_cxxStandardIndex >= cxxStandardCount) {
+        m_cxxStandardIndex = 0;
+    }
+    m_project->setCxxStandard(cxxStandards[m_cxxStandardIndex]);
 
     // The project already carries the values applied above
     const std::string inheritedName = m_project->getApplicationName();
