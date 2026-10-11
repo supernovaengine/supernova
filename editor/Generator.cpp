@@ -1031,8 +1031,9 @@ void editor::Generator::writeSourceFiles(const fs::path& projectPath, const fs::
     cmakeContent += "# Build mode: when ON, build as Doriax Editor plugin (shared library)\n";
     cmakeContent += "option(DORIAX_EDITOR_PLUGIN \"Build as Doriax Editor plugin\" OFF)\n";
 
-    // Both modes link the editor's engine library, which always has both physics backends
-    cmakeContent += "add_compile_definitions(DORIAX_PHYSICS_2D DORIAX_PHYSICS_3D)\n\n";
+    // Both modes link the editor's engine library, which always has both physics backends.
+    // Jolt's object layer size changes its class layouts, so it has to match the engine.
+    cmakeContent += "add_compile_definitions(DORIAX_PHYSICS_2D DORIAX_PHYSICS_3D JPH_OBJECT_LAYER_BITS=" + std::to_string(JPH_OBJECT_LAYER_BITS) + ")\n\n";
 
     cmakeContent += getEditorPluginAbiCheck();
     cmakeContent += "if(DORIAX_EDITOR_PLUGIN)\n";
