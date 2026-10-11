@@ -24,6 +24,7 @@ editor::ToolsLayer::ToolsLayer(bool use2DGizmos){
     aGizmo = new AnchorGizmo(scene);
 
     anchorGizmoEnabled = false;
+    gizmoVisible = false;
 
     scene->setCamera(camera);
 
@@ -189,6 +190,12 @@ void editor::ToolsLayer::setGizmoVisible(bool visible){
         gizmoSideSelected = GizmoSideSelected::NONE;
         gizmo2DSideSelected = Gizmo2DSideSelected::NONE;
     }
+
+    gizmoVisible = visible;
+}
+
+bool editor::ToolsLayer::isGizmoVisible() const{
+    return gizmoVisible;
 }
 
 Framebuffer* editor::ToolsLayer::getFramebuffer(){

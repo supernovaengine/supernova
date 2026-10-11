@@ -1089,6 +1089,14 @@ void Engine::systemViewChanged(){
 }
 
 void Engine::systemDraw(){
+    runFrame(true);
+}
+
+void Engine::systemUpdate(){
+    runFrame(false);
+}
+
+void Engine::runFrame(bool draw){
     const int MAX_UPDATES_PER_FRAME = 100;
 
     //Deltatime in seconds
@@ -1116,7 +1124,8 @@ void Engine::systemDraw(){
     SceneManager::applyPendingLoad();
 
     // before the update, which bakes the PIP_RTT pipelines from the target in use
-    beginCompositeFramebuffer();
+    if (draw)
+        beginCompositeFramebuffer();
 
     // avoid increment updateTimeCount after resume
     if (!paused) {
@@ -1180,21 +1189,28 @@ void Engine::systemDraw(){
         Engine::onPostUpdate.call();
     }
 
-    Engine::onDraw.call();
+    if (draw){
+        Engine::onDraw.call();
 
-    // again for a scene stack loaded during the update
-    beginCompositeFramebuffer();
+        // again for a scene stack loaded during the update
+        beginCompositeFramebuffer();
 
-    beginFrameStats();
-    for (int i = 0; i < scenes.size(); i++){
-        scenes[i]->draw();
+        beginFrameStats();
+        for (int i = 0; i < scenes.size(); i++){
+            scenes[i]->draw();
+        }
+
+        endCompositeFramebuffer();
+    }else{
+        // draw() moves the waves; this frame has no draw
+        for (int i = 0; i < scenes.size(); i++){
+            scenes[i]->getSystem<RenderSystem>()->advanceWaters();
+        }
     }
-
-    endCompositeFramebuffer();
 
     SystemRender::commit();
 
-    {
+    if (draw){
         std::lock_guard<std::mutex> lock(sceneListMutex);
 
         // Retire one-shots that finished loading: they got the frame they asked for.

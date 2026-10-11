@@ -31,6 +31,9 @@ namespace doriax {
         // Disconnects every pad (so the engine sees the events) and unloads.
         void shutdown();
         void poll();
+        // Lets go of held buttons and centers the axes; the next poll() reports
+        // what is still held as new input.
+        void release();
 
     private:
         struct Pad {

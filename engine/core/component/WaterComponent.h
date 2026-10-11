@@ -107,7 +107,7 @@ namespace doriax{
         bool buoyancy = true; // floats the dynamic bodies that have Body3D buoyancy
         float buoyancyDepth = 0.0f; // how far below the surface they still float, 0 = no bottom
 
-        // advanced by RenderSystem after each draw
+        // advanced by RenderSystem::advanceWaters() at the end of each frame
         float wavePhase[WATER_WAVE_COUNT] = {0.0f, 0.0f, 0.0f, 0.0f};
         Vector2 rippleOffset[2] = {Vector2(0.0f, 0.0f), Vector2(0.0f, 0.0f)};
         float time = 0.0f;

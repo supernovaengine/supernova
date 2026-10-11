@@ -6163,15 +6163,18 @@ uint32_t editor::Project::getSelectedSceneForProperties() const{
 }
 
 bool editor::Project::isTempProject() const{
+    // The menu asks every frame, and relative() opens both paths
+    if (projectPath == tempCheckPath) {
+        return tempCheckResult;
+    }
+    tempCheckPath = projectPath;
+
     std::error_code ec;
     auto relPath = std::filesystem::relative(projectPath, std::filesystem::temp_directory_path(), ec);
 
     // relative() returns empty across different roots, like a project on D: while temp is on C:
-    if (ec || relPath.empty()) {
-        return false;
-    }
-
-    return *relPath.begin() != "..";
+    tempCheckResult = !ec && !relPath.empty() && *relPath.begin() != "..";
+    return tempCheckResult;
 }
 
 bool editor::Project::isTempUnsavedProject() const{

@@ -419,6 +419,9 @@ namespace doriax::editor{
         };
 
         std::filesystem::path projectPath;
+        // isTempProject() cache
+        mutable std::filesystem::path tempCheckPath;
+        mutable bool tempCheckResult = false;
         bool resourcesFocused;
         std::map<MaterialLinkKey, MaterialLinkEntry> materialFileLinks;
         std::chrono::steady_clock::time_point lastMaterialRefreshTime;

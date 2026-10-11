@@ -34,6 +34,7 @@ namespace doriax::editor{
         Gizmo2DSideSelected gizmo2DSideSelected;
 
         bool anchorGizmoEnabled;
+        bool gizmoVisible;
 
         float gizmoScale;
     public:
@@ -56,6 +57,7 @@ namespace doriax::editor{
         void setShowObject2DCross(bool show);
 
         void setGizmoVisible(bool visible);
+        bool isGizmoVisible() const;
 
         Framebuffer* getFramebuffer();
         TextureRender& getTexture();

@@ -49,6 +49,27 @@ void GamepadWin::disconnect(int id) {
     Engine::systemGamepadDisconnect(id);
 }
 
+void GamepadWin::release() {
+    for (int id = 0; id < COUNT; ++id) {
+        Pad& pad = pads[id];
+        if (!pad.connected) continue;
+
+        for (int button = 0; button < BUTTON_COUNT; ++button) {
+            if (!pad.buttons[button]) continue;
+            pad.buttons[button] = 0;
+            Engine::systemGamepadButtonUp(id, button);
+        }
+
+        for (int axis = 0; axis < AXIS_COUNT; ++axis) {
+            // triggers rest at -1
+            const float rest = axis >= 4 ? -1.0f : 0.0f;
+            if (pad.axes[axis] == rest) continue;
+            pad.axes[axis] = rest;
+            Engine::systemGamepadAxisMove(id, axis, rest);
+        }
+    }
+}
+
 void GamepadWin::poll() {
     if (!getState) return;
 

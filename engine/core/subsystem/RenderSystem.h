@@ -793,6 +793,8 @@ namespace doriax{
 		void setDisableFixedResolution(bool disableFixedResolution);
 
 		void setWaterPaused(bool waterPaused);
+		// moves the waves by the update time since the last call; draw() does it after drawing
+		void advanceWaters();
 
 		// the depth pass alpha-tests the submesh (MASK, or the legacy AUTO + textureShadow);
 		// the editor derives export keys from it, so the rule lives in one place

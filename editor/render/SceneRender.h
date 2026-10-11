@@ -227,6 +227,8 @@ namespace doriax::editor{
 
         virtual bool isAnyGizmoSideSelected() const;
         bool isTerrainEditing() const;
+        // Gizmo hover highlight or terrain brush, which follow the mouse
+        bool hasHoverFeedback() const;
 
         void setChildSceneLayers(const std::vector<Scene*>& layers);
 

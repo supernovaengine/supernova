@@ -6486,8 +6486,19 @@ void RenderSystem::advanceWater(WaterComponent& water, float seconds){
     water.time = std::fmod(water.time + seconds, 10000.0f);
 }
 
+void RenderSystem::advanceWaters(){
+    auto waters = scene->getComponentArray<WaterComponent>();
+    for (int i = 0; i < waters->size(); i++){
+        WaterComponent& water = waters->getComponentFromIndex(i);
+        if (water.pendingTime > 0.0f){
+            advanceWater(water, water.pendingTime);
+            water.pendingTime = 0.0f;
+        }
+    }
+}
+
 void RenderSystem::updateWater(Entity entity, WaterComponent& water, Transform& transform, uint16_t pipelines, double dt){
-    // applied by draw()
+    // applied by advanceWaters()
     if (!waterPaused)
         water.pendingTime += (float)dt;
 
@@ -8949,13 +8960,19 @@ void RenderSystem::update(double dt){
         }else if (signature.test(scene->getComponentId<UIComponent>())){
             UIComponent& ui = scene->getComponent<UIComponent>(entity);
 
+            bool isText = false;
+            if (signature.test(scene->getComponentId<TextComponent>())){
+                isText = true;
+            }
+
             if (ui.needUpdateTexture){
+                uint32_t textureProperty = isText ? (1 << 1) : (1 << 0); // 'Ftx' for texts, 'Tex' otherwise
                 if (!ui.texture.empty()){
-                    if (!(ui.shaderProperties & (1 << 0))){ // not 'Tex'
+                    if (!(ui.shaderProperties & textureProperty)){
                         ui.needReload = true;
                     }
                 }else{
-                    if (ui.shaderProperties & (1 << 0)){ // 'Tex'
+                    if (ui.shaderProperties & textureProperty){
                         ui.needReload = true;
                     }
                 }
@@ -8965,10 +8982,6 @@ void RenderSystem::update(double dt){
                 destroyUI(entity, ui);
             }
             if (!ui.loadCalled){
-                bool isText = false;
-                if (signature.test(scene->getComponentId<TextComponent>())){
-                    isText = true;
-                }
                 loadUI(entity, ui, pipelines, isText);
             }
             if (ui.needUpdateAABB || transform.needUpdate){
@@ -9998,14 +10011,7 @@ void RenderSystem::draw(){
     }
 
     // waves move after drawing, so Water::getHeight in the next update matches the next draw
-    auto waters = scene->getComponentArray<WaterComponent>();
-    for (int i = 0; i < waters->size(); i++){
-        WaterComponent& water = waters->getComponentFromIndex(i);
-        if (water.pendingTime > 0.0f){
-            advanceWater(water, water.pendingTime);
-            water.pendingTime = 0.0f;
-        }
-    }
+    advanceWaters();
 
     //---------Missing some shaders----------
     if (ShaderPool::getMissingShaders().size() > 0){

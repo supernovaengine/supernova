@@ -27,6 +27,7 @@ namespace doriax::editor{
             App* app = nullptr;
             void (*platformNewFrame)() = nullptr;
             double lastActivityTime = 0.0;
+            double frameDeadline = 0.0;
 
             bool detectActivity(bool& redrawRequested);
 

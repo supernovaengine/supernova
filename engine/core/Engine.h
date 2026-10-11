@@ -284,6 +284,7 @@ namespace doriax {
         static bool ensureCompositeFramebuffer();
         static void beginCompositeFramebuffer();
         static void endCompositeFramebuffer();
+        static void runFrame(bool draw);
         
     public:
         class AsyncThreadScope {
@@ -413,6 +414,8 @@ namespace doriax {
         static void systemViewLoaded();
         static void systemViewChanged();
         static void systemDraw();
+        // systemDraw() without drawing, for a view that can't be seen
+        static void systemUpdate();
         static void systemViewDestroyed();
         static void systemShutdown();
 

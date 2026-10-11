@@ -661,6 +661,13 @@ HDC deviceContextOf(ImGuiViewport* viewport) {
     return deviceContext;
 }
 
+// wglMakeCurrent is costly even when the context is already current
+bool makeContextCurrent(HDC deviceContext) {
+    if (wglGetCurrentContext() == glContext && wglGetCurrentDC() == deviceContext)
+        return true;
+    return wglMakeCurrent(deviceContext, glContext) != FALSE;
+}
+
 void destroyViewportWindow(ImGuiViewport* viewport) {
     HWND window = static_cast<HWND>(viewport->PlatformHandleRaw);
     auto existing = windowContexts.find(window);
@@ -762,12 +769,12 @@ editor::RendererPlatform rendererPlatform() {
     };
     platform.makeCurrent = [](ImGuiViewport* viewport) {
         HDC deviceContext = deviceContextOf(viewport);
-        if (!deviceContext || !wglMakeCurrent(deviceContext, glContext))
+        if (!deviceContext || !makeContextCurrent(deviceContext))
             std::fprintf(stderr, "Error: Could not activate an OpenGL viewport.\n");
     };
     platform.swapBuffers = [](ImGuiViewport* viewport) {
         HDC deviceContext = deviceContextOf(viewport);
-        if (!deviceContext || !wglMakeCurrent(deviceContext, glContext)) {
+        if (!deviceContext || !makeContextCurrent(deviceContext)) {
             std::fprintf(stderr, "Error: Could not activate an OpenGL viewport.\n");
             return;
         }

@@ -961,15 +961,24 @@ void editor::SceneWindow::sceneEventHandler(SceneProject* sceneProject) {
     bool isMouseInWindow = ImGui::IsWindowHovered() && (mousePos.x >= windowPos.x && mousePos.x <= windowPos.x + windowSize.x &&
                             mousePos.y >= windowPos.y && mousePos.y <= windowPos.y + windowSize.y);
 
-    // Keep the viewport redrawing while it is hovered or manipulated (hover highlight,
-    // camera drag/fly, gizmo drag). draggingMouse tracks a drag so it survives the
-    // cursor leaving the window; edits flag the scene through the command system.
+    // Keep the viewport redrawing while it is used (hover highlight, camera drag/fly,
+    // gizmo drag, shortcuts), not just hovered. draggingMouse tracks a drag so it survives
+    // the cursor leaving the window; edits flag the scene through the command system.
     {
         bool viewportFocused = ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows);
         bool anyMouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left) ||
                             ImGui::IsMouseDown(ImGuiMouseButton_Right) ||
                             ImGui::IsMouseDown(ImGuiMouseButton_Middle);
-        if (isMouseInWindow || draggingMouse[sceneProject->id] || (viewportFocused && anyMouseDown)) {
+        bool hoverInput = false;
+        if (isMouseInWindow) {
+            bool mouseMoved = mouseDelta.x != 0.0f || mouseDelta.y != 0.0f;
+            hoverInput = anyMouseDown || mouseWheel != 0.0f || io.MouseWheelH != 0.0f ||
+                         (mouseMoved && sceneProject->sceneRender->hasHoverFeedback());
+            for (int key = ImGuiKey_Keyboard_BEGIN; !hoverInput && key < ImGuiKey_Keyboard_END; key++) {
+                hoverInput = ImGui::IsKeyPressed(static_cast<ImGuiKey>(key));
+            }
+        }
+        if (hoverInput || draggingMouse[sceneProject->id] || (viewportFocused && anyMouseDown)) {
             sceneProject->needUpdateRender = true;
         }
     }

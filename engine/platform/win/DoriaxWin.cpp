@@ -17,8 +17,13 @@
 
 #include "Engine.h"
 
+#include <chrono>
 #include <cmath>
 #include <cstdio>
+
+#ifndef CREATE_WAITABLE_TIMER_HIGH_RESOLUTION
+#define CREATE_WAITABLE_TIMER_HIGH_RESOLUTION 0x00000002
+#endif
 
 #ifndef DORIAX_VSYNC_ENABLED
 #define DORIAX_VSYNC_ENABLED 1
@@ -51,6 +56,8 @@ constexpr wchar_t WINDOW_CLASS_NAME[] = L"DoriaxGameWindow";
 // draw from that loop at a bounded rate until the drag ends.
 constexpr UINT_PTR LIVE_RESIZE_TIMER_ID = 0xD04A;
 constexpr UINT LIVE_RESIZE_INTERVAL_MS = 16;
+// A minimized window updates the game this often, without drawing
+constexpr double MINIMIZED_UPDATE_PERIOD = 1.0 / 60.0;
 
 #if defined(SOKOL_GLCORE)
 // wglCreateContextAttribsARB / wglSwapIntervalEXT, resolved at runtime
@@ -100,6 +107,9 @@ LRESULT CALLBACK windowProc(HWND handle, UINT message,
         case WM_ERASEBKGND:
             return 1;
         case WM_SIZE:
+            // a minimized game keeps updating, but the pads are no longer polled
+            if (wParam == SIZE_MINIMIZED)
+                gamepads.release();
             WindowWin::refreshClientSize();
             WindowWin::updateCursorClip();
             return 0;
@@ -299,6 +309,24 @@ void drawFrame() {
     endFrame();
 }
 
+double monotonicSeconds() {
+    using Clock = std::chrono::steady_clock;
+    return std::chrono::duration<double>(Clock::now().time_since_epoch()).count();
+}
+
+// Waits for a message or the timeout, finer than the 15.6 ms system tick
+void waitForMessage(double timeout) {
+    static HANDLE timer = CreateWaitableTimerExW(nullptr, nullptr, CREATE_WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+    if (timeout <= 0.0) return;
+
+    LARGE_INTEGER due;
+    due.QuadPart = -static_cast<LONGLONG>(timeout * 1e7); // relative, in 100 ns units
+    if (timer && SetWaitableTimer(timer, &due, 0, nullptr, nullptr, FALSE))
+        MsgWaitForMultipleObjectsEx(1, &timer, INFINITE, QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+    else
+        MsgWaitForMultipleObjectsEx(0, nullptr, static_cast<DWORD>(timeout * 1000.0), QS_ALLINPUT, MWMO_INPUTAVAILABLE);
+}
+
 }
 
 int DoriaxWin::init(int argc, char **argv) {
@@ -347,7 +375,14 @@ int DoriaxWin::init(int argc, char **argv) {
     if (DORIAX_WINDOW_MODE == 2)
         WindowWin::requestFullscreen();
 
+    double nextUpdate = 0.0;
+
     while (!shouldClose) {
+        // A minimized window has no present to pace the loop, so the game keeps
+        // updating without drawing, at a steady rate between messages
+        if (IsIconic(WindowWin::handle()))
+            waitForMessage(nextUpdate - monotonicSeconds());
+
         MSG message{};
         while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE)) {
             if (message.message == WM_QUIT) {
@@ -360,7 +395,20 @@ int DoriaxWin::init(int argc, char **argv) {
         if (shouldClose)
             break;
 
-        drawFrame();
+        if (!IsIconic(WindowWin::handle())) {
+            drawFrame();
+            continue;
+        }
+
+        const double now = monotonicSeconds();
+        if (now >= nextUpdate) {
+            Engine::systemUpdate();
+
+            // A late update is made up on the next one
+            nextUpdate += MINIMIZED_UPDATE_PERIOD;
+            if (std::abs(nextUpdate - now) > MINIMIZED_UPDATE_PERIOD)
+                nextUpdate = now + MINIMIZED_UPDATE_PERIOD;
+        }
     }
 
     KillTimer(WindowWin::handle(), LIVE_RESIZE_TIMER_ID);

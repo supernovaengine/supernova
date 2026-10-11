@@ -153,10 +153,12 @@ std::string Text::getFont(unsigned int index) const{
 void Text::setFontSize(unsigned int fontSize){
     TextComponent& textcomp = getComponent<TextComponent>();
 
-    textcomp.fontSize = fontSize;
+    if (textcomp.fontSize != fontSize){
+        textcomp.fontSize = fontSize;
 
-    textcomp.needReloadAtlas = true;
-    textcomp.needUpdateText = true;
+        textcomp.needReloadAtlas = true;
+        textcomp.needUpdateText = true;
+    }
 }
 
 unsigned int Text::getFontSize() const{
