@@ -8463,7 +8463,8 @@ uint16_t RenderSystem::getScenePipelines() const{
         if (!scene->findComponent<Transform>(cameraEntity))
             continue;
 
-        if (cameraEntity == mainCameraEntity && !camera.renderToTexture){
+        // with an engine framebuffer (the editor) nothing draws to the swapchain
+        if (cameraEntity == mainCameraEntity && !camera.renderToTexture && !Engine::getFramebuffer()){
             pipelines |= camera.depthTest ? PIP_DEFAULT : PIP_DEFAULT_NODEPTH;
         }
 
