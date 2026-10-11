@@ -134,6 +134,7 @@ namespace doriax::editor{
         bool windowOpen;
         bool focusRequested;
         bool brushActive;
+        bool settingsLoaded; // read before show() writes them back
         bool normalizeBlendPaint;
         bool heightMapStartAtMiddle;
         bool flattenPickOnStroke;
@@ -258,6 +259,7 @@ namespace doriax::editor{
         bool applyPlacement(SceneProject* sceneProject, Entity entity, const Vector3& localPoint);
         bool applyObjectErase(SceneProject* sceneProject, Entity entity, const Vector3& localPoint);
         void clearStroke();
+        void loadSettings();
 
         bool createMapForTarget(const TerrainMapRef& ref, int width, int height);
         bool deleteMapForTarget(const TerrainMapRef& ref);
@@ -287,6 +289,7 @@ namespace doriax::editor{
         void openForEntity(Entity entity, uint32_t sceneId);
         void setOpen(bool open);
         bool isOpen() const;
+        void resetProjectState();
 
         bool isEditingScene(Scene* scene) const;
         bool beginStroke(Scene* scene, const Ray& ray);

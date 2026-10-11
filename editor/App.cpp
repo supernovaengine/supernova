@@ -2631,6 +2631,7 @@ void editor::App::prepareForProjectSwitch() {
     codeEditor->closeAll();
     outputWindow->clear();
     sceneWindow->resetProjectState();
+    terrainEditWindow->resetProjectState();
     dockspaceNeedsRebuild = true;
 }
 

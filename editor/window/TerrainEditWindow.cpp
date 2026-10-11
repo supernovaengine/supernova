@@ -1026,6 +1026,7 @@ editor::TerrainEditWindow::TerrainEditWindow(Project* project){
     windowOpen = false;
     focusRequested = false;
     brushActive = false;
+    settingsLoaded = false;
     selectedSceneId = NULL_PROJECT_SCENE;
     selectedEntity = NULL_ENTITY;
     brushMode     = TerrainBrushMode::Raise;
@@ -2995,6 +2996,9 @@ void editor::TerrainEditWindow::show(){
     if (!windowOpen){
         return;
     }
+    if (!settingsLoaded){
+        loadSettings();
+    }
 
     ImGui::SetNextWindowSize(ImVec2(ImGui::GetFontSize() * 27.0f, ImGui::GetFontSize() * 44.0f), ImGuiCond_FirstUseEver);
     if (focusRequested){
@@ -3374,7 +3378,14 @@ void editor::TerrainEditWindow::openForEntity(Entity entity, uint32_t sceneId){
     selectedSceneId = sceneId;
     selectedEntity = entity;
     updateFoliagePreview();
+}
 
+void editor::TerrainEditWindow::resetProjectState(){
+    settingsLoaded = false;
+}
+
+void editor::TerrainEditWindow::loadSettings(){
+    settingsLoaded = true;
     const TerrainEditorSettings& ts = project->getTerrainEditorSettings();
     brushMode     = static_cast<TerrainBrushMode>(ts.brushMode);
     brushShape    = static_cast<TerrainBrushShape>(ts.brushShape);
