@@ -9968,6 +9968,19 @@ std::vector<Scene*> editor::Project::getRunningRuntimeLayers(uint32_t sceneId, S
     return runningLayers;
 }
 
+const editor::SceneProject* editor::Project::getRuntimeScene(const Scene* scene) const {
+    std::scoped_lock lock(playSessionMutex);
+    if (!scene || !activePlaySession) {
+        return nullptr;
+    }
+    for (const auto& entry : activePlaySession->runtimeScenes) {
+        if (entry.runtime && entry.runtime->scene == scene) {
+            return entry.runtime;
+        }
+    }
+    return nullptr;
+}
+
 // Another viewport is about to take the engine, which drops the scenes Play shows
 void editor::Project::storeRuntimeScenes(uint32_t sceneId) {
     Scene* mainScene = nullptr;

@@ -525,6 +525,114 @@ bool editor::SceneRender::isCameraDetached() const{
     return cameraDetached;
 }
 
+// a deleted runtime scene's address can be reused, so the copy is also known by name
+static const char* RUNTIME_VIEW_CAMERA_NAME = "Editor View Camera";
+
+static bool isRuntimeViewCamera(Scene* scene, Entity entity){
+    return entity != NULL_ENTITY && scene->isEntityCreated(entity) &&
+        scene->getEntityName(entity) == RUNTIME_VIEW_CAMERA_NAME && scene->findComponent<CameraComponent>(entity);
+}
+
+// A scene loaded by SceneManager during Play draws from a copy of the editor camera
+void editor::SceneRender::syncRuntimeViewCamera(){
+    Scene* shown = Engine::getMainScene();
+    if (!isPlaying || !cameraDetached || shown == scene){
+        releaseRuntimeViewCamera();
+        return;
+    }
+
+    // another viewport has the engine
+    const SceneProject* runtime = Backend::getApp().getProject()->getRuntimeScene(shown);
+    if (!runtime){
+        return;
+    }
+
+    const Entity source = camera->getEntity();
+    const Transform& fromTransform = scene->getComponent<Transform>(source);
+    const CameraComponent& from = scene->getComponent<CameraComponent>(source);
+
+    if (shown != runtimeViewScene){
+        releaseRuntimeViewCamera();
+        runtimeViewScene = shown;
+    }
+    if (!isRuntimeViewCamera(shown, runtimeViewCamera)){
+        runtimeViewCamera = shown->createSystemEntity();
+        shown->setEntityName(runtimeViewCamera, RUNTIME_VIEW_CAMERA_NAME);
+        shown->addComponent<Transform>(runtimeViewCamera, {});
+        shown->addComponent<CameraComponent>(runtimeViewCamera, {});
+        runtimeViewMirrorY = 2.0f * fromTransform.position.y + from.topClip - from.bottomClip;
+    }
+
+    // 2D views take the y direction of the scene shown (UI is y-down) and mirror the
+    // editor camera, so they start on the same area and still pan with the cursor
+    CameraType type = from.type;
+    if (type != CameraType::CAMERA_PERSPECTIVE){
+        type = (runtime->sceneType == SceneType::SCENE_UI) ? CameraType::CAMERA_UI : CameraType::CAMERA_ORTHO;
+    }
+    Vector3 position = fromTransform.position;
+    Vector3 target = from.target;
+    if (type != from.type){
+        float height = from.topClip - from.bottomClip;
+        position.y = runtimeViewMirrorY - position.y - height;
+        target.y = runtimeViewMirrorY - target.y - height;
+    }
+
+    Transform& toTransform = shown->getComponent<Transform>(runtimeViewCamera);
+    CameraComponent& to = shown->getComponent<CameraComponent>(runtimeViewCamera);
+
+    // only on a change, a camera update rebuilds the instance views
+    if (toTransform.position != position || toTransform.rotation != fromTransform.rotation){
+        toTransform.position = position;
+        toTransform.rotation = fromTransform.rotation;
+        toTransform.needUpdate = true;
+    }
+    if (to.type != type || to.target != target || to.up != from.up || to.useTarget != from.useTarget ||
+            to.yfov != from.yfov || to.aspect != from.aspect || to.nearClip != from.nearClip || to.farClip != from.farClip ||
+            to.leftClip != from.leftClip || to.rightClip != from.rightClip ||
+            to.bottomClip != from.bottomClip || to.topClip != from.topClip || to.autoResize != from.autoResize ||
+            to.depthTest != from.depthTest || to.transparentSort != from.transparentSort){
+        to.type = type;
+        to.target = target;
+        to.up = from.up;
+        to.useTarget = from.useTarget;
+        to.yfov = from.yfov;
+        to.aspect = from.aspect;
+        to.nearClip = from.nearClip;
+        to.farClip = from.farClip;
+        to.leftClip = from.leftClip;
+        to.rightClip = from.rightClip;
+        to.bottomClip = from.bottomClip;
+        to.topClip = from.topClip;
+        to.autoResize = from.autoResize;
+        to.depthTest = from.depthTest;
+        to.transparentSort = from.transparentSort;
+        to.needUpdate = true;
+    }
+
+    if (shown->getRenderCamera() != runtimeViewCamera){
+        shown->setViewCamera(runtimeViewCamera);
+    }
+    shown->getSystem<RenderSystem>()->setDisableFixedResolution(true);
+}
+
+void editor::SceneRender::releaseRuntimeViewCamera(){
+    if (!runtimeViewScene){
+        return;
+    }
+    // a retired or stopped runtime scene is already deleted
+    if (Backend::getApp().getProject()->getRuntimeScene(runtimeViewScene)){
+        if (isRuntimeViewCamera(runtimeViewScene, runtimeViewCamera)){
+            if (runtimeViewScene->getRenderCamera() == runtimeViewCamera){
+                runtimeViewScene->setViewCamera(NULL_ENTITY);
+            }
+            runtimeViewScene->destroyEntity(runtimeViewCamera);
+        }
+        runtimeViewScene->getSystem<RenderSystem>()->setDisableFixedResolution(false);
+    }
+    runtimeViewScene = nullptr;
+    runtimeViewCamera = NULL_ENTITY;
+}
+
 void editor::SceneRender::activate(){
     if (!isPlaying){
         syncSceneCamera();
@@ -601,6 +709,8 @@ void editor::SceneRender::update(std::vector<Entity> selEntities, std::vector<En
     // Fixed game resolution only applies to the game view: editor camera viewports
     // stay at native resolution (gizmos and overlays would otherwise mismatch).
     scene->getSystem<RenderSystem>()->setDisableFixedResolution(!isGameView());
+
+    syncRuntimeViewCamera();
 
     if (isGameView()){
         return;

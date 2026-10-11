@@ -127,6 +127,11 @@ namespace doriax::editor{
         Entity selectedTrackPointEntity = 0;  // NULL_ENTITY
         int selectedTrackPointIndex = -1;
 
+        // editor camera copy in a scene SceneManager loaded during Play
+        Scene* runtimeViewScene = nullptr;
+        Entity runtimeViewCamera = NULL_ENTITY;
+        float runtimeViewMirrorY = 0.0f;
+
         // world position of vertex pointIndex of the selected entity's Polygon/MeshPolygon
         // points (nullptr list / bad index -> false)
         bool getPolygonPointWorld(Entity entity, bool isMesh, int pointIndex, Vector3& worldPoint);
@@ -153,6 +158,8 @@ namespace doriax::editor{
         bool isPreviewCameraUsable(Entity entity);
         Entity getActiveCameraEntity();
         void syncSceneCamera();
+        void syncRuntimeViewCamera();
+        void releaseRuntimeViewCamera();
 
     protected:
         void updateCameraFrustum(CameraObjects& co, const CameraComponent& cameraComponent, bool isMainCamera, bool fixedSizeFrustum = true);

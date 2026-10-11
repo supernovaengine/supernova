@@ -974,6 +974,8 @@ namespace doriax::editor{
         // A runtime scene loaded in place of the played one comes back as mainScene
         std::vector<Scene*> getRunningRuntimeLayers(uint32_t sceneId, Scene*& mainScene);
         void storeRuntimeScenes(uint32_t sceneId);
+        // scene may be a deleted one, it is only compared
+        const SceneProject* getRuntimeScene(const Scene* scene) const;
 
         void debugSceneHierarchy();
     };
