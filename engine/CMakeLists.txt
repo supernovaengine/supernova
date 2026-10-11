@@ -806,14 +806,6 @@ foreach(lib IN ITEMS
     target_compile_options(${lib} PRIVATE ${EXTERNAL_WARNING_FLAG})
 endforeach()
 
-# C++ scripts link only the engine library, so it has to export Box2D
-if(DORIAX_SHARED AND DORIAX_PHYSICS_2D)
-    target_compile_definitions(box2d PRIVATE box2d_EXPORTS)
-    if(MINGW)
-        target_compile_options(box2d PRIVATE "SHELL:-include \"${CMAKE_CURRENT_SOURCE_DIR}/platform/win/Box2DExport.h\"")
-    endif()
-endif()
-
 if(DEFINED NO_LUA_INIT)
     add_definitions("-DNO_LUA_INIT=${NO_LUA_INIT}")
     unset(NO_LUA_INIT CACHE)
@@ -1047,6 +1039,23 @@ if(DORIAX_SHARED)
         PUBLIC
         DORIAX_SHARED
     )
+endif()
+
+# C++ scripts link only the engine library, so it has to export the physics libraries
+if(DORIAX_SHARED AND DORIAX_PHYSICS_2D)
+    target_compile_definitions(box2d PRIVATE box2d_EXPORTS)
+    if(MINGW)
+        target_compile_options(box2d PRIVATE "SHELL:-include \"${CMAKE_CURRENT_SOURCE_DIR}/platform/win/Box2DExport.h\"")
+    endif()
+endif()
+
+if(DORIAX_SHARED AND DORIAX_PHYSICS_3D)
+    target_compile_definitions(joltphysics PRIVATE JPH_SHARED_LIBRARY JPH_BUILD_SHARED_LIBRARY)
+    # MSVC links Jolt variables, like JPH::Allocate, only through dllimport
+    target_compile_definitions(doriax INTERFACE JPH_SHARED_LIBRARY)
+    if(MINGW)
+        target_compile_options(joltphysics PRIVATE "SHELL:-include \"${CMAKE_CURRENT_SOURCE_DIR}/platform/win/JoltExport.h\"")
+    endif()
 endif()
 
 # =============================================================
