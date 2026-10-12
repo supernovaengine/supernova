@@ -43,8 +43,9 @@ namespace doriax::editor {
         virtual void registerAlert(std::string title, std::string message);
         virtual void registerConfirmAlert(std::string title, std::string message, std::function<void()> onYes, std::function<void()> onNo = nullptr);
         virtual void registerThreeButtonAlert(std::string title, std::string message, std::function<void()> onYes, std::function<void()> onNo = nullptr, std::function<void()> onCancel = nullptr);
-        virtual void registerSaveSceneDialog(uint32_t sceneId, std::function<void()> callback = nullptr);
-        virtual void registerProjectSaveDialog(std::function<void()> callback = nullptr);
+        // callback(false) if the dialog is cancelled or the save fails
+        virtual void registerSaveSceneDialog(uint32_t sceneId, std::function<void(bool)> callback = nullptr);
+        virtual void registerProjectSaveDialog(std::function<void(bool)> callback = nullptr);
 
         virtual Properties* getPropertiesWindow() const;
         virtual CodeEditor* getCodeEditor() const;

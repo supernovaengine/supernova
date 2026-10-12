@@ -537,6 +537,7 @@ namespace doriax::editor{
         void saveModifiedChildScenes(uint32_t sceneId, std::function<void(bool)> callback = nullptr);
         bool hasSceneUnsavedChangesImpl(uint32_t sceneId, std::unordered_set<uint32_t>& visited) const;
         void saveSceneListSequentially(std::vector<uint32_t> sceneIds, std::function<bool(uint32_t)> needsSave, std::function<void(bool)> callback);
+        void ensureStartScene();
 
         void collectInvolvedScenes(uint32_t sceneId, std::vector<uint32_t>& involvedSceneIds);
         void collectStartActiveScenes(uint32_t sceneId, std::vector<uint32_t>& activeSceneIds);
@@ -785,6 +786,8 @@ namespace doriax::editor{
         bool saveSceneToPath(uint32_t sceneId, const std::filesystem::path& path, bool stopTransientPreviews = true);
         void saveSceneToPathAsync(uint32_t sceneId, const std::filesystem::path& path, std::function<void(bool)> callback = nullptr);
         void saveAllScenes(std::function<void(bool)> callback = nullptr);
+        // Untouched scenes with no file, which saveAllScenes() skips
+        void saveScenesWithoutFile(std::function<void(bool)> callback = nullptr);
         void saveLastSelectedScene(std::function<void(bool)> callback = nullptr);
 
         uint32_t createNewScene(std::string sceneName, SceneType type);

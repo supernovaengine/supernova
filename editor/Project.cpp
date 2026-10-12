@@ -4946,7 +4946,9 @@ bool editor::Project::createTempProject(std::string projectName, bool deleteIfEx
 
 bool editor::Project::saveProject(bool userCalled, std::function<void()> callback) {
     if (isTempProject() && userCalled) {
-        editor::getEditorHost().registerProjectSaveDialog(callback);
+        editor::getEditorHost().registerProjectSaveDialog([callback](bool saved) {
+            if (saved && callback) callback();
+        });
         return true;
     }
 
@@ -5351,9 +5353,7 @@ void editor::Project::saveScene(uint32_t sceneId, std::function<void(bool)> call
     if (!sceneProject->filepath.empty()) {
         saveSceneToPathAsync(sceneId, sceneProject->filepath, finishWithChildren);
     } else {
-        editor::getEditorHost().registerSaveSceneDialog(sceneId, [finishWithChildren]() {
-            finishWithChildren(true);
-        });
+        editor::getEditorHost().registerSaveSceneDialog(sceneId, finishWithChildren);
     }
 }
 
@@ -5477,7 +5477,21 @@ bool editor::Project::saveSceneToPath(uint32_t sceneId, const std::filesystem::p
         return false;
     }
 
+    ensureStartScene();
     return saveProject();
+}
+
+// Like Project Settings and the export window, falls back to the first saved scene
+void editor::Project::ensureStartScene() {
+    if (startSceneId != NULL_PROJECT_SCENE) {
+        return;
+    }
+    for (const SceneProject& sceneProject : scenes) {
+        if (!sceneProject.filepath.empty()) {
+            startSceneId = sceneProject.id;
+            return;
+        }
+    }
 }
 
 bool editor::Project::writeSceneToPath(uint32_t sceneId, const std::filesystem::path& path, bool stopTransientPreviews) {
@@ -5627,6 +5641,7 @@ void editor::Project::saveSceneToPathAsync(uint32_t sceneId, const std::filesyst
 
         editor::getEditorHost().enqueueMainThreadTask([this, sceneId, success, callback = std::move(callback)]() mutable {
             if (success) {
+                ensureStartScene();
                 success = saveProject();
             }
 
@@ -5650,6 +5665,21 @@ void editor::Project::saveAllScenes(std::function<void(bool)> callback) {
     }
 
     saveSceneListSequentially(std::move(sceneIds), [this](uint32_t id) { return hasSceneUnsavedChanges(id); }, std::move(callback));
+}
+
+void editor::Project::saveScenesWithoutFile(std::function<void(bool)> callback) {
+    std::vector<uint32_t> sceneIds;
+    for (const auto& sceneProject : scenes) {
+        if (sceneProject.filepath.empty() && sceneProject.scene) {
+            sceneIds.push_back(sceneProject.id);
+        }
+    }
+
+    // each one opens the scene save dialog
+    saveSceneListSequentially(std::move(sceneIds), [this](uint32_t id) {
+        const SceneProject* sceneProject = getScene(id);
+        return sceneProject && sceneProject->filepath.empty();
+    }, std::move(callback));
 }
 
 void editor::Project::saveLastSelectedScene(std::function<void(bool)> callback){

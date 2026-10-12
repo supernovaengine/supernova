@@ -157,12 +157,20 @@ void editor::App::saveAllFunc(std::function<void(bool)> callback){
             if (callback) callback(false);
             return;
         }
+        // saveAllScenes() skips untouched scenes with no file, like a new project's first one
         if (project.isTempProject()) {
-            registerProjectSaveDialog([callback]() { if (callback) callback(true); });
+            registerProjectSaveDialog([this, callback](bool saved) {
+                if (saved) {
+                    project.saveScenesWithoutFile(callback);
+                } else if (callback) {
+                    callback(false);
+                }
+            });
+        } else if (project.saveProject(true)) {
+            project.saveScenesWithoutFile(callback);
         } else {
-            const bool saved = project.saveProject(true);
-            if (!saved) registerAlert("Save Failed", "The project could not be saved. Check its directory and try again.");
-            if (callback) callback(saved);
+            registerAlert("Save Failed", "The project could not be saved. Check its directory and try again.");
+            if (callback) callback(false);
         }
     });
 }
@@ -529,7 +537,7 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
             break;
         case AppMenuCommand::SaveProjectAs:
             if (project.isAnyScenePlaying() || saveDialogInProgress) return;
-            registerProjectSaveDialog([](){});
+            registerProjectSaveDialog();
             break;
         case AppMenuCommand::Save:
             saveFunc();
@@ -2779,7 +2787,7 @@ void editor::App::registerThreeButtonAlert(std::string title, std::string messag
     alert.onCancel = onCancel;
 }
 
-void editor::App::registerSaveSceneDialog(uint32_t sceneId, std::function<void()> callback) {
+void editor::App::registerSaveSceneDialog(uint32_t sceneId, std::function<void(bool)> callback) {
     // Add scene to the save dialog queue with callback
     SaveDialogQueueItem item = {SaveDialogType::Scene, sceneId, callback};
     saveDialogQueue.push(item);
@@ -2791,7 +2799,7 @@ void editor::App::registerSaveSceneDialog(uint32_t sceneId, std::function<void()
     // If queue has more items or another dialog is open, they'll be processed later
 }
 
-void editor::App::registerProjectSaveDialog(std::function<void()> callback) {
+void editor::App::registerProjectSaveDialog(std::function<void(bool)> callback) {
     // Add project save to the dialog queue with callback
     SaveDialogQueueItem item = {SaveDialogType::Project, 0, callback};  // sceneId is unused for Project saves
     saveDialogQueue.push(item);
@@ -2986,7 +2994,7 @@ void editor::App::processNextSaveDialog() {
     // Get the next item from the queue
     SaveDialogQueueItem item = saveDialogQueue.front();
     // Store the callback to use it later
-    std::function<void()> completionCallback = item.callback;
+    std::function<void(bool)> completionCallback = item.callback;
 
     if (item.type == SaveDialogType::Scene) {
         // Process scene save dialog
@@ -2995,6 +3003,9 @@ void editor::App::processNextSaveDialog() {
         if (!sceneProject) {
             // Invalid scene, remove from queue and try next item
             popSaveDialogQueueItem();
+            if (completionCallback) {
+                completionCallback(false);
+            }
             processNextSaveDialog();
             return;
         }
@@ -3037,8 +3048,8 @@ void editor::App::processNextSaveDialog() {
                             saveDialogInProgress = false;
                             popSaveDialogQueueItem();
 
-                            if (success && completionCallback) {
-                                completionCallback();
+                            if (completionCallback) {
+                                completionCallback(success);
                             }
 
                             processNextSaveDialog();
@@ -3049,6 +3060,9 @@ void editor::App::processNextSaveDialog() {
                 if (!saveStarted) {
                     saveDialogInProgress = false;
                     popSaveDialogQueueItem();
+                    if (completionCallback) {
+                        completionCallback(false);
+                    }
                     processNextSaveDialog();
                 }
             },
@@ -3057,6 +3071,10 @@ void editor::App::processNextSaveDialog() {
                 // Remove the current item from the queue without saving
                 saveDialogInProgress = false;
                 popSaveDialogQueueItem();
+
+                if (completionCallback) {
+                    completionCallback(false);
+                }
 
                 // Process the next item if available
                 processNextSaveDialog();
@@ -3090,8 +3108,8 @@ void editor::App::processNextSaveDialog() {
                 popSaveDialogQueueItem();
 
                 // Execute the completion callback if provided
-                if (saved && completionCallback) {
-                    completionCallback();
+                if (completionCallback) {
+                    completionCallback(saved);
                 }
 
                 // Process the next item if available
@@ -3102,6 +3120,10 @@ void editor::App::processNextSaveDialog() {
                 // Remove the current item from the queue without saving
                 saveDialogInProgress = false;
                 popSaveDialogQueueItem();
+
+                if (completionCallback) {
+                    completionCallback(false);
+                }
 
                 // Process the next item if available
                 processNextSaveDialog();

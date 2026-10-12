@@ -88,15 +88,15 @@ void EditorHost::registerThreeButtonAlert(std::string, std::string, std::functio
     }
 }
 
-void EditorHost::registerSaveSceneDialog(uint32_t, std::function<void()> callback) {
+void EditorHost::registerSaveSceneDialog(uint32_t, std::function<void(bool)> callback) {
     if (callback) {
-        callback();
+        callback(true);
     }
 }
 
-void EditorHost::registerProjectSaveDialog(std::function<void()> callback) {
+void EditorHost::registerProjectSaveDialog(std::function<void(bool)> callback) {
     if (callback) {
-        callback();
+        callback(true);
     }
 }
 

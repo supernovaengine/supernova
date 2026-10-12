@@ -73,7 +73,7 @@ namespace doriax::editor{
     struct SaveDialogQueueItem {
         SaveDialogType type;
         uint32_t sceneId;  // Only used for Scene dialogs
-        std::function<void()> callback = nullptr;
+        std::function<void(bool)> callback = nullptr;
     };
 
     class App : public EditorHost{
@@ -304,8 +304,8 @@ namespace doriax::editor{
         void registerOutsideAssetsAlert(const std::string& path);
         void registerConfirmAlert(std::string title, std::string message, std::function<void()> onYes, std::function<void()> onNo = nullptr) override;
         void registerThreeButtonAlert(std::string title, std::string message, std::function<void()> onYes, std::function<void()> onNo = nullptr, std::function<void()> onCancel = nullptr) override;
-        void registerSaveSceneDialog(uint32_t sceneId, std::function<void()> callback = nullptr) override;
-        void registerProjectSaveDialog(std::function<void()> callback = nullptr) override;
+        void registerSaveSceneDialog(uint32_t sceneId, std::function<void(bool)> callback = nullptr) override;
+        void registerProjectSaveDialog(std::function<void(bool)> callback = nullptr) override;
 
         // Thread-safe: schedules a task to run on the main/GL thread during the next frame.
         void enqueueMainThreadTask(std::function<void()> task) override;
