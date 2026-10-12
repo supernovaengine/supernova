@@ -14,6 +14,10 @@
 // already-connected controllers. Call once after Engine::systemInit.
 + (void)start;
 
+// While suspended, held buttons are let go, the axes rest and the pads are not
+// read. Resuming reports what is still held as new input.
++ (void)setSuspended:(BOOL)suspended;
+
 @end
 
 #endif /* DoriaxGameController_h */

@@ -43,6 +43,12 @@
 using namespace doriax;
 
 namespace {
+    constexpr NSTimeInterval FRAME_PERIOD = 1.0 / 240.0;
+    // A hidden window updates the game this often, without drawing
+    constexpr NSTimeInterval HIDDEN_UPDATE_PERIOD = 1.0 / 60.0;
+
+    bool hidden = false;
+
 #if defined(SOKOL_METAL)
     MacViewMetal* gameView = nil;
 #elif defined(SOKOL_VULKAN)
@@ -147,14 +153,28 @@ namespace {
 
     // A timer-driven loop keeps the run loop live, so Cocoa still delivers
     // input and window events between frames. VSync paces the actual rate.
-    self.frameTimer = [NSTimer scheduledTimerWithTimeInterval:1.0 / 240.0
-                                                      repeats:YES
-                                                        block:^(NSTimer*){ [self renderFrame]; }];
+    [self startFrameTimer:FRAME_PERIOD];
+}
+
+- (void)startFrameTimer:(NSTimeInterval)period {
+    [self.frameTimer invalidate];
+    self.frameTimer = [NSTimer timerWithTimeInterval:period
+                                             repeats:YES
+                                               block:^(NSTimer*){ [self renderFrame]; }];
     [[NSRunLoop currentRunLoop] addTimer:self.frameTimer forMode:NSRunLoopCommonModes];
 }
 
 - (void)renderFrame {
     if (!gameView) return;
+
+    if (hidden) {
+#if defined(SOKOL_GLCORE)
+        [gameView makeContextCurrent];
+#endif
+        Engine::systemUpdate();
+        return;
+    }
+
 #if defined(SOKOL_METAL)
     // Runs drawInMTKView below, the only place currentDrawable is valid
     [gameView draw];
@@ -186,6 +206,23 @@ namespace {
 - (void)windowDidResize:(NSNotification*)notification {
     (void)notification;
     WindowMac::refreshDrawableSize();
+}
+
+// Also sent on minimize and restore. Same test as the editor: a window fully
+// covered, on another Space or of a hidden app is hidden too.
+- (void)windowDidChangeOcclusionState:(NSNotification*)notification {
+    NSWindow* window = notification.object;
+    const bool wasHidden = hidden;
+    hidden = window.miniaturized ||
+        (window.occlusionState & NSWindowOcclusionStateVisible) == 0;
+    // no loop to switch before launch finishes or after quitting
+    if (hidden == wasHidden || !self.frameTimer)
+        return;
+
+    // a hidden game keeps updating, but the pads are no longer read
+    [DoriaxGameController setSuspended:hidden];
+    // Nothing drawn can be seen, so the game updates at a steady rate instead
+    [self startFrameTimer:hidden ? HIDDEN_UPDATE_PERIOD : FRAME_PERIOD];
 }
 
 - (BOOL)applicationShouldTerminateAfterLastWindowClosed:(NSApplication*)sender {
