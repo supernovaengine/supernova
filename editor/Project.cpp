@@ -5182,7 +5182,7 @@ bool editor::Project::saveProjectToPath(const std::filesystem::path& path) {
         return false;
     }
 
-    if (!isTempProject()){
+    if (!isTempProject() && editor::getEditorHost().recordsRecentProjects()){
         AppSettings::setLastProjectPath(path);
     }
     editor::getEditorHost().updateResourcesPath();

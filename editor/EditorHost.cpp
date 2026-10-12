@@ -36,6 +36,10 @@ bool EditorHost::shouldSyncEngineApi() const {
     return false;
 }
 
+bool EditorHost::recordsRecentProjects() const {
+    return false;
+}
+
 void EditorHost::updateResourcesPath() {
 }
 

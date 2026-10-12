@@ -2682,6 +2682,10 @@ bool editor::App::shouldSyncEngineApi() const {
     return true;
 }
 
+bool editor::App::recordsRecentProjects() const {
+    return true;
+}
+
 void editor::App::updateResourcesPath(){
     std::filesystem::path currentProjectPath = project.getProjectPath().lexically_normal();
     bool projectPathChanged = lastResourcesProjectPath != currentProjectPath;
