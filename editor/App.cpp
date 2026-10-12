@@ -1959,7 +1959,7 @@ void editor::App::parseBenchmarkArgs(int argc, char** argv) {
         const std::string arg = argv[i];
         if (arg == "-p" || arg == "--project") {
             if (const char* value = requireValue(i, "--project"))
-                benchmarkProject = value;
+                benchmarkProject = std::filesystem::absolute(value);
         } else if (arg == "-s" || arg == "--scene") {
             if (const char* value = requireValue(i, "--scene"))
                 benchmarkScene = value;
