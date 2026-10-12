@@ -154,6 +154,8 @@ namespace {
     // A timer-driven loop keeps the run loop live, so Cocoa still delivers
     // input and window events between frames. VSync paces the actual rate.
     [self startFrameTimer:FRAME_PERIOD];
+    // a window opened behind others gets no occlusion change
+    [self updateVisibility];
 }
 
 - (void)startFrameTimer:(NSTimeInterval)period {
@@ -166,15 +168,10 @@ namespace {
 
 - (void)renderFrame {
     if (!gameView) return;
-
     if (hidden) {
-#if defined(SOKOL_GLCORE)
-        [gameView makeContextCurrent];
-#endif
         Engine::systemUpdate();
         return;
     }
-
 #if defined(SOKOL_METAL)
     // Runs drawInMTKView below, the only place currentDrawable is valid
     [gameView draw];
@@ -208,20 +205,20 @@ namespace {
     WindowMac::refreshDrawableSize();
 }
 
-// Also sent on minimize and restore. Same test as the editor: a window fully
-// covered, on another Space or of a hidden app is hidden too.
+// Also sent on minimize and restore
 - (void)windowDidChangeOcclusionState:(NSNotification*)notification {
-    NSWindow* window = notification.object;
+    (void)notification;
+    [self updateVisibility];
+}
+
+- (void)updateVisibility {
+    NSWindow* window = (__bridge NSWindow*)WindowMac::nativeWindow();
     const bool wasHidden = hidden;
-    hidden = window.miniaturized ||
-        (window.occlusionState & NSWindowOcclusionStateVisible) == 0;
-    // no loop to switch before launch finishes or after quitting
-    if (hidden == wasHidden || !self.frameTimer)
-        return;
+    hidden = (window.occlusionState & NSWindowOcclusionStateVisible) == 0;
+    if (hidden == wasHidden) return;
 
     // a hidden game keeps updating, but the pads are no longer read
     [DoriaxGameController setSuspended:hidden];
-    // Nothing drawn can be seen, so the game updates at a steady rate instead
     [self startFrameTimer:hidden ? HIDDEN_UPDATE_PERIOD : FRAME_PERIOD];
 }
 
@@ -247,7 +244,9 @@ namespace {
     (void)notification;
     [self.frameTimer invalidate];
     self.frameTimer = nil;
-    Engine::systemViewDestroyed();
+    // launching can fail before the view loads
+    if (Engine::isViewLoaded())
+        Engine::systemViewDestroyed();
     Engine::systemShutdown();
 #if defined(SOKOL_VULKAN)
     // After sokol has released its own objects, which live on this device

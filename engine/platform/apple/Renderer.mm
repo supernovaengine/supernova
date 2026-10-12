@@ -10,17 +10,9 @@
 #include "DoriaxApple.h"
 #import "DoriaxGameController.h"
 
-#if TARGET_OS_OSX
-// A hidden window updates the game this often, without drawing
-static const NSTimeInterval HIDDEN_UPDATE_PERIOD = 1.0 / 60.0;
-#endif
-
 @implementation Renderer
 {
     id <MTLDevice> _device;
-#if TARGET_OS_OSX
-    NSTimer* _hiddenTimer;
-#endif
 }
 
 static MTKView* _view;
@@ -67,13 +59,6 @@ static CGSize _screenSize;
         _screenSize.width = (float) view.drawableSize.width;
         _screenSize.height = (float) view.drawableSize.height;
         doriax::Engine::systemViewLoaded();
-
-#if TARGET_OS_OSX
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(windowDidChangeOcclusionState:)
-                                                     name:NSWindowDidChangeOcclusionStateNotification
-                                                   object:nil];
-#endif
     }
 
     return self;
@@ -98,42 +83,16 @@ static CGSize _screenSize;
     doriax::Engine::systemViewChanged();
 }
 
-#if TARGET_OS_OSX
-// Also sent on minimize and restore. Same test as the editor: a window fully
-// covered, on another Space or of a hidden app is hidden too.
-- (void)windowDidChangeOcclusionState:(NSNotification *)notification
-{
-    NSWindow* window = notification.object;
-    if (window != _view.window)
-        return;
-
-    const bool hidden = window.miniaturized ||
-        (window.occlusionState & NSWindowOcclusionStateVisible) == 0;
-    if (hidden == (_hiddenTimer != nil))
-        return;
-
-    // a hidden game keeps updating, but the pads are no longer read
-    [DoriaxGameController setSuspended:hidden];
-    // Nothing drawn can be seen, so the game updates at a steady rate instead
-    _view.paused = hidden;
-    if (hidden) {
-        _hiddenTimer = [NSTimer timerWithTimeInterval:HIDDEN_UPDATE_PERIOD
-                                              repeats:YES
-                                                block:^(NSTimer*){ doriax::Engine::systemUpdate(); }];
-        [[NSRunLoop currentRunLoop] addTimer:_hiddenTimer forMode:NSRunLoopCommonModes];
-    } else {
-        [_hiddenTimer invalidate];
-        _hiddenTimer = nil;
-    }
-}
-#endif
-
 + (void)pauseGame {
     doriax::Engine::systemPause();
 }
 
 + (void)resumeGame {
     doriax::Engine::systemResume();
+}
+
++ (void)updateGame {
+    doriax::Engine::systemUpdate();
 }
 
 @end

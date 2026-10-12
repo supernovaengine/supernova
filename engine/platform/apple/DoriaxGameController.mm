@@ -136,7 +136,6 @@ static void processAxis(int slot, int axis, float value) {
 }
 
 + (void)handleState:(GCExtendedGamepad*)gp slot:(int)slot {
-    // read again on resume
     if (_suspended)
         return;
 
@@ -185,7 +184,7 @@ static void processAxis(int slot, int axis, float value) {
 }
 
 + (void)setSuspended:(BOOL)suspended {
-    if (!_started || suspended == _suspended)
+    if (suspended == _suspended)
         return;
     _suspended = suspended;
 
@@ -193,17 +192,16 @@ static void processAxis(int slot, int axis, float value) {
         if (_slots[slot] == [NSNull null])
             continue;
 
-        if (!suspended) {
+        if (suspended) {
+            for (int button = 0; button <= D_GAMEPAD_BUTTON_LAST; button++)
+                processButton(slot, button, false);
+            // triggers rest at -1
+            for (int axis = 0; axis <= D_GAMEPAD_AXIS_LAST; axis++)
+                processAxis(slot, axis, axis >= D_GAMEPAD_AXIS_LEFT_TRIGGER ? -1.0f : 0.0f);
+        } else {
             GCController* controller = _slots[slot];
             [self handleState:controller.extendedGamepad slot:slot];
-            continue;
         }
-
-        for (int button = 0; button <= D_GAMEPAD_BUTTON_LAST; button++)
-            processButton(slot, button, false);
-        // triggers rest at -1
-        for (int axis = 0; axis <= D_GAMEPAD_AXIS_LAST; axis++)
-            processAxis(slot, axis, axis >= D_GAMEPAD_AXIS_LEFT_TRIGGER ? -1.0f : 0.0f);
     }
 }
 

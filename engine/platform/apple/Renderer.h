@@ -11,6 +11,8 @@
 
 + (void)pauseGame;
 + (void)resumeGame;
+// A frame without drawing, for a window that can't be seen
++ (void)updateGame;
 
 @property (class, nonatomic, assign, readonly, nullable) MTKView* view;
 @property (class, nonatomic, assign, readonly) CGSize screenSize;
