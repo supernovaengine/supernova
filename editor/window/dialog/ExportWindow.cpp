@@ -244,7 +244,8 @@ void ExportWindow::loadSettingsFromProject() {
         if (m_sourcePlatformLinux) addPresetBackends({ShaderBackend::GLCore, ShaderBackend::Vulkan});
         if (m_sourcePlatformMacOS) addPresetBackends({ShaderBackend::MetalMacOS, ShaderBackend::GLCore});
         if (m_sourcePlatformIOS) addPresetBackends({ShaderBackend::MetalIOS});
-        if (m_sourcePlatformAndroid) addPresetBackends({ShaderBackend::GLES3, ShaderBackend::Vulkan});
+        // Android builds only support OpenGL ES 3
+        if (m_sourcePlatformAndroid) addPresetBackends({ShaderBackend::GLES3});
         if (m_sourcePlatformWeb) addPresetBackends({ShaderBackend::GLES3});
         if (settings.graphicBackendsConfigured) {
             for (auto& entry : m_backendEntries) {
@@ -691,7 +692,7 @@ void ExportWindow::applySourcePlatformPresets() {
     if (m_sourcePlatformLinux) add({ShaderBackend::GLCore, ShaderBackend::Vulkan});
     if (m_sourcePlatformMacOS) add({ShaderBackend::MetalMacOS, ShaderBackend::GLCore});
     if (m_sourcePlatformIOS) add({ShaderBackend::MetalIOS});
-    if (m_sourcePlatformAndroid) add({ShaderBackend::GLES3, ShaderBackend::Vulkan});
+    if (m_sourcePlatformAndroid) add({ShaderBackend::GLES3});
     if (m_sourcePlatformWeb) add({ShaderBackend::GLES3});
 
     for (auto& entry : m_backendEntries) {
