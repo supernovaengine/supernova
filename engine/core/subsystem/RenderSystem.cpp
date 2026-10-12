@@ -9921,30 +9921,36 @@ void RenderSystem::draw(){
         // the scene copy: an SSR composite or the underwater fade replace the pass content,
         // a plain copy keeps it
         CameraRender* passRender = &camera.render;
-        if (copyScene && ensureSceneCopyFramebuffer(colorTarget->getWidth(), colorTarget->getHeight())){
+        if (copyScene){
+            // ended first: creating the copy framebuffer runs a clear pass, and passes can't nest
             camera.render.endRenderPass();
-            if (useSSR){
-                renderSSR(camera, &sceneCopyFramebuffer.getRender());
-            }else{
-                renderSceneCopy(colorTarget);
-            }
+            const bool copied = ensureSceneCopyFramebuffer(colorTarget->getWidth(), colorTarget->getHeight());
+            if (copied){
+                if (useSSR){
+                    renderSSR(camera, &sceneCopyFramebuffer.getRender());
+                }else{
+                    renderSceneCopy(colorTarget);
+                }
 
-            // view rects are centered, so the gap above the view matches the one below
-            const float copyWidth = (float)colorTarget->getWidth();
-            const float copyHeight = (float)colorTarget->getHeight();
-            currentSceneCopy = &sceneCopyFramebuffer.getRender().getColorTexture();
-            currentSceneCopyRect = Vector4(colorPassViewport.getX() / copyWidth, colorPassViewport.getY() / copyHeight,
-                    colorPassViewport.getWidth() / copyWidth, colorPassViewport.getHeight() / copyHeight);
+                // view rects are centered, so the gap above the view matches the one below
+                const float copyWidth = (float)colorTarget->getWidth();
+                const float copyHeight = (float)colorTarget->getHeight();
+                currentSceneCopy = &sceneCopyFramebuffer.getRender().getColorTexture();
+                currentSceneCopyRect = Vector4(colorPassViewport.getX() / copyWidth, colorPassViewport.getY() / copyHeight,
+                        colorPassViewport.getWidth() / copyWidth, colorPassViewport.getHeight() / copyHeight);
+            }
 
             passRender = &resumePassRender;
             // kept for another copy between overlapping waters
             resumePassRender.setStoreDepth(passWaters.size() > 1);
             resumePassRender.startRenderPass(&colorTarget->getRender());
             resumePassRender.applyViewport(colorPassViewport);
-            if (currentUnderwater){
-                drawUnderwater(*currentUnderwater, camera, cameraTransform);
-            }else if (useSSR){
-                drawBlit(&sceneCopyFramebuffer.getRender().getColorTexture(), PIP_RTT_NODEPTH, false);
+            if (copied){
+                if (currentUnderwater){
+                    drawUnderwater(*currentUnderwater, camera, cameraTransform);
+                }else if (useSSR){
+                    drawBlit(&sceneCopyFramebuffer.getRender().getColorTexture(), PIP_RTT_NODEPTH, false);
+                }
             }
         }
 
