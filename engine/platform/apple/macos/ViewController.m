@@ -12,11 +12,6 @@
     Renderer *_renderer;
 }
 
-- (void)viewDidDisappear
-{
-    [_renderer destroyView];
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
@@ -39,6 +34,17 @@
     [_renderer mtkView:_view drawableSizeWillChange:_view.drawableSize];
 
     _view.delegate = _renderer;
+
+    // Not on viewDidDisappear, which minimizing or hiding the app also sends
+    [[NSNotificationCenter defaultCenter] addObserver:self
+                                             selector:@selector(applicationWillTerminate:)
+                                                 name:NSApplicationWillTerminateNotification
+                                               object:nil];
+}
+
+- (void)applicationWillTerminate:(NSNotification *)notification
+{
+    [_renderer destroyView];
 }
 
 @end
