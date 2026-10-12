@@ -8,6 +8,8 @@
 #include "window/Widgets.h"
 #include "external/IconsFontAwesome6.h"
 
+#include <utility>
+
 namespace doriax {
 namespace editor {
 
@@ -99,8 +101,10 @@ void ProjectSaveDialog::show() {
         // Buttons
         ImGui::BeginDisabled(!canSave);
         if (ImGui::Button("Save", ImVec2(120, 0))) {
-            if (m_onSave) {
-                m_onSave(projectName, m_projectPath);
+            auto onSave = std::exchange(m_onSave, nullptr);
+            m_onCancel = nullptr;
+            if (onSave) {
+                onSave(projectName, m_projectPath);
             }
             m_isOpen = false;
             ImGui::CloseCurrentPopup();
@@ -109,10 +113,7 @@ void ProjectSaveDialog::show() {
 
         ImGui::SameLine();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-            m_isOpen = false;
-            if (m_onCancel) {
-                m_onCancel();
-            }
+            cancel();
             ImGui::CloseCurrentPopup();
         }
 
@@ -122,11 +123,25 @@ void ProjectSaveDialog::show() {
         // If the popup isn't open anymore but our state says it should be,
         // update our state and make sure to call the cancel callback
         if (m_isOpen) {
-            m_isOpen = false;
-            if (m_onCancel) {
-                m_onCancel();
-            }
+            cancel();
         }
+    }
+}
+
+void ProjectSaveDialog::close() {
+    if (m_isOpen) {
+        cancel();
+    }
+}
+
+// Callbacks are cleared before running, so a closed dialog holds nothing of the save
+void ProjectSaveDialog::cancel() {
+    m_isOpen = false;
+
+    auto onCancel = std::exchange(m_onCancel, nullptr);
+    m_onSave = nullptr;
+    if (onCancel) {
+        onCancel();
     }
 }
 

@@ -5357,28 +5357,24 @@ void editor::Project::saveScene(uint32_t sceneId, std::function<void(bool)> call
     }
 }
 
-void editor::Project::saveSceneListSequentially(std::vector<uint32_t> sceneIds, std::function<void(bool)> callback) {
-    auto ids = std::make_shared<std::vector<uint32_t>>(std::move(sceneIds));
-    auto index = std::make_shared<size_t>(0);
-    auto saveNext = std::make_shared<std::function<void(bool)>>();
-    *saveNext = [this, ids, index, callback, saveNext](bool previousSuccess) {
-        if (!previousSuccess) {
-            if (callback) callback(false);
-            return;
-        }
-
-        while (*index < ids->size()) {
-            uint32_t id = (*ids)[(*index)++];
-            if (hasSceneUnsavedChanges(id)) {
-                saveScene(id, *saveNext);
-                return;
-            }
-        }
-
+void editor::Project::saveSceneListSequentially(std::vector<uint32_t> sceneIds, std::function<bool(uint32_t)> needsSave, std::function<void(bool)> callback) {
+    auto it = std::find_if(sceneIds.begin(), sceneIds.end(), needsSave);
+    if (it == sceneIds.end()) {
         if (callback) callback(true);
-    };
+        return;
+    }
 
-    (*saveNext)(true);
+    const uint32_t sceneId = *it;
+    sceneIds.erase(sceneIds.begin(), it + 1);
+
+    // The rest of the list is owned by the pending save, so it is freed when the last one ends
+    saveScene(sceneId, [this, sceneIds, needsSave, callback](bool success) {
+        if (success) {
+            saveSceneListSequentially(sceneIds, needsSave, callback);
+        } else if (callback) {
+            callback(false);
+        }
+    });
 }
 
 void editor::Project::saveModifiedChildScenes(uint32_t sceneId, std::function<void(bool)> callback) {
@@ -5394,7 +5390,7 @@ void editor::Project::saveModifiedChildScenes(uint32_t sceneId, std::function<vo
         }
     }
 
-    saveSceneListSequentially(std::move(childIds), std::move(callback));
+    saveSceneListSequentially(std::move(childIds), [this](uint32_t id) { return hasSceneUnsavedChanges(id); }, std::move(callback));
 }
 
 bool editor::Project::saveSceneFile(SceneProject* sceneProject, const std::filesystem::path& path, bool stopTransientPreviews) {
@@ -5653,7 +5649,7 @@ void editor::Project::saveAllScenes(std::function<void(bool)> callback) {
         }
     }
 
-    saveSceneListSequentially(std::move(sceneIds), std::move(callback));
+    saveSceneListSequentially(std::move(sceneIds), [this](uint32_t id) { return hasSceneUnsavedChanges(id); }, std::move(callback));
 }
 
 void editor::Project::saveLastSelectedScene(std::function<void(bool)> callback){

@@ -6,6 +6,7 @@
 #include "external/IconsFontAwesome6.h"
 #include "Backend.h"
 #include <algorithm>
+#include <utility>
 #include <vector>
 
 namespace doriax {
@@ -146,8 +147,10 @@ void SceneSaveDialog::show() {
         // Buttons
         ImGui::BeginDisabled(!canSave);
         if (ImGui::Button("Save", ImVec2(120, 0))) {
-            if (m_onSave) {
-                m_onSave(fullPath);
+            auto onSave = std::exchange(m_onSave, nullptr);
+            m_onCancel = nullptr;
+            if (onSave) {
+                onSave(fullPath);
             }
             m_isOpen = false;
 
@@ -157,11 +160,7 @@ void SceneSaveDialog::show() {
 
         ImGui::SameLine();
         if (ImGui::Button("Cancel", ImVec2(120, 0))) {
-            m_isOpen = false;
-
-            if (m_onCancel) {
-                m_onCancel();
-            }
+            cancel();
 
             ImGui::CloseCurrentPopup();
         }
@@ -173,14 +172,25 @@ void SceneSaveDialog::show() {
         // update our state and make sure to call the cancel callback
         // This happens if user presses ESC or clicks outside the modal
         if (m_isOpen) {
-            m_isOpen = false;
-
-            // If dialog was closed without explicit button press,
-            // we still need to call the cancel callback
-            if (m_onCancel) {
-                m_onCancel();
-            }
+            cancel();
         }
+    }
+}
+
+void SceneSaveDialog::close() {
+    if (m_isOpen) {
+        cancel();
+    }
+}
+
+// Callbacks are cleared before running, so a closed dialog holds nothing of the save
+void SceneSaveDialog::cancel() {
+    m_isOpen = false;
+
+    auto onCancel = std::exchange(m_onCancel, nullptr);
+    m_onSave = nullptr;
+    if (onCancel) {
+        onCancel();
     }
 }
 
