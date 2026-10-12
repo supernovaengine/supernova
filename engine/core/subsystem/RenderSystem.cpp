@@ -7733,6 +7733,12 @@ void RenderSystem::getLoadCount(size_t& loaded, size_t& total) const{
     auto meshes = scene->getComponentArray<MeshComponent>();
     for (int i = 0; i < meshes->size(); i++) {
         const MeshComponent& mesh = meshes->getComponentFromIndex(i);
+        // An empty tilemap never loads: loadMesh() has no buffers to create until a tile is added.
+        if (!mesh.loaded) {
+            const TilemapComponent* tilemap = scene->findComponent<TilemapComponent>(meshes->getEntity(i));
+            if (tilemap && tilemap->numTiles == 0)
+                continue;
+        }
         count(mesh.loaded);
     }
 
