@@ -37,6 +37,8 @@ RE_ADD_STATIC_FUNCTION = re.compile(r'\.addStaticFunction\(\s*"([^"]+)"')
 
 RE_ADD_PROPERTY = re.compile(r'\.addProperty\(\s*"([^"]+)"')
 RE_ADD_STATIC_PROPERTY = re.compile(r'\.addStaticProperty\(\s*"([^"]+)"')
+# Static property read through an accessor, like &Engine::getDeltatime
+RE_STATIC_ACCESSOR = re.compile(r'&[A-Za-z0-9_]+::(?:get|is|has)[A-Z]')
 
 # Property getters: a cast naming the return type, or a plain member pointer
 RE_GETTER_CAST = re.compile(r'\((.+?)\([A-Za-z0-9_]+::\*\)')
@@ -210,15 +212,15 @@ def parse_binding_file(filepath):
             if not pname.startswith('__'):
                 # Check if it's an event callback (lambda pattern)
                 if '[]' in stripped or 'lua_State' in stripped:
-                    symbols.append(APISymbol(
-                        pname, 'Event',
-                        f'{current_lua_name}.{pname}', current_lua_name
-                    ))
+                    kind = 'Event'
+                elif RE_STATIC_ACCESSOR.search(stripped):
+                    kind = 'Property'  # Lua-only, C++ calls the accessor
                 else:
-                    symbols.append(APISymbol(
-                        pname, 'Constant',
-                        f'{current_lua_name}.{pname}', current_lua_name
-                    ))
+                    kind = 'Constant'
+                symbols.append(APISymbol(
+                    pname, kind,
+                    f'{current_lua_name}.{pname}', current_lua_name
+                ))
             continue
 
         # Member property
