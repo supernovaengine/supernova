@@ -112,6 +112,8 @@ namespace doriax::editor{
         static std::string bundleToFunctionName(const std::filesystem::path& bundlePath);
         static std::string bundleToBuildFunctionName(const std::filesystem::path& bundlePath);
         static std::string bundleToFileName(const std::filesystem::path& bundlePath);
+        // Never the name of main.cpp, scene_scripts.cpp, a bundle or another scene, even ignoring case
+        static std::string sceneToFileName(uint32_t sceneId, const std::string& sceneName);
 
         static std::string createComponent(int indentSpaces, EntityRegistry* scene, Entity entity, ComponentType componentType, const fs::path& projectPath, std::string sceneName = "", std::string entityName = "", bool assignExisting = false, const std::unordered_map<Entity, std::string>* entityVarNames = nullptr);
         static std::string createAllComponents(int indentSpaces, EntityRegistry* scene, Entity entity, const fs::path& projectPath, std::string sceneName = "", std::string entityName = "", const std::unordered_map<Entity, std::string>* entityVarNames = nullptr);

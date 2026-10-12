@@ -3246,6 +3246,8 @@ editor::SceneProject* editor::Project::createRuntimeCloneFromSource(const SceneP
 
     YAML::Node sceneNode = YAML::LoadFile(fullPath.string());
     Stream::decodeSceneProject(runtime.get(), sceneNode, true);
+    // the file's id differs if loading replaced a duplicate
+    runtime->id = source->id;
     //runtime->sceneRender = createSceneRender(runtime->sceneType, runtime->scene);
     runtime->defaultCamera = createDefaultCamera(runtime->sceneType, runtime->scene);
     Stream::decodeSceneProjectEntities(this, runtime.get(), sceneNode);
@@ -4052,7 +4054,7 @@ void editor::Project::removeScene(uint32_t sceneId) {
     deleteSceneProject(&(*it));
 
     // Remove C++ source file
-    generator.clearSceneSource(it->name, getProjectInternalPath());
+    generator.clearSceneSource(it->id, it->name, getProjectInternalPath());
 
     // Cleanup EntityBundles
     cleanupEntityBundlesForScene(sceneId);
@@ -5521,19 +5523,19 @@ bool editor::Project::writeSceneToPath(uint32_t sceneId, const std::filesystem::
 
 void editor::Project::writeSceneSource(const SceneProject* sceneProject) {
     std::vector<BundleInstanceInfo> bundleInstances = generator.writeBundleSources(entityBundles, sceneProject->id, getProjectPath(), getProjectInternalPath());
-    generator.writeSceneSource(sceneProject->scene, sceneProject->name, sceneProject->entities, getSceneCamera(sceneProject), getProjectPath(), getProjectInternalPath(), bundleInstances, collectResourcesInRegistry(sceneProject->scene));
+    generator.writeSceneSource(sceneProject->scene, sceneProject->id, sceneProject->name, sceneProject->entities, getSceneCamera(sceneProject), getProjectPath(), getProjectInternalPath(), bundleInstances, collectResourcesInRegistry(sceneProject->scene));
 }
 
 bool editor::Project::hasMissingSceneSources() const {
     return std::any_of(scenes.begin(), scenes.end(), [&](const SceneProject& sceneProject){
-        return !generator.hasSceneSource(sceneProject.name, getProjectInternalPath());
+        return !generator.hasSceneSource(sceneProject.id, sceneProject.name, getProjectInternalPath());
     });
 }
 
 // Scenes the editor never saved or played, like one created outside it
 void editor::Project::writeMissingSceneSources() {
     for (const SceneProject& sceneProject : scenes) {
-        if (generator.hasSceneSource(sceneProject.name, getProjectInternalPath())) {
+        if (generator.hasSceneSource(sceneProject.id, sceneProject.name, getProjectInternalPath())) {
             continue;
         }
 
@@ -9012,7 +9014,7 @@ void editor::Project::runPlayStartup(const std::shared_ptr<PlaySession>& session
                 }
 
                 std::vector<BundleInstanceInfo> bundleInstances = generator.writeBundleSources(entityBundles, currentSceneProject.id, getProjectPath(), getProjectInternalPath());
-                generator.writeSceneSource(entry.runtime->scene, entry.runtime->name, entry.runtime->entities, getSceneCamera(entry.runtime), getProjectPath(), getProjectInternalPath(), bundleInstances, collectResourcesInRegistry(entry.runtime->scene));
+                generator.writeSceneSource(entry.runtime->scene, entry.runtime->id, entry.runtime->name, entry.runtime->entities, getSceneCamera(entry.runtime), getProjectPath(), getProjectInternalPath(), bundleInstances, collectResourcesInRegistry(entry.runtime->scene));
 
                 {
                     std::scoped_lock lock(playSessionMutex);

@@ -901,8 +901,7 @@ void editor::Generator::writeSourceFiles(const fs::path& projectPath, const fs::
     std::string factorySources = "set(FACTORY_SOURCES\n";
     std::unordered_set<std::string> addedFactorySources;
     for (const auto& sceneData : scenes) {
-        std::string sceneName = Factory::toIdentifier(sceneData.name);
-        std::string filename = sceneName + ".cpp";
+        std::string filename = Factory::sceneToFileName(sceneData.id, sceneData.name) + ".cpp";
         if (addedFactorySources.insert(filename).second) {
             factorySources += "    " + internalPathStr + "/generated/" + filename + "\n";
         }
@@ -1456,22 +1455,20 @@ std::vector<editor::BundleInstanceInfo> editor::Generator::writeBundleSources(co
     return bundleInstances;
 }
 
-void editor::Generator::writeSceneSource(Scene* scene, const std::string& sceneName, const std::vector<Entity>& entities, const Entity camera, const fs::path& projectPath, const fs::path& projectInternalPath, std::vector<BundleInstanceInfo>& bundleInstances, const SceneResources& resources){
+void editor::Generator::writeSceneSource(Scene* scene, uint32_t sceneId, const std::string& sceneName, const std::vector<Entity>& entities, const Entity camera, const fs::path& projectPath, const fs::path& projectInternalPath, std::vector<BundleInstanceInfo>& bundleInstances, const SceneResources& resources){
     const fs::path generatedPath = getGeneratedPath(projectInternalPath);
-
-    std::string sceneIdStr = Factory::toIdentifier(sceneName);
 
     std::string sceneContent = Factory::createScene(0, scene, sceneName, entities, camera, projectPath, generatedPath, bundleInstances, resources);
 
-    std::string filename = sceneIdStr + ".cpp";
+    std::string filename = Factory::sceneToFileName(sceneId, sceneName) + ".cpp";
     const fs::path sourceFile = generatedPath / filename;
 
     FileUtils::writeIfChanged(sourceFile, sceneContent);
 }
 
-void editor::Generator::clearSceneSource(const std::string& sceneName, const fs::path& projectInternalPath) {
+void editor::Generator::clearSceneSource(uint32_t sceneId, const std::string& sceneName, const fs::path& projectInternalPath) {
     const fs::path generatedPath = getGeneratedPath(projectInternalPath);
-    std::string filename = Factory::toIdentifier(sceneName) + ".cpp";
+    std::string filename = Factory::sceneToFileName(sceneId, sceneName) + ".cpp";
     const fs::path sourceFile = generatedPath / filename;
 
     if (fs::exists(sourceFile)) {
@@ -1483,9 +1480,9 @@ void editor::Generator::clearSceneSource(const std::string& sceneName, const fs:
     }
 }
 
-bool editor::Generator::hasSceneSource(const std::string& sceneName, const fs::path& projectInternalPath) const {
+bool editor::Generator::hasSceneSource(uint32_t sceneId, const std::string& sceneName, const fs::path& projectInternalPath) const {
     // one written by an older editor lacks what main.cpp calls
-    std::ifstream file(getGeneratedPath(projectInternalPath) / (Factory::toIdentifier(sceneName) + ".cpp"));
+    std::ifstream file(getGeneratedPath(projectInternalPath) / (Factory::sceneToFileName(sceneId, sceneName) + ".cpp"));
     std::string header;
     return std::getline(file, header) && header == Factory::sceneSourceHeader;
 }

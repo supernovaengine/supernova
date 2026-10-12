@@ -2799,6 +2799,10 @@ std::string editor::Factory::bundleToFileName(const fs::path& bundlePath) {
     return "bundle_" + toIdentifier(pathStr);
 }
 
+std::string editor::Factory::sceneToFileName(uint32_t sceneId, const std::string& sceneName) {
+    return "scene_" + toIdentifier(sceneName) + "_" + std::to_string(sceneId);
+}
+
 std::string editor::Factory::createBundleHeader(const fs::path& bundlePath) {
     std::string funcName = bundleToFunctionName(bundlePath);
     std::string buildFuncName = bundleToBuildFunctionName(bundlePath);
