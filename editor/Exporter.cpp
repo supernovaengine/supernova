@@ -966,8 +966,10 @@ bool editor::Exporter::runBuild() {
     MsBuildProgress msBuildProgress(buildDir, config.buildType);
 
     Out::info("Building export with %u parallel jobs...", jobs);
-    bool ok = commandRunner.run(cmd, buildDir, [this, &msBuildProgress](const std::string& line) {
+    std::vector<std::string> errors;
+    bool ok = commandRunner.run(cmd, buildDir, [this, &msBuildProgress, &errors](const std::string& line) {
         Out::build("%s", line.c_str());
+        CommandRunner::collectBuildError(line, errors);
         float fraction = 0.0f;
         bool hasProgress = parseBuildProgress(line, fraction);
         float buildEnd = BUILD_PROGRESS_END;
@@ -988,8 +990,14 @@ bool editor::Exporter::runBuild() {
     if (!ok) {
         if (isCancelled()) {
             setError("Export cancelled");
-        } else {
+        } else if (errors.empty()) {
             setError("Build failed. See the Output window for details.");
+        } else {
+            // repeated at the end, where the warnings don't bury them
+            for (const std::string& error : errors) {
+                Out::error("%s", error.c_str());
+            }
+            setError("Build failed: " + errors.front() + "\nSee the Output window for details.");
         }
         return false;
     }

@@ -8,6 +8,7 @@
 #include <functional>
 #include <atomic>
 #include <mutex>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -38,6 +39,9 @@ namespace doriax::editor {
         // (vcvars) so non-Visual-Studio generators such as Ninja can find the
         // Windows SDK and CRT libraries. Returns "" when not needed / not found.
         static std::string msvcEnvPrefix(const std::string& generator);
+
+        // Adds line to errors if it is a compiler, linker or MSBuild error (up to 20, no repeats)
+        static void collectBuildError(const std::string& line, std::vector<std::string>& errors);
 
 #ifdef _WIN32
         static std::string runCaptureNoWindow(const std::string& command);

@@ -5,6 +5,7 @@
 #include "CommandRunner.h"
 #include "editor/Out.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <chrono>
 #include <cstring>
@@ -120,6 +121,27 @@ std::string editor::CommandRunner::findVcvarsall() {
     return "";
 }
 #endif
+
+void editor::CommandRunner::collectBuildError(const std::string& line, std::vector<std::string>& errors) {
+    // MSVC, MSBuild, GCC and Clang
+    static const char* const markers[] = {": error C", ": fatal error C", "error LNK", ": error MSB", ": error:", "fatal error:"};
+    const bool isError = std::any_of(std::begin(markers), std::end(markers), [&line](const char* marker) {
+        return line.find(marker) != std::string::npos;
+    });
+    if (!isError || errors.size() >= 20) return;
+
+    // MSBuild repeats each error at the end with " [project.vcxproj]"
+    std::string error = line;
+    const size_t project = error.rfind(" [");
+    if (project != std::string::npos && error.back() == ']' && error.find(".vcxproj", project) != std::string::npos) {
+        error.erase(project);
+    }
+    error.erase(0, error.find_first_not_of(" \t"));
+
+    if (std::find(errors.begin(), errors.end(), error) == errors.end()) {
+        errors.push_back(error);
+    }
+}
 
 std::string editor::CommandRunner::msvcEnvPrefix(const std::string& generator) {
 #ifdef _WIN32

@@ -403,7 +403,18 @@ bool editor::Generator::buildProject(const fs::path& projectPath, const fs::path
     Out::info("Building project with %u parallel jobs...", parallelJobs);
     // The build step invokes the compiler/linker again, so it needs the same
     // MSVC environment as configure (see CommandRunner::msvcEnvPrefix).
-    return runCommand(CommandRunner::msvcEnvPrefix(generator) + buildCommand, buildPath);
+    std::vector<std::string> errors;
+    const bool built = commandRunner.run(CommandRunner::msvcEnvPrefix(generator) + buildCommand, buildPath, [&errors](const std::string& line) {
+        Out::build("%s", line.c_str());
+        CommandRunner::collectBuildError(line, errors);
+    });
+    // repeated at the end, where the warnings don't bury them
+    if (!built && !commandRunner.isCancelRequested()) {
+        for (const std::string& error : errors) {
+            Out::error("%s", error.c_str());
+        }
+    }
+    return built;
 }
 
 bool editor::Generator::runCommand(const std::string& command, const fs::path& workingDir) {
