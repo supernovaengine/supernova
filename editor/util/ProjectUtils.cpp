@@ -328,7 +328,7 @@ bool editor::ProjectUtils::writeShaderFork(const ShaderForkPlan& plan) {
         if (std::filesystem::exists(path, ec) || ec)
             return false;
 
-        std::ofstream f(path, std::ios::trunc);
+        std::ofstream f(path, std::ios::binary | std::ios::trunc);
         if (!f.is_open())
             return false;
         written.push_back(path);

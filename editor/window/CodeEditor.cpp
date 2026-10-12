@@ -27,15 +27,45 @@ namespace {
 
 using ProjectSymbol = editor::CustomTextEditor::ProjectSymbol;
 
-bool readFile(const fs::path& path, std::string& out) {
-    std::ifstream file(path);
+// Gives LF text; crlf tells if the file mostly uses CRLF, for writeFile() to keep it
+bool readFile(const fs::path& path, std::string& out, bool* crlf = nullptr) {
+    std::ifstream file(path, std::ios::binary);
     if (!file.is_open()) return false;
 
     std::stringstream buffer;
     buffer << file.rdbuf();
-    out = buffer.str();
+    const std::string raw = buffer.str();
+
+    out.clear();
+    out.reserve(raw.size());
+    size_t crlfCount = 0;
+    size_t lfCount = 0;
+    for (size_t i = 0; i < raw.size(); i++) {
+        if (raw[i] == '\r' && i + 1 < raw.size() && raw[i + 1] == '\n') {
+            crlfCount++;
+            continue;
+        }
+        if (raw[i] == '\n' && (i == 0 || raw[i - 1] != '\r')) {
+            lfCount++;
+        }
+        out.push_back(raw[i]);
+    }
+    if (crlf) *crlf = crlfCount > lfCount;
 
     return true;
+}
+
+bool writeFile(const fs::path& path, const std::string& text, bool crlf) {
+    std::ofstream file(path, std::ios::binary | std::ios::trunc);
+    if (!file.is_open()) return false;
+
+    for (char c : text) {
+        if (crlf && c == '\n') file.put('\r');
+        file.put(c);
+    }
+    file.close();
+
+    return static_cast<bool>(file);
 }
 
 size_t skipSpaces(const std::string& line, size_t pos) {
@@ -497,7 +527,7 @@ bool editor::CodeEditor::loadFileContent(EditorInstance& instance) {
         fs::path fullPath = resolveFilepath(instance.filepath);
 
         std::string content;
-        if (!readFile(fullPath, content)) return false;
+        if (!readFile(fullPath, content, &instance.crlf)) return false;
 
         instance.editor->SetText(content);
         instance.savedUndoIndex = instance.editor->GetUndoIndex();
@@ -601,8 +631,10 @@ void editor::CodeEditor::checkFileChanges(EditorInstance& instance) {
         if (currentWriteTime == instance.lastWriteTime) return;
 
         std::string content;
-        if (readFile(fullPath, content) && content == instance.editor->GetText()) {
-            // Same content, this is our own save
+        bool crlf = false;
+        if (readFile(fullPath, content, &crlf) && content == instance.editor->GetText()) {
+            // Our own save, or only the line endings changed
+            instance.crlf = crlf;
             instance.lastWriteTime = currentWriteTime;
             return;
         }
@@ -1026,12 +1058,15 @@ void editor::CodeEditor::addScriptEvent(const std::string& filepath, size_t even
             }
             if (isTarget) target = &open->second;
         } else if (change.texts[i] != texts[i]) {
-            std::ofstream file(resolveFilepath(paths[i]), std::ios::trunc);
-            if (!file.is_open()) {
+            // read again for its line endings
+            const fs::path fullPath = resolveFilepath(paths[i]);
+            std::string current;
+            bool crlf = false;
+            readFile(fullPath, current, &crlf);
+            if (!writeFile(fullPath, change.texts[i], crlf)) {
                 Out::error("Could not write file: %s", key.c_str());
                 continue;
             }
-            file << change.texts[i];
         }
     }
 
@@ -1220,12 +1255,13 @@ void editor::CodeEditor::insertCppEntityProperty(EditorInstance& instance, Entit
     }
 
     std::string headerText;
+    bool headerCrlf = false;
     EditorInstance* headerInstance = nullptr;
     auto headerIt = editors.find(headerPath.string());
     if (headerIt != editors.end()) {
         headerInstance = &headerIt->second;
         headerText = headerInstance->editor->GetText();
-    } else if (!readFile(resolveFilepath(headerPath), headerText)) {
+    } else if (!readFile(resolveFilepath(headerPath), headerText, &headerCrlf)) {
         Out::error("Could not open header file: %s", headerPath.string().c_str());
         return;
     }
@@ -1326,12 +1362,10 @@ void editor::CodeEditor::insertCppEntityProperty(EditorInstance& instance, Entit
             }
         }
 
-        std::ofstream file(resolveFilepath(headerPath), std::ios::trunc);
-        if (!file.is_open()) {
+        if (!writeFile(resolveFilepath(headerPath), headerText.substr(0, insertPos) + propCode + headerText.substr(insertPos), headerCrlf)) {
             Out::error("Could not write header file: %s", headerPath.string().c_str());
             return;
         }
-        file << headerText.substr(0, insertPos) + propCode + headerText.substr(insertPos);
     }
 
     SceneProject* selectedScene = project->getSelectedScene();
@@ -1401,14 +1435,9 @@ void editor::CodeEditor::closeAll() {
 bool editor::CodeEditor::save(EditorInstance& instance) {
     try {
         fs::path fullPath = resolveFilepath(instance.filepath);
-        std::ofstream file(fullPath);
-        if (!file.is_open()) {
+        if (!writeFile(fullPath, instance.editor->GetText(), instance.crlf)) {
             return false;
         }
-
-        file << instance.editor->GetText();
-        file.close();
-        if (!file) return false;
 
         instance.savedUndoIndex = instance.editor->GetUndoIndex();
         instance.isModified = false;

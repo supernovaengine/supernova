@@ -2575,7 +2575,7 @@ bool editor::Project::visitAssetPathsInMaterialFiles(const std::function<bool(st
             continue;
         }
 
-        std::ofstream file(entry.path());
+        std::ofstream file(entry.path(), std::ios::binary);
         if (!file){
             Out::error("Failed to write material: %s", entry.path().string().c_str());
             continue;

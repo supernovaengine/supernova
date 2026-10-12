@@ -3880,7 +3880,7 @@ ActionResult EditorActionExecutor::createScript(const Json& arguments) {
     }
 
     if (type == ScriptType::LUA) {
-        std::ofstream f(sourceFull, std::ios::trunc);
+        std::ofstream f(sourceFull, std::ios::binary | std::ios::trunc);
         if (!f) return failResult("Failed to create Lua script file.");
         f << "-- " << className << ".lua\n\n";
         f << "local " << className << " = {\n";
@@ -3897,8 +3897,8 @@ ActionResult EditorActionExecutor::createScript(const Json& arguments) {
         f << "end\n\n";
         f << "return " << className << "\n";
     } else {
-        std::ofstream h(headerFull, std::ios::trunc);
-        std::ofstream c(sourceFull, std::ios::trunc);
+        std::ofstream h(headerFull, std::ios::binary | std::ios::trunc);
+        std::ofstream c(sourceFull, std::ios::binary | std::ios::trunc);
         if (!h || !c) return failResult("Failed to create C++ script files.");
         h << "#pragma once\n\n";
         if (cppSubclass) {
@@ -5319,7 +5319,7 @@ ActionResult EditorActionExecutor::downloadCuratedAsset(const Json& arguments, c
     entry["local_path"] = fs::relative(importedFile, project->getProjectPath()).generic_string();
     root["assets"].push_back(entry);
     fs::create_directories(attributionPath.parent_path(), ec);
-    std::ofstream out(attributionPath);
+    std::ofstream out(attributionPath, std::ios::binary);
     out << YAML::Dump(root);
 
     if (resourcesWindow) {

@@ -33,8 +33,9 @@ namespace doriax::editor {
         int propertyInsertUndoIndex; // undo index after a drag-drop insertion, -1 if none pending
         bool pendingWindowFocus; // focus the window when it is drawn next
         uint64_t diffBaseVersion; // of the GitFileBase the change marks come from, 0 for none
+        bool crlf; // the file uses CRLF line endings, kept on save
 
-        EditorInstance() : isOpen(true), languageType(SyntaxLanguage::None), isModified(false), lastCheckTime(0.0), savedUndoIndex(0), propertyInsertUndoIndex(-1), pendingWindowFocus(false), diffBaseVersion(0) {}
+        EditorInstance() : isOpen(true), languageType(SyntaxLanguage::None), isModified(false), lastCheckTime(0.0), savedUndoIndex(0), propertyInsertUndoIndex(-1), pendingWindowFocus(false), diffBaseVersion(0), crlf(false) {}
     };
 
     class CodeEditor {
