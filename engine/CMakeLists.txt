@@ -773,6 +773,8 @@ endif()
 if(DORIAX_PHYSICS_3D)
     list(APPEND DORIAX_PHYSICS_LIBS joltphysics)
     include_directories(SYSTEM libs/joltphysics)
+    # Otherwise Jolt defines _HAS_EXCEPTIONS=0 PUBLIC, which breaks try/catch on MSVC
+    set(CPP_EXCEPTIONS_ENABLED ON)
 endif()
 
 include_directories(SYSTEM libs/harfbuzz)
