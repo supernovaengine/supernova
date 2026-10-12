@@ -35,6 +35,7 @@ namespace {
     Atom gWmStateFullscreen = None;
     Atom gWmStateMaximizedVert = None;
     Atom gWmStateMaximizedHorz = None;
+    Atom gWmStateHidden = None;
     Atom gNetWmName = None;
     Atom gUtf8String = None;
 
@@ -65,6 +66,7 @@ namespace {
         gWmStateFullscreen = XInternAtom(gDisplay, "_NET_WM_STATE_FULLSCREEN", False);
         gWmStateMaximizedVert = XInternAtom(gDisplay, "_NET_WM_STATE_MAXIMIZED_VERT", False);
         gWmStateMaximizedHorz = XInternAtom(gDisplay, "_NET_WM_STATE_MAXIMIZED_HORZ", False);
+        gWmStateHidden = XInternAtom(gDisplay, "_NET_WM_STATE_HIDDEN", False);
         gNetWmName = XInternAtom(gDisplay, "_NET_WM_NAME", False);
         gUtf8String = XInternAtom(gDisplay, "UTF8_STRING", False);
     }
@@ -94,6 +96,30 @@ namespace {
         XSendEvent(gDisplay, gRoot, False,
                    SubstructureNotifyMask | SubstructureRedirectMask, &event);
         XFlush(gDisplay);
+    }
+
+    bool hasWmState(Atom first, Atom second) {
+        if (!gDisplay || !gWindow) return false;
+
+        Atom actualType = None;
+        int actualFormat = 0;
+        unsigned long count = 0;
+        unsigned long bytesAfter = 0;
+        unsigned char* data = nullptr;
+        bool hasFirst = false;
+        bool hasSecond = second == None;
+
+        if (XGetWindowProperty(gDisplay, gWindow, gWmState, 0, 32, False, XA_ATOM,
+                               &actualType, &actualFormat, &count, &bytesAfter,
+                               &data) == Success && data) {
+            Atom* states = reinterpret_cast<Atom*>(data);
+            for (unsigned long i = 0; i < count; ++i) {
+                if (states[i] == first) hasFirst = true;
+                if (states[i] == second) hasSecond = true;
+            }
+            XFree(data);
+        }
+        return hasFirst && hasSecond;
     }
 
     void applySizeHints(int width, int height) {
@@ -158,7 +184,7 @@ bool WindowLinux::create(const WindowLinuxConfig& config) {
     // border_pixel is required whenever the visual differs from the root's
     attributes.border_pixel = 0;
     attributes.event_mask =
-        StructureNotifyMask | ExposureMask | FocusChangeMask |
+        StructureNotifyMask | PropertyChangeMask | ExposureMask | FocusChangeMask |
         KeyPressMask | KeyReleaseMask |
         ButtonPressMask | ButtonReleaseMask |
         PointerMotionMask | EnterWindowMask | LeaveWindowMask;
@@ -276,27 +302,15 @@ void WindowLinux::exitFullscreen() {
 }
 
 bool WindowLinux::isMaximized() {
-    if (!gDisplay || !gWindow) return false;
+    return hasWmState(gWmStateMaximizedVert, gWmStateMaximizedHorz);
+}
 
-    Atom actualType = None;
-    int actualFormat = 0;
-    unsigned long count = 0;
-    unsigned long bytesAfter = 0;
-    unsigned char* data = nullptr;
-    bool vertical = false;
-    bool horizontal = false;
+bool WindowLinux::isMinimized() {
+    return hasWmState(gWmStateHidden, None);
+}
 
-    if (XGetWindowProperty(gDisplay, gWindow, gWmState, 0, 32, False, XA_ATOM,
-                           &actualType, &actualFormat, &count, &bytesAfter,
-                           &data) == Success && data) {
-        Atom* states = reinterpret_cast<Atom*>(data);
-        for (unsigned long i = 0; i < count; ++i) {
-            if (states[i] == gWmStateMaximizedVert) vertical = true;
-            if (states[i] == gWmStateMaximizedHorz) horizontal = true;
-        }
-        XFree(data);
-    }
-    return vertical && horizontal;
+bool WindowLinux::isStateEvent(const XEvent& event) {
+    return event.type == PropertyNotify && event.xproperty.atom == gWmState;
 }
 
 void WindowLinux::maximize() {

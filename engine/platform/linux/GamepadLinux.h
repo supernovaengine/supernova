@@ -29,12 +29,16 @@ namespace doriax {
         // now is a monotonic clock in seconds; new devices are scanned for once
         // per second rather than on every frame.
         void poll(double now);
+        // Lets go of held buttons and centers the axes; the next poll() reports
+        // what is still held as new input.
+        void release();
 
     private:
         struct Pad {
             int fd = -1;
             bool connected = false;
             std::string name;
+            std::string guid;
             std::array<unsigned char, ABS_CNT> axisMap{};
             // js_event.number is a device index, not an input code; the kernel
             // reports the code each index stands for.
@@ -53,6 +57,7 @@ namespace doriax {
 
         void scan(double now);
         void connect(int id, const char* path);
+        bool reopen(int id, Pad& pad);
         void disconnect(int id);
         void readEvents(int id, Pad& pad);
 

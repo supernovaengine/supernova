@@ -53,6 +53,13 @@ int axisForCode(unsigned char code) {
     }
 }
 
+std::string deviceName(int fd) {
+    char name[128] = "Gamepad";
+    if (ioctl(fd, JSIOCGNAME(sizeof(name)), name) >= 0)
+        name[sizeof(name) - 1] = '\0';
+    return name;
+}
+
 // Same identifier the community database is keyed by, see SDL_GameControllerDB
 bool readGuid(int id, std::string& guid) {
     static const char* const parts[] = {"bustype", "vendor", "product", "version"};
@@ -165,16 +172,12 @@ void GamepadLinux::connect(int id, const char* path) {
     pad.axes[4] = pad.axes[5] = -1.0f;
     ioctl(fd, JSIOCGAXMAP, pad.axisMap.data());
     ioctl(fd, JSIOCGBTNMAP, pad.buttonMap.data());
-
-    char name[128] = "Gamepad";
-    if (ioctl(fd, JSIOCGNAME(sizeof(name)), name) >= 0)
-        name[sizeof(name) - 1] = '\0';
-    pad.name = name;
+    pad.name = deviceName(fd);
 
     // The joystick device sends the current state of every control on open, so
     // the mapped values settle on the first poll
-    std::string guid;
-    pad.mapped = readGuid(id, guid) && editor::findGamepadMapping(guid, pad.mapping);
+    pad.mapped = readGuid(id, pad.guid) &&
+                 editor::findGamepadMapping(pad.guid, pad.mapping);
 
     Engine::systemGamepadConnect(id, pad.name);
 }
@@ -244,12 +247,46 @@ void GamepadLinux::readEvents(int id, Pad& pad) {
     if (pad.mapped) applyMapping(id, pad);
 }
 
+bool GamepadLinux::reopen(int id, Pad& pad) {
+    char path[32];
+    std::snprintf(path, sizeof(path), "/dev/input/js%d", id);
+    pad.fd = open(path, O_RDONLY | O_NONBLOCK | O_CLOEXEC);
+
+    std::string guid;
+    readGuid(id, guid);
+    // Gone, or a pad with another layout took its node
+    if (pad.fd < 0 || deviceName(pad.fd) != pad.name || guid != pad.guid) {
+        disconnect(id);
+        return false;
+    }
+    return true;
+}
+
 void GamepadLinux::poll(double now) {
     scan(now);
     for (int id = 0; id < COUNT; ++id) {
         Pad& pad = pads[id];
         if (!pad.connected) continue;
+        if (pad.fd < 0 && !reopen(id, pad)) continue;
         readEvents(id, pad);
+    }
+}
+
+void GamepadLinux::release() {
+    for (int id = 0; id < COUNT; ++id) {
+        Pad& pad = pads[id];
+        if (!pad.connected) continue;
+
+        for (int button = 0; button < BUTTON_COUNT; ++button)
+            setButton(id, pad, button, false);
+        // triggers rest at -1
+        for (int axis = 0; axis < AXIS_COUNT; ++axis)
+            setAxis(id, pad, axis, axis >= 4 ? -1.0f : 0.0f);
+
+        // Reopened by poll(), so input made meanwhile isn't replayed
+        if (pad.fd >= 0) close(pad.fd);
+        pad.fd = -1;
+        pad.hatX = pad.hatY = pad.hat = 0;
     }
 }
 

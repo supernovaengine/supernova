@@ -18,8 +18,10 @@
 #endif
 #include <X11/Xutil.h>
 
+#include <poll.h>
 #include <time.h>
 
+#include <cmath>
 #include <cstdio>
 #include <cstring>
 
@@ -48,6 +50,9 @@ using namespace doriax;
 
 namespace {
 
+// A hidden window updates the game this often, without drawing
+constexpr double HIDDEN_UPDATE_PERIOD = 1.0 / 60.0;
+
 #if !defined(SOKOL_VULKAN)
 using CreateContextAttribsProc =
     GLXContext (*)(Display*, GLXFBConfig, GLXContext, Bool, const int*);
@@ -63,11 +68,21 @@ GamepadLinux gamepads;
 LinuxInputRouter inputRouter;
 
 bool shouldClose = false;
+bool mapped = true;
+bool minimized = false;
 
 double monotonicSeconds() {
     timespec now{};
     clock_gettime(CLOCK_MONOTONIC, &now);
     return double(now.tv_sec) + double(now.tv_nsec) / 1.0e9;
+}
+
+void waitForEvents(double timeout) {
+    Display* display = WindowLinux::display();
+    if (timeout <= 0.0 || XPending(display)) return;
+
+    pollfd connection{ConnectionNumber(display), POLLIN, 0};
+    poll(&connection, 1, static_cast<int>(std::ceil(timeout * 1000.0)));
 }
 
 #if !defined(SOKOL_VULKAN)
@@ -262,6 +277,16 @@ void processEvents() {
                 if (WindowLinux::isRelativeMouse())
                     WindowLinux::setMouseMode(MouseMode::CAPTURED);
                 break;
+            case MapNotify:
+                mapped = true;
+                break;
+            case UnmapNotify:
+                mapped = false;
+                break;
+            case PropertyNotify:
+                if (WindowLinux::isStateEvent(event))
+                    minimized = WindowLinux::isMinimized();
+                break;
             default:
                 break;
         }
@@ -332,16 +357,41 @@ int DoriaxLinux::init(int argc, char **argv) {
     else if (DORIAX_WINDOW_MODE == 2)
         WindowLinux::requestFullscreen();
 
+    bool hidden = false;
+    double nextUpdate = 0.0;
+
     while (!shouldClose) {
+        // Presents stall while hidden, so the game updates without drawing
+        if (hidden)
+            waitForEvents(nextUpdate - monotonicSeconds());
+
         processEvents();
         if (shouldClose)
             break;
 
-        gamepads.poll(monotonicSeconds());
+        const bool wasHidden = hidden;
+        hidden = !mapped || minimized;
+        // a hidden game keeps updating, but the pads are no longer polled
+        if (hidden && !wasHidden)
+            gamepads.release();
 
-        beginFrame();
-        Engine::systemDraw();
-        endFrame();
+        if (!hidden) {
+            gamepads.poll(monotonicSeconds());
+            beginFrame();
+            Engine::systemDraw();
+            endFrame();
+            continue;
+        }
+
+        const double now = monotonicSeconds();
+        if (now >= nextUpdate) {
+            Engine::systemUpdate();
+
+            // A late update is made up on the next one
+            nextUpdate += HIDDEN_UPDATE_PERIOD;
+            if (std::abs(nextUpdate - now) > HIDDEN_UPDATE_PERIOD)
+                nextUpdate = now + HIDDEN_UPDATE_PERIOD;
+        }
     }
 
     Engine::systemViewDestroyed();

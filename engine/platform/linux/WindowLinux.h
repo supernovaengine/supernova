@@ -64,6 +64,10 @@ namespace doriax {
         static bool isMaximized();
         static void maximize();
         static void restore();
+        // Some window managers minimize without unmapping, mutter among them
+        static bool isMinimized();
+        // A PropertyNotify for _NET_WM_STATE
+        static bool isStateEvent(const XEvent& event);
 
         static void setSize(int width, int height);
         static bool isResizable();
