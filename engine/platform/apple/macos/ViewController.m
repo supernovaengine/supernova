@@ -70,6 +70,12 @@ static const NSTimeInterval HIDDEN_UPDATE_PERIOD = 1.0 / 60.0;
 
 - (void)destroyView
 {
+    // nothing may call into the engine once it's torn down
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    [_updateTimer invalidate];
+    _updateTimer = nil;
+    _view.delegate = nil;
+
     [_renderer destroyView];
 }
 
@@ -91,6 +97,8 @@ static const NSTimeInterval HIDDEN_UPDATE_PERIOD = 1.0 / 60.0;
     _view.paused = hidden;
 
     if (hidden) {
+        // update-only frames free resources without waiting for the GPU
+        [Renderer waitForGPU];
         _updateTimer = [NSTimer timerWithTimeInterval:HIDDEN_UPDATE_PERIOD
                                               repeats:YES
                                                 block:^(NSTimer *timer) { [Renderer updateGame]; }];

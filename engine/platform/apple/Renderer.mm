@@ -95,4 +95,11 @@ static CGSize _screenSize;
     doriax::Engine::systemUpdate();
 }
 
++ (void)waitForGPU {
+    id<MTLCommandBuffer> commandBuffer =
+        [(__bridge id<MTLCommandQueue>)sg_mtl_command_queue() commandBuffer];
+    [commandBuffer commit];
+    [commandBuffer waitUntilCompleted];
+}
+
 @end

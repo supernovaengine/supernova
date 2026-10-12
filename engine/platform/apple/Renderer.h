@@ -13,6 +13,8 @@
 + (void)resumeGame;
 // A frame without drawing, for a window that can't be seen
 + (void)updateGame;
+// Returns once the GPU has finished every frame sent to it
++ (void)waitForGPU;
 
 @property (class, nonatomic, assign, readonly, nullable) MTKView* view;
 @property (class, nonatomic, assign, readonly) CGSize screenSize;

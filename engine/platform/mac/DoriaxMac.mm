@@ -51,6 +51,14 @@ namespace {
 
 #if defined(SOKOL_METAL)
     MacViewMetal* gameView = nil;
+
+    // Returns once the GPU has finished every frame sent to it
+    void waitForGPU() {
+        id<MTLCommandBuffer> commandBuffer =
+            [(__bridge id<MTLCommandQueue>)sg_mtl_command_queue() commandBuffer];
+        [commandBuffer commit];
+        [commandBuffer waitUntilCompleted];
+    }
 #elif defined(SOKOL_VULKAN)
     MacViewVulkan* gameView = nil;
 
@@ -212,6 +220,9 @@ namespace {
 }
 
 - (void)updateVisibility {
+    // quitting stops the loop for good
+    if (!self.frameTimer) return;
+
     NSWindow* window = (__bridge NSWindow*)WindowMac::nativeWindow();
     const bool wasHidden = hidden;
     hidden = (window.occlusionState & NSWindowOcclusionStateVisible) == 0;
@@ -219,6 +230,10 @@ namespace {
 
     // a hidden game keeps updating, but the pads are no longer read
     [DoriaxGameController setSuspended:hidden];
+#if defined(SOKOL_METAL)
+    // update-only frames free resources without waiting for the GPU
+    if (hidden) waitForGPU();
+#endif
     [self startFrameTimer:hidden ? HIDDEN_UPDATE_PERIOD : FRAME_PERIOD];
 }
 
