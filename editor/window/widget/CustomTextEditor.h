@@ -52,6 +52,12 @@ namespace doriax::editor {
         TokenType type;
     };
 
+    // A comment or string that runs past the end of its line, and the text that closes it
+    struct OpenToken {
+        TokenType type = TokenType::Default;
+        std::string end;
+    };
+
     struct TextPosition {
         int line;
         int column;
@@ -372,9 +378,12 @@ namespace doriax::editor {
         std::string inferTypeBefore(int lineIndex, int endColumn) const;
         // Class or Lua table the cursor is inside, what "this" and "self" resolve to
         std::string findEnclosingType(int lineIndex) const;
-        void tokenizeLine(int lineIndex);
-        // inMultiLineComment carries a block comment from one line to the next
-        void tokenizeText(const std::string& line, bool& inMultiLineComment, std::vector<Token>& tokens) const;
+        // open carries a comment or string from one line to the next
+        void tokenizeText(const std::string& line, OpenToken& open, std::vector<Token>& tokens) const;
+        // A comment or string at i that can span lines: returns the length of its opening text, 0 for none
+        int multiLineTokenAt(const std::string& line, int i, OpenToken& token) const;
+        // Where the open token ends on the line, scanning from i; open stays set when it runs on to the next line
+        int scanOpenToken(const std::string& line, int i, OpenToken& open) const;
         void tokenizeAll();
         TokenType classifyWord(const std::string& word) const;
 

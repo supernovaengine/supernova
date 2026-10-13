@@ -325,8 +325,6 @@ void CustomTextEditor::initializeLanguage() {
             for (const auto& b : getEngineBuiltinNames()) languageDef.builtinFunctions.insert(b);
             for (const auto& e : getEngineEnumNames()) languageDef.builtinFunctions.insert(e);
             languageDef.singleLineComment = "--";
-            languageDef.multiLineCommentStart = "--[[";
-            languageDef.multiLineCommentEnd = "]]";
             break;
 
         case SyntaxLanguage::CMake:
@@ -372,8 +370,6 @@ void CustomTextEditor::initializeLanguage() {
                 "WIN32", "UNIX", "APPLE", "MSVC", "MINGW", "LINUX"
             };
             languageDef.singleLineComment = "#";
-            languageDef.multiLineCommentStart = "#[[";
-            languageDef.multiLineCommentEnd = "]]";
             break;
 
         default:
@@ -636,44 +632,7 @@ void CustomTextEditor::ClearExtraCursors() {
     }
 }
 
-void CustomTextEditor::tokenizeLine(int lineIndex) {
-    if (lineIndex < 0 || lineIndex >= static_cast<int>(lines.size())) return;
-
-    while (static_cast<int>(lineTokens.size()) <= lineIndex) {
-        lineTokens.push_back({});
-    }
-
-    lineTokens[lineIndex].clear();
-    if (lines[lineIndex].empty()) return;
-
-    bool inMultiLineComment = false;
-
-    // Check if previous line ends in multi-line comment
-    if (lineIndex > 0) {
-        const auto& prevTokens = lineTokens[lineIndex - 1];
-        for (const auto& token : prevTokens) {
-            if (token.type == TokenType::MultiLineComment) {
-                int tokenEnd = token.start + token.length;
-                if (tokenEnd >= static_cast<int>(lines[lineIndex - 1].size())) {
-                    // Check if multi-line comment was closed
-                    const std::string& prevLine = lines[lineIndex - 1];
-                    std::string tokenText = prevLine.substr(token.start, token.length);
-                    if (!languageDef.multiLineCommentEnd.empty()) {
-                        if (tokenText.find(languageDef.multiLineCommentEnd) == std::string::npos ||
-                            tokenText.rfind(languageDef.multiLineCommentEnd) < 
-                            tokenText.rfind(languageDef.multiLineCommentStart)) {
-                            inMultiLineComment = true;
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    tokenizeText(lines[lineIndex], inMultiLineComment, lineTokens[lineIndex]);
-}
-
-void CustomTextEditor::tokenizeText(const std::string& line, bool& inMultiLineComment, std::vector<Token>& tokens) const {
+void CustomTextEditor::tokenizeText(const std::string& line, OpenToken& open, std::vector<Token>& tokens) const {
     tokens.clear();
     if (line.empty()) return;
 
@@ -686,17 +645,15 @@ void CustomTextEditor::tokenizeText(const std::string& line, bool& inMultiLineCo
             continue;
         }
 
-        // Multi-line comment continuation
-        if (inMultiLineComment) {
+        // A comment or string that can span lines, from the line before or starting here.
+        // It goes before line comments, as Lua's --[[ also starts one
+        int openLength = 0;
+        if (open.type == TokenType::Default) openLength = multiLineTokenAt(line, i, open);
+        if (open.type != TokenType::Default) {
             int start = i;
-            size_t endPos = line.find(languageDef.multiLineCommentEnd, i);
-            if (endPos != std::string::npos) {
-                i = static_cast<int>(endPos + languageDef.multiLineCommentEnd.size());
-                inMultiLineComment = false;
-            } else {
-                i = len;
-            }
-            tokens.push_back({start, i - start, TokenType::MultiLineComment});
+            TokenType type = open.type;
+            i = scanOpenToken(line, i + openLength, open);
+            tokens.push_back({start, i - start, type});
             continue;
         }
 
@@ -714,52 +671,6 @@ void CustomTextEditor::tokenizeText(const std::string& line, bool& inMultiLineCo
             line.compare(i, languageDef.singleLineComment.size(), languageDef.singleLineComment) == 0) {
             tokens.push_back({i, len - i, TokenType::Comment});
             break;
-        }
-
-        // Multi-line comment start
-        if (!languageDef.multiLineCommentStart.empty() &&
-            line.compare(i, languageDef.multiLineCommentStart.size(), languageDef.multiLineCommentStart) == 0) {
-            int start = i;
-            i += static_cast<int>(languageDef.multiLineCommentStart.size());
-            size_t endPos = line.find(languageDef.multiLineCommentEnd, i);
-            if (endPos != std::string::npos) {
-                i = static_cast<int>(endPos + languageDef.multiLineCommentEnd.size());
-            } else {
-                i = len;
-                inMultiLineComment = true;
-            }
-            tokens.push_back({start, i - start, TokenType::MultiLineComment});
-            continue;
-        }
-
-        // String literals
-        if (line[i] == '"' || line[i] == '\'') {
-            char quote = line[i];
-            int start = i++;
-            while (i < len && line[i] != quote) {
-                if (line[i] == '\\' && i + 1 < len) {
-                    i += 2;
-                } else {
-                    ++i;
-                }
-            }
-            if (i < len) ++i;
-            tokens.push_back({start, i - start, TokenType::String});
-            continue;
-        }
-
-        // Lua long strings [[ ]]
-        if (language == SyntaxLanguage::Lua && line[i] == '[' && i + 1 < len && line[i + 1] == '[') {
-            int start = i;
-            i += 2;
-            size_t endPos = line.find("]]", i);
-            if (endPos != std::string::npos) {
-                i = static_cast<int>(endPos + 2);
-            } else {
-                i = len;
-            }
-            tokens.push_back({start, i - start, TokenType::String});
-            continue;
         }
 
         // Numbers
@@ -844,14 +755,89 @@ void CustomTextEditor::tokenizeText(const std::string& line, bool& inMultiLineCo
     }
 }
 
+int CustomTextEditor::multiLineTokenAt(const std::string& line, int i, OpenToken& token) const {
+    const std::string& commentStart = languageDef.multiLineCommentStart;
+    if (!commentStart.empty() && line.compare(i, commentStart.size(), commentStart) == 0) {
+        token = {TokenType::MultiLineComment, languageDef.multiLineCommentEnd};
+        return static_cast<int>(commentStart.size());
+    }
+
+    // Quoted strings; CMake only quotes with "
+    if (line[i] == '"' || (line[i] == '\'' && language != SyntaxLanguage::CMake)) {
+        token = {TokenType::String, std::string(1, line[i])};
+        return 1;
+    }
+
+    if (language == SyntaxLanguage::Cpp) {
+        // Raw strings, R"delim(...)delim", maybe with a u8, u, U or L prefix
+        size_t r = i;
+        if (line.compare(r, 2, "u8") == 0) {
+            r += 2;
+        } else if (line[r] == 'u' || line[r] == 'U' || line[r] == 'L') {
+            ++r;
+        }
+        if (line.compare(r, 2, "R\"") != 0) return 0;
+        size_t paren = line.find('(', r + 2);
+        if (paren == std::string::npos || paren - r - 2 > 16) return 0;
+        std::string delimiter = line.substr(r + 2, paren - r - 2);
+        if (delimiter.find_first_of(" )\\\t\v\f") != std::string::npos) return 0;
+        token = {TokenType::String, ")" + delimiter + "\""};
+        return static_cast<int>(paren) + 1 - i;
+    }
+
+    if (language == SyntaxLanguage::Lua || language == SyntaxLanguage::CMake) {
+        // Long brackets, [[ ]], [=[ ]=] and so on, make strings, or comments after the comment marker
+        const std::string& marker = languageDef.singleLineComment;
+        size_t first = (line.compare(i, marker.size(), marker) == 0) ? i + marker.size() : i;
+        size_t second = first + 1;
+        while (second < line.size() && line[second] == '=') ++second;
+        if (first >= line.size() || line[first] != '[' || second >= line.size() || line[second] != '[') return 0;
+        TokenType type = (first > static_cast<size_t>(i)) ? TokenType::MultiLineComment : TokenType::String;
+        token = {type, "]" + std::string(second - first - 1, '=') + "]"};
+        return static_cast<int>(second) + 1 - i;
+    }
+    return 0;
+}
+
+int CustomTextEditor::scanOpenToken(const std::string& line, int i, OpenToken& open) const {
+    int len = static_cast<int>(line.size());
+    if (open.end != "\"" && open.end != "'") {
+        size_t endPos = line.find(open.end, i);
+        if (endPos == std::string::npos) return len;
+        i = static_cast<int>(endPos + open.end.size());
+        open = OpenToken();
+        return i;
+    }
+
+    // Quoted strings skip escapes, and run on past the line end after a backslash, Lua's \z, or in CMake
+    bool skipping = false;
+    while (i < len) {
+        if (line[i] == open.end[0]) {
+            open = OpenToken();
+            return i + 1;
+        }
+        if (line[i] == '\\') {
+            if (i + 1 == len) return len;
+            skipping = (language == SyntaxLanguage::Lua && line[i + 1] == 'z');
+            i += 2;
+        } else {
+            if (!std::isspace(static_cast<unsigned char>(line[i]))) skipping = false;
+            ++i;
+        }
+    }
+    if (!skipping && language != SyntaxLanguage::CMake) open = OpenToken();
+    return len;
+}
+
 void CustomTextEditor::tokenizeAll() {
     // Every edit retokenizes, so this is also where cached widths and the diff expire
     maxLineWidthDirty = true;
     if (hasDiffBase) diffDirty = true;
     lineTokens.clear();
     lineTokens.resize(lines.size());
+    OpenToken open;
     for (int i = 0; i < static_cast<int>(lines.size()); ++i) {
-        tokenizeLine(i);
+        tokenizeText(lines[i], open, lineTokens[i]);
     }
 }
 
@@ -3747,10 +3733,10 @@ void CustomTextEditor::buildDiffPeekRows(const LineChange& change) {
     diffPeekRows.clear();
 
     // The base lines need tokens of their own
-    bool inMultiLineComment = false;
+    OpenToken open;
     for (int i = change.originalStart; i < change.originalEnd && i < static_cast<int>(diffBaseLines.size()); i++) {
         DiffPeekRow row{false, diffBaseLines[i], {}, 0, 0};
-        tokenizeText(row.text, inMultiLineComment, row.tokens);
+        tokenizeText(row.text, open, row.tokens);
         diffPeekRows.push_back(std::move(row));
     }
     const int removed = static_cast<int>(diffPeekRows.size());
