@@ -19,7 +19,7 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true // avoid error 'Cannot fit requested classes in a single dex file'
+        multiDexEnabled = true // avoid error 'Cannot fit requested classes in a single dex file'
         externalNativeBuild {
             cmake {
                 abiFilters "arm64-v8a"
@@ -50,8 +50,8 @@ android {
     }
 
     buildFeatures {
-        prefab true
-        buildConfig true
+        prefab = true
+        buildConfig = true
     }
 
     sourceSets {
@@ -63,7 +63,7 @@ android {
         }
     }
 
-    namespace 'org.doriaxengine.doriax'
+    namespace = 'org.doriaxengine.doriax'
 }
 
 dependencies {
