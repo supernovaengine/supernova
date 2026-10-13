@@ -859,14 +859,12 @@ static TextPosition adjustPosAfterDelete(const TextPosition& pos, const TextPosi
     return TextPosition(pos.line - (delEnd.line - delStart.line), pos.column);
 }
 
-static TextPosition adjustPosAfterInsert(const TextPosition& pos, const TextPosition& insertPos, const TextPosition& afterPos) {
+static TextPosition adjustPosAfterInsert(const TextPosition& pos, const TextPosition& insertPos, const TextPosition& afterPos, int removed = 0) {
     if (pos < insertPos) return pos;
     int deltaLines = afterPos.line - insertPos.line;
     if (pos.line == insertPos.line) {
-        if (deltaLines > 0) {
-            return TextPosition(pos.line + deltaLines, pos.column - insertPos.column + afterPos.column);
-        }
-        return TextPosition(pos.line, pos.column + (afterPos.column - insertPos.column));
+        // Positions in the whitespace that auto-indent removed after insertPos collapse onto afterPos
+        return TextPosition(pos.line + deltaLines, afterPos.column + std::max(0, pos.column - insertPos.column - removed));
     }
     return TextPosition(pos.line + deltaLines, pos.column);
 }
@@ -877,10 +875,10 @@ static void adjustCursorAfterDelete(Cursor& cursor, const TextPosition& delStart
     cursor.selection.end = adjustPosAfterDelete(cursor.selection.end, delStart, delEnd);
 }
 
-static void adjustCursorAfterInsert(Cursor& cursor, const TextPosition& insertPos, const TextPosition& afterPos) {
-    cursor.position = adjustPosAfterInsert(cursor.position, insertPos, afterPos);
-    cursor.selection.start = adjustPosAfterInsert(cursor.selection.start, insertPos, afterPos);
-    cursor.selection.end = adjustPosAfterInsert(cursor.selection.end, insertPos, afterPos);
+static void adjustCursorAfterInsert(Cursor& cursor, const TextPosition& insertPos, const TextPosition& afterPos, int removed = 0) {
+    cursor.position = adjustPosAfterInsert(cursor.position, insertPos, afterPos, removed);
+    cursor.selection.start = adjustPosAfterInsert(cursor.selection.start, insertPos, afterPos, removed);
+    cursor.selection.end = adjustPosAfterInsert(cursor.selection.end, insertPos, afterPos, removed);
 }
 
 void CustomTextEditor::InsertText(const std::string& text, bool allowAutoIndent) {
@@ -908,15 +906,15 @@ void CustomTextEditor::InsertText(const std::string& text, bool allowAutoIndent)
         }
 
         TextPosition insertPos = cursor.position;
-        insertTextAtCursor(cursor, text, allowAutoIndent);
-        TextPosition afterPos = cursor.position;
+        int removed = 0;
+        TextPosition afterPos = insertTextAtCursor(cursor, text, allowAutoIndent, &removed);
 
         // Adjust all subsequent cursors for the insertion
         for (size_t j = idx + 1; j < order.size(); ++j) {
-            adjustCursorAfterInsert(cursors[order[j]], insertPos, afterPos);
+            adjustCursorAfterInsert(cursors[order[j]], insertPos, afterPos, removed);
         }
         if (showParamHint) {
-            paramHintAnchor = adjustPosAfterInsert(paramHintAnchor, insertPos, afterPos);
+            paramHintAnchor = adjustPosAfterInsert(paramHintAnchor, insertPos, afterPos, removed);
         }
     }
 
@@ -938,9 +936,12 @@ void CustomTextEditor::SetTextUndoable(const std::string& text) {
     finalizeUndoRecord();
 }
 
-void CustomTextEditor::insertTextAtCursor(Cursor& cursor, const std::string& text, bool allowAutoIndent) {
+TextPosition CustomTextEditor::insertTextAtCursor(Cursor& cursor, const std::string& text, bool allowAutoIndent, int* removed) {
     int line = cursor.position.line;
     int col = cursor.position.column;
+    // Set when a block is broken open and the text after the cursor goes to the next line
+    int tailColumn = -1;
+    int stripped = 0;
 
     for (char c : text) {
         if (c == '\n') {
@@ -954,18 +955,37 @@ void CustomTextEditor::insertTextAtCursor(Cursor& cursor, const std::string& tex
             ++line;
             col = 0;
 
-            if (autoIndent && allowAutoIndent && line > 0) {
+            if (autoIndent && allowAutoIndent) {
                 int indent = getLineIndent(line - 1);
-                // Increase indent after { or :
-                if (!before.empty()) {
-                    char lastChar = before.back();
-                    if (lastChar == '{' || lastChar == ':') {
+                OpenToken state = lineStartState(line - 1);
+                std::vector<Token> tokens;
+                tokenizeText(before, state, tokens);
+
+                // Only code gets block indents. With just whitespace before the cursor, or inside
+                // a comment or string that spans lines, the line moves down as it is
+                if (!tokens.empty() && state.type == TokenType::Default) {
+                    int blanks = static_cast<int>(std::min(after.find_first_not_of(" \t"), after.size()));
+                    after.erase(0, blanks);
+                    stripped += blanks;
+
+                    bool opens = opensBlock(before, tokens);
+                    bool closes = closesBlock(after);
+                    if (opens && closes) {
+                        // Break the block open: an indented line for the content and one for the closer
+                        lines.insert(lines.begin() + line + 1, getIndentString(indent) + after);
+                        after.clear();
+                        tailColumn = indent;
+                    }
+
+                    if (opens) {
                         indent += tabSize;
+                    } else if (closes) {
+                        indent = std::max(0, indent - tabSize);
                     }
                 }
-                std::string indentStr = getIndentString(indent);
-                lines[line] = indentStr + lines[line];
-                col = static_cast<int>(indentStr.size());
+
+                lines[line] = getIndentString(indent) + after;
+                col = indent;
             }
         } else if (c == '\t') {
             int visualCol = byteOffsetToVisualColumn(line, col);
@@ -984,6 +1004,9 @@ void CustomTextEditor::insertTextAtCursor(Cursor& cursor, const std::string& tex
     cursor.selection.start = cursor.position;
     cursor.selection.end = cursor.position;
     cursor.preferredColumn = byteOffsetToVisualColumn(line, col);
+
+    if (removed) *removed = stripped;
+    return (tailColumn >= 0) ? TextPosition(line + 1, tailColumn) : cursor.position;
 }
 
 void CustomTextEditor::DeleteSelection() {
@@ -1593,6 +1616,125 @@ int CustomTextEditor::getLineIndent(int lineIndex) const {
 
 std::string CustomTextEditor::getIndentString(int level) const {
     return std::string(level, ' ');
+}
+
+OpenToken CustomTextEditor::lineStartState(int lineIndex) const {
+    // Scans from the top, since lineTokens can be behind in the middle of an edit
+    OpenToken state;
+    std::vector<Token> tokens;
+    for (int i = 0; i < lineIndex; ++i) {
+        tokenizeText(lines[i], state, tokens);
+    }
+    return state;
+}
+
+bool CustomTextEditor::opensBlock(const std::string& text, const std::vector<Token>& tokens) const {
+    std::string last;
+    int blocks = 0;
+    for (const Token& token : tokens) {
+        if (token.type == TokenType::Comment || token.type == TokenType::MultiLineComment) continue;
+        last = text.substr(token.start, token.length);
+
+        // Lua blocks are counted, so "if x then return end" opens none
+        if (language == SyntaxLanguage::Lua && token.type == TokenType::Keyword) {
+            if (last == "function" || last == "then" || last == "do" || last == "repeat") {
+                ++blocks;
+            } else if (last == "else") {
+                blocks = std::max(blocks, 1);
+            } else if (last == "elseif" || last == "end" || last == "until") {
+                blocks = std::max(blocks - 1, 0);
+            }
+        }
+    }
+
+    if (last == "{" || last == "(" || last == "[") return true;
+    // Labels, access specifiers and case
+    if (last == ":" && language != SyntaxLanguage::Lua) return true;
+    return blocks > 0;
+}
+
+bool CustomTextEditor::closesBlock(const std::string& text) const {
+    size_t start = text.find_first_not_of(" \t");
+    if (start == std::string::npos) return false;
+    if (text[start] == '}' || text[start] == ')' || text[start] == ']') return true;
+    if (language != SyntaxLanguage::Lua) return false;
+
+    size_t end = start;
+    while (end < text.size() && isWordChar(text[end])) ++end;
+    std::string word = text.substr(start, end - start);
+    return word == "end" || word == "else" || word == "elseif" || word == "until";
+}
+
+int CustomTextEditor::openingBracketLine(const TextPosition& closer) const {
+    char closeChar = lines[closer.line][closer.column];
+    char openChar = getMatchingBracket(closeChar);
+    int depth = 0;
+    for (int i = closer.line; i >= 0; --i) {
+        // Brackets in strings and comments aren't punctuation tokens
+        for (auto token = lineTokens[i].rbegin(); token != lineTokens[i].rend(); ++token) {
+            if (token->type != TokenType::Punctuation || (i == closer.line && token->start >= closer.column)) continue;
+            char c = lines[i][token->start];
+            if (c == closeChar) {
+                ++depth;
+            } else if (c == openChar) {
+                if (depth == 0) return i;
+                --depth;
+            }
+        }
+    }
+    return -1;
+}
+
+void CustomTextEditor::reindentAfterTyping(int typedLength) {
+    if (!autoIndent) return;
+
+    bool changed = false;
+    for (size_t i = 0; i < cursors.size(); ++i) {
+        int lineIndex = cursors[i].position.line;
+        int typedColumn = cursors[i].position.column - typedLength;
+        if (typedColumn < 0) continue;
+
+        // Only when the typed text makes the line start with a closer, or stop doing so
+        std::string& line = lines[lineIndex];
+        std::string before = line;
+        before.erase(typedColumn, typedLength);
+        bool closes = closesBlock(line);
+        if (closes == closesBlock(before)) continue;
+
+        int indentEnd = static_cast<int>(std::min(line.find_first_not_of(" \t"), line.size()));
+        // A closer gets its indent back only by growing into a longer word, as "end" into "endpoint"
+        if (!closes && typedColumn <= indentEnd) continue;
+        // Keep "else" outdented while it becomes "elseif"
+        if (!closes && line.compare(indentEnd, 5, "elsei") == 0) continue;
+        // The inside of a comment or string that spans lines is text, not code
+        if (lineStartState(lineIndex).type != TokenType::Default) continue;
+
+        // The line above sets the indent, one level deeper if it opens a block
+        int indent = 0;
+        for (int prev = lineIndex - 1; prev >= 0; --prev) {
+            if (lines[prev].find_first_not_of(" \t") == std::string::npos) continue;
+            indent = getLineIndent(prev) + (opensBlock(lines[prev], lineTokens[prev]) ? tabSize : 0);
+            break;
+        }
+        if (closes) {
+            // A bracket lines up with the line that opened it
+            int opener = isCloseBracket(line[indentEnd]) ? openingBracketLine(TextPosition(lineIndex, indentEnd)) : -1;
+            indent = (opener >= 0) ? getLineIndent(opener) : std::max(0, indent - tabSize);
+        }
+        if (indent == getLineIndent(lineIndex)) continue;
+
+        line = getIndentString(indent) + line.substr(indentEnd);
+        for (auto& cursor : cursors) {
+            adjustCursorAfterDelete(cursor, TextPosition(lineIndex, 0), TextPosition(lineIndex, indentEnd));
+            adjustCursorAfterInsert(cursor, TextPosition(lineIndex, 0), TextPosition(lineIndex, indent));
+            if (cursor.position.line == lineIndex) cursor.preferredColumn = -1;
+        }
+        // Later cursors read the tokens
+        tokenizeAll();
+        changed = true;
+    }
+
+    if (changed) finalizeUndoRecord();
 }
 
 void CustomTextEditor::ensureValidCursors() {
@@ -3152,44 +3294,8 @@ void CustomTextEditor::handleKeyboardInput() {
 
     if (ImGui::IsKeyPressed(ImGuiKey_Enter) && !readOnly) {
         if (!showAutoComplete) {
-            bool handled = false;
-
-            // Smart Enter for brackets
-            if (cursors.size() == 1) {
-                const auto& cursor = cursors[0];
-                if (cursor.selection.isEmpty() && cursor.position.column > 0) {
-                    char prevChar = getCharAt(TextPosition(cursor.position.line, cursor.position.column - 1));
-                    char nextChar = getCharAt(cursor.position);
-
-                    if ((prevChar == '{' && nextChar == '}') ||
-                        (prevChar == '[' && nextChar == ']') ||
-                        (prevChar == '(' && nextChar == ')')) {
-
-                        // Break the brackets open: an indented line for the content
-                        // and one for the closing bracket
-                        InsertText("\n", true);
-                        InsertText("\n", false);
-
-                        int closingBracketLine = cursors[0].position.line;
-                        int parentLine = closingBracketLine - 2;
-
-                        if (parentLine >= 0) {
-                            SetCursorPosition(closingBracketLine, 0);
-                            InsertText(getIndentString(getLineIndent(parentLine)), false);
-
-                            int contentLine = closingBracketLine - 1;
-                            SetCursorPosition(contentLine, static_cast<int>(lines[contentLine].size()));
-                        }
-
-                        handled = true;
-                    }
-                }
-            }
-
-            if (!handled) {
-                InsertText("\n");
-                scrollToCursor();
-            }
+            InsertText("\n");
+            scrollToCursor();
         }
     }
 
@@ -3528,6 +3634,7 @@ void CustomTextEditor::handleTextInput() {
                 }
 
                 InsertText(utf8);
+                reindentAfterTyping(static_cast<int>(std::strlen(utf8)));
 
                 // Auto-close brackets
                 if (c == '(' || c == '[' || c == '{') {

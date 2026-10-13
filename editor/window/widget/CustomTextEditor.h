@@ -406,7 +406,8 @@ namespace doriax::editor {
         void moveCursorToLineStart(Cursor& cursor, bool shift);
         void moveCursorToLineEnd(Cursor& cursor, bool shift);
 
-        void insertTextAtCursor(Cursor& cursor, const std::string& text, bool allowAutoIndent);
+        // Returns where the text that followed the cursor ended up; removed gets how much whitespace auto-indent dropped from its start
+        TextPosition insertTextAtCursor(Cursor& cursor, const std::string& text, bool allowAutoIndent, int* removed = nullptr);
         void deleteRange(const TextPosition& start, const TextPosition& end);
         void moveSelectedText(const TextPosition& destPos);
         std::string getRange(const TextPosition& start, const TextPosition& end) const;
@@ -416,6 +417,12 @@ namespace doriax::editor {
 
         int getLineIndent(int lineIndex) const;
         std::string getIndentString(int level) const;
+        // Auto-indent: a line ending in a block opener indents the next one, a line starting with a closer is outdented
+        OpenToken lineStartState(int lineIndex) const;
+        bool opensBlock(const std::string& text, const std::vector<Token>& tokens) const;
+        bool closesBlock(const std::string& text) const;
+        int openingBracketLine(const TextPosition& closer) const;
+        void reindentAfterTyping(int typedLength);
 
         TextPosition screenToText(const ImVec2& screenPos, const ImVec2& origin) const;
         ImVec2 textToScreen(const TextPosition& pos, const ImVec2& origin) const;
