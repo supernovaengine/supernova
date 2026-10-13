@@ -187,11 +187,18 @@ namespace {
 
     // A value that becomes a C string literal through add_definitions crosses two quoting
     // layers: escape for C first, then for the CMake string ($ stops variable expansion).
+    // ; and # become octal escapes: ; splits the define in two and CMake drops defines with #.
     std::string escapeCMakeCString(const std::string& value) {
         std::string cValue;
         for (char c : value) {
-            if (c == '\\' || c == '"') cValue += '\\';
-            cValue += c;
+            if (c == ';') {
+                cValue += "\\073";
+            } else if (c == '#') {
+                cValue += "\\043";
+            } else {
+                if (c == '\\' || c == '"') cValue += '\\';
+                cValue += c;
+            }
         }
         std::string out;
         for (char c : cValue) {

@@ -441,8 +441,14 @@ std::string editor::Generator::getPlatformCMakeConfig(bool vsyncEnabled, const W
     // exported-project configuration produced by Exporter.
     std::string title;
     for (char c : windowSettings.title) {
-        if (c == '\\' || c == '"') title += '\\';
-        title += c;
+        if (c == ';') {
+            title += "\\073";
+        } else if (c == '#') {
+            title += "\\043";
+        } else {
+            if (c == '\\' || c == '"') title += '\\';
+            title += c;
+        }
     }
     std::string cmakeTitle;
     for (char c : title) {
