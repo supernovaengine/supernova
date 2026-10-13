@@ -235,7 +235,7 @@ static_assert(getDoriaxGamepadButton(AKEYCODE_DPAD_LEFT) == D_GAMEPAD_BUTTON_DPA
 static_assert(getDoriaxGamepadButton(AKEYCODE_UNKNOWN) == -1,
               "Unknown Android gamepad buttons must stay unknown");
 
-// GameTextInput text is Java's modified UTF-8: characters past U+FFFF are two 3-byte surrogates
+// GameTextInput takes Java's modified UTF-8: characters past U+FFFF are two 3-byte surrogates
 std::string toModifiedUtf8(const std::wstring& text) {
     std::string out;
     auto append = [&out](uint32_t unit) {
@@ -261,24 +261,28 @@ std::string toModifiedUtf8(const std::wstring& text) {
     return out;
 }
 
+// ART returns them as standard 4-byte sequences instead, so both forms are read
 std::wstring fromModifiedUtf8(const char* text, int32_t length) {
     std::wstring out;
     for (int32_t i = 0; i < length;) {
         const unsigned char c = text[i];
-        wchar_t unit = c;
-        if (c >= 0xE0 && i + 2 < length) {
-            unit = ((c & 0x0F) << 12) | ((text[i + 1] & 0x3F) << 6) | (text[i + 2] & 0x3F);
+        wchar_t cp = c;
+        if (c >= 0xF0 && i + 3 < length) {
+            cp = ((c & 0x07) << 18) | ((text[i + 1] & 0x3F) << 12) | ((text[i + 2] & 0x3F) << 6) | (text[i + 3] & 0x3F);
+            i += 4;
+        } else if (c >= 0xE0 && i + 2 < length) {
+            cp = ((c & 0x0F) << 12) | ((text[i + 1] & 0x3F) << 6) | (text[i + 2] & 0x3F);
             i += 3;
         } else if (c >= 0xC0 && i + 1 < length) {
-            unit = ((c & 0x1F) << 6) | (text[i + 1] & 0x3F);
+            cp = ((c & 0x1F) << 6) | (text[i + 1] & 0x3F);
             i += 2;
         } else {
             i++;
         }
-        if (unit >= 0xDC00 && unit <= 0xDFFF && !out.empty() && out.back() >= 0xD800 && out.back() <= 0xDBFF) {
-            out.back() = 0x10000 + ((out.back() - 0xD800) << 10) + (unit - 0xDC00);
+        if (cp >= 0xDC00 && cp <= 0xDFFF && !out.empty() && out.back() >= 0xD800 && out.back() <= 0xDBFF) {
+            out.back() = 0x10000 + ((out.back() - 0xD800) << 10) + (cp - 0xDC00);
         } else {
-            out += unit;
+            out += cp;
         }
     }
     return out;
