@@ -1160,11 +1160,14 @@ void ExportWindow::drawProgress() {
     ImGui::Text("%s", progress.currentStep.c_str());
 
     // Last build-output line, clipped to a single line so the modal keeps its size.
+    // No background, as an empty one looked like a second progress bar.
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(0, 0, 0, 0));
     ImGui::BeginChild("##BuildDetail", ImVec2(0, ImGui::GetTextLineHeight() + Theme::dpi(2.0f)), false, ImGuiWindowFlags_NoScrollbar);
     if (!progress.detailLine.empty()) {
         ImGui::TextDisabled("%s", progress.detailLine.c_str());
     }
     ImGui::EndChild();
+    ImGui::PopStyleColor();
     ImGui::Dummy(ImVec2(0.0f, Theme::dpi(6.0f)));
 
     if (progress.failed) {
