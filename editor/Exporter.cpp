@@ -2077,6 +2077,13 @@ bool editor::Exporter::copyEngine() {
             setError("Failed to copy doriax.py: " + ec.message());
             return false;
         }
+#ifndef _WIN32
+        // The editor's release zips lose file modes
+        for (const fs::path& script : {config.targetDir / "doriax.py", config.targetDir / "workspaces" / "androidstudio" / "gradlew"}) {
+            fs::permissions(script, fs::perms::owner_exec | fs::perms::group_exec | fs::perms::others_exec, fs::perm_options::add, ec);
+            if (ec) Out::warning("Could not make %s executable: %s", script.string().c_str(), ec.message().c_str());
+        }
+#endif
         if (!writeAndroidProjectSettings()) return false;
         if (!writeAppleProjectSettings()) return false;
     }
