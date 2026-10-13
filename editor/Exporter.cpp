@@ -446,6 +446,130 @@ namespace {
         return out;
     }
 
+    // 24 hex digits like Xcode's ids. FNV-1a, since std::hash differs between standard libraries.
+    std::string xcodeObjectId(const std::string& key) {
+        uint64_t hash = 1469598103934665603ull;
+        uint32_t extra = 2166136261u;
+        for (unsigned char c : key) {
+            hash ^= c;
+            hash *= 1099511628211ull;
+            extra ^= c;
+            extra *= 16777619u;
+        }
+        char id[25];
+        snprintf(id, sizeof(id), "%016llX%08X", static_cast<unsigned long long>(hash), static_cast<unsigned int>(extra));
+        return id;
+    }
+
+    // Quoted unless Xcode would write it bare
+    std::string pbxString(const std::string& value) {
+        const bool bare = !value.empty() && std::all_of(value.begin(), value.end(), [](unsigned char c) {
+            return c < 0x80 && (std::isalnum(c) || c == '_' || c == '$' || c == '.' || c == '/');
+        });
+        if (bare) return value;
+        std::string out = "\"";
+        for (char c : value) {
+            if (c == '"' || c == '\\') out += '\\';
+            out += c;
+        }
+        return out + "\"";
+    }
+
+    struct PbxRange {
+        size_t start = std::string::npos;
+        size_t end = std::string::npos;
+        bool found() const { return start != std::string::npos; }
+    };
+
+    // An object starts on a line indented by two tabs and ends with "\t\t};"
+    PbxRange pbxObjectAt(const std::string& pbx, size_t start) {
+        const size_t end = pbx.find("\n\t\t};\n", start);
+        return end == std::string::npos ? PbxRange{} : PbxRange{start, end + 6};
+    }
+
+    PbxRange findPbxObject(const std::string& pbx, const std::string& id) {
+        const size_t start = pbx.find("\n\t\t" + id + " ");
+        return start == std::string::npos ? PbxRange{} : pbxObjectAt(pbx, start + 1);
+    }
+
+    PbxRange findPbxObjectContaining(const std::string& pbx, const std::string& section, const std::string& text) {
+        const size_t match = pbx.find(text, pbx.find("/* Begin " + section + " section */"));
+        if (match >= pbx.find("/* End " + section + " section */")) return {};
+        size_t start = pbx.rfind('\n', match);
+        while (start != std::string::npos && pbx.compare(start + 1, 3, "\t\t\t") == 0) {
+            start = pbx.rfind('\n', start - 1);
+        }
+        return start == std::string::npos ? PbxRange{} : pbxObjectAt(pbx, start + 1);
+    }
+
+    // The id in "key = <id> /* name */;" inside range
+    std::string pbxValueId(const std::string& pbx, PbxRange range, const std::string& key) {
+        const size_t start = pbx.find("\t" + key + " = ", range.start);
+        if (start >= range.end) return {};
+        const size_t value = start + key.size() + 4;
+        return pbx.substr(value, pbx.find_first_of(" ;", value) - value);
+    }
+
+    // The entry lines of the list "key = (" inside range; indent is the key's
+    PbxRange findPbxList(const std::string& pbx, PbxRange range, const std::string& key, std::string& indent) {
+        const size_t keyStart = pbx.find("\t" + key + " = (\n", range.start);
+        if (keyStart >= range.end) return {};
+        const size_t lineStart = pbx.rfind('\n', keyStart) + 1;
+        indent = pbx.substr(lineStart, keyStart + 1 - lineStart);
+        const size_t start = pbx.find('\n', keyStart) + 1;
+        const size_t end = pbx.find("\n" + indent + ");", start - 1);
+        return end >= range.end ? PbxRange{} : PbxRange{start, end + 1};
+    }
+
+    std::vector<std::string> pbxListIds(const std::string& pbx, PbxRange range, const std::string& key) {
+        std::string indent;
+        const PbxRange list = findPbxList(pbx, range, key, indent);
+        std::vector<std::string> ids;
+        for (size_t line = list.start; line < list.end; line = pbx.find('\n', line) + 1) {
+            const size_t id = line + indent.size() + 1;
+            ids.push_back(pbx.substr(id, pbx.find_first_of(" ,", id) - id));
+        }
+        return ids;
+    }
+
+    // Adds the entries the list lacks; false when range has no list "key = ("
+    bool addPbxListEntries(std::string& pbx, PbxRange range, const std::string& key, const std::vector<std::string>& entries) {
+        std::string indent;
+        const PbxRange list = findPbxList(pbx, range, key, indent);
+        if (!list.found()) return false;
+        std::set<std::string> lines;
+        for (size_t line = list.start; line < list.end; line = pbx.find('\n', line) + 1) {
+            lines.insert(pbx.substr(line, pbx.find('\n', line) + 1 - line));
+        }
+        std::string added;
+        for (const std::string& entry : entries) {
+            const std::string line = indent + "\t" + entry + ",\n";
+            if (lines.insert(line).second) added += line;
+        }
+        pbx.insert(list.end, added);
+        return true;
+    }
+
+    PbxRange findPbxBuildSettings(const std::string& pbx, const std::string& configurationId) {
+        const PbxRange configuration = findPbxObject(pbx, configurationId);
+        const size_t start = pbx.find("\t\t\tbuildSettings = {\n", configuration.start);
+        const size_t end = pbx.find("\n\t\t\t};\n", start);
+        return end >= configuration.end ? PbxRange{} : PbxRange{start, end + 1};
+    }
+
+    // By name, as ids drift whenever the workspace is edited in Xcode
+    bool findXcodeTarget(const std::string& pbx, const std::string& name, std::string& sourcesPhaseId,
+                         std::vector<std::string>& configurationIds) {
+        const PbxRange target = findPbxObjectContaining(pbx, "PBXNativeTarget", "\n\t\t\tname = " + pbxString(name) + ";\n");
+        for (const std::string& phaseId : pbxListIds(pbx, target, "buildPhases")) {
+            const PbxRange phase = findPbxObject(pbx, phaseId);
+            if (pbx.find("\t\t\tisa = PBXSourcesBuildPhase;\n", phase.start) < phase.end) sourcesPhaseId = phaseId;
+        }
+        const PbxRange configurationList = findPbxObject(pbx, pbxValueId(pbx, target, "buildConfigurationList"));
+        configurationIds = pbxListIds(pbx, configurationList, "buildConfigurations");
+        return !sourcesPhaseId.empty() && !configurationIds.empty();
+    }
+
 }
 
 editor::Exporter::Exporter() {
@@ -1537,6 +1661,7 @@ bool editor::Exporter::copyGenerated() {
 
     fs::path generatedSrc = project->getProjectInternalPath() / "generated";
     fs::path generatedDst = getExportProjectRoot();
+    cppExportedPaths.clear();
 
     std::error_code ec;
     fs::create_directories(generatedDst, ec);
@@ -1563,6 +1688,7 @@ bool editor::Exporter::copyGenerated() {
             } else if (entry.is_regular_file()) {
                 fs::create_directories(destPath.parent_path(), ec);
                 fs::copy_file(entry.path(), destPath, fs::copy_options::overwrite_existing, ec);
+                if (!ec) cppExportedPaths.insert(relativePath);
             }
         }
     }
@@ -1636,6 +1762,7 @@ bool editor::Exporter::copyGenerated() {
         }
 
         FileUtils::writeIfChanged(generatedDst / "scene_scripts.cpp", content);
+        cppExportedPaths.insert("scene_scripts.cpp");
     }
 
     return true;
@@ -1835,6 +1962,7 @@ bool editor::Exporter::copyCppScripts() {
                         fs::path dstPath = scriptsDst / relPath;
                         fs::create_directories(dstPath.parent_path(), ec);
                         fs::copy_file(srcPath, dstPath, fs::copy_options::overwrite_existing, ec);
+                        if (!ec) cppExportedPaths.insert(fs::path("scripts") / relPath);
                     }
                 }
             }
@@ -1920,6 +2048,7 @@ bool editor::Exporter::copyCppScripts() {
                 const fs::path dstPath = scriptsDst / relPath;
                 fs::create_directories(dstPath.parent_path(), ec);
                 fs::copy_file(it->path(), dstPath, fs::copy_options::overwrite_existing, ec);
+                if (!ec) cppExportedPaths.insert(fs::path("scripts") / relPath);
             }
         } catch (const fs::filesystem_error& e) {
             setError("Failed to copy script directory: " + std::string(e.what()));
@@ -2396,20 +2525,24 @@ fs::path editor::Exporter::scriptDirRelativePath(const fs::path& scriptDir) cons
     return relPath;
 }
 
-std::string editor::Exporter::buildScriptDirIncludes() const {
+std::vector<std::string> editor::Exporter::getExportedScriptRoots() const {
     // copyCppScripts() mirrors the project-relative layout under scripts/, so a
     // root keeps its path there.
-    std::string dirs;
+    std::vector<std::string> roots;
     for (const fs::path& scriptDir : project->getScriptDirs()) {
         const fs::path relDir = scriptDirRelativePath(scriptDir);
         if (relDir.empty()) {
             continue;
         }
+        roots.push_back(relDir == "." ? "scripts" : "scripts/" + FileUtils::pathToGenericUtf8(relDir));
+    }
+    return roots;
+}
 
-        dirs += "\n        ${PROJECT_ROOT}/scripts";
-        if (relDir != ".") {
-            dirs += "/" + relDir.generic_string();
-        }
+std::string editor::Exporter::buildScriptDirIncludes() const {
+    std::string dirs;
+    for (const std::string& root : getExportedScriptRoots()) {
+        dirs += "\n        ${PROJECT_ROOT}/" + root;
     }
 
     if (dirs.empty()) {
@@ -2418,7 +2551,7 @@ std::string editor::Exporter::buildScriptDirIncludes() const {
     return "target_include_directories(${APP_NAME} PRIVATE" + dirs + "\n    )";
 }
 
-std::string editor::Exporter::buildSceneMaxValuesDefinitions() const {
+std::vector<std::pair<std::string, unsigned int>> editor::Exporter::getSceneMaxValues() const {
     // Aggregate the per-scene maxima into a single project-wide capacity for each
     // HybridArray. SceneProject::maxValues is refreshed for every scene during
     // loadAndSaveAllScenes(), which always runs before copyEngine().
@@ -2444,24 +2577,30 @@ std::string editor::Exporter::buildSceneMaxValuesDefinitions() const {
     // created dynamically by scripts. Passing the macros themselves as the floor keeps these in
     // lockstep with the engine defaults (string literals are not macro-expanded; the bare macro
     // arguments are).
-    auto define = [&](const char* macro, unsigned int value, unsigned int engineDefault) {
-        return std::string("add_definitions(\"-D") + macro + "=" + std::to_string(std::max(value, engineDefault)) + "\")";
+    auto capacity = [](unsigned int value, unsigned int engineDefault) { return std::max(value, engineDefault); };
+    return {
+        {"MAX_SUBMESHES", capacity(agg.maxSubmeshes, MAX_SUBMESHES)},
+        {"MAX_TILEMAP_TILESRECT", capacity(agg.maxTilemapTilesRect, MAX_TILEMAP_TILESRECT)},
+        {"MAX_TILEMAP_TILES", capacity(agg.maxTilemapTiles, MAX_TILEMAP_TILES)},
+        {"MAX_SPRITE_FRAMES", capacity(agg.maxSpriteFrames, MAX_SPRITE_FRAMES)},
+        {"MAX_EXTERNAL_BUFFERS", capacity(agg.maxExternalBuffers, MAX_EXTERNAL_BUFFERS)},
+        {"MAX_BONES", capacity(agg.maxBones, MAX_BONES)},
+        {"MAX_SHAPES_2D", capacity(agg.maxShapes2D, MAX_SHAPES_2D)},
+        {"MAX_SHAPE_POINTS_2D", capacity(agg.maxShapePoints2D, MAX_SHAPE_POINTS_2D)},
+        {"MAX_SHAPES_3D", capacity(agg.maxShapes3D, MAX_SHAPES_3D)},
+        {"MAX_SHAPE_VERTICES_3D", capacity(agg.maxShapeVertices3D, MAX_SHAPE_VERTICES_3D)},
+        {"MAX_SHAPE_INDICES_3D", capacity(agg.maxShapeIndices3D, MAX_SHAPE_INDICES_3D)},
     };
+}
 
+std::string editor::Exporter::buildSceneMaxValuesDefinitions() const {
     // First line reuses the marker's existing indentation; subsequent lines are
     // indented to match the surrounding standalone setup block (4 spaces).
-    const std::string indent = "\n    ";
-    std::string out = define("MAX_SUBMESHES", agg.maxSubmeshes, MAX_SUBMESHES);
-    out += indent + define("MAX_TILEMAP_TILESRECT", agg.maxTilemapTilesRect, MAX_TILEMAP_TILESRECT);
-    out += indent + define("MAX_TILEMAP_TILES", agg.maxTilemapTiles, MAX_TILEMAP_TILES);
-    out += indent + define("MAX_SPRITE_FRAMES", agg.maxSpriteFrames, MAX_SPRITE_FRAMES);
-    out += indent + define("MAX_EXTERNAL_BUFFERS", agg.maxExternalBuffers, MAX_EXTERNAL_BUFFERS);
-    out += indent + define("MAX_BONES", agg.maxBones, MAX_BONES);
-    out += indent + define("MAX_SHAPES_2D", agg.maxShapes2D, MAX_SHAPES_2D);
-    out += indent + define("MAX_SHAPE_POINTS_2D", agg.maxShapePoints2D, MAX_SHAPE_POINTS_2D);
-    out += indent + define("MAX_SHAPES_3D", agg.maxShapes3D, MAX_SHAPES_3D);
-    out += indent + define("MAX_SHAPE_VERTICES_3D", agg.maxShapeVertices3D, MAX_SHAPE_VERTICES_3D);
-    out += indent + define("MAX_SHAPE_INDICES_3D", agg.maxShapeIndices3D, MAX_SHAPE_INDICES_3D);
+    std::string out;
+    for (const auto& [macro, value] : getSceneMaxValues()) {
+        if (!out.empty()) out += "\n    ";
+        out += "add_definitions(\"-D" + macro + "=" + std::to_string(value) + "\")";
+    }
     return out;
 }
 
@@ -2967,6 +3106,7 @@ bool editor::Exporter::writeAppleProjectSettings() {
         }
         blockStart += block.size() + 2;
     }
+    if (!addXcodeProjectSources(xcodeProject) || !writeXcodeBuildSettings(xcodeProject)) return false;
     FileUtils::writeIfChanged(projectFile, xcodeProject);
     std::string iosPlist;
     if (!readText(iosPlistPath, iosPlist)) {
@@ -3076,6 +3216,214 @@ bool editor::Exporter::writeAppleProjectSettings() {
         FileUtils::writeIfChanged(appIconSetDir / "Contents.json", contents);
     }
 
+    return true;
+}
+
+bool editor::Exporter::addXcodeProjectSources(std::string& xcodeProject) {
+    const fs::path projectRoot = getExportProjectRoot();
+    // Two paths can name one file on a case-insensitive file system. Only files of
+    // the same size can be the same one, so just those are compared.
+    std::map<uintmax_t, std::vector<fs::path>> filesBySize;
+    std::vector<std::string> paths;
+    for (const fs::path& path : cppExportedPaths) {
+        // Headers stay out: Xcode maps every header of a project by name for all targets,
+        // so a project Log.h would shadow the engine's in the engine's own build
+        if (!isCppSourceFile(path) || isCppHeaderFile(path)) continue;
+        const fs::path file = projectRoot / path;
+        std::error_code ec;
+        std::vector<fs::path>& sameSize = filesBySize[fs::file_size(file, ec)];
+        const bool listed = std::any_of(sameSize.begin(), sameSize.end(),
+                                        [&](const fs::path& other) { return fs::equivalent(other, file, ec); });
+        if (listed) continue;
+        sameSize.push_back(file);
+        paths.push_back(FileUtils::pathToGenericUtf8(path));
+    }
+    std::sort(paths.begin(), paths.end());
+
+    struct AppTarget {
+        std::string name;
+        std::string sourcesPhaseId;
+        std::vector<std::string> configurationIds;
+        std::vector<std::string> sources;
+    };
+    std::vector<AppTarget> targets = {{"Doriax iOS"}, {"Doriax macOS"}};
+    for (AppTarget& target : targets) {
+        if (!findXcodeTarget(xcodeProject, target.name, target.sourcesPhaseId, target.configurationIds)) {
+            setError("Apple export template has no \"" + target.name + "\" target");
+            return false;
+        }
+    }
+
+    std::set<std::string> usedIds;
+    for (size_t start = xcodeProject.find_first_of("0123456789ABCDEF"); start != std::string::npos;) {
+        const size_t end = std::min(xcodeProject.find_first_not_of("0123456789ABCDEF", start), xcodeProject.size());
+        if (end - start == 24) usedIds.insert(xcodeProject.substr(start, 24));
+        start = xcodeProject.find_first_of("0123456789ABCDEF", end);
+    }
+    // Ids come from the paths, so re-exports match. A taken id is skipped, unless an
+    // earlier run of this patch left the same object there.
+    auto addObject = [&](const std::string& key, std::string& objects, auto&& define) {
+        for (int attempt = 0;; attempt++) {
+            const std::string id = xcodeObjectId(attempt == 0 ? key : key + "#" + std::to_string(attempt));
+            const std::string object = define(id);
+            if (usedIds.insert(id).second) {
+                objects += object;
+                return id;
+            }
+            if (xcodeProject.find(object) != std::string::npos) return id;
+        }
+    };
+
+    auto baseName = [](const std::string& path) { return path.substr(path.rfind('/') + 1); };
+    auto parentDir = [](const std::string& path) {
+        const size_t slash = path.rfind('/');
+        return slash == std::string::npos ? std::string() : path.substr(0, slash);
+    };
+
+    // A group per folder, "" being the template's project group
+    struct Folder {
+        std::set<std::string> folders;
+        std::vector<std::string> files;
+    };
+    std::map<std::string, Folder> folders;
+    std::string fileReferences, buildFiles, groups;
+    for (const std::string& path : paths) {
+        const std::string name = baseName(path);
+        const char* type = FileUtils::pathFromUtf8(name).extension() == ".c" ? "sourcecode.c.c" : "sourcecode.cpp.cpp";
+        const std::string fileId = addObject("file:" + path, fileReferences, [&](const std::string& id) {
+            return "\t\t" + id + " /* " + name + " */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "
+                + type + "; path = " + pbxString(name) + "; sourceTree = \"<group>\"; };\n";
+        });
+        for (AppTarget& target : targets) {
+            const std::string buildFileId = addObject("build:" + target.name + ":" + path, buildFiles, [&](const std::string& id) {
+                return "\t\t" + id + " /* " + name + " in Sources */ = {isa = PBXBuildFile; fileRef = " + fileId
+                    + " /* " + name + " */; };\n";
+            });
+            target.sources.push_back(buildFileId + " /* " + name + " in Sources */");
+        }
+        folders[parentDir(path)].files.push_back(fileId + " /* " + name + " */");
+        for (std::string dir = parentDir(path); !dir.empty(); dir = parentDir(dir)) {
+            folders[parentDir(dir)].folders.insert(dir);
+        }
+    }
+
+    std::map<std::string, std::string> groupIds;
+    auto children = [&](const Folder& folder) {
+        std::vector<std::string> entries;
+        for (const std::string& dir : folder.folders) entries.push_back(groupIds[dir] + " /* " + baseName(dir) + " */");
+        entries.insert(entries.end(), folder.files.begin(), folder.files.end());
+        return entries;
+    };
+    // In reverse, subfolders come before their folder and "" comes last
+    for (auto it = folders.rbegin(); it != folders.rend() && !it->first.empty(); ++it) {
+        const std::string name = baseName(it->first);
+        const std::vector<std::string> entries = children(it->second);
+        groupIds[it->first] = addObject("group:" + it->first, groups, [&](const std::string& id) {
+            std::string group = "\t\t" + id + " /* " + name + " */ = {\n\t\t\tisa = PBXGroup;\n\t\t\tchildren = (\n";
+            for (const std::string& entry : entries) group += "\t\t\t\t" + entry + ",\n";
+            return group + "\t\t\t);\n\t\t\tpath = " + pbxString(name) + ";\n\t\t\tsourceTree = \"<group>\";\n\t\t};\n";
+        });
+    }
+
+    auto insertObjects = [&](const std::string& section, const std::string& objects) {
+        const size_t sectionEnd = xcodeProject.find("/* End " + section + " section */");
+        if (sectionEnd == std::string::npos) {
+            setError("Apple export template has no " + section + " section");
+            return false;
+        }
+        xcodeProject.insert(sectionEnd, objects);
+        return true;
+    };
+    if (!insertObjects("PBXBuildFile", buildFiles) || !insertObjects("PBXFileReference", fileReferences)
+        || !insertObjects("PBXGroup", groups)) {
+        return false;
+    }
+    const PbxRange projectGroup = findPbxObjectContaining(xcodeProject, "PBXGroup", "\n\t\t\tpath = ../../project;\n");
+    if (!addPbxListEntries(xcodeProject, projectGroup, "children", children(folders[""]))) {
+        setError("Apple export template has no project group");
+        return false;
+    }
+
+    // The include directories CMake gives the game target
+    std::vector<std::string> includeDirs = {"project", "project/scripts"};
+    for (const std::string& root : getExportedScriptRoots()) includeDirs.push_back("project/" + root);
+    std::vector<std::string> searchPaths;
+    for (const std::string& dir : includeDirs) {
+        std::string path = "$(SRCROOT)/../../" + dir;
+        // Xcode splits a list item like a shell does. It writes a backslash as is into the
+        // response file, where clang reads it as an escape, so backslashes are doubled again.
+        if (path.find_first_of(" \t'\"\\") != std::string::npos) {
+            std::string quoted = "\"";
+            for (char c : path) {
+                if (c == '\\') quoted += "\\\\\\\\";
+                else if (c == '"') quoted += "\\\"";
+                else quoted += c;
+            }
+            path = quoted + "\"";
+        }
+        searchPaths.push_back(pbxString(path));
+    }
+    for (const AppTarget& target : targets) {
+        if (!addPbxListEntries(xcodeProject, findPbxObject(xcodeProject, target.sourcesPhaseId), "files", target.sources)) {
+            setError("Apple export template has no Sources phase in \"" + target.name + "\"");
+            return false;
+        }
+        for (const std::string& configurationId : target.configurationIds) {
+            if (!addPbxListEntries(xcodeProject, findPbxBuildSettings(xcodeProject, configurationId), "HEADER_SEARCH_PATHS", searchPaths)) {
+                setError("Apple export template has no HEADER_SEARCH_PATHS in \"" + target.name + "\"");
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
+bool editor::Exporter::writeXcodeBuildSettings(std::string& xcodeProject) {
+    // Like CMake, the engine library and the apps use the project's C++ standard
+    const std::string standardKey = "\t\t\t\tCLANG_CXX_LANGUAGE_STANDARD = ";
+    const std::string standard = "\"c++" + std::to_string(project->getCxxStandard()) + "\"";
+    for (const std::string name : {"doriax-ios", "doriax-macos", "Doriax iOS", "Doriax macOS"}) {
+        std::string sourcesPhaseId;
+        std::vector<std::string> configurationIds;
+        if (!findXcodeTarget(xcodeProject, name, sourcesPhaseId, configurationIds)) {
+            setError("Apple export template has no \"" + name + "\" target");
+            return false;
+        }
+        for (const std::string& configurationId : configurationIds) {
+            const PbxRange settings = findPbxBuildSettings(xcodeProject, configurationId);
+            const size_t key = xcodeProject.find(standardKey, settings.start);
+            if (key >= settings.end) {
+                setError("Apple export template has no C++ standard in \"" + name + "\"");
+                return false;
+            }
+            const size_t value = key + standardKey.size();
+            xcodeProject.replace(value, xcodeProject.find(';', value) - value, standard);
+        }
+    }
+
+    // Like add_definitions() in CMake: the capacities size engine structs, so every target gets them
+    const PbxRange projectObject = findPbxObject(xcodeProject, pbxValueId(xcodeProject, {0, xcodeProject.size()}, "rootObject"));
+    const PbxRange configurationList = findPbxObject(xcodeProject, pbxValueId(xcodeProject, projectObject, "buildConfigurationList"));
+    const std::vector<std::string> configurationIds = pbxListIds(xcodeProject, configurationList, "buildConfigurations");
+    if (configurationIds.empty()) {
+        setError("Apple export template has no project build configurations");
+        return false;
+    }
+    std::vector<std::string> definitions;
+    for (const auto& [macro, value] : getSceneMaxValues()) {
+        definitions.push_back(pbxString(macro + "=" + std::to_string(value)));
+    }
+    for (const std::string& configurationId : configurationIds) {
+        if (!addPbxListEntries(xcodeProject, findPbxBuildSettings(xcodeProject, configurationId), "GCC_PREPROCESSOR_DEFINITIONS", definitions)) {
+            setError("Apple export template has no project GCC_PREPROCESSOR_DEFINITIONS");
+            return false;
+        }
+    }
+
+    std::error_code ec;
+    if (fs::exists(getExportProjectRoot() / "ProjectBuild.cmake", ec)) {
+        Out::warning("ProjectBuild.cmake applies to CMake builds only; the Xcode workspace ignores it");
+    }
     return true;
 }
 
