@@ -201,6 +201,22 @@ namespace {
         return out;
     }
 
+    // Bytes other than ASCII letters, digits, . and - become _XX: safe in a define, still unique
+    std::string toStorageId(const std::string& value) {
+        static const char hex[] = "0123456789ABCDEF";
+        std::string out;
+        for (unsigned char c : value) {
+            if (c < 0x80 && (std::isalnum(c) || c == '.' || c == '-')) {
+                out += static_cast<char>(c);
+            } else {
+                out += '_';
+                out += hex[c >> 4];
+                out += hex[c & 0xF];
+            }
+        }
+        return out;
+    }
+
     std::string escapeXmlAttribute(const std::string& value) {
         std::string out;
         out.reserve(value.size());
@@ -2185,7 +2201,7 @@ bool editor::Exporter::copyEngine() {
         // Web saves use the identifier, unless it is the default every project shares
         const std::string identifier = project->getApplicationIdentifier();
         const std::string storageId = (identifier != ApplicationSettings{}.identifier) ? identifier : project->getName();
-        projectSettings += indent + "set(DORIAX_STORAGE_ID \"" + escapeCMakeCString(storageId) + "\")";
+        projectSettings += indent + "set(DORIAX_STORAGE_ID \"" + toStorageId(storageId) + "\")";
         if (iconGenerated) {
             projectSettings += indent + "set(DORIAX_WINDOW_ICON ON)";
         }
