@@ -13,6 +13,7 @@
 #include "util/MsBuildProgress.h"
 #include "util/ShaderHeaderBuilder.h"
 #include "pool/ShaderPool.h"
+#include "resources/icons/doriax-favicon_png.h"
 
 #include "stb_image.h"
 #include "stb_image_resize2.h"
@@ -2246,8 +2247,19 @@ bool editor::Exporter::writeExportSettingsScript(std::string& cmakeContent) {
         if (ec) { setError("Cannot prepare export setting file: " + ec.message()); return false; }
         return true;
     };
-    if (config.mode != ExportMode::Desktop
-            && (!copySettingFile(web.favicon, "favicon.png") || !copySettingFile(web.customHtmlShell, "shell.html"))) return false;
+    if (config.mode != ExportMode::Desktop) {
+        if (web.favicon.empty()) {
+            // The Doriax icon, or browsers get a 404 for /favicon.ico
+            const std::string favicon(reinterpret_cast<const char*>(doriax_favicon_png), doriax_favicon_png_len);
+            if (!FileUtils::writeIfChanged(settingsDir / "favicon.png", favicon)) {
+                setError("Cannot prepare export setting file: favicon.png");
+                return false;
+            }
+        } else if (!copySettingFile(web.favicon, "favicon.png")) {
+            return false;
+        }
+        if (!copySettingFile(web.customHtmlShell, "shell.html")) return false;
+    }
     std::string script;
     auto value = [&](const char* name, const std::string& text) {
         script += "set(" + std::string(name) + " " + literal(text) + ")\n";

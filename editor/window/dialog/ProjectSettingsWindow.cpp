@@ -1388,7 +1388,7 @@ void ProjectSettingsWindow::drawWebSettings() {
     drawOverrideSetting("App Name", "##WebAppName", m_webApplicationNameBuffer, inheritedApplicationName(),
         "Title used by the exported web page. Empty means the shared application name.");
 
-    drawProjectFilePathSetting(m_project, "Favicon", "Browser tab icon for web export.", "##WebFaviconPath",
+    drawProjectFilePathSetting(m_project, "Favicon", "Browser tab icon for web export. Empty uses the Doriax icon.", "##WebFaviconPath",
         "Browse##webfavicon", "Clear##webfavicon", m_webFavicon);
     drawProjectFilePathSetting(m_project, "Custom HTML Shell", "Optional web HTML wrapper. The file must contain {{DORIAX_DEFAULT_HTML}} marker.", "##WebHtmlShellPath",
         "Browse##webhtmlshell", "Clear##webhtmlshell", m_webCustomHtmlShell, FILE_DIALOG_ALL);
