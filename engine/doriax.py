@@ -213,7 +213,8 @@ def build():
         # <App>.html lacks the project's web settings
         pages = glob.glob(os.path.join(glob.escape(build_dir), "*.export.html")) if platform == "web" else []
         if pages:
-            page = os.path.basename(pages[0])
+            # The newest one, as a build with an earlier --appname can leave its page
+            page = os.path.basename(max(pages, key=os.path.getmtime))
             if page.lower() != "index.export.html":
                 page = "index.html"
             print("Web build ready: serve %s and open %s" % (build_dir, page), flush=True)
