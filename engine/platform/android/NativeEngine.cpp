@@ -13,8 +13,6 @@
 #include <linux/input-event-codes.h>
 #include <swappy/swappyGL.h>
 #include <cstring>
-#include <codecvt>
-#include <locale>
 #include <assert.h>
 #include <math.h>
 
@@ -237,6 +235,55 @@ static_assert(getDoriaxGamepadButton(AKEYCODE_DPAD_LEFT) == D_GAMEPAD_BUTTON_DPA
 static_assert(getDoriaxGamepadButton(AKEYCODE_UNKNOWN) == -1,
               "Unknown Android gamepad buttons must stay unknown");
 
+// GameTextInput text is Java's modified UTF-8: characters past U+FFFF are two 3-byte surrogates
+std::string toModifiedUtf8(const std::wstring& text) {
+    std::string out;
+    auto append = [&out](uint32_t unit) {
+        if (unit != 0 && unit < 0x80) {
+            out += static_cast<char>(unit);
+        } else if (unit < 0x800) {
+            out += static_cast<char>(0xC0 | (unit >> 6));
+            out += static_cast<char>(0x80 | (unit & 0x3F));
+        } else {
+            out += static_cast<char>(0xE0 | (unit >> 12));
+            out += static_cast<char>(0x80 | ((unit >> 6) & 0x3F));
+            out += static_cast<char>(0x80 | (unit & 0x3F));
+        }
+    };
+    for (wchar_t c : text) {
+        if (c >= 0x10000) {
+            append(0xD800 + ((c - 0x10000) >> 10));
+            append(0xDC00 + ((c - 0x10000) & 0x3FF));
+        } else {
+            append(c);
+        }
+    }
+    return out;
+}
+
+std::wstring fromModifiedUtf8(const char* text, int32_t length) {
+    std::wstring out;
+    for (int32_t i = 0; i < length;) {
+        const unsigned char c = text[i];
+        wchar_t unit = c;
+        if (c >= 0xE0 && i + 2 < length) {
+            unit = ((c & 0x0F) << 12) | ((text[i + 1] & 0x3F) << 6) | (text[i + 2] & 0x3F);
+            i += 3;
+        } else if (c >= 0xC0 && i + 1 < length) {
+            unit = ((c & 0x1F) << 6) | (text[i + 1] & 0x3F);
+            i += 2;
+        } else {
+            i++;
+        }
+        if (unit >= 0xDC00 && unit <= 0xDFFF && !out.empty() && out.back() >= 0xD800 && out.back() <= 0xDBFF) {
+            out.back() = 0x10000 + ((out.back() - 0xD800) << 10) + (unit - 0xDC00);
+        } else {
+            out += unit;
+        }
+    }
+    return out;
+}
+
 } // namespace
 
 static bool all_motion_filter(const GameActivityMotionEvent* event) {
@@ -397,13 +444,15 @@ int NativeEngine::getScreenDensity(){
 void NativeEngine::showSoftInput(std::wstring text){
     textInputBuffer = text;
 
-    std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
-    std::string strInputBuffer = convert.to_bytes(textInputBuffer);
+    std::string strInputBuffer = toModifiedUtf8(textInputBuffer);
+    // Selections count UTF-16 units, like Java strings
+    int32_t cursor = 0;
+    for (wchar_t c : textInputBuffer) cursor += (c >= 0x10000) ? 2 : 1;
 
     mGameTextInputState.text_UTF8 = strInputBuffer.data();
     mGameTextInputState.text_length = strInputBuffer.length();
-    mGameTextInputState.selection.start = strInputBuffer.length();
-    mGameTextInputState.selection.end = strInputBuffer.length();
+    mGameTextInputState.selection.start = cursor;
+    mGameTextInputState.selection.end = cursor;
     mGameTextInputState.composingRegion.start = -1;
     mGameTextInputState.composingRegion.end = -1;
 
@@ -477,26 +526,25 @@ void NativeEngine::gameLoop() {
             GameActivity_getTextInputState(mApp->activity, [](void *context, const GameTextInputState *state) {
                 if (!context || !state) return;
 
-                std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> convert;
-                std::wstring utf16Text = convert.from_bytes(state->text_UTF8);
+                std::wstring inputText = fromModifiedUtf8(state->text_UTF8, state->text_length);
 
-                while (textInputBuffer.length() > utf16Text.length()){
+                while (textInputBuffer.length() > inputText.length()){
                     textInputBuffer.pop_back();
                     doriax::Engine::systemCharInput('\b');
                 }
 
                 int pos = 0;
-                while (textInputBuffer[pos] == utf16Text[pos] and pos < textInputBuffer.length()){
+                while (textInputBuffer[pos] == inputText[pos] and pos < textInputBuffer.length()){
                     pos++;
                 }
 
                 for (int i = pos; i < textInputBuffer.length(); i++){
                     doriax::Engine::systemCharInput('\b');
                 }
-                for (int i = pos; i < utf16Text.length(); i++){
-                    doriax::Engine::systemCharInput(utf16Text[i]);
+                for (int i = pos; i < inputText.length(); i++){
+                    doriax::Engine::systemCharInput(inputText[i]);
                 }
-                textInputBuffer = utf16Text;
+                textInputBuffer = inputText;
 
             }, this);
             mApp->textInputState = 0;
