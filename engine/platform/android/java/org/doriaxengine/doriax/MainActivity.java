@@ -6,6 +6,7 @@ import android.os.Build.VERSION_CODES;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager.LayoutParams;
+import androidx.activity.OnBackPressedCallback;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
@@ -29,6 +30,8 @@ public class MainActivity extends GameActivity {
 	private Object adMobWrapper;
 	private Object billingWrapper;
 	private final List<ActivityListener> activityListeners = new ArrayList<>();
+
+	private native void onBackPressedNative();
 
 	private void hideSystemUI() {
 		// This will put the game behind any cutouts and waterfalls on devices which have
@@ -71,6 +74,14 @@ public class MainActivity extends GameActivity {
 		userSettings = new UserSettings(this);
 		adMobWrapper = createOptionalWrapper("org.doriaxengine.doriax.AdMobWrapper");
 		billingWrapper = createOptionalWrapper("org.doriaxengine.doriax.BillingWrapper");
+
+		// Games get Back as Escape. A callback, since Android 16 no longer sends it as a key
+		getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+			@Override
+			public void handleOnBackPressed() {
+				onBackPressedNative();
+			}
+		});
 
 		super.onCreate(savedInstanceState);
 	}

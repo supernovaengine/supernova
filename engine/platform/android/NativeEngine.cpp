@@ -12,6 +12,7 @@
 #include <android/window.h>
 #include <linux/input-event-codes.h>
 #include <swappy/swappyGL.h>
+#include <atomic>
 #include <cstring>
 #include <assert.h>
 #include <math.h>
@@ -295,10 +296,13 @@ static bool all_motion_filter(const GameActivityMotionEvent* event) {
   return true;
 }
 
-static bool all_key_filter(const GameActivityKeyEvent* event) {
-  // Process all key events (the default filter drops gamepad buttons
-  // whose source lacks the keyboard class)
-  return true;
+// Unused keys go back to the system, so volume and media keys keep working.
+// Back goes to MainActivity's back callback, except IME backspaces sent as Back.
+static bool key_filter(const GameActivityKeyEvent* event) {
+  if (event->keyCode == AKEYCODE_BACK)
+    return (event->flags & AKEY_EVENT_FLAG_SOFT_KEYBOARD) != 0;
+  return getDoriaxKey(event->keyCode, event->scanCode) != D_KEY_UNKNOWN ||
+         getDoriaxGamepadButton(event->keyCode) >= 0;
 }
 
 static void _handle_cmd_proxy(struct android_app *app, int32_t cmd) {
@@ -339,6 +343,15 @@ static NativeEngineSavedState appState = {false};
 
 static std::wstring textInputBuffer;
 
+// Set on the UI thread by MainActivity's back callback
+static std::atomic<bool> backPressed(false);
+static bool backEscapeDown = false;
+
+extern "C" JNIEXPORT void JNICALL
+Java_org_doriaxengine_doriax_MainActivity_onBackPressedNative(JNIEnv* env, jobject obj) {
+    backPressed = true;
+}
+
 
 NativeEngine::NativeEngine(struct android_app *app) {
     mApp = app;
@@ -360,7 +373,7 @@ NativeEngine::NativeEngine(struct android_app *app) {
     mExternalDataPath = mApp->activity->externalDataPath;
 
     app->motionEventFilter = all_motion_filter;
-    app->keyEventFilter = all_key_filter;
+    app->keyEventFilter = key_filter;
 
     // Flags to control how the IME behaves.
     // https://developer.android.com/reference/android/text/InputType
@@ -924,6 +937,17 @@ void NativeEngine::handleGamepadMotion(GameActivityMotionEvent* motionEvent){
 }
 
 void NativeEngine::handleGameActivityInput(){
+    // Back plays as an Escape press, released on the next frame
+    if (backEscapeDown) {
+        doriax::Engine::systemKeyUp(D_KEY_ESCAPE, false, doriax::Input::getModifiers());
+        backEscapeDown = false;
+    }
+    if (backPressed.exchange(false)) {
+        doriax::Engine::systemCharInput('\x1b');
+        doriax::Engine::systemKeyDown(D_KEY_ESCAPE, false, doriax::Input::getModifiers());
+        backEscapeDown = true;
+    }
+
     android_input_buffer* inputBuffer = android_app_swap_input_buffers(mApp);
 
     if (inputBuffer == nullptr) return;
@@ -967,8 +991,7 @@ void NativeEngine::handleGameActivityInput(){
                 if (keyEvent->keyCode == AKEYCODE_BACK && (keyEvent->flags & AKEY_EVENT_FLAG_SOFT_KEYBOARD))
                     doriax::Engine::systemCharInput('\b');
 
-                // volume, back, camera and other device keys have no engine
-                // equivalent; don't spam listeners with D_KEY_UNKNOWN
+                // don't spam listeners with D_KEY_UNKNOWN
                 if (keyCode != D_KEY_UNKNOWN)
                     doriax::Engine::systemKeyDown(keyCode, repeat, modifiers);
             } else if (keyEvent->action == AKEY_EVENT_ACTION_UP) {
