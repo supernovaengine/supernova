@@ -77,6 +77,10 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     if(NOT DEFINED DORIAX_WINDOW_TITLE)
         set(DORIAX_WINDOW_TITLE "Doriax")
     endif()
+    # Prefix of the web build's saved keys
+    if(NOT DEFINED DORIAX_STORAGE_ID)
+        set(DORIAX_STORAGE_ID "${APP_NAME}")
+    endif()
     # ON only when the editor export generated project/app_icon.h (+ .ico/.rc)
     if(NOT DEFINED DORIAX_WINDOW_ICON)
         set(DORIAX_WINDOW_ICON OFF)
@@ -91,6 +95,7 @@ if(CMAKE_SOURCE_DIR STREQUAL CMAKE_CURRENT_SOURCE_DIR)
     add_definitions("-DDORIAX_WINDOW_MODE=${DORIAX_WINDOW_MODE}")
     add_definitions("-DDORIAX_WINDOW_RESIZABLE=${DORIAX_WINDOW_RESIZABLE_VALUE}")
     add_definitions("-DDORIAX_WINDOW_TITLE=\"${DORIAX_WINDOW_TITLE}\"")
+    add_definitions("-DDORIAX_STORAGE_ID=\"${DORIAX_STORAGE_ID}\"")
     # X11 class / Wayland app_id (APP_NAME is a plain identifier, safe to quote).
     # Desktop environments match it against <APP_NAME>.desktop for the app icon.
     add_definitions("-DDORIAX_APP_ID=\"${APP_NAME}\"")

@@ -2181,6 +2181,10 @@ bool editor::Exporter::copyEngine() {
         projectSettings += indent + "set(DORIAX_WINDOW_MODE " + std::to_string(static_cast<int>(window.mode)) + ")";
         projectSettings += indent + std::string("set(DORIAX_WINDOW_RESIZABLE ") + (window.resizable ? "ON" : "OFF") + ")";
         projectSettings += indent + "set(DORIAX_WINDOW_TITLE \"" + cmakeTitle + "\")";
+        // Web saves use the identifier, unless it is the default every project shares
+        const std::string identifier = project->getApplicationIdentifier();
+        const std::string storageId = (identifier != ApplicationSettings{}.identifier) ? identifier : project->getName();
+        projectSettings += indent + "set(DORIAX_STORAGE_ID \"" + escapeCMakeCString(storageId) + "\")";
         if (iconGenerated) {
             projectSettings += indent + "set(DORIAX_WINDOW_ICON ON)";
         }
