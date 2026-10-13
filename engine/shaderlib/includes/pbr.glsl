@@ -28,7 +28,8 @@ vec4 getVertexColor(){
         ivec4 set1; // x=normal
     } texCoordSets;
 
-    vec2 selectUV(int set)        { return (set == 1) ? v_uv2 : v_uv1; }
+    // set1.w is always 0; reading it keeps set1 active when no normal map uses it
+    vec2 selectUV(int set)        { return (set + texCoordSets.set1.w == 1) ? v_uv2 : v_uv1; }
     vec2 getBaseColorUV()         { return selectUV(texCoordSets.set0.x); }
     vec2 getMetallicRoughnessUV() { return selectUV(texCoordSets.set0.y); }
     vec2 getOcclusionUV()         { return selectUV(texCoordSets.set0.z); }
