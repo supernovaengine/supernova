@@ -39,6 +39,20 @@ bool DoriaxWeb::quitRequested = false;
 
 DoriaxWeb::GamepadState DoriaxWeb::gamepads[DORIAX_WEB_MAX_GAMEPADS];
 
+// miniaudio only resumes its AudioContext on click or touchend
+static void resumeAudio(){
+    EM_ASM({
+        var ma = window.miniaudio;
+        if (!ma || !ma.devices) return;
+        for (var i = 0; i < ma.devices.length; ++i) {
+            var device = ma.devices[i];
+            if (device && device.webaudio && device.webaudio.state === 'suspended' && device.state === ma.device_state.started) {
+                device.webaudio.resume().catch(function() {});
+            }
+        }
+    });
+}
+
 extern "C" {
     EMSCRIPTEN_KEEPALIVE 
     int getScreenWidth() {
@@ -504,6 +518,7 @@ EM_BOOL DoriaxWeb::key_callback(int eventType, const EmscriptenKeyboardEvent *e,
     if ((!strcmp(key,"Escape"))||(*key=='\x1b')) skey=8;
 
     if (eventType == EMSCRIPTEN_EVENT_KEYDOWN){
+        resumeAudio();
         doriax::Engine::systemKeyDown(code, e->repeat, modifiers);
         if (skey==1) doriax::Engine::systemCharInput('\t');
         if (skey==2) doriax::Engine::systemCharInput('\b');
