@@ -623,6 +623,11 @@ bool NativeEngine::initContext() {
 }
 
 void NativeEngine::killContext() {
+    // killSurface() released the context, and GL deletes need it current
+    if (mEglContext != EGL_NO_CONTEXT && eglGetCurrentContext() != mEglContext) {
+        eglMakeCurrent(mEglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, mEglContext);
+    }
+
     killGLObjects();
 
     eglMakeCurrent(mEglDisplay, EGL_NO_SURFACE, EGL_NO_SURFACE, EGL_NO_CONTEXT);
@@ -1024,10 +1029,7 @@ void NativeEngine::handleCommand(int32_t cmd) {
             // then you need to handle this event!
             break;
         case APP_CMD_LOW_MEMORY:
-            // system told us we have low memory. So if we are not visible, let's
-            // cooperate by deallocating all of our graphic resources.
-            // The context is no longer current once the window is gone, so GL deletes are
-            // no-ops; destroying the context is what frees the GPU memory.
+            // GameActivity sends this for every onTrimMemory, so also when going to the background
             if (!mHasWindow) {
                 killContext();
             }
