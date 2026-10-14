@@ -2672,6 +2672,14 @@ std::string editor::Factory::createScene(int indentSpaces, Scene* scene, std::st
         out << ind2 << "scene->setDefaultLinesShader(" << formatString(scene->getDefaultLinesShader()) << ");\n";
     if (!scene->getDefaultWaterShader().empty())
         out << ind2 << "scene->setDefaultWaterShader(" << formatString(scene->getDefaultWaterShader()) << ");\n";
+    const std::pair<ShaderType, const char*> defaultShaderTypes[] = {
+        {ShaderType::MESH, "MESH"}, {ShaderType::UI, "UI"}, {ShaderType::SKYBOX, "SKYBOX"},
+        {ShaderType::POINTS, "POINTS"}, {ShaderType::LINES, "LINES"}, {ShaderType::WATER, "WATER"}};
+    for (const auto& [type, token] : defaultShaderTypes) {
+        const ShaderUniformValues& values = scene->getDefaultShaderUniforms(type);
+        if (!values.empty())
+            out << ind2 << "scene->setDefaultShaderUniforms(ShaderType::" << token << ", " << formatShaderUniforms(values) << ");\n";
+    }
     if (!scene->getPostProcessPasses().empty()) {
         out << ind2 << "{\n";
         out << ind3 << "std::vector<PostProcessPass> postProcess;\n";

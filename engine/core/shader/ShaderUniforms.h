@@ -44,8 +44,9 @@ namespace doriax{
         bool resolve(ShaderData& shaderData, const std::string& blockName);
         void clear();
 
-        // every member from the value of the same name (zero when unset), reserved ones skipped
-        void writeValues(const ShaderUniformValues& values);
+        // every member from the value of the same name, else from inherited, else zero;
+        // reserved ones skipped
+        void writeValues(const ShaderUniformValues& values, const ShaderUniformValues* inherited = nullptr);
         void writeTime(float seconds);
         void writeResolution(float width, float height);
 

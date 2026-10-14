@@ -203,6 +203,9 @@ namespace doriax::editor{
         // same for a mesh's depth fork
         static bool isCustomDepthShaderBuildFailed(Scene* scene, Entity entity);
         static bool isCustomUnderwaterShaderBuildFailed(Scene* scene, Entity entity);
+        // scene property of a default shader's uniform values ("default_mesh_shader_uniforms"...)
+        static const char* getDefaultShaderUniformsProperty(ShaderType type);
+        static bool getDefaultShaderUniformsType(const std::string& propertyName, ShaderType& type);
 
         template<typename T>
         static T* getPropertyRef(EntityRegistry* registry, Entity entity, ComponentType component, std::string propertyName){
@@ -228,6 +231,7 @@ namespace doriax::editor{
                 if constexpr (std::is_same_v<T, ShadowQuality>) return ShadowQuality::LOW;
                 if constexpr (std::is_same_v<T, TextureFilter>) return TextureFilter::NEAREST;
                 if constexpr (std::is_same_v<T, std::string>) return std::string();
+                if constexpr (std::is_same_v<T, ShaderUniformValues>) return ShaderUniformValues();
                 // Add other types as needed
             }
 
@@ -412,6 +416,12 @@ namespace doriax::editor{
                 }
             }
 
+            if constexpr (std::is_same_v<T, ShaderUniformValues>) {
+                ShaderType type;
+                if (getDefaultShaderUniformsType(propertyName, type))
+                    return scene->getDefaultShaderUniforms(type);
+            }
+
             // Return default value if property not found
             if constexpr (std::is_same_v<T, Vector4>) return Vector4(0.0, 0.0, 0.0, 1.0);
             if constexpr (std::is_same_v<T, Vector3>) return Vector3(1.0, 1.0, 1.0);
@@ -424,6 +434,7 @@ namespace doriax::editor{
             if constexpr (std::is_same_v<T, TextureFilter>) return TextureFilter::NEAREST;
             if constexpr (std::is_same_v<T, std::string>) return std::string();
             if constexpr (std::is_same_v<T, std::vector<PostProcessPass>>) return std::vector<PostProcessPass>();
+            if constexpr (std::is_same_v<T, ShaderUniformValues>) return ShaderUniformValues();
             // Add other types as needed
         }
 
@@ -733,6 +744,12 @@ namespace doriax::editor{
                 if constexpr (std::is_same_v<T, std::vector<PostProcessPass>>) {
                     scene->setPostProcessPasses(value);
                 }
+            }
+
+            if constexpr (std::is_same_v<T, ShaderUniformValues>) {
+                ShaderType type;
+                if (getDefaultShaderUniformsType(propertyName, type))
+                    scene->setDefaultShaderUniforms(type, value);
             }
         }
     };

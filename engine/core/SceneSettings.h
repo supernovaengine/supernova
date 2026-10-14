@@ -109,6 +109,14 @@ namespace doriax{
         std::string defaultLinesShader;
         std::string defaultWaterShader;
 
+        // custom block values of the default shaders, under the inheriting components' own
+        ShaderUniformValues defaultMeshShaderUniforms;
+        ShaderUniformValues defaultUIShaderUniforms;
+        ShaderUniformValues defaultSkyShaderUniforms;
+        ShaderUniformValues defaultPointsShaderUniforms;
+        ShaderUniformValues defaultLinesShaderUniforms;
+        ShaderUniformValues defaultWaterShaderUniforms;
+
         // ordered user post-process chain (main camera only), applied after SSR
         std::vector<PostProcessPass> postProcess;
     };

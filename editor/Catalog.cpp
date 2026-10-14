@@ -4036,9 +4036,10 @@ bool editor::Catalog::isCustomShaderBuildFailed(Scene* scene, Entity entity, Com
 
     switch (component) {
         case ComponentType::MeshComponent:
+            // a model root without submeshes is drawn by its parts and builds nothing
             if (MeshComponent* mesh = scene->findComponent<MeshComponent>(entity))
-                return failed(mesh->customShader, ShaderType::MESH, mesh->loaded, mesh->needReload,
-                              mesh->numSubmeshes > 0 ? mesh->submeshes[0].customShaderId : 0);
+                return mesh->numSubmeshes > 0 && failed(mesh->customShader, ShaderType::MESH, mesh->loaded,
+                                                        mesh->needReload, mesh->submeshes[0].customShaderId);
             break;
         case ComponentType::UIComponent:
             if (UIComponent* ui = scene->findComponent<UIComponent>(entity))
@@ -4079,6 +4080,29 @@ bool editor::Catalog::isCustomUnderwaterShaderBuildFailed(Scene* scene, Entity e
     WaterComponent* water = scene->findComponent<WaterComponent>(entity);
     return water && !water->customUnderwaterShader.empty() && water->underwaterLoaded &&
            water->customUnderwaterShaderId == 0;
+}
+
+const char* editor::Catalog::getDefaultShaderUniformsProperty(ShaderType type) {
+    switch (type) {
+        case ShaderType::MESH:   return "default_mesh_shader_uniforms";
+        case ShaderType::UI:     return "default_ui_shader_uniforms";
+        case ShaderType::SKYBOX: return "default_sky_shader_uniforms";
+        case ShaderType::POINTS: return "default_points_shader_uniforms";
+        case ShaderType::LINES:  return "default_lines_shader_uniforms";
+        case ShaderType::WATER:  return "default_water_shader_uniforms";
+        default: return "";
+    }
+}
+
+bool editor::Catalog::getDefaultShaderUniformsType(const std::string& propertyName, ShaderType& type) {
+    for (ShaderType candidate : {ShaderType::MESH, ShaderType::UI, ShaderType::SKYBOX,
+                                 ShaderType::POINTS, ShaderType::LINES, ShaderType::WATER}) {
+        if (propertyName == getDefaultShaderUniformsProperty(candidate)) {
+            type = candidate;
+            return true;
+        }
+    }
+    return false;
 }
 
 void editor::Catalog::updateEntity(EntityRegistry* registry, Entity entity, uint64_t updateFlags){

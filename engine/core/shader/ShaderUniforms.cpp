@@ -118,12 +118,14 @@ void CustomUniformBlock::clear(){
     mixedTypes = false;
 }
 
-void CustomUniformBlock::writeValues(const ShaderUniformValues& values){
+void CustomUniformBlock::writeValues(const ShaderUniformValues& values, const ShaderUniformValues* inherited){
     for (size_t m = 0; m < members.size(); m++){
         if ((int)m == timeMember || (int)m == resolutionMember)
             continue;
-        // unset (or removed) members read zero
-        writeUniform(data, members[m], ShaderUniforms::get(values, members[m].name));
+        // unset (or removed) members read the inherited value, else zero
+        const std::string& name = members[m].name;
+        const bool hasOwn = !inherited || ShaderUniforms::has(values, name);
+        writeUniform(data, members[m], ShaderUniforms::get(hasOwn ? values : *inherited, name));
     }
 }
 

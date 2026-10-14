@@ -842,6 +842,8 @@ namespace doriax{
 		void needReloadMeshes();
 		void needReloadPostProcess();
 		void needUpdatePostProcessUniforms();
+		// components inheriting the default shader of this type rewrite their custom blocks
+		void needUpdateDefaultShaderUniforms(ShaderType type);
 		void needReloadUIs();
 		void needReloadSky();
 		void needReloadWater();

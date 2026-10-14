@@ -344,6 +344,17 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addVariable("DISABLED", UIEventState::DISABLED)
         .endNamespace();
 
+    // only the types that can have a scene default shader
+    luabridge::getGlobalNamespace(L)
+        .beginNamespace("ShaderType")
+        .addVariable("MESH", ShaderType::MESH)
+        .addVariable("UI", ShaderType::UI)
+        .addVariable("SKYBOX", ShaderType::SKYBOX)
+        .addVariable("POINTS", ShaderType::POINTS)
+        .addVariable("LINES", ShaderType::LINES)
+        .addVariable("WATER", ShaderType::WATER)
+        .endNamespace();
+
     luabridge::getGlobalNamespace(L)
         .beginNamespace("EntityPool")
         .addVariable("User", EntityPool::User)
@@ -977,6 +988,13 @@ void LuaBinding::registerCoreClasses(lua_State *L){
         .addProperty("defaultPointsShader", &Scene::getDefaultPointsShader, &Scene::setDefaultPointsShader)
         .addProperty("defaultLinesShader", &Scene::getDefaultLinesShader, &Scene::setDefaultLinesShader)
         .addProperty("defaultWaterShader", &Scene::getDefaultWaterShader, &Scene::setDefaultWaterShader)
+        .addFunction("setDefaultShaderUniform",
+            luabridge::overload<ShaderType, const std::string&, const Vector4&>(&Scene::setDefaultShaderUniform),
+            luabridge::overload<ShaderType, const std::string&, const Vector3&>(&Scene::setDefaultShaderUniform),
+            luabridge::overload<ShaderType, const std::string&, const Vector2&>(&Scene::setDefaultShaderUniform),
+            luabridge::overload<ShaderType, const std::string&, float>(&Scene::setDefaultShaderUniform))
+        .addFunction("getDefaultShaderUniform", &Scene::getDefaultShaderUniform)
+        .addFunction("removeDefaultShaderUniform", &Scene::removeDefaultShaderUniform)
         .addProperty("postProcessPasses", &Scene::getPostProcessPasses, &Scene::setPostProcessPasses)
         .addFunction("setPostProcessUniform",
             luabridge::overload<unsigned int, const std::string&, const Vector4&>(&Scene::setPostProcessUniform),

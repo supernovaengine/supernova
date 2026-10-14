@@ -998,6 +998,16 @@ FogType editor::Stream::stringToFogType(const std::string& str) {
     return FogType::LINEAR;
 }
 
+// scene keys of the default shaders' uniform values
+static const std::pair<ShaderType, const char*> defaultShaderUniformKeys[] = {
+    {ShaderType::MESH, "defaultMeshShaderUniforms"},
+    {ShaderType::UI, "defaultUIShaderUniforms"},
+    {ShaderType::SKYBOX, "defaultSkyShaderUniforms"},
+    {ShaderType::POINTS, "defaultPointsShaderUniforms"},
+    {ShaderType::LINES, "defaultLinesShaderUniforms"},
+    {ShaderType::WATER, "defaultWaterShaderUniforms"},
+};
+
 static std::string shadowQualityToString(ShadowQuality quality) {
     switch (quality) {
         case ShadowQuality::NONE: return "none";
@@ -2911,6 +2921,12 @@ YAML::Node editor::Stream::encodeScene(Scene* scene) {
     if (!scene->getDefaultWaterShader().empty())
         sceneNode["defaultWaterShader"] = scene->getDefaultWaterShader();
 
+    for (const auto& [type, key] : defaultShaderUniformKeys) {
+        const ShaderUniformValues& values = scene->getDefaultShaderUniforms(type);
+        if (!values.empty())
+            sceneNode[key] = encodeShaderUniforms(values);
+    }
+
     for (const PostProcessPass& pass : scene->getPostProcessPasses()) {
         YAML::Node passNode;
         passNode["shader"] = pass.shader;
@@ -3034,6 +3050,9 @@ Scene* editor::Stream::decodeScene(Scene* scene, const YAML::Node& node) {
     scene->setDefaultPointsShader(node["defaultPointsShader"] ? node["defaultPointsShader"].as<std::string>() : "");
     scene->setDefaultLinesShader(node["defaultLinesShader"] ? node["defaultLinesShader"].as<std::string>() : "");
     scene->setDefaultWaterShader(node["defaultWaterShader"] ? node["defaultWaterShader"].as<std::string>() : "");
+    for (const auto& [type, key] : defaultShaderUniformKeys) {
+        scene->setDefaultShaderUniforms(type, decodeShaderUniforms(node[key]));
+    }
 
     // absent key clears the chain so decoding into a reused scene (play restore) is exact
     std::vector<PostProcessPass> postProcess;

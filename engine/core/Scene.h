@@ -217,6 +217,18 @@ namespace doriax{
         void setDefaultCustomShader(ShaderType type, const std::string& path);
         const std::string& getDefaultCustomShader(ShaderType type) const;
 
+        // custom block values of a default shader, under those of the components inheriting it
+        void setDefaultShaderUniforms(ShaderType type, const ShaderUniformValues& values);
+        const ShaderUniformValues& getDefaultShaderUniforms(ShaderType type) const;
+        void setDefaultShaderUniform(ShaderType type, const std::string& name, const Vector4& value);
+        void setDefaultShaderUniform(ShaderType type, const std::string& name, const Vector3& value);
+        void setDefaultShaderUniform(ShaderType type, const std::string& name, const Vector2& value);
+        void setDefaultShaderUniform(ShaderType type, const std::string& name, float value);
+        Vector4 getDefaultShaderUniform(ShaderType type, const std::string& name) const;
+        bool removeDefaultShaderUniform(ShaderType type, const std::string& name);
+        // the values a component with this customShader inherits, null when it has its own fork
+        const ShaderUniformValues* getInheritedShaderUniforms(ShaderType type, const std::string& customShader) const;
+
         // ordered user post-process chain; setting it rebuilds the RenderSystem passes
         // unless only uniform values changed
         const std::vector<PostProcessPass>& getPostProcessPasses() const;

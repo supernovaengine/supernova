@@ -74,7 +74,6 @@ namespace doriax::editor {
                 if (project == otherCmd->project && sceneId == otherCmd->sceneId && propertyName == otherCmd->propertyName) {
                     // Update oldValue from the earliest command
                     value.oldValue = otherCmd->value.oldValue;
-                    value.newValue = otherCmd->value.newValue;
 
                     wasModified = wasModified && otherCmd->wasModified;
 

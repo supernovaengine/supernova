@@ -120,40 +120,54 @@ namespace {
     }
 
     // both stages of a single-block component, rewritten first when its values changed
-    void applyCustomUniforms(ObjectRender& render, CustomUniformBlock& vsBlock, CustomUniformBlock& fsBlock,
-                             const ShaderUniformValues& values, bool& needUpdate, float frameTime, const Vector2& resolution){
-        if (needUpdate){
-            vsBlock.writeValues(values);
-            fsBlock.writeValues(values);
-            needUpdate = false;
+    template<typename T>
+    void applyCustomUniforms(ObjectRender& render, T& component, const Scene* scene, ShaderType type,
+                             float frameTime, const Vector2& resolution){
+        if (component.needUpdateShaderUniforms){
+            const ShaderUniformValues* inherited = scene->getInheritedShaderUniforms(type, component.customShader);
+            component.customVSParams.writeValues(component.shaderUniforms, inherited);
+            component.customFSParams.writeValues(component.shaderUniforms, inherited);
+            component.needUpdateShaderUniforms = false;
         }
-        applyCustomUniforms(render, vsBlock, frameTime, resolution);
-        applyCustomUniforms(render, fsBlock, frameTime, resolution);
+        applyCustomUniforms(render, component.customVSParams, frameTime, resolution);
+        applyCustomUniforms(render, component.customFSParams, frameTime, resolution);
     }
 
     // the mesh blocks of both forks, from whichever pass draws first (depth runs before color)
-    void writeCustomUniforms(MeshComponent& mesh){
+    void writeCustomUniforms(MeshComponent& mesh, const Scene* scene){
         if (!mesh.needUpdateShaderUniforms)
             return;
 
+        const ShaderUniformValues* inherited = scene->getInheritedShaderUniforms(ShaderType::MESH, mesh.customShader);
         for (int i = 0; i < mesh.numSubmeshes; i++){
-            mesh.submeshes[i].customVSParams.writeValues(mesh.shaderUniforms);
-            mesh.submeshes[i].customFSParams.writeValues(mesh.shaderUniforms);
-            mesh.submeshes[i].customVSDepthParams.writeValues(mesh.shaderUniforms);
-            mesh.submeshes[i].customFSDepthParams.writeValues(mesh.shaderUniforms);
+            mesh.submeshes[i].customVSParams.writeValues(mesh.shaderUniforms, inherited);
+            mesh.submeshes[i].customFSParams.writeValues(mesh.shaderUniforms, inherited);
+            mesh.submeshes[i].customVSDepthParams.writeValues(mesh.shaderUniforms, inherited);
+            mesh.submeshes[i].customFSDepthParams.writeValues(mesh.shaderUniforms, inherited);
         }
         mesh.needUpdateShaderUniforms = false;
     }
 
     // the water blocks of both forks, from whichever pass draws first (underwater runs before the surface)
-    void writeCustomUniforms(WaterComponent& water){
+    void writeCustomUniforms(WaterComponent& water, const Scene* scene){
         if (!water.needUpdateShaderUniforms)
             return;
 
-        water.customVSParams.writeValues(water.shaderUniforms);
-        water.customFSParams.writeValues(water.shaderUniforms);
-        water.customUnderwaterParams.writeValues(water.shaderUniforms);
+        const ShaderUniformValues* inherited = scene->getInheritedShaderUniforms(ShaderType::WATER, water.customShader);
+        water.customVSParams.writeValues(water.shaderUniforms, inherited);
+        water.customFSParams.writeValues(water.shaderUniforms, inherited);
+        water.customUnderwaterParams.writeValues(water.shaderUniforms, inherited);
         water.needUpdateShaderUniforms = false;
+    }
+
+    // flags the components that inherit their default shader
+    template<typename ComponentArrayPtr>
+    void flagInheritedUniforms(const ComponentArrayPtr& components){
+        for (size_t i = 0; i < components->size(); i++){
+            auto& component = components->getComponentFromIndex(i);
+            if (component.customShader.empty())
+                component.needUpdateShaderUniforms = true;
+        }
     }
 
     bool usesAlphaBlend(const Material& material){
@@ -2880,6 +2894,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint16_t pipelin
         // (#define) system, depth/gbuffer passes and bind-slots are unchanged.
         // Priority: component customShader > scene default shader > built-in (empty)
         const std::string& meshShaderSrc = mesh.customShader.empty() ? scene->getDefaultCustomShader(ShaderType::MESH) : mesh.customShader;
+        const ShaderUniformValues* inheritedUniforms = scene->getInheritedShaderUniforms(ShaderType::MESH, mesh.customShader);
         mesh.submeshes[i].customShaderId = ShaderPool::registerCustomShader(meshShaderSrc);
         mesh.submeshes[i].shader = ShaderPool::get(ShaderType::MESH, mesh.submeshes[i].shaderProperties, mesh.submeshes[i].customShaderId);
         // the depth shader feeds shadow maps (casters) and the SSAO depth pre-pass
@@ -2910,8 +2925,8 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint16_t pipelin
             ShaderData& depthShaderData = mesh.submeshes[i].depthShader.get()->shaderData;
             mesh.submeshes[i].customVSDepthParams.resolve(depthShaderData, "u_vs_customParams");
             mesh.submeshes[i].customFSDepthParams.resolve(depthShaderData, "u_fs_customParams");
-            mesh.submeshes[i].customVSDepthParams.writeValues(mesh.shaderUniforms);
-            mesh.submeshes[i].customFSDepthParams.writeValues(mesh.shaderUniforms);
+            mesh.submeshes[i].customVSDepthParams.writeValues(mesh.shaderUniforms, inheritedUniforms);
+            mesh.submeshes[i].customFSDepthParams.writeValues(mesh.shaderUniforms, inheritedUniforms);
         }else if (mesh.submeshes[i].depthShader){
             // a reload keeps the handle; release it with the key it was taken with
             mesh.submeshes[i].depthShader.reset();
@@ -2991,8 +3006,8 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint16_t pipelin
         // custom blocks of a forked shader (none in the built-in)
         mesh.submeshes[i].customVSParams.resolve(shaderData, "u_vs_customParams");
         mesh.submeshes[i].customFSParams.resolve(shaderData, "u_fs_customParams");
-        mesh.submeshes[i].customVSParams.writeValues(mesh.shaderUniforms);
-        mesh.submeshes[i].customFSParams.writeValues(mesh.shaderUniforms);
+        mesh.submeshes[i].customVSParams.writeValues(mesh.shaderUniforms, inheritedUniforms);
+        mesh.submeshes[i].customFSParams.writeValues(mesh.shaderUniforms, inheritedUniforms);
 
         if (!loadPBRTextures(mesh.submeshes[i].material, shaderData, mesh.submeshes[i].render, mesh.receiveLights)){
             return false;
@@ -3933,7 +3948,7 @@ bool RenderSystem::drawMesh(Entity entity, MeshComponent& mesh, Transform& trans
         unsigned int instanceCount = draw.instanceCount;
 
         updateMeshBuffers(mesh);
-        writeCustomUniforms(mesh);
+        writeCustomUniforms(mesh, scene);
 
         if (terrain){
             updateTerrainNodesBuffer(*terrain, terrainView);
@@ -4117,7 +4132,7 @@ bool RenderSystem::drawMeshDepth(MeshComponent& mesh, Transform& transform, cons
         unsigned int instanceCount = draw.instanceCount;
 
         updateMeshBuffers(mesh);
-        writeCustomUniforms(mesh);
+        writeCustomUniforms(mesh, scene);
 
         // the depth pass renders the main camera's selection (view 0)
         if (terrain){
@@ -4999,6 +5014,18 @@ void RenderSystem::needUpdatePostProcessUniforms(){
     postProcessNeedUpdateUniforms = true;
 }
 
+void RenderSystem::needUpdateDefaultShaderUniforms(ShaderType type){
+    switch (type){
+        case ShaderType::MESH:   flagInheritedUniforms(scene->getComponentArray<MeshComponent>());   break;
+        case ShaderType::UI:     flagInheritedUniforms(scene->getComponentArray<UIComponent>());     break;
+        case ShaderType::SKYBOX: flagInheritedUniforms(scene->getComponentArray<SkyComponent>());    break;
+        case ShaderType::POINTS: flagInheritedUniforms(scene->getComponentArray<PointsComponent>()); break;
+        case ShaderType::LINES:  flagInheritedUniforms(scene->getComponentArray<LinesComponent>());  break;
+        case ShaderType::WATER:  flagInheritedUniforms(scene->getComponentArray<WaterComponent>());  break;
+        default: break;
+    }
+}
+
 void RenderSystem::loadPostProcess(){
     if (postProcessLoaded && !postProcessNeedReload)
         return;
@@ -5393,8 +5420,9 @@ bool RenderSystem::loadUI(Entity entity, UIComponent& ui, uint16_t pipelines, bo
     ui.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::UI_FS_PARAMS);
     ui.customVSParams.resolve(shaderData, "u_vs_customParams");
     ui.customFSParams.resolve(shaderData, "u_fs_customParams");
-    ui.customVSParams.writeValues(ui.shaderUniforms);
-    ui.customFSParams.writeValues(ui.shaderUniforms);
+    const ShaderUniformValues* inheritedUniforms = scene->getInheritedShaderUniforms(ShaderType::UI, ui.customShader);
+    ui.customVSParams.writeValues(ui.shaderUniforms, inheritedUniforms);
+    ui.customFSParams.writeValues(ui.shaderUniforms, inheritedUniforms);
     ui.needUpdateShaderUniforms = false;
 
     size_t bufferSize;
@@ -5494,7 +5522,7 @@ bool RenderSystem::drawUI(UIComponent& ui, Transform& transform, PipelineType pi
         render.applyUniformBlock(ui.slotVSParams, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
         //Color
         render.applyUniformBlock(ui.slotFSParams, sizeof(float) * 4, &ui.color);
-        applyCustomUniforms(render, ui.customVSParams, ui.customFSParams, ui.shaderUniforms, ui.needUpdateShaderUniforms, frameTime, passResolution);
+        applyCustomUniforms(render, ui, scene, ShaderType::UI, frameTime, passResolution);
         render.draw(0, ui.vertexCount, 1);
 
     }
@@ -5592,8 +5620,9 @@ bool RenderSystem::loadPoints(Entity entity, PointsComponent& points, uint16_t p
     points.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::POINTS_VS_PARAMS);
     points.customVSParams.resolve(shaderData, "u_vs_customParams");
     points.customFSParams.resolve(shaderData, "u_fs_customParams");
-    points.customVSParams.writeValues(points.shaderUniforms);
-    points.customFSParams.writeValues(points.shaderUniforms);
+    const ShaderUniformValues* inheritedUniforms = scene->getInheritedShaderUniforms(ShaderType::POINTS, points.customShader);
+    points.customVSParams.writeValues(points.shaderUniforms, inheritedUniforms);
+    points.customFSParams.writeValues(points.shaderUniforms, inheritedUniforms);
     points.needUpdateShaderUniforms = false;
 
     points.buffer.clear();
@@ -5673,8 +5702,9 @@ bool RenderSystem::loadLines(Entity entity, LinesComponent& lines, uint16_t pipe
     lines.slotVSParams = shaderData.getUniformBlockIndex(UniformBlockType::LINES_VS_PARAMS);
     lines.customVSParams.resolve(shaderData, "u_vs_customParams");
     lines.customFSParams.resolve(shaderData, "u_fs_customParams");
-    lines.customVSParams.writeValues(lines.shaderUniforms);
-    lines.customFSParams.writeValues(lines.shaderUniforms);
+    const ShaderUniformValues* inheritedUniforms = scene->getInheritedShaderUniforms(ShaderType::LINES, lines.customShader);
+    lines.customVSParams.writeValues(lines.shaderUniforms, inheritedUniforms);
+    lines.customFSParams.writeValues(lines.shaderUniforms, inheritedUniforms);
     lines.needUpdateShaderUniforms = false;
 
     lines.buffer.clear();
@@ -5791,7 +5821,7 @@ bool RenderSystem::drawPoints(PointsComponent& points, Transform& transform, Cam
         vsParams.mvpMatrix = transform.modelViewProjectionMatrix;
         vsParams.pointScale = computePointsScale(camera, getPointsViewportHeight(camera));
         render.applyUniformBlock(points.slotVSParams, sizeof(vs_points_params_t), &vsParams);
-        applyCustomUniforms(render, points.customVSParams, points.customFSParams, points.shaderUniforms, points.needUpdateShaderUniforms, frameTime, passResolution);
+        applyCustomUniforms(render, points, scene, ShaderType::POINTS, frameTime, passResolution);
         render.draw(0, points.numVisible, 1);
     }
 
@@ -5847,7 +5877,7 @@ bool RenderSystem::drawLines(LinesComponent& lines, Transform& transform, Transf
             return false;
         }
         render.applyUniformBlock(lines.slotVSParams, sizeof(float) * 16, &transform.modelViewProjectionMatrix);
-        applyCustomUniforms(render, lines.customVSParams, lines.customFSParams, lines.shaderUniforms, lines.needUpdateShaderUniforms, frameTime, passResolution);
+        applyCustomUniforms(render, lines, scene, ShaderType::LINES, frameTime, passResolution);
         render.draw(0, lines.lines.size() * 2, 1);
     }
 
@@ -5959,8 +5989,9 @@ bool RenderSystem::loadSky(Entity entity, SkyComponent& sky, uint16_t pipelines)
     sky.slotFSParams = shaderData.getUniformBlockIndex(UniformBlockType::SKY_FS_PARAMS);
     sky.customVSParams.resolve(shaderData, "u_vs_customParams");
     sky.customFSParams.resolve(shaderData, "u_fs_customParams");
-    sky.customVSParams.writeValues(sky.shaderUniforms);
-    sky.customFSParams.writeValues(sky.shaderUniforms);
+    const ShaderUniformValues* inheritedUniforms = scene->getInheritedShaderUniforms(ShaderType::SKYBOX, sky.customShader);
+    sky.customVSParams.writeValues(sky.shaderUniforms, inheritedUniforms);
+    sky.customFSParams.writeValues(sky.shaderUniforms, inheritedUniforms);
     sky.needUpdateShaderUniforms = false;
 
     if (TextureRender* textureRender = sky.texture.getRender(&emptyCubeWhite)){
@@ -6017,7 +6048,7 @@ bool RenderSystem::drawSky(SkyComponent& sky, PipelineType pipType){
         }
         render.applyUniformBlock(sky.slotVSParams, sizeof(float) * 16, &sky.skyViewProjectionMatrix);
         render.applyUniformBlock(sky.slotFSParams, sizeof(float) * 4, &sky.color);
-        applyCustomUniforms(render, sky.customVSParams, sky.customFSParams, sky.shaderUniforms, sky.needUpdateShaderUniforms, frameTime, passResolution);
+        applyCustomUniforms(render, sky, scene, ShaderType::SKYBOX, frameTime, passResolution);
         render.draw(0, 36, 1);
     }
 
@@ -6387,8 +6418,9 @@ bool RenderSystem::loadWater(Entity entity, WaterComponent& water, uint16_t pipe
     }
     water.customVSParams.resolve(shaderData, "u_vs_customParams");
     water.customFSParams.resolve(shaderData, "u_fs_customParams");
-    water.customVSParams.writeValues(water.shaderUniforms);
-    water.customFSParams.writeValues(water.shaderUniforms);
+    const ShaderUniformValues* inheritedUniforms = scene->getInheritedShaderUniforms(ShaderType::WATER, water.customShader);
+    water.customVSParams.writeValues(water.shaderUniforms, inheritedUniforms);
+    water.customFSParams.writeValues(water.shaderUniforms, inheritedUniforms);
     water.needUpdateShaderUniforms = false;
 
     // grid on local XZ, kept by reloads that only change the shader
@@ -6657,7 +6689,7 @@ bool RenderSystem::drawWater(Entity entity, WaterComponent& water, Transform& tr
     render.applyUniformBlock(water.slotVSShadows, sizeof(vs_shadows_t), &vs_shadows);
     render.applyUniformBlock(water.slotFSShadows, sizeof(fs_shadows_t), &fs_shadows);
     render.applyUniformBlock(water.slotFSPointShadows, sizeof(fs_point_shadows_t), &fs_point_shadows);
-    writeCustomUniforms(water);
+    writeCustomUniforms(water, scene);
     applyCustomUniforms(render, water.customVSParams, frameTime, passResolution);
     applyCustomUniforms(render, water.customFSParams, frameTime, passResolution);
 
@@ -6910,7 +6942,7 @@ bool RenderSystem::loadUnderwater(WaterComponent& water){
     water.underwaterRender.setShader(water.underwaterShader.get());
     water.slotUnderwaterParams = shaderData.getUniformBlockIndex(UniformBlockType::UNDERWATER_FS_PARAMS);
     water.customUnderwaterParams.resolve(shaderData, "u_fs_customParams");
-    water.customUnderwaterParams.writeValues(water.shaderUniforms);
+    water.customUnderwaterParams.writeValues(water.shaderUniforms, scene->getInheritedShaderUniforms(ShaderType::WATER, water.customShader));
     if (!water.underwaterRender.endLoad(PIP_RTT_NODEPTH, false, true, CullingMode::BACK, WindingOrder::CCW))
         return false;
 
@@ -6962,7 +6994,7 @@ void RenderSystem::drawUnderwater(WaterComponent& water, CameraComponent& camera
     render.addTexture(shaderData.getTextureIndex(TextureShaderType::DEPTHTEXTURE), ShaderStageType::FRAGMENT, currentSceneDepthTexture ? currentSceneDepthTexture : &emptyWhite);
     render.addTexture(shaderData.getTextureIndex(TextureShaderType::IRRADIANCEMAP), ShaderStageType::FRAGMENT, irradiance);
     render.applyUniformBlock(water.slotUnderwaterParams, sizeof(fs_underwater_t), &params);
-    writeCustomUniforms(water);
+    writeCustomUniforms(water, scene);
     applyCustomUniforms(render, water.customUnderwaterParams, frameTime, passResolution);
     render.draw(0, 3, 1);
 }

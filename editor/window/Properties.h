@@ -311,17 +311,24 @@ namespace doriax::editor{
             std::vector<ShaderUniform> members;
             std::vector<std::string> warnings;
             bool buildFailed = false; // the fork failed and the built-in is rendering
+            // scene values of the default shader the component inherits, null with its own fork
+            const ShaderUniformValues* inherited = nullptr;
         };
-        ShaderUniformRows resolveShaderUniformRows(ComponentType cpType, SceneProject* sceneProject, Entity entity);
-        // rows under the Shader row, stored by name in shaderUniforms
-        void drawShaderUniformRows(ComponentType cpType, SceneProject* sceneProject, Entity entity, const ShaderUniformRows& rows);
-        // one member row: a label for engine-written and non-editable members, else a
-        // drag field; true with newValue when it changed
-        bool drawShaderUniformRow(const ShaderUniform& uniform, const ShaderUniformValues& values, const std::string& idPrefix, Vector4& newValue);
+        ShaderUniformRows resolveShaderUniformRows(ComponentType cpType, ShaderType shaderType, SceneProject* sceneProject, Entity entity);
+        // the build state and warnings (status), or the member rows, stored by name in shaderUniforms
+        void drawShaderUniformRows(ComponentType cpType, SceneProject* sceneProject, Entity entity, const ShaderUniformRows& rows, bool status);
+        enum class ShaderUniformEdit { NONE, CHANGED, RESET };
+        // one member row; an unset value shows the inherited one, and RESET drops an override
+        ShaderUniformEdit drawShaderUniformRow(const ShaderUniform& uniform, const ShaderUniformValues& values,
+                                               const ShaderUniformValues* inherited, const std::string& idPrefix, Vector4& newValue);
         void drawShaderUniformWarnings(const std::vector<std::string>& warnings);
         // Scene-level variant: edits a scene default shader property (e.g. "default_mesh_shader"),
         // used by every component of that type whose customShader is empty.
         void drawSceneShaderRow(SceneProject* sceneProject, ShaderType shaderType, const char* scenePropertyName, const char* label);
+        // members of a scene default fork, from the components rendering with it (used)
+        ShaderUniformRows resolveSceneShaderUniformRows(SceneProject* sceneProject, ShaderType shaderType, bool& used);
+        // same split for a default shader's rows, whose values are stored on the scene
+        void drawSceneShaderUniforms(SceneProject* sceneProject, ShaderType shaderType, const ShaderUniformRows& rows, bool used, bool status);
 
         // Ordered user post-process chain: per-pass enable, shader fork/pick, reorder
         // and remove. Uniform rows come from the fork's own u_fs_postParams block.
@@ -335,8 +342,9 @@ namespace doriax::editor{
         };
         PostProcessShader resolvePostProcessShader(const PostProcessPass& pass);
         float getPostProcessLabelSize(const PostProcessShader& resolved);
+        // same split as drawShaderUniformRows, for a pass's u_fs_postParams members
         void drawPostProcessUniforms(uint32_t sceneId, const std::vector<PostProcessPass>& passes, size_t index,
-                                     const PostProcessShader& resolved);
+                                     const PostProcessShader& resolved, bool status);
 
         // Commits a planned fork as one undoable step and opens the new .vert/.frag in the
         // code editor. Alerts instead when the plan is invalid or the files cannot be written.
@@ -346,10 +354,12 @@ namespace doriax::editor{
         // table value cell. setShader issues the undoable command; onFork opens the modal
         // that selects the destination and exact shader name before files are written.
         // idSuffix uniquifies ImGui IDs and the edit-files popup within the window.
+        // inheritedShader names the scene default an empty component shader falls back to.
         void drawShaderRowContents(ShaderType shaderType, const std::string& currentShader,
                                    const std::function<void(const std::string&)>& setShader,
                                    const std::function<void()>& onFork,
-                                   const std::string& idSuffix);
+                                   const std::string& idSuffix,
+                                   const std::string& inheritedShader = std::string());
         void drawShaderFilesPopup(const std::string& popupName, const std::function<void(const std::string&)>& setShader, const std::string& currentVert, const std::string& currentFrag);
         void drawTransform(ComponentType cpType, SceneProject* sceneProject, std::vector<Entity> entities);
         void drawMeshComponent(ComponentType cpType, SceneProject* sceneProject, std::vector<Entity> entities);

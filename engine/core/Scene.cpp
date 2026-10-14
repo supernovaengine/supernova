@@ -558,6 +558,79 @@ const std::string& Scene::getDefaultCustomShader(ShaderType type) const{
     }
 }
 
+// null for the types without a scene default
+static ShaderUniformValues* defaultShaderUniformsField(SceneSettings& settings, ShaderType type){
+    switch (type){
+        case ShaderType::MESH:   return &settings.defaultMeshShaderUniforms;
+        case ShaderType::UI:     return &settings.defaultUIShaderUniforms;
+        case ShaderType::SKYBOX: return &settings.defaultSkyShaderUniforms;
+        case ShaderType::POINTS: return &settings.defaultPointsShaderUniforms;
+        case ShaderType::LINES:  return &settings.defaultLinesShaderUniforms;
+        case ShaderType::WATER:  return &settings.defaultWaterShaderUniforms;
+        default: return nullptr;
+    }
+}
+
+void Scene::setDefaultShaderUniforms(ShaderType type, const ShaderUniformValues& values){
+    ShaderUniformValues* field = defaultShaderUniformsField(settings, type);
+    if (!field)
+        return;
+
+    *field = values;
+    getSystem<RenderSystem>()->needUpdateDefaultShaderUniforms(type);
+}
+
+const ShaderUniformValues& Scene::getDefaultShaderUniforms(ShaderType type) const{
+    static const ShaderUniformValues empty;
+    switch (type){
+        case ShaderType::MESH:   return settings.defaultMeshShaderUniforms;
+        case ShaderType::UI:     return settings.defaultUIShaderUniforms;
+        case ShaderType::SKYBOX: return settings.defaultSkyShaderUniforms;
+        case ShaderType::POINTS: return settings.defaultPointsShaderUniforms;
+        case ShaderType::LINES:  return settings.defaultLinesShaderUniforms;
+        case ShaderType::WATER:  return settings.defaultWaterShaderUniforms;
+        default: return empty;
+    }
+}
+
+void Scene::setDefaultShaderUniform(ShaderType type, const std::string& name, const Vector4& value){
+    ShaderUniformValues* field = defaultShaderUniformsField(settings, type);
+    if (field && ShaderUniforms::set(*field, name, value))
+        getSystem<RenderSystem>()->needUpdateDefaultShaderUniforms(type);
+}
+
+void Scene::setDefaultShaderUniform(ShaderType type, const std::string& name, const Vector3& value){
+    setDefaultShaderUniform(type, name, Vector4(value.x, value.y, value.z, 0.0f));
+}
+
+void Scene::setDefaultShaderUniform(ShaderType type, const std::string& name, const Vector2& value){
+    setDefaultShaderUniform(type, name, Vector4(value.x, value.y, 0.0f, 0.0f));
+}
+
+void Scene::setDefaultShaderUniform(ShaderType type, const std::string& name, float value){
+    setDefaultShaderUniform(type, name, Vector4(value, 0.0f, 0.0f, 0.0f));
+}
+
+Vector4 Scene::getDefaultShaderUniform(ShaderType type, const std::string& name) const{
+    return ShaderUniforms::get(getDefaultShaderUniforms(type), name);
+}
+
+bool Scene::removeDefaultShaderUniform(ShaderType type, const std::string& name){
+    ShaderUniformValues* field = defaultShaderUniformsField(settings, type);
+    if (!field || !ShaderUniforms::remove(*field, name))
+        return false;
+
+    getSystem<RenderSystem>()->needUpdateDefaultShaderUniforms(type);
+    return true;
+}
+
+const ShaderUniformValues* Scene::getInheritedShaderUniforms(ShaderType type, const std::string& customShader) const{
+    if (!customShader.empty() || getDefaultCustomShader(type).empty())
+        return nullptr;
+
+    return &getDefaultShaderUniforms(type);
+}
+
 const std::vector<PostProcessPass>& Scene::getPostProcessPasses() const{
     return settings.postProcess;
 }
