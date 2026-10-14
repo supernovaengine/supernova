@@ -130,8 +130,8 @@ bool WinInputRouter::handleMessage(HWND window, UINT message, WPARAM wParam,
         case WM_SYSCHAR: {
             const wchar_t codepoint = static_cast<wchar_t>(wParam);
             // Other control characters would show up as boxes
-            if (codepoint >= 32 || codepoint == '\t' || codepoint == '\b' ||
-                codepoint == '\r' || codepoint == 0x1b)
+            if ((codepoint >= 32 && codepoint != 0x7f) || codepoint == '\t' ||
+                codepoint == '\b' || codepoint == '\r' || codepoint == 0x1b)
                 Engine::systemCharInput(codepoint);
             result = 0;
             return true;

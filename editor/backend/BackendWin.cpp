@@ -793,6 +793,46 @@ editor::RendererPlatform rendererPlatform() {
 
 #endif
 
+// Play expects these keys' chars, but Alt combos post WM_SYSCHAR (not queued by
+// imgui_impl_win32) and Ctrl+Backspace posts 0x7f
+unsigned int controlCharForKey(const MSG& message) {
+    if (message.message != WM_KEYDOWN && message.message != WM_SYSKEYDOWN)
+        return 0;
+    switch (message.wParam) {
+        case VK_BACK: return '\b';
+        case VK_TAB: return '\t';
+        case VK_RETURN: return '\r';
+        case VK_ESCAPE: return 0x1b;
+        default: return 0;
+    }
+}
+
+void translateAndDispatch(MSG& message) {
+    unsigned int control = controlCharForKey(message);
+    if (!control) {
+        TranslateMessage(&message);
+        DispatchMessageW(&message);
+        return;
+    }
+
+    // Earlier presses' chars go first, leaving only this press's after translating
+    MSG pending{};
+    while (PeekMessageW(&pending, message.hwnd, WM_CHAR, WM_CHAR, PM_REMOVE))
+        DispatchMessageW(&pending);
+    TranslateMessage(&message);
+    std::vector<MSG> chars;
+    while (PeekMessageW(&pending, message.hwnd, WM_CHAR, WM_CHAR, PM_REMOVE)) {
+        if (pending.wParam == control || (control == '\r' && pending.wParam == '\n'))
+            control = 0;
+        chars.push_back(pending);
+    }
+
+    DispatchMessageW(&message);
+    for (const MSG& c : chars) DispatchMessageW(&c);
+    if (control && ImGui::GetCurrentContext())
+        ImGui::GetIO().AddInputCharacter(control);
+}
+
 void processMessages(bool waitForMessage) {
     if (waitForMessage)
         MsgWaitForMultipleObjectsEx(
@@ -803,8 +843,7 @@ void processMessages(bool waitForMessage) {
             backend->shouldClose = true;
             continue;
         }
-        TranslateMessage(&message);
-        DispatchMessageW(&message);
+        translateAndDispatch(message);
     }
 }
 

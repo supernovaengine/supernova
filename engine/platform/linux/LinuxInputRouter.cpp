@@ -49,8 +49,8 @@ void LinuxInputRouter::handleKey(XKeyEvent& event, bool pressed) {
     const int length = XLookupString(&event, text, sizeof(text), &ignored, nullptr);
     for (int i = 0; i < length; ++i) {
         const unsigned char codepoint = static_cast<unsigned char>(text[i]);
-        if (codepoint >= 32 || codepoint == '\t' || codepoint == '\b' ||
-            codepoint == '\r' || codepoint == 0x1b)
+        if ((codepoint >= 32 && codepoint != 0x7f) || codepoint == '\t' ||
+            codepoint == '\b' || codepoint == '\r' || codepoint == 0x1b)
             Engine::systemCharInput(codepoint);
     }
 }

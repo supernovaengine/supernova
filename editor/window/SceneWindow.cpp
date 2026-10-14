@@ -814,11 +814,20 @@ void editor::SceneWindow::handleTileRectDragDrop(SceneProject* sceneProject) {
 
 void editor::SceneWindow::forwardPlayKeyboardInput(ImGuiIO& io, int mods){
     for (int i = 0; i < io.InputQueueCharacters.Size; i++){
-        Engine::systemCharInput(static_cast<wchar_t>(io.InputQueueCharacters[i]));
+        const ImWchar codepoint = io.InputQueueCharacters[i];
+        // Other control characters would show up as boxes
+        if ((codepoint >= 32 && codepoint != 0x7f) || codepoint == '\t' || codepoint == '\b' ||
+            codepoint == '\r' || codepoint == '\n' || codepoint == 0x1b){
+            Engine::systemCharInput(static_cast<wchar_t>(codepoint));
+        }
     }
     io.InputQueueCharacters.resize(0);
 
     auto forwardKeyPress = [&](ImGuiKey imguiKey, int engineKey, wchar_t charInput = 0, bool allowRepeat = true){
+#ifndef __APPLE__
+        // Only imgui_impl_osx leaves control characters out of the queue
+        charInput = 0;
+#endif
         if (ImGui::IsKeyPressed(imguiKey, false)){
             if (charInput != 0){
                 Engine::systemCharInput(charInput);

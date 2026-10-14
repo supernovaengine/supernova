@@ -1160,6 +1160,17 @@ unsigned int modifierMaskForKey(KeySym key) {
     }
 }
 
+// Play expects these keys' chars, but Shift+Tab (ISO_Left_Tab) looks up as no text
+unsigned int controlCharForKey(KeySym key) {
+    switch (key) {
+        case XK_BackSpace: return '\b';
+        case XK_Tab: return '\t';
+        case XK_Return: case XK_KP_Enter: return '\r';
+        case XK_Escape: return 0x1b;
+        default: return 0;
+    }
+}
+
 void addModifiers(ImGuiIO& io, unsigned int state) {
     io.AddKeyEvent(ImGuiMod_Ctrl, (state & ControlMask) != 0);
     io.AddKeyEvent(ImGuiMod_Shift, (state & ShiftMask) != 0);
@@ -1641,6 +1652,9 @@ void handleKeyEvent(NativeWindow* window, XKeyEvent& event, bool pressed) {
         if (length > 0 && length < static_cast<int>(sizeof(buffer))) {
             buffer[length] = '\0';
             io.AddInputCharactersUTF8(buffer);
+        } else if (length == 0) {
+            if (const unsigned int control = controlCharForKey(keySym))
+                io.AddInputCharacter(control);
         }
     }
 }
