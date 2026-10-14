@@ -512,7 +512,7 @@ bool editor::ModelLoadCmd::execute(){
     }
 
     // Synchronous failure — restore old state
-    scene->getComponent<Transform>(entity) = Stream::decodeTransform(oldTransform);
+    restoreTransform(scene);
     restoreMesh(scene);
     scene->getComponent<ModelComponent>(entity) = Stream::decodeModelComponent(oldModel);
     if (oldSubEntitiesDeleteCmd) {
@@ -526,6 +526,12 @@ bool editor::ModelLoadCmd::execute(){
         createEntityCmd->undo();
     }
     return false;
+}
+
+// The parent is not encoded, so it stays
+void editor::ModelLoadCmd::restoreTransform(Scene* scene){
+    Transform& transform = scene->getComponent<Transform>(entity);
+    transform = Stream::decodeTransform(oldTransform, &transform);
 }
 
 // The load adds or removes the model's own mesh, so this puts back whichever it had
@@ -601,7 +607,7 @@ void editor::ModelLoadCmd::undo(){
     }
 
     // Restore old components
-    scene->getComponent<Transform>(entity) = Stream::decodeTransform(oldTransform);
+    restoreTransform(scene);
     restoreMesh(scene);
     scene->getComponent<ModelComponent>(entity) = Stream::decodeModelComponent(oldModel);
 

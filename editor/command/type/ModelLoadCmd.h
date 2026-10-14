@@ -98,6 +98,7 @@ namespace doriax::editor{
         bool tryLoad();
         void finalizeLoad();
         void schedulePoll();
+        void restoreTransform(Scene* scene);
         void restoreMesh(Scene* scene);
         void rebuildRuntimeNodes(SceneProject* sceneProject);
 
