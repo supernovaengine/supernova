@@ -5182,6 +5182,7 @@ void editor::Properties::drawCustomShaderRow(ComponentType cpType, ShaderType sh
         longestLabel = "Underwater Shader";
     float labelSize = getLabelSize(longestLabel, false);
 
+    ImGui::SeparatorText("Shaders");
     beginTable(cpType, labelSize, "custom_shader_table");
     propertyHeader("Shader");
     drawComponentShaderRow(cpType, shaderType, sceneProject, shaderEntity, "customShader", "custom_shader");
