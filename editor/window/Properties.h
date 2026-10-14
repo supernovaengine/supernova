@@ -322,6 +322,8 @@ namespace doriax::editor{
         ShaderUniformEdit drawShaderUniformRow(const ShaderUniform& uniform, const ShaderUniformValues& values,
                                                const ShaderUniformValues* inherited, const std::string& idPrefix, Vector4& newValue);
         void drawShaderUniformWarnings(const std::vector<std::string>& warnings);
+        // label column of a uniforms table, with room for the reset arrow when it can show
+        float getShaderUniformsLabelSize(const std::vector<ShaderUniform>& members, bool resetArrow);
         // Scene-level variant: edits a scene default shader property (e.g. "default_mesh_shader"),
         // used by every component of that type whose customShader is empty.
         void drawSceneShaderRow(SceneProject* sceneProject, ShaderType shaderType, const char* scenePropertyName, const char* label);
@@ -341,7 +343,6 @@ namespace doriax::editor{
             bool buildFailed = false;
         };
         PostProcessShader resolvePostProcessShader(const PostProcessPass& pass);
-        float getPostProcessLabelSize(const PostProcessShader& resolved);
         // same split as drawShaderUniformRows, for a pass's u_fs_postParams members
         void drawPostProcessUniforms(uint32_t sceneId, const std::vector<PostProcessPass>& passes, size_t index,
                                      const PostProcessShader& resolved, bool status);

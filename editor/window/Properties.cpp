@@ -5174,7 +5174,6 @@ void editor::Properties::drawCustomShaderRow(ComponentType cpType, ShaderType sh
     if (!Catalog::getPropertyRef<std::string>(sceneProject->scene, shaderEntity, cpType, "customShader"))
         return;
 
-    // the shader and uniform tables share the label width
     ShaderUniformRows uniformRows = resolveShaderUniformRows(cpType, shaderType, sceneProject, shaderEntity);
     const char* longestLabel = "Shader";
     if (cpType == ComponentType::MeshComponent)
@@ -5182,9 +5181,6 @@ void editor::Properties::drawCustomShaderRow(ComponentType cpType, ShaderType sh
     else if (cpType == ComponentType::WaterComponent)
         longestLabel = "Underwater Shader";
     float labelSize = getLabelSize(longestLabel, false);
-    // inherited rows can show the reset arrow
-    for (const ShaderUniform& uniform : uniformRows.members)
-        labelSize = std::max(labelSize, getLabelSize(uniform.name, uniformRows.inherited != nullptr));
 
     beginTable(cpType, labelSize, "custom_shader_table");
     propertyHeader("Shader");
@@ -5230,8 +5226,8 @@ void editor::Properties::drawCustomShaderRow(ComponentType cpType, ShaderType sh
             forkShader = *Catalog::getPropertyRef<std::string>(sceneProject->scene, shaderEntity, cpType, "customUnderwaterShader");
 
         shaderUniformsSeparator(forkShader);
-        // same table ID, so both keep one column width when resized
-        beginTable(cpType, labelSize, "custom_shader_table");
+        // inherited rows can show the reset arrow
+        beginTable(cpType, getShaderUniformsLabelSize(uniformRows.members, uniformRows.inherited != nullptr), "custom_shader_uniforms_table");
         drawShaderUniformRows(cpType, sceneProject, shaderEntity, uniformRows, false);
         endTable();
     }
@@ -5515,8 +5511,6 @@ void editor::Properties::drawSceneShaderUniforms(SceneProject* sceneProject, Sha
     const ShaderUniformValues values = Catalog::getSceneProperty<ShaderUniformValues>(sceneProject->scene, propertyName);
     const uint32_t sceneId = sceneProject->id;
 
-    // member names can repeat across the defaults
-    ImGui::PushID(propertyName);
     for (const ShaderUniform& uniform : orderShaderUniforms(rows.members)){
         Vector4 newValue;
         if (drawShaderUniformRow(uniform, values, nullptr, "##scene_uniform_", newValue) == ShaderUniformEdit::CHANGED){
@@ -5532,7 +5526,6 @@ void editor::Properties::drawSceneShaderUniforms(SceneProject* sceneProject, Sha
             cmd = nullptr;
         }
     }
-    ImGui::PopID();
 }
 
 editor::Properties::PostProcessShader editor::Properties::resolvePostProcessShader(const PostProcessPass& pass){
@@ -5549,12 +5542,10 @@ editor::Properties::PostProcessShader editor::Properties::resolvePostProcessShad
     return resolved;
 }
 
-// widest uniform name the pass declares, so the rows are not truncated to "Shader"
-float editor::Properties::getPostProcessLabelSize(const PostProcessShader& resolved){
-    // no reset arrow on these rows, so they only need getLabelSize's half-icon padding
-    float width = getLabelSize("Shader", false);
-    for (const ShaderUniform& uniform : resolved.block.members)
-        width = std::max(width, getLabelSize(uniform.name, false));
+float editor::Properties::getShaderUniformsLabelSize(const std::vector<ShaderUniform>& members, bool resetArrow){
+    float width = 0.0f;
+    for (const ShaderUniform& uniform : members)
+        width = std::max(width, getLabelSize(uniform.name, resetArrow));
 
     return width;
 }
@@ -5605,9 +5596,7 @@ void editor::Properties::drawScenePostProcess(SceneProject* sceneProject){
             new ScenePropertyCmd<std::vector<PostProcessPass>>(project, sceneId, "post_process", value));
     };
 
-    // not resizable: the label column is sized from the pass uniform names, and a saved
-    // width would freeze it at whatever was known while the shader was still compiling
-    ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchSame;
+    ImGuiTableFlags tableFlags = ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_Resizable | ImGuiTableFlags_SizingStretchSame;
 
     for (size_t i = 0; i < passes.size(); i++){
         ImGui::PushID((int)i);
@@ -5725,11 +5714,9 @@ void editor::Properties::drawScenePostProcess(SceneProject* sceneProject){
         }
 
         PostProcessShader resolved = resolvePostProcessShader(passes[i]);
-        // shared by the pass and uniform tables
-        const float labelSize = getPostProcessLabelSize(resolved);
 
         if (ImGui::BeginTable("scene_post_process_pass_table", 2, tableFlags)){
-            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, labelSize);
+            ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, getLabelSize("Shader", false));
             ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
             ImGui::TableNextRow();
@@ -5784,10 +5771,11 @@ void editor::Properties::drawScenePostProcess(SceneProject* sceneProject){
             ImGui::EndTable();
         }
 
+        // only drawn once the shader is built, so the first width of its column fits the names
         if (!resolved.block.members.empty()){
             shaderUniformsSeparator(passes[i].shader);
             if (ImGui::BeginTable("scene_post_process_uniforms_table", 2, tableFlags)){
-                ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, labelSize);
+                ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, getShaderUniformsLabelSize(resolved.block.members, false));
                 ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
 
                 drawPostProcessUniforms(sceneId, passes, i, resolved, false);
@@ -14328,72 +14316,51 @@ void editor::Properties::show(){
             // empty (priority: component shader > scene default > built-in).
             ImGui::SeparatorText("Default Shaders");
 
-            // a forked default lists its uniforms under its row
-            struct DefaultShaderRow {
-                ShaderType type;
-                const char* propertyName;
-                const char* label;
-                bool forked = false;
+            // each shader type, and a forked default's uniforms, in a table of its own
+            bool afterUniforms = false;
+            auto drawDefaultShader = [&](ShaderType type, const char* propertyName, const char* label) {
+                // a line closes the uniforms above
+                if (afterUniforms)
+                    ImGui::Separator();
+                afterUniforms = false;
+
                 bool used = false;
                 ShaderUniformRows rows;
-            };
-            std::vector<DefaultShaderRow> defaultRows;
-            auto addDefaultRow = [&](ShaderType type, const char* propertyName, const char* label) {
-                DefaultShaderRow row{type, propertyName, label};
-                row.forked = !sceneProject->scene->getDefaultCustomShader(type).empty();
-                if (row.forked)
-                    row.rows = resolveSceneShaderUniformRows(sceneProject, type, row.used);
-                defaultRows.push_back(row);
-            };
-            if (sceneProject->sceneType != SceneType::SCENE_UI) {
-                addDefaultRow(ShaderType::MESH, "default_mesh_shader", "Mesh");
-                if (sceneProject->sceneType == SceneType::SCENE_3D) {
-                    addDefaultRow(ShaderType::SKYBOX, "default_sky_shader", "Sky");
-                    addDefaultRow(ShaderType::WATER, "default_water_shader", "Water");
-                }
-            }
-            addDefaultRow(ShaderType::UI, "default_ui_shader", "UI");
-            if (sceneProject->sceneType != SceneType::SCENE_UI) {
-                addDefaultRow(ShaderType::POINTS, "default_points_shader", "Points");
-                addDefaultRow(ShaderType::LINES, "default_lines_shader", "Lines");
-            }
-
-            float defaultsLabelSize = ImGui::CalcTextSize("Points").x;
-            for (const DefaultShaderRow& row : defaultRows) {
-                for (const ShaderUniform& uniform : row.rows.members)
-                    defaultsLabelSize = std::max(defaultsLabelSize, getLabelSize(uniform.name, false));
-            }
-
-            // not resizable, so the label column follows the uniform names; the parts of the table
-            // split by a fork's uniforms line share one ID
-            auto beginDefaultsTable = [&]() {
-                if (!ImGui::BeginTable("scene_default_shaders_table", 2, ImGuiTableFlags_BordersInnerV | ImGuiTableFlags_SizingStretchSame))
-                    return false;
-                ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, defaultsLabelSize);
-                ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
-                return true;
-            };
-
-            bool defaultsTableOpen = beginDefaultsTable();
-            for (const DefaultShaderRow& row : defaultRows) {
-                if (!defaultsTableOpen)
-                    break;
-
-                drawSceneShaderRow(sceneProject, row.type, row.propertyName, row.label);
-                if (!row.forked)
-                    continue;
-
-                drawSceneShaderUniforms(sceneProject, row.type, row.rows, row.used, true);
-                if (!row.rows.members.empty()) {
+                if (ImGui::BeginTable((std::string(propertyName) + "_table").c_str(), 2, tableFlags)) {
+                    ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, ImGui::CalcTextSize("Points").x);
+                    ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+                    drawSceneShaderRow(sceneProject, type, propertyName, label);
+                    if (!sceneProject->scene->getDefaultCustomShader(type).empty()) {
+                        rows = resolveSceneShaderUniformRows(sceneProject, type, used);
+                        drawSceneShaderUniforms(sceneProject, type, rows, used, true);
+                    }
                     ImGui::EndTable();
-                    shaderUniformsSeparator(sceneProject->scene->getDefaultCustomShader(row.type));
-                    defaultsTableOpen = beginDefaultsTable();
-                    if (defaultsTableOpen)
-                        drawSceneShaderUniforms(sceneProject, row.type, row.rows, row.used, false);
+                }
+                if (rows.members.empty())
+                    return;
+
+                shaderUniformsSeparator(sceneProject->scene->getDefaultCustomShader(type));
+                if (ImGui::BeginTable((std::string(propertyName) + "_uniforms_table").c_str(), 2, tableFlags)) {
+                    ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_WidthFixed, getShaderUniformsLabelSize(rows.members, false));
+                    ImGui::TableSetupColumn("Value", ImGuiTableColumnFlags_WidthStretch);
+                    drawSceneShaderUniforms(sceneProject, type, rows, used, false);
+                    ImGui::EndTable();
+                }
+                afterUniforms = true;
+            };
+
+            if (sceneProject->sceneType != SceneType::SCENE_UI) {
+                drawDefaultShader(ShaderType::MESH, "default_mesh_shader", "Mesh");
+                if (sceneProject->sceneType == SceneType::SCENE_3D) {
+                    drawDefaultShader(ShaderType::SKYBOX, "default_sky_shader", "Sky");
+                    drawDefaultShader(ShaderType::WATER, "default_water_shader", "Water");
                 }
             }
-            if (defaultsTableOpen)
-                ImGui::EndTable();
+            drawDefaultShader(ShaderType::UI, "default_ui_shader", "UI");
+            if (sceneProject->sceneType != SceneType::SCENE_UI) {
+                drawDefaultShader(ShaderType::POINTS, "default_points_shader", "Points");
+                drawDefaultShader(ShaderType::LINES, "default_lines_shader", "Lines");
+            }
         }
 
         thumbnailTextures.clear();
