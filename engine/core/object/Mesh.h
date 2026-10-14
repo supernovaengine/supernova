@@ -10,7 +10,22 @@
 
 namespace doriax{
 
+    struct ModelComponent;
+
     class DORIAX_API Mesh: public Object{
+    private:
+        ModelComponent* findPartsModel() const;
+        AABB getPartsAABB(const ModelComponent& model, AABB MeshComponent::*bounds) const;
+
+    protected:
+        // A model with its geometry on node children uses their meshes: the setters change all of
+        // them, the getters read the first, and a submesh index counts across them as when merged
+        std::vector<MeshComponent*> findMeshes() const;
+        std::vector<MeshComponent*> getMeshes();
+        const MeshComponent& getMesh() const;
+        MeshComponent* findSubmesh(unsigned int& submesh) const;
+        const Submesh& getSubmesh(unsigned int submesh) const;
+
     public:
         Mesh(Scene* scene);
         Mesh(Scene* scene, Entity entity);

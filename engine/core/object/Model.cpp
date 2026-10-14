@@ -50,7 +50,6 @@ bool Model::loadModel(const std::string& filename){
 }
 
 bool Model::loadOBJ(const std::string& filename){
-    MeshComponent& mesh = getComponent<MeshComponent>();
     ModelComponent& model = getComponent<ModelComponent>();
 
     if (isEntityOwned()){
@@ -62,15 +61,17 @@ bool Model::loadOBJ(const std::string& filename){
     bool ret = scene->getSystem<MeshSystem>()->loadOBJ(entity, filename);
 
     if (ret){
-        mesh.needReload = true;
+        getComponent<MeshComponent>().needReload = true;
     }
 
     return ret;
 }
 
 bool Model::loadGLTF(const std::string& filename){
-    MeshComponent& mesh = getComponent<MeshComponent>();
     ModelComponent& model = getComponent<ModelComponent>();
+
+    // The parts are destroyed below, a reload puts their settings back
+    MeshSystem::MeshSettingsByNode settings = scene->getSystem<MeshSystem>()->collectMeshSettings(entity, model, filename);
 
     if (isEntityOwned()){
         scene->getSystem<MeshSystem>()->clearBoneMapping(model);
@@ -88,7 +89,10 @@ bool Model::loadGLTF(const std::string& filename){
                 }
             }
         }
-        mesh.needReload = true;
+        scene->getSystem<MeshSystem>()->applyMeshSettings(settings, entity, model);
+        if (MeshComponent* mesh = scene->findComponent<MeshComponent>(entity)){
+            mesh->needReload = true;
+        }
     }
 
     return ret;
@@ -241,8 +245,9 @@ Bone Model::getBone(int id){
 float Model::getMorphWeight(const std::string& name){
     ModelComponent& model = getComponent<ModelComponent>();
 
-    if (model.morphNameMapping.count(name)){
-        return getMorphWeight(model.morphNameMapping.at(name));
+    auto targets = scene->getSystem<MeshSystem>()->findMorphTargets(entity, model, name);
+    if (!targets.empty()){
+        return targets[0].first->morphWeights[targets[0].second];
     }else{
         Log::error("Retrieving non-existent morph weight '%s'", name.c_str());
     }
@@ -251,10 +256,16 @@ float Model::getMorphWeight(const std::string& name){
 }
 
 float Model::getMorphWeight(int id){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
     if (id >= 0 && id < MAX_MORPHTARGETS){
-        return mesh.morphWeights[id];
+        // the part with the targets is the one an animation sets
+        for (MeshComponent* mesh : findMeshes()){
+            for (unsigned int i = 0; i < mesh->numSubmeshes; i++){
+                if (mesh->submeshes[i].hasMorphTarget){
+                    return mesh->morphWeights[id];
+                }
+            }
+        }
+        return getMesh().morphWeights[id];
     }else{
         Log::error("Retrieving non-existent morph weight '%i'", id);
     }
@@ -265,18 +276,20 @@ float Model::getMorphWeight(int id){
 void Model::setMorphWeight(const std::string& name, float value){
     ModelComponent& model = getComponent<ModelComponent>();
 
-    if (model.morphNameMapping.count(name)){
-        setMorphWeight(model.morphNameMapping.at(name), value);
-    }else{
+    auto targets = scene->getSystem<MeshSystem>()->findMorphTargets(entity, model, name);
+    for (const auto& [mesh, index] : targets){
+        mesh->morphWeights[index] = value;
+    }
+    if (targets.empty()){
         Log::error("Retrieving non-existent morph weight '%s'", name.c_str());
     }
 }
 
 void Model::setMorphWeight(int id, float value){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
     if (id >= 0 && id < MAX_MORPHTARGETS){
-        mesh.morphWeights[id] = value;
+        for (MeshComponent* mesh : findMeshes()){
+            mesh->morphWeights[id] = value;
+        }
     }else{
         Log::error("Retrieving non-existent morph weight '%i'", id);
     }

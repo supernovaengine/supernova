@@ -34,6 +34,7 @@ void editor::ComponentToBundleSharedCmd::rebuildModel(ComponentToBundleSharedDat
 
     // Entities hung on the old nodes move to the model, since the nodes the load builds are not saved
     entityData.modelAttachments = ModelLoadCmd::collectAttachments(sceneProject, entityData.entity, model);
+    entityData.modelSettings = scene->getSystem<MeshSystem>()->collectMeshSettings(entityData.entity, model, model.filename);
     ModelLoadCmd::parkEntities(sceneProject, entityData.entity, entityData.modelAttachments);
     if (tracked) {
         entityData.modelNodesDeleteCmd = std::make_shared<DeleteEntityCmd>(project, sceneId, ModelLoadCmd::collectModelDeleteRoots(scene, model), true);
@@ -114,7 +115,7 @@ void editor::ComponentToBundleSharedCmd::undo() {
                 entityData.modelNodesDeleteCmd->undo();
                 entityData.modelNodesDeleteCmd.reset();
                 ModelLoadCmd::unparkEntities(sceneProject, entityData.modelAttachments);
-            } else if (entityData.modelRebuilt && ModelLoadCmd::rebuildNodes(sceneProject->scene, entityData.entity)) {
+            } else if (entityData.modelRebuilt && ModelLoadCmd::rebuildNodes(sceneProject->scene, entityData.entity, entityData.modelSettings)) {
                 // Runtime nodes have no snapshot, the old file builds them again
                 ModelLoadCmd::attachToNodes(sceneProject->scene, sceneProject->scene->getComponent<ModelComponent>(entityData.entity), entityData.modelAttachments);
                 ProjectUtils::sortEntitiesByTransformOrder(sceneProject->scene, sceneProject->entities);

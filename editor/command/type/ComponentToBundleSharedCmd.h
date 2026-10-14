@@ -17,11 +17,12 @@ namespace doriax::editor {
     struct ComponentToBundleSharedData {
         Entity entity;
         YAML::Node recovery;
-        // a model rebuilt from the shared file, the deleted tracked nodes of the old one
-        // and the entities moved from them to the model
+        // a model rebuilt from the shared file, the deleted tracked nodes of the old one,
+        // the entities moved from them to the model and the settings of its runtime nodes
         bool modelRebuilt = false;
         std::shared_ptr<DeleteEntityCmd> modelNodesDeleteCmd;
         std::vector<ModelLoadCmd::ParkedEntity> modelAttachments;
+        MeshSystem::MeshSettingsByNode modelSettings;
     };
 
     class ComponentToBundleSharedCmd: public Command {

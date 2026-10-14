@@ -109,7 +109,6 @@ namespace doriax{
         }
         static void applyDefaultGLTFMaterial(Material& material);
         static void applyDefaultObjMaterial(Submesh& submesh);
-        std::vector<std::pair<MeshComponent*, unsigned int>> getSubmeshRuns(Entity entity, const ModelComponent& model) const;
         static void applySubmeshOverride(const Submesh& saved, Submesh& submesh);
         void addSubmeshAttribute(Submesh& submesh, const std::string& bufferName, AttributeType attribute, unsigned int elements, AttributeDataType dataType, size_t size, size_t offset, bool normalized);
         bool loadGLTFBuffer(int bufferViewIndex, MeshComponent& mesh, ModelComponent& model, const int stride, std::vector<std::string>& loadedBuffers);
@@ -179,7 +178,7 @@ namespace doriax{
         void createCylinder(MeshComponent& mesh, float baseRadius=1, float topRadius=1, float height=2, unsigned int slices=36, unsigned int stacks=18);
         void createCapsule(MeshComponent& mesh, float baseRadius=1, float topRadius=1, float height=2, unsigned int slices=36, unsigned int stacks=18);
         void createTorus(MeshComponent& mesh, float radius=1, float ringRadius=0.5, unsigned int sides=36, unsigned int rings=16);
-        bool canMergeStaticModel(const ModelComponent& model, const MeshComponent& mesh, std::string* reason = nullptr) const;
+        bool canMergeStaticModel(const ModelComponent& model, std::string* reason = nullptr) const;
         bool canEditModelHierarchy(const ModelComponent& model, std::string* reason = nullptr) const;
         // Whether a part or local group can move without breaking the model's animation.
         bool canEditModelPart(const ModelComponent& model, Entity part, std::string* reason = nullptr) const;
@@ -200,6 +199,32 @@ namespace doriax{
         typedef std::map<unsigned int, Submesh> SubmeshOverrides;
         SubmeshOverrides collectSubmeshOverrides(Entity entity, const ModelComponent& model) const;
         void applySubmeshOverrides(const SubmeshOverrides& overrides, Entity entity, const ModelComponent& model) const;
+        std::vector<std::pair<MeshComponent*, unsigned int>> getSubmeshRuns(Entity entity, const ModelComponent& model) const;
+
+        // The settings of a model's meshes that its file does not give, carried across a reload
+        // like the submesh edits. Keyed by each part's node index and the file's name for it, and
+        // by -1 for the model's, as its getters read them. Another file is a fresh import.
+        struct MeshSettings{
+            bool receiveLights;
+            bool receiveIBL;
+            bool castShadows;
+            bool receiveShadows;
+            bool shadowsBillboard;
+            bool renderInReflectionProbes;
+            bool transparent;
+            bool autoTransparency;
+            bool lodEnabled;
+            float lodBias;
+            std::string customShader;
+            std::string customDepthShader;
+            ShaderUniformValues shaderUniforms;
+        };
+        typedef std::map<std::pair<int, std::string>, MeshSettings> MeshSettingsByNode;
+        MeshSettingsByNode collectMeshSettings(Entity entity, const ModelComponent& model, const std::string& filename) const;
+        void applyMeshSettings(const MeshSettingsByNode& settings, Entity entity, const ModelComponent& model) const;
+
+        // The meshes of a model with the named morph target, and its index in each
+        std::vector<std::pair<MeshComponent*, int>> findMorphTargets(Entity entity, const ModelComponent& model, const std::string& name) const;
 
         bool loadGLTF(Entity entity, const std::string filename, bool asyncLoad=false, bool skipEntities=false, bool changeRootTransform=true);
         bool loadOBJ(Entity entity, const std::string filename, bool asyncLoad=false);
@@ -242,7 +267,7 @@ namespace doriax{
         bool createOrUpdateTerrain(TerrainComponent& terrain, MeshComponent& mesh, Transform& transform);
         bool createOrUpdateMeshPolygon(MeshPolygonComponent& polygon, MeshComponent& mesh);
         bool createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent& mesh);
-        bool createOrUpdateModel(Entity entity, ModelComponent& model, MeshComponent& mesh);
+        bool createOrUpdateModel(Entity entity, ModelComponent& model);
 
         void calculateMeshAABB(MeshComponent& mesh);
 

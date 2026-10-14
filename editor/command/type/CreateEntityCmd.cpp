@@ -604,8 +604,8 @@ bool editor::CreateEntityCmd::execute(){
 
     }else if (type == EntityCreationType::MODEL){
 
+        // the load adds a mesh when the geometry is not on node children
         scene->addComponent<Transform>(entity, {});
-        scene->addComponent<MeshComponent>(entity, {});
         scene->addComponent<ModelComponent>(entity, {});
 
     }else if (type == EntityCreationType::PARTICLES){

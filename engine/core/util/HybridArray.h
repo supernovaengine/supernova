@@ -29,7 +29,7 @@ struct HybridArray {
         return values.data();
     }
 
-    bool validIndex(int index) const {
+    static bool validIndex(int index) {
         return index >= 0;
     }
 
@@ -59,7 +59,7 @@ struct HybridArray {
         return values;
     }
 
-    bool validIndex(int index) const {
+    static bool validIndex(int index) {
         return index >= 0 && static_cast<std::size_t>(index) < Size;
     }
 

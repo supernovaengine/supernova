@@ -80,9 +80,11 @@ namespace doriax::editor{
         // Another file has other nodes, so the parked entities stay on the model
         bool sameModelFile = false;
 
-        // The generated mesh entities are destroyed before the load, so their submesh edits are
-        // taken aside here. Empty when the asset itself changed.
+        // The generated mesh entities are destroyed before the load, so their submesh edits and
+        // settings are taken aside here. The edits are empty when the asset itself changed, the
+        // settings are always kept for the runtime nodes an undo builds again.
         MeshSystem::SubmeshOverrides savedSubmeshOverrides;
+        MeshSystem::MeshSettingsByNode savedMeshSettings;
 
         static bool isMappedMeshNode(const ModelComponent& model, Entity entity);
         static NodeRef makeNodeRef(const ModelComponent& model, int nodeIndex, bool bone);
@@ -96,6 +98,7 @@ namespace doriax::editor{
         bool tryLoad();
         void finalizeLoad();
         void schedulePoll();
+        void restoreMesh(Scene* scene);
         void rebuildRuntimeNodes(SceneProject* sceneProject);
 
     public:
@@ -113,8 +116,9 @@ namespace doriax::editor{
         static void unparkEntities(SceneProject* sceneProject, const std::vector<ParkedEntity>& parked);
         // Onto the nodes of a rebuilt model, by node reference
         static void attachToNodes(Scene* scene, const ModelComponent& model, const std::vector<ParkedEntity>& parked);
-        // Builds the nodes of a model again now, once its old ones are destroyed
-        static bool rebuildNodes(Scene* scene, Entity entity);
+        // Builds the nodes of a model again now, once its old ones are destroyed, with the settings
+        // they had
+        static bool rebuildNodes(Scene* scene, Entity entity, const MeshSystem::MeshSettingsByNode& settings);
 
         bool execute() override;
         void undo() override;

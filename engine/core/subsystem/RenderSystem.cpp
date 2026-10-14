@@ -7774,6 +7774,16 @@ void RenderSystem::getLoadCount(size_t& loaded, size_t& total) const{
         count(mesh.loaded);
     }
 
+    // Check models with no mesh of their own, their load builds the parts
+    auto models = scene->getComponentArray<ModelComponent>();
+    for (int i = 0; i < models->size(); i++) {
+        const ModelComponent& model = models->getComponentFromIndex(i);
+        Entity entity = models->getEntity(i);
+        if (model.filename.empty() || !scene->findComponent<Transform>(entity) || scene->findComponent<MeshComponent>(entity))
+            continue;
+        count(!model.needUpdateModel);
+    }
+
     // Check UIComponents
     auto uis = scene->getComponentArray<UIComponent>();
     for (int i = 0; i < uis->size(); i++) {

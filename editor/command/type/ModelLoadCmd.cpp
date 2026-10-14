@@ -349,6 +349,9 @@ void editor::ModelLoadCmd::finalizeLoad(){
 
     // Put back on whichever mesh the primitive ended up in, which a merge change moves.
     scene->getSystem<MeshSystem>()->applySubmeshOverrides(savedSubmeshOverrides, entity, newModel);
+    if (sameModelFile && !reuseHierarchy) {
+        scene->getSystem<MeshSystem>()->applyMeshSettings(savedMeshSettings, entity, newModel);
+    }
 
     sceneProject->isModified = true;
 
@@ -399,22 +402,18 @@ bool editor::ModelLoadCmd::execute(){
         Log::error("Entity %lu does not have a Transform component", entity);
         return false;
     }
-    if (!signature.test(scene->getComponentId<MeshComponent>())){
-        Log::error("Entity %lu does not have a MeshComponent", entity);
-        return false;
-    }
     if (!signature.test(scene->getComponentId<ModelComponent>())){
         Log::error("Entity %lu does not have a ModelComponent", entity);
         return false;
     }
 
     Transform& transform = scene->getComponent<Transform>(entity);
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+    MeshComponent* mesh = scene->findComponent<MeshComponent>(entity);
     ModelComponent& model = scene->getComponent<ModelComponent>(entity);
 
     if (hasMergeStaticMeshesOverride && mergeStaticMeshesOverride) {
         std::string reason;
-        if (!scene->getSystem<MeshSystem>()->canMergeStaticModel(model, mesh, &reason)) {
+        if (!scene->getSystem<MeshSystem>()->canMergeStaticModel(model, &reason)) {
             Log::warn("Cannot merge static model '%s': %s", model.filename.c_str(), reason.c_str());
             return false;
         }
@@ -429,7 +428,7 @@ bool editor::ModelLoadCmd::execute(){
     // Save old component state
     const bool firstExecution = !oldModel.IsMap();
     oldTransform = Stream::encodeTransform(transform);
-    oldMesh = Stream::encodeMeshComponent(mesh, false, false);
+    oldMesh = mesh ? Stream::encodeMeshComponent(*mesh, false, false) : YAML::Node();
     oldModel = Stream::encodeModelComponent(model);
 
     // This is an import option for the current model asset, not an entity-wide preference.
@@ -459,10 +458,15 @@ bool editor::ModelLoadCmd::execute(){
     // those meshes, so the loader restores them and these ordinals would be the pre-remap ones.
     if (sameModelFile && !reuseHierarchy) {
         savedSubmeshOverrides = scene->getSystem<MeshSystem>()->collectSubmeshOverrides(entity, model);
-    } else if (!sameModelFile) {
-        for (unsigned int i = 0; i < mesh.numSubmeshes; i++) {
-            mesh.submeshes[i].overrideFields = 0;
+    } else if (!sameModelFile && mesh) {
+        for (unsigned int i = 0; i < mesh->numSubmeshes; i++) {
+            mesh->submeshes[i].overrideFields = 0;
         }
+    }
+    // The settings go back on a reload of the same file, and on the runtime nodes an undo builds
+    // again. Only the first run has the parsed glTF to name their nodes, so a redo keeps them.
+    if (firstExecution) {
+        savedMeshSettings = scene->getSystem<MeshSystem>()->collectMeshSettings(entity, model, model.filename);
     }
 
     // Rebuilt nodes get the user's arrangement back by node name. Only the first run has the
@@ -509,7 +513,7 @@ bool editor::ModelLoadCmd::execute(){
 
     // Synchronous failure — restore old state
     scene->getComponent<Transform>(entity) = Stream::decodeTransform(oldTransform);
-    scene->getComponent<MeshComponent>(entity) = Stream::decodeMeshComponent(oldMesh);
+    restoreMesh(scene);
     scene->getComponent<ModelComponent>(entity) = Stream::decodeModelComponent(oldModel);
     if (oldSubEntitiesDeleteCmd) {
         oldSubEntitiesDeleteCmd->undo();
@@ -524,17 +528,31 @@ bool editor::ModelLoadCmd::execute(){
     return false;
 }
 
+// The load adds or removes the model's own mesh, so this puts back whichever it had
+void editor::ModelLoadCmd::restoreMesh(Scene* scene){
+    MeshComponent* mesh = scene->findComponent<MeshComponent>(entity);
+    if (!oldMesh.IsMap()){
+        if (mesh){
+            scene->removeComponent<MeshComponent>(entity);
+        }
+    }else if (mesh){
+        *mesh = Stream::decodeMeshComponent(oldMesh);
+    }else{
+        scene->addComponent<MeshComponent>(entity, Stream::decodeMeshComponent(oldMesh));
+    }
+}
+
 // Runtime nodes have no snapshot, the restored file builds them again
 void editor::ModelLoadCmd::rebuildRuntimeNodes(SceneProject* sceneProject){
     if (!oldRuntimeNodesDestroyed) return;
     oldRuntimeNodesDestroyed = false;
 
-    if (rebuildNodes(sceneProject->scene, entity)) {
+    if (rebuildNodes(sceneProject->scene, entity, savedMeshSettings)) {
         restoreArrangement(sceneProject, sceneProject->scene->getComponent<ModelComponent>(entity));
     }
 }
 
-bool editor::ModelLoadCmd::rebuildNodes(Scene* scene, Entity entity){
+bool editor::ModelLoadCmd::rebuildNodes(Scene* scene, Entity entity, const MeshSystem::MeshSettingsByNode& settings){
     // The mapping points at the destroyed nodes, and the update retries a failed load
     ModelComponent& model = scene->getComponent<ModelComponent>(entity);
     ProjectUtils::clearModelNodes(model);
@@ -547,7 +565,9 @@ bool editor::ModelLoadCmd::rebuildNodes(Scene* scene, Entity entity){
         ? meshSys->loadOBJ(entity, filename)
         : meshSys->loadGLTF(entity, filename, false, false, false);
     if (loaded) {
-        scene->getComponent<ModelComponent>(entity).needUpdateModel = false;
+        ModelComponent& loadedModel = scene->getComponent<ModelComponent>(entity);
+        loadedModel.needUpdateModel = false;
+        meshSys->applyMeshSettings(settings, entity, loadedModel);
     }
     return loaded;
 }
@@ -582,7 +602,7 @@ void editor::ModelLoadCmd::undo(){
 
     // Restore old components
     scene->getComponent<Transform>(entity) = Stream::decodeTransform(oldTransform);
-    scene->getComponent<MeshComponent>(entity) = Stream::decodeMeshComponent(oldMesh);
+    restoreMesh(scene);
     scene->getComponent<ModelComponent>(entity) = Stream::decodeModelComponent(oldModel);
 
     if (oldSubEntitiesDeleteCmd) {

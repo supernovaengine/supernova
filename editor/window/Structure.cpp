@@ -1702,14 +1702,13 @@ void editor::Structure::showTreeNode(editor::TreeNode& node) {
 
                 if (selectedScene && selectedScene->scene) {
                     ModelComponent* model = selectedScene->scene->findComponent<ModelComponent>(node.id);
-                    MeshComponent* mesh = selectedScene->scene->findComponent<MeshComponent>(node.id);
-                    if (model && mesh && !model->filename.empty()) {
+                    if (model && !model->filename.empty()) {
                         ImGui::Separator();
 
                         const bool restoreHierarchy = model->mergeStaticMeshes;
                         std::string mergeReason;
                         bool canChangeMerge = restoreHierarchy ||
-                            selectedScene->scene->getSystem<MeshSystem>()->canMergeStaticModel(*model, *mesh, &mergeReason);
+                            selectedScene->scene->getSystem<MeshSystem>()->canMergeStaticModel(*model, &mergeReason);
                         bool canEditHierarchy = ProjectUtils::hasCustomMeshParenting(selectedScene->scene, node.id) &&
                             selectedScene->scene->getSystem<MeshSystem>()->canEditModelHierarchy(*model);
                         if (!restoreHierarchy && canEditHierarchy) {

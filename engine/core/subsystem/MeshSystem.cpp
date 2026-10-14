@@ -198,8 +198,8 @@ void MeshSystem::applyDefaultObjMaterial(Submesh& submesh) {
 
 // Where each of a model's meshes starts in the primitive numbering a merged load produces. The
 // submeshes are filled in ascending node order and then reversed, so a node's primitives form one
-// run and the runs come in descending node order. The root mesh owns the numbering, and is empty
-// unless the model is merged or single-node.
+// run and the runs come in descending node order. The root mesh owns the numbering, and exists
+// only when the model is merged or single-node.
 std::vector<std::pair<MeshComponent*, unsigned int>> MeshSystem::getSubmeshRuns(Entity entity, const ModelComponent& model) const {
     std::vector<std::pair<MeshComponent*, unsigned int>> runs;
 
@@ -292,6 +292,118 @@ void MeshSystem::applySubmeshOverride(const Submesh& saved, Submesh& submesh) {
 
     submesh.overrideFields = fields;
     submesh.needUpdateTexture = true;
+}
+
+static MeshSystem::MeshSettings getMeshSettings(const MeshComponent& mesh) {
+    return {mesh.receiveLights, mesh.receiveIBL, mesh.castShadows, mesh.receiveShadows, mesh.shadowsBillboard,
+            mesh.renderInReflectionProbes, mesh.transparent, mesh.autoTransparency, mesh.lodEnabled, mesh.lodBias,
+            mesh.customShader, mesh.customDepthShader, mesh.shaderUniforms};
+}
+
+static void setMeshSettings(const MeshSystem::MeshSettings& settings, MeshComponent& mesh) {
+    mesh.receiveLights = settings.receiveLights;
+    mesh.receiveIBL = settings.receiveIBL;
+    mesh.castShadows = settings.castShadows;
+    mesh.receiveShadows = settings.receiveShadows;
+    mesh.shadowsBillboard = settings.shadowsBillboard;
+    mesh.renderInReflectionProbes = settings.renderInReflectionProbes;
+    mesh.transparent = settings.transparent;
+    mesh.autoTransparency = settings.autoTransparency;
+    mesh.lodEnabled = settings.lodEnabled;
+    mesh.lodBias = settings.lodBias;
+    mesh.customShader = settings.customShader;
+    mesh.customDepthShader = settings.customDepthShader;
+    mesh.shaderUniforms = settings.shaderUniforms;
+}
+
+MeshSystem::MeshSettingsByNode MeshSystem::collectMeshSettings(Entity entity, const ModelComponent& model, const std::string& filename) const {
+    MeshSettingsByNode settings;
+
+    if (!model.loadedFilename.empty() && model.loadedFilename != getModelFilenameKey(filename)) {
+        return settings;
+    }
+
+    // The model's own mesh, or its first part
+    auto runs = getSubmeshRuns(entity, model);
+    if (!runs.empty()) {
+        settings.emplace(std::make_pair(-1, std::string()), getMeshSettings(*runs[0].first));
+    }
+    for (const auto& node : model.meshNodesMapping) {
+        if (MeshComponent* mesh = scene->findComponent<MeshComponent>(node.second)) {
+            settings.emplace(std::make_pair(node.first, getModelNodeName(model, node.first)), getMeshSettings(*mesh));
+        }
+    }
+
+    return settings;
+}
+
+// Like the restored attachments: same index and name, then the name, then the index
+static MeshSystem::MeshSettingsByNode::const_iterator findNodeSettings(const MeshSystem::MeshSettingsByNode& settings, int node, const std::string& name) {
+    auto found = settings.find({node, name});
+    if (found == settings.end() && !name.empty()) {
+        found = std::find_if(settings.begin(), settings.end(), [&](const auto& saved) { return saved.first.second == name; });
+    }
+    if (found == settings.end()) {
+        found = std::find_if(settings.begin(), settings.end(), [&](const auto& saved) { return saved.first.first == node; });
+    }
+    return found;
+}
+
+// A part takes what was saved for its node, any other mesh the model's
+void MeshSystem::applyMeshSettings(const MeshSettingsByNode& settings, Entity entity, const ModelComponent& model) const {
+    auto modelSettings = settings.find({-1, ""});
+    if (modelSettings == settings.end()) {
+        return;
+    }
+
+    if (MeshComponent* mesh = scene->findComponent<MeshComponent>(entity)) {
+        setMeshSettings(modelSettings->second, *mesh);
+    }
+    for (const auto& node : model.meshNodesMapping) {
+        if (MeshComponent* mesh = scene->findComponent<MeshComponent>(node.second)) {
+            auto found = findNodeSettings(settings, node.first, getModelNodeName(model, node.first));
+            setMeshSettings((found != settings.end() ? found : modelSettings)->second, *mesh);
+        }
+    }
+}
+
+std::vector<std::pair<MeshComponent*, int>> MeshSystem::findMorphTargets(Entity entity, const ModelComponent& model, const std::string& name) const {
+    std::vector<std::pair<MeshComponent*, int>> targets;
+
+    if (MeshComponent* mesh = scene->findComponent<MeshComponent>(entity)) {
+        auto found = model.morphNameMapping.find(name);
+        if (found != model.morphNameMapping.end() && found->second < MAX_MORPHTARGETS) {
+            targets.emplace_back(mesh, found->second);
+        }
+        return targets;
+    }
+    if (!model.gltfModel) {
+        return targets;
+    }
+
+    // Each part numbers its own targets
+    for (const auto& node : model.meshNodesMapping) {
+        MeshComponent* mesh = scene->findComponent<MeshComponent>(node.second);
+        if (!mesh || !isValidGLTFIndex(node.first, model.gltfModel->nodes)) {
+            continue;
+        }
+        int meshIndex = model.gltfModel->nodes[node.first].mesh;
+        if (!isValidGLTFIndex(meshIndex, model.gltfModel->meshes)) {
+            continue;
+        }
+        const tinygltf::Value& extras = model.gltfModel->meshes[meshIndex].extras;
+        if (!extras.Has("targetNames") || !extras.Get("targetNames").IsArray()) {
+            continue;
+        }
+        const tinygltf::Value& names = extras.Get("targetNames");
+        for (int t = 0; t < static_cast<int>(names.Size()) && t < MAX_MORPHTARGETS; t++) {
+            if (names.Get(t).IsString() && names.Get(t).Get<std::string>() == name) {
+                targets.emplace_back(mesh, t);
+            }
+        }
+    }
+
+    return targets;
 }
 
 bool MeshSystem::createSprite(SpriteComponent& sprite, MeshComponent& mesh, CameraComponent& camera){
@@ -2039,8 +2151,7 @@ bool MeshSystem::canBakeGLTFMesh(const ModelComponent& model, int meshIndex, std
     return true;
 }
 
-bool MeshSystem::canMergeStaticModel(const ModelComponent& model, const MeshComponent& mesh,
-                                     std::string* reason) const {
+bool MeshSystem::canMergeStaticModel(const ModelComponent& model, std::string* reason) const {
     auto reject = [reason](const char* message) {
         if (reason) *reason = message;
         return false;
@@ -2069,7 +2180,7 @@ bool MeshSystem::canMergeStaticModel(const ModelComponent& model, const MeshComp
     if (primitiveCount == 0) {
         return reject("The model has no mesh primitives to merge");
     }
-    if (!mesh.submeshes.validIndex(static_cast<int>(primitiveCount - 1))) {
+    if (!HybridArray<Submesh, MAX_SUBMESHES>::validIndex(static_cast<int>(primitiveCount - 1))) {
         return reject("The merged model would exceed the root mesh submesh limit");
     }
     if (!model.gltfModel->animations.empty()) {
@@ -4367,6 +4478,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
 
     // Taken before anything is torn down, put back once every mesh is filled.
     const SubmeshOverrides submeshOverrides = collectSubmeshOverrides(entity, model);
+    const MeshSettingsByNode meshSettings = collectMeshSettings(entity, model, filename);
 
     // A merged root owns all renderable geometry. Remove any generated mesh-node entities left
     // by the previously loaded hierarchy before taking MeshComponent references: destroying a
@@ -4375,10 +4487,18 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
         clearMeshNodeMapping(model);
     }
 
-    MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
     Transform& transform = scene->getComponent<Transform>(entity);
 
-    scene->getSystem<RenderSystem>()->prepareMeshForDataReload(entity, mesh);
+    // A model with its geometry on node children has no mesh of its own
+    if (MeshComponent* rootMesh = scene->findComponent<MeshComponent>(entity)) {
+        scene->getSystem<RenderSystem>()->prepareMeshForDataReload(entity, *rootMesh);
+
+        rootMesh->numExternalBuffers = 0;
+        rootMesh->normAdjustJoint = 1.0f;
+        rootMesh->normAdjustWeight = 1.0f;
+        rootMesh->bonesMatrix = HybridArray<Matrix4, MAX_BONES>();
+        rootMesh->needUpdateBones = false;
+    }
 
     destroyModel(model);
 
@@ -4390,12 +4510,6 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
     std::string warn;
 
     std::vector<std::string> loadedBuffers;
-
-    mesh.numExternalBuffers = 0;
-    mesh.normAdjustJoint = 1.0f;
-    mesh.normAdjustWeight = 1.0f;
-    mesh.bonesMatrix = HybridArray<Matrix4, MAX_BONES>();
-    mesh.needUpdateBones = false;
 
     bool res = false;
 
@@ -4498,7 +4612,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
     const bool mergeMeshNodes = model.mergeStaticMeshes && meshNodes.size() > 1;
     if (mergeMeshNodes) {
         std::string reason;
-        if (!canMergeStaticModel(model, mesh, &reason)) {
+        if (!canMergeStaticModel(model, &reason)) {
             Log::error("Cannot merge static GLTF model (%s): %s", filename.c_str(), reason.c_str());
             if (asyncLoad) {
                 ResourceProgress::failBuild(buildId);
@@ -4573,9 +4687,6 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
         transform.needUpdate = true;
     }
 
-    mesh.cullingMode = CullingMode::BACK;
-    mesh.windingOrder = ((matrix * meshOffset).determinant() < 0.0) ? WindingOrder::CW : WindingOrder::CCW;
-
     if (asyncLoad) {
         ResourceProgress::updateProgress(buildId, 0.4f); // Transform processing done
     }
@@ -4599,11 +4710,23 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
 
     model.morphNameMapping.clear();
 
+    // Made by this load rather than reused
+    std::vector<Entity> createdMeshes;
     if (useChildEntities) {
-        // Each node becomes its own child mesh; the root mesh stays an empty container (loadMesh
-        // skips it). numExternalBuffers was already zeroed at the top of loadGLTF.
-        mesh.numSubmeshes = 0;
+        // Each node becomes its own child mesh, so the model keeps no mesh of its own
+        if (scene->findComponent<MeshComponent>(entity)) {
+            scene->removeComponent<MeshComponent>(entity);
+        }
     } else {
+        if (!scene->findComponent<MeshComponent>(entity)) {
+            scene->addComponent<MeshComponent>(entity);
+            createdMeshes.push_back(entity);
+        }
+        MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
+        mesh.cullingMode = CullingMode::BACK;
+        mesh.windingOrder = ((matrix * meshOffset).determinant() < 0.0) ? WindingOrder::CW : WindingOrder::CCW;
+
         // Flatten path: every node's primitives accumulate into the single root MeshComponent, so its
         // submesh array is sized for the total up-front and the buffer dedup/reserve happens once.
         mesh.numSubmeshes = totalSubmeshes;
@@ -4628,8 +4751,6 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
         remapMeshNodesByName(model, meshNodes);
     }
 
-    // Creating node meshes may reallocate the MeshComponent array. Do it only after the root mesh
-    // setup above; the child path does not dereference that root reference again.
     if (useNodeHierarchy && !skipEntities &&
             !buildGLTFNodeHierarchy(entity, model, nodesParent)) {
         Log::error("Cannot create GLTF node hierarchy: %s", filename.c_str());
@@ -4685,6 +4806,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
                 }
                 scene->addComponent<Transform>(meshEntity);
                 scene->addComponent<MeshComponent>(meshEntity);
+                createdMeshes.push_back(meshEntity);
 
                 const std::string& nodeName = model.gltfModel->nodes[nodeIdx].name;
                 scene->setEntityName(meshEntity, nodeName.empty() ? ("MeshNode " + std::to_string(nodeIdx)) : nodeName);
@@ -4718,7 +4840,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
             scene->getComponent<Transform>(meshEntity).needUpdate = true;
         }
 
-        MeshComponent& mesh = scene->getComponent<MeshComponent>(meshEntity); // shadows root mesh
+        MeshComponent& mesh = scene->getComponent<MeshComponent>(meshEntity);
         const int nodeSkinIndex = model.gltfModel->nodes[nodeIdx].skin;
         const tinygltf::Skin* nodeSkin = isValidGLTFIndex(nodeSkinIndex, model.gltfModel->skins)
             ? &model.gltfModel->skins[nodeSkinIndex] : nullptr;
@@ -5199,7 +5321,7 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
 
     if (!useChildEntities) {
         // Flatten path: submeshIndex accumulated every node's primitives into the root mesh.
-        mesh.numSubmeshes = submeshIndex;
+        scene->getComponent<MeshComponent>(entity).numSubmeshes = submeshIndex;
     }
 
     if (asyncLoad) {
@@ -5564,10 +5686,10 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
     //END DEBUG
 */
     // Root-mesh finalization (flat path only). In the child-entity path each child mesh was
-    // already finalized in the loop, the root mesh is an empty container, and adding child
-    // MeshComponents may have reallocated the component array — so the `mesh` reference captured
-    // before the loop must not be dereferenced here.
+    // already finalized in the loop and the model has no mesh of its own.
     if (!useChildEntities) {
+        MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
+
         std::reverse(mesh.submeshes.data(), mesh.submeshes.data() + mesh.numSubmeshes);
 
         calculateMeshAABB(mesh);
@@ -5578,6 +5700,15 @@ bool MeshSystem::loadGLTF(Entity entity, const std::string filename, bool asyncL
 
     // Only here are all submesh counts final, which is what the run ordinals are read from.
     applySubmeshOverrides(submeshOverrides, entity, model);
+    auto modelSettings = meshSettings.find({-1, ""});
+    if (!skipEntities) {
+        applyMeshSettings(meshSettings, entity, model);
+    } else if (modelSettings != meshSettings.end()) {
+        // The saved parts keep their own, the meshes made for missing ones take the model's
+        for (Entity created : createdMeshes) {
+            setMeshSettings(modelSettings->second, scene->getComponent<MeshComponent>(created));
+        }
+    }
 
     if (asyncLoad) {
         ResourceProgress::updateProgress(buildId, 1.0f); // Complete
@@ -5629,6 +5760,11 @@ bool MeshSystem::loadOBJ(Entity entity, const std::string filename, bool asyncLo
         if (!asyncResult || !asyncResult->success || !asyncResult->objModel){
             return false;
         }
+    }
+
+    // An OBJ always loads into the model's own mesh
+    if (!scene->findComponent<MeshComponent>(entity)) {
+        scene->addComponent<MeshComponent>(entity);
     }
 
     MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
@@ -6169,7 +6305,7 @@ bool MeshSystem::createOrUpdateTilemap(TilemapComponent& tilemap, MeshComponent&
     return true;
 }
 
-bool MeshSystem::createOrUpdateModel(Entity entity, ModelComponent& model, MeshComponent& mesh){
+bool MeshSystem::createOrUpdateModel(Entity entity, ModelComponent& model){
     if (model.needUpdateModel){
         if (!model.filename.empty()){
             if (getModelFilenameKey(model.filename) == model.loadedFilename &&
@@ -6311,10 +6447,8 @@ void MeshSystem::update(double dt){
         Entity entity = models->getEntity(i);
         Signature signature = scene->getSignature(entity);
 
-        if (signature.test(scene->getComponentId<MeshComponent>())){
-            MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-
-            createOrUpdateModel(entity, model, mesh);
+        if (signature.test(scene->getComponentId<Transform>())){
+            createOrUpdateModel(entity, model);
         }
     }
 

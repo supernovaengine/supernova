@@ -9,7 +9,30 @@
 #include "subsystem/RenderSystem.h"
 #include "subsystem/MeshSystem.h"
 
+#include <cfloat>
+
 using namespace doriax;
+
+// Read while a model has no geometry, on the heap as a game build's mesh is large
+static const MeshComponent& getDefaultMesh(){
+    static std::unique_ptr<MeshComponent> mesh = std::make_unique<MeshComponent>();
+    return *mesh;
+}
+
+// In the space of an entity above, from the local poses between them, which are current before
+// the transforms update. False when the ancestor is not above it.
+static bool getPoseMatrix(Scene* scene, Entity entity, Entity ancestor, Matrix4& matrix){
+    matrix = Matrix4();
+    while (entity != ancestor){
+        Transform* transform = (entity != NULL_ENTITY) ? scene->findComponent<Transform>(entity) : nullptr;
+        if (!transform){
+            return false;
+        }
+        matrix = Matrix4::translateMatrix(transform->position) * transform->rotation.getRotationMatrix() * Matrix4::scaleMatrix(transform->scale) * matrix;
+        entity = transform->parent;
+    }
+    return true;
+}
 
 Mesh::Mesh(Scene* scene): Object(scene){
     addComponent<MeshComponent>();
@@ -21,7 +44,95 @@ Mesh::Mesh(Scene* scene, Entity entity): Object(scene, entity){
 Mesh::~Mesh(){
 }
 
+// A model with its geometry on node children has no mesh of its own
+ModelComponent* Mesh::findPartsModel() const{
+    if (scene->findComponent<MeshComponent>(entity)){
+        return nullptr;
+    }
+    return scene->findComponent<ModelComponent>(entity);
+}
+
+// In the model's space. A part moved out of the model comes back through the scene, which a
+// zero scale on the model leaves no way back from.
+AABB Mesh::getPartsAABB(const ModelComponent& model, AABB MeshComponent::*bounds) const{
+    AABB aabb;
+    for (const auto& node : model.meshNodesMapping){
+        MeshComponent* mesh = scene->findComponent<MeshComponent>(node.second);
+        if (!mesh){
+            continue;
+        }
+
+        Matrix4 pose, modelPose;
+        if (getPoseMatrix(scene, node.second, entity, pose)){
+            aabb.merge(pose * (mesh->*bounds));
+        }else if (getPoseMatrix(scene, entity, NULL_ENTITY, modelPose) && std::fabs(modelPose.determinant()) > FLT_MIN){
+            getPoseMatrix(scene, node.second, NULL_ENTITY, pose);
+            aabb.merge(modelPose.inverse() * pose * (mesh->*bounds));
+        }
+    }
+    return aabb;
+}
+
+std::vector<MeshComponent*> Mesh::findMeshes() const{
+    std::vector<MeshComponent*> meshes;
+    if (ModelComponent* model = findPartsModel()){
+        for (const auto& run : scene->getSystem<MeshSystem>()->getSubmeshRuns(entity, *model)){
+            meshes.push_back(run.first);
+        }
+    }else{
+        meshes.push_back(&getComponent<MeshComponent>());
+    }
+    return meshes;
+}
+
+// Until a model has geometry, a mesh of its own keeps the values for the meshes its load builds
+std::vector<MeshComponent*> Mesh::getMeshes(){
+    std::vector<MeshComponent*> meshes = findMeshes();
+    if (meshes.empty()){
+        addComponent<MeshComponent>();
+        meshes.push_back(&getComponent<MeshComponent>());
+    }
+    return meshes;
+}
+
+const MeshComponent& Mesh::getMesh() const{
+    if (ModelComponent* model = findPartsModel()){
+        auto runs = scene->getSystem<MeshSystem>()->getSubmeshRuns(entity, *model);
+        return runs.empty() ? getDefaultMesh() : *runs[0].first;
+    }
+    return getComponent<MeshComponent>();
+}
+
+// Numbered across the parts as in the merged model, null past the last one
+MeshComponent* Mesh::findSubmesh(unsigned int& submesh) const{
+    if (ModelComponent* model = findPartsModel()){
+        for (const auto& [mesh, base] : scene->getSystem<MeshSystem>()->getSubmeshRuns(entity, *model)){
+            if (submesh >= base && submesh < base + mesh->numSubmeshes){
+                submesh -= base;
+                return mesh;
+            }
+        }
+        return nullptr;
+    }
+    return &getComponent<MeshComponent>();
+}
+
+const Submesh& Mesh::getSubmesh(unsigned int submesh) const{
+    MeshComponent* mesh = findSubmesh(submesh);
+    return mesh ? mesh->submeshes[submesh] : getDefaultMesh().submeshes[0];
+}
+
 bool Mesh::load(){
+    if (ModelComponent* model = findPartsModel()){
+        bool loaded = true;
+        for (const auto& node : model->meshNodesMapping){
+            if (scene->findComponent<MeshComponent>(node.second)){
+                loaded = Mesh(scene, node.second).load() && loaded;
+            }
+        }
+        return loaded;
+    }
+
     MeshComponent& mesh = getComponent<MeshComponent>();
 
     TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
@@ -32,33 +143,33 @@ bool Mesh::load(){
 }
 
 void Mesh::setTexture(const std::string& path){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->submeshes[0].material.baseColorTexture.setPath(path);
 
-    mesh.submeshes[0].material.baseColorTexture.setPath(path);
-
-    mesh.submeshes[0].needUpdateTexture = true;
+        mesh->submeshes[0].needUpdateTexture = true;
+    }
 }
 
 void Mesh::setTexture(const std::string& id, TextureData data){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->submeshes[0].material.baseColorTexture.setData(id, data);
 
-    mesh.submeshes[0].material.baseColorTexture.setData(id, data);
-
-    mesh.submeshes[0].needUpdateTexture = true;
+        mesh->submeshes[0].needUpdateTexture = true;
+    }
 }
 
 void Mesh::setTexture(Framebuffer* framebuffer){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->submeshes[0].material.baseColorTexture.setFramebuffer(framebuffer);
 
-    mesh.submeshes[0].material.baseColorTexture.setFramebuffer(framebuffer);
-
-    mesh.submeshes[0].needUpdateTexture = true;
+        mesh->submeshes[0].needUpdateTexture = true;
+    }
 }
 
 void Mesh::setColor(Vector4 color){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    mesh.submeshes[0].material.baseColorFactor = Color::sRGBToLinear(color);
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->submeshes[0].material.baseColorFactor = Color::sRGBToLinear(color);
+    }
 }
 
 void Mesh::setColor(const float red, const float green, const float blue, const float alpha){
@@ -75,9 +186,7 @@ void Mesh::setAlpha(const float alpha){
 }
 
 Vector4 Mesh::getColor() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return Color::linearTosRGB(mesh.submeshes[0].material.baseColorFactor);
+    return Color::linearTosRGB(getSubmesh(0).material.baseColorFactor);
 }
 
 float Mesh::getAlpha() const{
@@ -85,7 +194,12 @@ float Mesh::getAlpha() const{
 }
 
 void Mesh::setMaterial(const Material& material){
-    setMaterial(0, material);
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->submeshes[0].material != material){
+            mesh->submeshes[0].material = material;
+            mesh->submeshes[0].needUpdateTexture = true;
+        }
+    }
 }
 
 Material Mesh::getMaterial() const{
@@ -93,22 +207,26 @@ Material Mesh::getMaterial() const{
 }
 
 void Mesh::setMaterial(unsigned int submesh, const Material& material){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    MeshComponent* mesh = findSubmesh(submesh);
 
-    if (mesh.submeshes[submesh].material != material){
-        mesh.submeshes[submesh].material = material;
-        mesh.submeshes[submesh].needUpdateTexture = true;
+    if (mesh && mesh->submeshes[submesh].material != material){
+        mesh->submeshes[submesh].material = material;
+        mesh->submeshes[submesh].needUpdateTexture = true;
     }
 }
 
 Material Mesh::getMaterial(unsigned int submesh) const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.submeshes[submesh].material;
+    return getSubmesh(submesh).material;
 }
 
 void Mesh::setPrimitiveType(PrimitiveType primitiveType){
-    setPrimitiveType(0, primitiveType);
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->submeshes[0].primitiveType != primitiveType){
+            mesh->submeshes[0].primitiveType = primitiveType;
+
+            mesh->needReload = true;
+        }
+    }
 }
 
 PrimitiveType Mesh::getPrimitiveType() const{
@@ -116,23 +234,27 @@ PrimitiveType Mesh::getPrimitiveType() const{
 }
 
 void Mesh::setPrimitiveType(unsigned int submesh, PrimitiveType primitiveType){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    MeshComponent* mesh = findSubmesh(submesh);
 
-    if (mesh.submeshes[submesh].primitiveType != primitiveType){
-        mesh.submeshes[submesh].primitiveType = primitiveType;
+    if (mesh && mesh->submeshes[submesh].primitiveType != primitiveType){
+        mesh->submeshes[submesh].primitiveType = primitiveType;
 
-        mesh.needReload = true;
+        mesh->needReload = true;
     }
 }
 
 PrimitiveType Mesh::getPrimitiveType(unsigned int submesh) const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.submeshes[submesh].primitiveType;
+    return getSubmesh(submesh).primitiveType;
 }
 
 void Mesh::setFaceCulling(bool faceCulling){
-    setFaceCulling(0, faceCulling);
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->submeshes[0].faceCulling != faceCulling){
+            mesh->submeshes[0].faceCulling = faceCulling;
+
+            mesh->needReload = true;
+        }
+    }
 }
 
 bool Mesh::isFaceCulling() const{
@@ -140,24 +262,26 @@ bool Mesh::isFaceCulling() const{
 }
 
 void Mesh::setFaceCulling(unsigned int submesh, bool faceCulling){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    MeshComponent* mesh = findSubmesh(submesh);
 
-    if (mesh.submeshes[submesh].faceCulling != faceCulling){
-        mesh.submeshes[submesh].faceCulling = faceCulling;
+    if (mesh && mesh->submeshes[submesh].faceCulling != faceCulling){
+        mesh->submeshes[submesh].faceCulling = faceCulling;
 
-        mesh.needReload = true;
+        mesh->needReload = true;
     }
 }
 
 bool Mesh::isFaceCulling(unsigned int submesh) const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.submeshes[submesh].faceCulling;
+    return getSubmesh(submesh).faceCulling;
 }
 
 
 void Mesh::setCastShadowsWithTexture(bool castShadowsWithTexture){
-    setCastShadowsWithTexture(0, castShadowsWithTexture);
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->submeshes[0].textureShadow = castShadowsWithTexture;
+
+        mesh->needReload = true;
+    }
 }
 
 bool Mesh::isCastShadowsWithTexture() const{
@@ -165,170 +289,166 @@ bool Mesh::isCastShadowsWithTexture() const{
 }
 
 void Mesh::setCastShadowsWithTexture(unsigned int submesh, bool castShadowsWithTexture){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    if (MeshComponent* mesh = findSubmesh(submesh)){
+        mesh->submeshes[submesh].textureShadow = castShadowsWithTexture;
 
-    mesh.submeshes[submesh].textureShadow = castShadowsWithTexture;
-
-    mesh.needReload = true;
+        mesh->needReload = true;
+    }
 }
 
 bool Mesh::isCastShadowsWithTexture(unsigned int submesh) const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.submeshes[submesh].textureShadow;
+    return getSubmesh(submesh).textureShadow;
 }
 
 void Mesh::setCullingMode(CullingMode cullingMode){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->cullingMode != cullingMode){
+            mesh->cullingMode = cullingMode;
 
-    if (mesh.cullingMode != cullingMode){
-        mesh.cullingMode = cullingMode;
-
-        mesh.needReload = true;
+            mesh->needReload = true;
+        }
     }
 }
 
 CullingMode Mesh::getCullingMode() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.cullingMode;
+    return getMesh().cullingMode;
 }
 
 void Mesh::setWindingOrder(WindingOrder windingOrder){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->windingOrder != windingOrder){
+            mesh->windingOrder = windingOrder;
 
-    if (mesh.windingOrder != windingOrder){
-        mesh.windingOrder = windingOrder;
-
-        mesh.needReload = true;
+            mesh->needReload = true;
+        }
     }
 }
 
 WindingOrder Mesh::getWindingOrder() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.windingOrder;
+    return getMesh().windingOrder;
 }
 
 
 AABB Mesh::getAABB() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    if (ModelComponent* model = findPartsModel()){
+        return getPartsAABB(*model, &MeshComponent::aabb);
+    }
 
-    return mesh.aabb;
+    return getComponent<MeshComponent>().aabb;
 }
 
 AABB Mesh::getVerticesAABB() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    if (ModelComponent* model = findPartsModel()){
+        return getPartsAABB(*model, &MeshComponent::verticesAABB);
+    }
 
-    return mesh.verticesAABB;
+    return getComponent<MeshComponent>().verticesAABB;
 }
 
 AABB Mesh::getWorldAABB() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    AABB aabb;
+    for (MeshComponent* mesh : findMeshes()){
+        aabb.merge(mesh->worldAABB);
+    }
 
-    return mesh.worldAABB;
+    return aabb;
 }
 
 unsigned int Mesh::getNumSubmeshes() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    unsigned int numSubmeshes = 0;
+    for (MeshComponent* mesh : findMeshes()){
+        numSubmeshes += mesh->numSubmeshes;
+    }
 
-    return mesh.numSubmeshes;
+    return numSubmeshes;
 }
 
 void Mesh::setReceiveLights(bool receiveLights){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->receiveLights != receiveLights){
+            mesh->receiveLights = receiveLights;
 
-    if (mesh.receiveLights != receiveLights){
-        mesh.receiveLights = receiveLights;
-
-        mesh.needReload = true;
+            mesh->needReload = true;
+        }
     }
 }
 
 bool Mesh::isReceiveLights() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.receiveLights;
+    return getMesh().receiveLights;
 }
 
 void Mesh::setReceiveIBL(bool receiveIBL){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->receiveIBL != receiveIBL){
+            mesh->receiveIBL = receiveIBL;
 
-    if (mesh.receiveIBL != receiveIBL){
-        mesh.receiveIBL = receiveIBL;
-
-        mesh.needReload = true;
+            mesh->needReload = true;
+        }
     }
 }
 
 bool Mesh::isReceiveIBL() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.receiveIBL;
+    return getMesh().receiveIBL;
 }
 
 void Mesh::setCastShadows(bool castShadows){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    mesh.castShadows = castShadows;
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->castShadows = castShadows;
+    }
 }
 
 bool Mesh::isCastShadows() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.castShadows;
+    return getMesh().castShadows;
 }
 
 void Mesh::setLodEnabled(bool lodEnabled){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->lodEnabled != lodEnabled){
+            mesh->lodEnabled = lodEnabled;
 
-    if (mesh.lodEnabled != lodEnabled){
-        mesh.lodEnabled = lodEnabled;
-
-        mesh.needReload = true;
+            mesh->needReload = true;
+        }
     }
 }
 
 bool Mesh::isLodEnabled() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.lodEnabled;
+    return getMesh().lodEnabled;
 }
 
 void Mesh::setLodBias(float lodBias){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    mesh.lodBias = lodBias;
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->lodBias = lodBias;
+    }
 }
 
 float Mesh::getLodBias() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.lodBias;
+    return getMesh().lodBias;
 }
 
 void Mesh::setReceiveShadows(bool receiveShadows){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->receiveShadows != receiveShadows){
+            mesh->receiveShadows = receiveShadows;
 
-    if (mesh.receiveShadows != receiveShadows){
-        mesh.receiveShadows = receiveShadows;
-
-        mesh.needReload = true;
+            mesh->needReload = true;
+        }
     }
 }
 
 bool Mesh::isReceiveShadows() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.receiveShadows;
+    return getMesh().receiveShadows;
 }
 
 void Mesh::setRenderInReflectionProbes(bool renderInReflectionProbes){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    bool changed = false;
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->renderInReflectionProbes != renderInReflectionProbes){
+            mesh->renderInReflectionProbes = renderInReflectionProbes;
+            changed = true;
+        }
+    }
 
-    if (mesh.renderInReflectionProbes != renderInReflectionProbes){
-        mesh.renderInReflectionProbes = renderInReflectionProbes;
-
+    if (changed){
         // baked cubemaps keep the old content until the probes capture again
         auto probes = scene->getComponentArray<ReflectionProbeComponent>();
         for (int i = 0; i < probes->size(); i++){
@@ -340,84 +460,72 @@ void Mesh::setRenderInReflectionProbes(bool renderInReflectionProbes){
 }
 
 bool Mesh::isRenderInReflectionProbes() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.renderInReflectionProbes;
+    return getMesh().renderInReflectionProbes;
 }
 
 void Mesh::setShadowsBillboard(bool shadowsBillboard){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    mesh.shadowsBillboard = shadowsBillboard;
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->shadowsBillboard = shadowsBillboard;
+    }
 }
 
 bool Mesh::isShadowsBillboard() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.shadowsBillboard;
+    return getMesh().shadowsBillboard;
 }
 
 void Mesh::setTransparent(bool transparent){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    mesh.transparent = transparent;
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->transparent = transparent;
+    }
 }
 
 bool Mesh::isTransparent() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.transparent;
+    return getMesh().transparent;
 }
 
 void Mesh::setAutoTransparency(bool autoTransparency){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    mesh.autoTransparency = autoTransparency;
+    for (MeshComponent* mesh : getMeshes()){
+        mesh->autoTransparency = autoTransparency;
+    }
 }
 
 bool Mesh::isAutoTransparency() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.autoTransparency;
+    return getMesh().autoTransparency;
 }
 
 void Mesh::setCustomShader(const std::string& path){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->customShader != path){
+            mesh->customShader = path;
 
-    if (mesh.customShader != path){
-        mesh.customShader = path;
-
-        mesh.needReload = true;
+            mesh->needReload = true;
+        }
     }
 }
 
 std::string Mesh::getCustomShader() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.customShader;
+    return getMesh().customShader;
 }
 
 void Mesh::setCustomDepthShader(const std::string& path){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    for (MeshComponent* mesh : getMeshes()){
+        if (mesh->customDepthShader != path){
+            mesh->customDepthShader = path;
 
-    if (mesh.customDepthShader != path){
-        mesh.customDepthShader = path;
-
-        mesh.needReload = true;
+            mesh->needReload = true;
+        }
     }
 }
 
 std::string Mesh::getCustomDepthShader() const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return mesh.customDepthShader;
+    return getMesh().customDepthShader;
 }
 
 void Mesh::setShaderUniform(const std::string& name, const Vector4& value){
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    if (ShaderUniforms::set(mesh.shaderUniforms, name, value))
-        mesh.needUpdateShaderUniforms = true;
+    for (MeshComponent* mesh : getMeshes()){
+        if (ShaderUniforms::set(mesh->shaderUniforms, name, value))
+            mesh->needUpdateShaderUniforms = true;
+    }
 }
 
 void Mesh::setShaderUniform(const std::string& name, const Vector3& value){
@@ -433,19 +541,19 @@ void Mesh::setShaderUniform(const std::string& name, float value){
 }
 
 Vector4 Mesh::getShaderUniform(const std::string& name) const{
-    MeshComponent& mesh = getComponent<MeshComponent>();
-
-    return ShaderUniforms::get(mesh.shaderUniforms, name);
+    return ShaderUniforms::get(getMesh().shaderUniforms, name);
 }
 
 bool Mesh::removeShaderUniform(const std::string& name){
-    MeshComponent& mesh = getComponent<MeshComponent>();
+    bool removed = false;
+    for (MeshComponent* mesh : getMeshes()){
+        if (ShaderUniforms::remove(mesh->shaderUniforms, name)){
+            mesh->needUpdateShaderUniforms = true;
+            removed = true;
+        }
+    }
 
-    if (!ShaderUniforms::remove(mesh.shaderUniforms, name))
-        return false;
-
-    mesh.needUpdateShaderUniforms = true;
-    return true;
+    return removed;
 }
 
 void Mesh::setAsMirror(){
@@ -543,13 +651,13 @@ bool Mesh::isInstancedCylindricalBillboard() const{
 
 void Mesh::setMaxInstances(unsigned int maxInstances){
     if (hasInstancedMesh()){
-        MeshComponent& mesh = getComponent<MeshComponent>();
         InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
         if (instmesh.maxInstances != maxInstances){
             instmesh.maxInstances = maxInstances;
 
-            mesh.needReload = true;
+            if (MeshComponent* mesh = scene->findComponent<MeshComponent>(entity))
+                mesh->needReload = true;
         }
     }else{
         Log::error("There is no instanced mesh component in this mesh");
@@ -569,13 +677,13 @@ unsigned int Mesh::getMaxInstances() const{
 
 void Mesh::setDistanceFade(bool distanceFade){
     if (hasInstancedMesh()){
-        MeshComponent& mesh = getComponent<MeshComponent>();
         InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
         if (instmesh.distanceFade != distanceFade){
             instmesh.distanceFade = distanceFade;
 
-            mesh.needReload = true;
+            if (MeshComponent* mesh = scene->findComponent<MeshComponent>(entity))
+                mesh->needReload = true;
         }
     }else{
         Log::error("There is no instanced mesh component in this mesh");
@@ -672,14 +780,14 @@ bool Mesh::isCullInstances() const{
 void Mesh::addInstance(InstanceData instance){
     createInstancedMesh();
 
-    MeshComponent& mesh = getComponent<MeshComponent>();
     InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
     instmesh.instances.push_back(instance);
 
     if (instmesh.maxInstances < instmesh.instances.size()){
         instmesh.maxInstances = instmesh.maxInstances * 2;
-        mesh.needReload = true;
+        if (MeshComponent* mesh = scene->findComponent<MeshComponent>(entity))
+            mesh->needReload = true;
     }
 
     instmesh.needUpdateInstances = true;
@@ -739,7 +847,6 @@ InstanceData& Mesh::getInstance(size_t index){
 void Mesh::updateInstance(size_t index, InstanceData instance){
     createInstancedMesh();
 
-    MeshComponent& mesh = getComponent<MeshComponent>();
     InstancedMeshComponent& instmesh = getComponent<InstancedMeshComponent>();
 
     instmesh.instances.at(index) = instance;

@@ -428,7 +428,7 @@ bool editor::ProjectUtils::hasModelMeshChildrenWithoutRootGeometry(EntityRegistr
 
     MeshComponent* rootMesh = registry->findComponent<MeshComponent>(entity);
     ModelComponent* model = registry->findComponent<ModelComponent>(entity);
-    if (!rootMesh || !model || rootMesh->numSubmeshes != 0 || model->meshNodesMapping.empty())
+    if (!model || (rootMesh && rootMesh->numSubmeshes != 0) || model->meshNodesMapping.empty())
         return false;
 
     for (const auto& node : model->meshNodesMapping){
