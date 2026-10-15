@@ -28,8 +28,9 @@ namespace doriax::editor{
         bool addCommand(Command* cmd);
         bool addCommandNoMerge(Command* cmd);
 
-        void undo();
-        void redo();
+        // false when the history did not move, also when the command refused
+        bool undo();
+        bool redo();
 
         bool canUndo() const;
         bool canRedo() const;

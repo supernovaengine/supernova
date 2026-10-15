@@ -15,6 +15,10 @@ namespace doriax::editor{
         virtual bool execute() = 0;
         virtual void undo() = 0;
 
+        // False when undoing or redoing now would break the project, so the history stays put
+        virtual bool canUndo() const { return true; }
+        virtual bool canRedo() const { return true; }
+
         virtual bool mergeWith(Command* olderCommand) = 0;
 
         // True if this can change what the Structure tree shows. Defaults to true so a

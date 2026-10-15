@@ -804,11 +804,13 @@ namespace doriax::editor{
         bool loadChildSceneInline(uint32_t childSceneId);
         void unloadChildSceneInline(uint32_t childSceneId);
 
-        void addChildScene(uint32_t sceneId, uint32_t childSceneId, bool startActive = true);
+        bool addChildScene(uint32_t sceneId, uint32_t childSceneId, bool startActive = true);
         void removeChildScene(uint32_t sceneId, uint32_t childSceneId);
         // Dirties parents of a child scene and forces the Engine layers to rebuild.
         void markParentScenesNeedUpdate(uint32_t childSceneId);
         bool hasChildScene(uint32_t sceneId, uint32_t childSceneId) const;
+        // True when sceneId is childSceneId or one of its descendants
+        bool wouldCreateChildSceneCycle(uint32_t sceneId, uint32_t childSceneId);
         bool isChildSceneStartActive(uint32_t sceneId, uint32_t childSceneId) const;
         void setChildSceneStartActive(uint32_t sceneId, uint32_t childSceneId, bool startActive);
         std::vector<uint32_t> getChildScenes(uint32_t sceneId) const;

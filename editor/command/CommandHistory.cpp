@@ -51,8 +51,8 @@ bool editor::CommandHistory::addCommandNoMerge(Command* cmd){
     return addCommand(cmd);
 }
 
-void editor::CommandHistory::undo(){
-    if (index > 0){
+bool editor::CommandHistory::undo(){
+    if (index > 0 && list[index-1]->canUndo()){
         const bool structural = list[index-1]->affectsStructure();
         list[index-1]->undo();
         index--;
@@ -64,11 +64,13 @@ void editor::CommandHistory::undo(){
         #ifdef _DEBUG
         printf("DEBUG: undo (%zu from %zu)\n", index, list.size());
         #endif
+        return true;
     }
+    return false;
 }
 
-void editor::CommandHistory::redo(){
-    if (index < list.size()){
+bool editor::CommandHistory::redo(){
+    if (index < list.size() && list[index]->canRedo()){
         index++;
         list[index-1]->execute();
 
@@ -79,7 +81,9 @@ void editor::CommandHistory::redo(){
         #ifdef _DEBUG
         printf("DEBUG: redo (%zu from %zu)\n", index, list.size());
         #endif
+        return true;
     }
+    return false;
 }
 
 bool editor::CommandHistory::canUndo() const{

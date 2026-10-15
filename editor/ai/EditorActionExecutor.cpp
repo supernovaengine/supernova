@@ -1419,6 +1419,8 @@ bool safeRelativePath(Project* project, const Json& args, const char* key, fs::p
 constexpr const char* kClosedParentScene = "The parent scene is closed, so the change would be lost when it opens. Open it with open_scene first.";
 constexpr const char* kUnsavedScriptEdits = "A script open in the code editor has unsaved edits. Ask the user to save or discard them first.";
 constexpr const char* kProjectChangeBusy = "The editor is already switching projects. Try again once it has loaded.";
+constexpr const char* kRefusedUndo = "The last command cannot be undone now. Check read_output_log for the reason.";
+constexpr const char* kRefusedRedo = "The next command no longer applies. Check read_output_log for the reason.";
 
 // isAnyScenePlaying() is also true while a scene saves or loads
 std::string busyError(Project* project, const std::string& action) {
@@ -3439,6 +3441,7 @@ ActionResult EditorActionExecutor::addChildScene(const Json& arguments) {
     if (!project->getScene(sceneId) || !project->getScene(childSceneId)) return failResult("Parent or child scene not found.");
     if (!project->getScene(sceneId)->scene) return failResult(kClosedParentScene);
     if (sceneId == childSceneId) return failResult("A scene cannot be its own child.");
+    if (project->wouldCreateChildSceneCycle(sceneId, childSceneId)) return failResult("The child scene already contains this scene, which would create a cycle.");
 
     const bool startActive = arguments.value("start_active", true);
     if (startActive) {
@@ -6302,14 +6305,14 @@ ActionResult EditorActionExecutor::undoEditor(const Json& arguments) {
     if (scope == "project") {
         CommandHistory* history = project->getProjectCommandHistory();
         if (!history || !history->canUndo()) return failResult("Nothing to undo in project history.");
-        history->undo();
+        if (!history->undo()) return failResult(kRefusedUndo);
         return okResult("Undid last project-level command.");
     }
 
     uint32_t sceneId = resolveSceneId(project, arguments);
     CommandHistory* history = CommandHandle::get(sceneId);
     if (!history || !history->canUndo()) return failResult("Nothing to undo in scene history.");
-    history->undo();
+    if (!history->undo()) return failResult(kRefusedUndo);
     return okResult("Undid last scene command.", Json{{"scene_id", sceneId}});
 }
 
@@ -6318,14 +6321,14 @@ ActionResult EditorActionExecutor::redoEditor(const Json& arguments) {
     if (scope == "project") {
         CommandHistory* history = project->getProjectCommandHistory();
         if (!history || !history->canRedo()) return failResult("Nothing to redo in project history.");
-        history->redo();
+        if (!history->redo()) return failResult(kRefusedRedo);
         return okResult("Redid last project-level command.");
     }
 
     uint32_t sceneId = resolveSceneId(project, arguments);
     CommandHistory* history = CommandHandle::get(sceneId);
     if (!history || !history->canRedo()) return failResult("Nothing to redo in scene history.");
-    history->redo();
+    if (!history->redo()) return failResult(kRefusedRedo);
     return okResult("Redid last scene command.", Json{{"scene_id", sceneId}});
 }
 

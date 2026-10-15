@@ -22,6 +22,7 @@ namespace doriax::editor {
 
         bool execute() override;
         void undo() override;
+        bool canUndo() const override;
 
         bool mergeWith(Command* otherCommand) override;
     };

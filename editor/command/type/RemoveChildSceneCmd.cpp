@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: MIT
 
 #include "RemoveChildSceneCmd.h"
+#include "Out.h"
 
 #include <algorithm>
 
@@ -45,6 +46,18 @@ void editor::RemoveChildSceneCmd::undo() {
             project->markParentScenesNeedUpdate(childSceneId);
         }
     }
+}
+
+// Another scene may have taken this one as a child since the removal
+bool editor::RemoveChildSceneCmd::canUndo() const {
+    if (!project->wouldCreateChildSceneCycle(sceneId, childSceneId)) {
+        return true;
+    }
+
+    const char* name = project->getScene(sceneId)->name.c_str();
+    const char* childName = project->getScene(childSceneId)->name.c_str();
+    Out::error("Cannot restore '%s' in '%s': '%s' now contains '%s'", childName, name, childName, name);
+    return false;
 }
 
 bool editor::RemoveChildSceneCmd::mergeWith(Command* otherCommand){
