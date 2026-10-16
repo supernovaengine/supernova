@@ -62,7 +62,7 @@
 #endif
 
 #ifndef MAX_SUBMESHES
-#define MAX_SUBMESHES 16
+#define MAX_SUBMESHES 4
 #endif
 
 // detail levels per submesh, level 0 being the source geometry
@@ -71,15 +71,15 @@
 #endif
 
 #ifndef MAX_TILEMAP_TILESRECT
-#define MAX_TILEMAP_TILESRECT 200
+#define MAX_TILEMAP_TILESRECT 64
 #endif
 
 #ifndef MAX_TILEMAP_TILES
-#define MAX_TILEMAP_TILES 2048
+#define MAX_TILEMAP_TILES 512
 #endif
 
 #ifndef MAX_SPRITE_FRAMES
-#define MAX_SPRITE_FRAMES 128
+#define MAX_SPRITE_FRAMES 32
 #endif
 
 // main font of a text plus its fallbacks
@@ -88,7 +88,7 @@
 #endif
 
 #ifndef MAX_BONES
-#define MAX_BONES 128
+#define MAX_BONES 96
 #endif
 
 #ifndef MAX_MORPHTARGETS
@@ -102,7 +102,7 @@
 #endif
 
 #ifndef MAX_EXTERNAL_BUFFERS
-#define MAX_EXTERNAL_BUFFERS 30
+#define MAX_EXTERNAL_BUFFERS 20
 #endif
 
 #ifndef MAX_BROADPHASELAYER_3D
@@ -110,23 +110,23 @@
 #endif
 
 #ifndef MAX_SHAPES_2D
-#define MAX_SHAPES_2D 10
+#define MAX_SHAPES_2D 4
 #endif
 
 #ifndef MAX_SHAPE_POINTS_2D
-#define MAX_SHAPE_POINTS_2D 16
+#define MAX_SHAPE_POINTS_2D 8
 #endif
 
 #ifndef MAX_SHAPES_3D
-#define MAX_SHAPES_3D 10
+#define MAX_SHAPES_3D 4
 #endif
 
 #ifndef MAX_SHAPE_VERTICES_3D
-#define MAX_SHAPE_VERTICES_3D 256
+#define MAX_SHAPE_VERTICES_3D 64
 #endif
 
 #ifndef MAX_SHAPE_INDICES_3D
-#define MAX_SHAPE_INDICES_3D 768
+#define MAX_SHAPE_INDICES_3D 192
 #endif
 
 #include "Export.h"
