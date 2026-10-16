@@ -464,7 +464,7 @@ namespace doriax::editor{
 
         Entity createNewEntity(uint32_t sceneId, std::string entityName);
         bool createNewComponent(uint32_t sceneId, Entity entity, ComponentType component);
-        void calculateSceneMaxValues(const SceneProject* sceneProject, SceneMaxValues& maxValues) const;
+        void calculateMaxValues(const EntityRegistry* registry, SceneMaxValues& maxValues) const;
         void resetEngineConfigs(bool executeViewChanged);
         void resetConfigs();
 
@@ -933,6 +933,8 @@ namespace doriax::editor{
         EntityBundle* getEntityBundle(const std::filesystem::path& filepath);
         const EntityBundle* getEntityBundle(const std::filesystem::path& filepath) const;
         std::map<std::filesystem::path, const EntityBundle*> getEntityBundles(uint32_t sceneId) const;
+        // largest capacities the exported bundles use, also the ones only scripts spawn
+        SceneMaxValues getBundleMaxValues() const;
         std::filesystem::path findEntityBundlePathFor(uint32_t sceneId, Entity entity) const;
 
         YAML::Node encodeEntityBundleNode(const std::filesystem::path& filepath) const;

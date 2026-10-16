@@ -3319,12 +3319,23 @@ void editor::Project::updateSceneBundles(SceneProject* sceneProject) {
     }
 }
 
-void editor::Project::calculateSceneMaxValues(const SceneProject* sceneProject, SceneMaxValues& maxValues) const {
-    if (!sceneProject || !sceneProject->scene) {
+editor::SceneMaxValues editor::Project::getBundleMaxValues() const {
+    SceneMaxValues maxValues;
+    for (const BundleSceneInfo& info : collectAllBundles()) {
+        const EntityBundle* bundle = getEntityBundle(info.bundlePath);
+        if (bundle && bundle->registry) {
+            calculateMaxValues(bundle->registry.get(), maxValues);
+        }
+    }
+    return maxValues;
+}
+
+void editor::Project::calculateMaxValues(const EntityRegistry* registry, SceneMaxValues& maxValues) const {
+    if (!registry) {
         return;
     }
 
-    auto meshes = sceneProject->scene->getComponentArray<MeshComponent>();
+    auto meshes = registry->getComponentArray<MeshComponent>();
     for (size_t i = 0; i < meshes->size(); ++i) {
         const MeshComponent& mesh = meshes->getComponentFromIndex(i);
         maxValues.maxSubmeshes = std::max(maxValues.maxSubmeshes, mesh.numSubmeshes);
@@ -3333,13 +3344,13 @@ void editor::Project::calculateSceneMaxValues(const SceneProject* sceneProject, 
             static_cast<unsigned int>(mesh.bonesMatrix.size()));
     }
 
-    auto sprites = sceneProject->scene->getComponentArray<SpriteComponent>();
+    auto sprites = registry->getComponentArray<SpriteComponent>();
     for (size_t i = 0; i < sprites->size(); ++i) {
         const SpriteComponent& sprite = sprites->getComponentFromIndex(i);
         maxValues.maxSpriteFrames = std::max(maxValues.maxSpriteFrames, sprite.numFramesRect);
     }
 
-    auto points = sceneProject->scene->getComponentArray<PointsComponent>();
+    auto points = registry->getComponentArray<PointsComponent>();
     for (size_t i = 0; i < points->size(); ++i) {
         const PointsComponent& pointsComponent = points->getComponentFromIndex(i);
         maxValues.maxSpriteFrames = std::max(maxValues.maxSpriteFrames, pointsComponent.numFramesRect);
@@ -3349,21 +3360,21 @@ void editor::Project::calculateSceneMaxValues(const SceneProject* sceneProject, 
     // Their counts are independent of (and can exceed) a sprite's numFramesRect (e.g. a ping-pong
     // sequence reuses frame indices), and the generated component code writes them with unchecked
     // operator[], so they must factor into MAX_SPRITE_FRAMES too.
-    auto spriteAnims = sceneProject->scene->getComponentArray<SpriteAnimationComponent>();
+    auto spriteAnims = registry->getComponentArray<SpriteAnimationComponent>();
     for (size_t i = 0; i < spriteAnims->size(); ++i) {
         const SpriteAnimationComponent& spriteAnim = spriteAnims->getComponentFromIndex(i);
         maxValues.maxSpriteFrames = std::max(maxValues.maxSpriteFrames, spriteAnim.framesSize);
         maxValues.maxSpriteFrames = std::max(maxValues.maxSpriteFrames, spriteAnim.framesTimeSize);
     }
 
-    auto tilemaps = sceneProject->scene->getComponentArray<TilemapComponent>();
+    auto tilemaps = registry->getComponentArray<TilemapComponent>();
     for (size_t i = 0; i < tilemaps->size(); ++i) {
         const TilemapComponent& tilemap = tilemaps->getComponentFromIndex(i);
         maxValues.maxTilemapTilesRect = std::max(maxValues.maxTilemapTilesRect, tilemap.numTilesRect);
         maxValues.maxTilemapTiles = std::max(maxValues.maxTilemapTiles, tilemap.numTiles);
     }
 
-    auto bodies2d = sceneProject->scene->getComponentArray<Body2DComponent>();
+    auto bodies2d = registry->getComponentArray<Body2DComponent>();
     for (size_t i = 0; i < bodies2d->size(); ++i) {
         const Body2DComponent& body = bodies2d->getComponentFromIndex(i);
         maxValues.maxShapes2D = std::max(maxValues.maxShapes2D, static_cast<unsigned int>(body.numShapes));
@@ -3372,7 +3383,7 @@ void editor::Project::calculateSceneMaxValues(const SceneProject* sceneProject, 
         }
     }
 
-    auto bodies3d = sceneProject->scene->getComponentArray<Body3DComponent>();
+    auto bodies3d = registry->getComponentArray<Body3DComponent>();
     for (size_t i = 0; i < bodies3d->size(); ++i) {
         const Body3DComponent& body = bodies3d->getComponentFromIndex(i);
         maxValues.maxShapes3D = std::max(maxValues.maxShapes3D, static_cast<unsigned int>(body.numShapes));
@@ -5435,7 +5446,7 @@ bool editor::Project::saveSceneFile(SceneProject* sceneProject, const std::files
 
     SceneMaxValues maxValues;
     maxValues.maxBones = sceneProject->maxValues.maxBones;
-    calculateSceneMaxValues(sceneProject, maxValues);
+    calculateMaxValues(sceneProject->scene, maxValues);
     sceneProject->maxValues = maxValues;
 
     std::set<ShaderKey> shaderKeys;

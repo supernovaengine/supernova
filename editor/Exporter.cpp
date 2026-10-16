@@ -2556,19 +2556,24 @@ std::vector<std::pair<std::string, unsigned int>> editor::Exporter::getSceneMaxV
     // HybridArray. SceneProject::maxValues is refreshed for every scene during
     // loadAndSaveAllScenes(), which always runs before copyEngine().
     SceneMaxValues agg;
+    auto merge = [&agg](const SceneMaxValues& values) {
+        agg.maxSubmeshes        = std::max(agg.maxSubmeshes, values.maxSubmeshes);
+        agg.maxTilemapTilesRect = std::max(agg.maxTilemapTilesRect, values.maxTilemapTilesRect);
+        agg.maxTilemapTiles     = std::max(agg.maxTilemapTiles, values.maxTilemapTiles);
+        agg.maxExternalBuffers  = std::max(agg.maxExternalBuffers, values.maxExternalBuffers);
+        agg.maxSpriteFrames     = std::max(agg.maxSpriteFrames, values.maxSpriteFrames);
+        agg.maxBones            = std::max(agg.maxBones, values.maxBones);
+        agg.maxShapes2D         = std::max(agg.maxShapes2D, values.maxShapes2D);
+        agg.maxShapePoints2D    = std::max(agg.maxShapePoints2D, values.maxShapePoints2D);
+        agg.maxShapes3D         = std::max(agg.maxShapes3D, values.maxShapes3D);
+        agg.maxShapeVertices3D  = std::max(agg.maxShapeVertices3D, values.maxShapeVertices3D);
+        agg.maxShapeIndices3D   = std::max(agg.maxShapeIndices3D, values.maxShapeIndices3D);
+    };
     for (const SceneProject& sceneProject : project->getScenes()) {
-        agg.maxSubmeshes        = std::max(agg.maxSubmeshes, sceneProject.maxValues.maxSubmeshes);
-        agg.maxTilemapTilesRect = std::max(agg.maxTilemapTilesRect, sceneProject.maxValues.maxTilemapTilesRect);
-        agg.maxTilemapTiles     = std::max(agg.maxTilemapTiles, sceneProject.maxValues.maxTilemapTiles);
-        agg.maxExternalBuffers  = std::max(agg.maxExternalBuffers, sceneProject.maxValues.maxExternalBuffers);
-        agg.maxSpriteFrames     = std::max(agg.maxSpriteFrames, sceneProject.maxValues.maxSpriteFrames);
-        agg.maxBones            = std::max(agg.maxBones, sceneProject.maxValues.maxBones);
-        agg.maxShapes2D         = std::max(agg.maxShapes2D, sceneProject.maxValues.maxShapes2D);
-        agg.maxShapePoints2D    = std::max(agg.maxShapePoints2D, sceneProject.maxValues.maxShapePoints2D);
-        agg.maxShapes3D         = std::max(agg.maxShapes3D, sceneProject.maxValues.maxShapes3D);
-        agg.maxShapeVertices3D  = std::max(agg.maxShapeVertices3D, sceneProject.maxValues.maxShapeVertices3D);
-        agg.maxShapeIndices3D   = std::max(agg.maxShapeIndices3D, sceneProject.maxValues.maxShapeIndices3D);
+        merge(sceneProject.maxValues);
     }
+    // a script can spawn a bundle that no scene places
+    merge(project->getBundleMaxValues());
 
     // Floor each capacity at the engine default declared in core/Engine.h: growing past the
     // default sizes big models correctly, while never shrinking below the known-safe baseline.
