@@ -2915,7 +2915,8 @@ std::filesystem::path editor::App::getUserShaderCacheDir(){
     // v30: Water component — new water and underwater shaders.
     // v32: Water exclusions, appended to u_fs_waterParams.
     // v33: pbr.glsl reads u_fs_texCoordSets.set1 in every UV-set variant.
-    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v33";
+    // v34: shadow projection in the fragment shader, directional-only variant.
+    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v34";
 }
 
 void editor::App::pushTabNotificationStyle(){
