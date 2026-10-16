@@ -53,6 +53,7 @@ namespace doriax{
         int slotFSFog = -1;
         int slotVSShadows = -1;
         int slotFSShadows = -1;
+        int slotFSShadowProjection = -1;
         int slotFSPointShadows = -1;
         // values of the fork's custom uniform blocks, by member name
         ShaderUniformValues shaderUniforms;

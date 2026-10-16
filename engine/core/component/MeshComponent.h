@@ -89,6 +89,7 @@ namespace doriax{
         int slotVSSprite = -1;
         int slotVSShadows = -1;
         int slotFSShadows = -1;
+        int slotFSShadowProjection = -1;
         int slotFSPointShadows = -1;
         int slotVSSkinning = -1;
         int slotVSMorphTarget = -1;

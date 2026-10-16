@@ -21,21 +21,36 @@ struct Shadow{
     vec4 lightProjPos;
 };
 
-Shadow getShadow2DConf(int index){
+#ifdef SHADOW_FRAGMENT_PROJECTION
+// affine in position and normal, so projecting the interpolated values is exact
+vec4 getLightProjPos(int index){
+    vec3 position = v_position;
+    #ifdef SHADOW_OFFSET_NORMAL
+        position += SHADOW_OFFSET_NORMAL * uShadowProjection.shadowParams[index].x;
+    #endif
+    return uShadowProjection.lightVPMatrix[index] * vec4(position, 1.0);
+}
+#else
+// shader forks from before the projection moved here still pass one varying per slot
+vec4 getLightProjPos(int index){
     for (int i = 0; i < MAX_SHADOW_ATLAS_SLOTS; i++){
         if (i == index){
-            return Shadow(
-                uShadows.bias_texSize_nearFar[i].x,
-                uShadows.bias_texSize_nearFar[i].x / 10.0,
-                uShadows.bias_texSize_nearFar[i].yy,
-                uShadows.bias_texSize_nearFar[i].zw,
-                uShadows.atlasRect[i],
-                v_lightProjPos[i]
-            );
+            return v_lightProjPos[i];
         }
     }
+    return vec4(0.0);
+}
+#endif
 
-    return Shadow(0.0, 0.0, vec2(0.0), vec2(0.0), vec4(0.0), vec4(0.0));
+Shadow getShadow2DConf(int index){
+    return Shadow(
+        uShadows.bias_texSize_nearFar[index].x,
+        uShadows.bias_texSize_nearFar[index].x / 10.0,
+        uShadows.bias_texSize_nearFar[index].yy,
+        uShadows.bias_texSize_nearFar[index].zw,
+        uShadows.atlasRect[index],
+        getLightProjPos(index)
+    );
 }
 
 Shadow getShadowCubeConf(int baseIndex){
@@ -185,10 +200,11 @@ float shadowCascadedCalculationPCF(int shadowMapIndex, int numShadowCascades, fl
     for (int c = 0; c < MAX_SHADOWCASCADES; c++){
         if (c < numShadowCascades){
             int casShadowMapIndex = shadowMapIndex + c;
-            Shadow shadowConf = getShadow2DConf(casShadowMapIndex);
+            // only the chosen cascade is projected
+            vec2 nearFar = uShadows.bias_texSize_nearFar[casShadowMapIndex].zw;
 
-            if ((viewDepth >= shadowConf.nearFar.x) && (viewDepth <= shadowConf.nearFar.y)){
-                return shadowCalculationAux(casShadowMapIndex, shadowConf, NdotL);
+            if ((viewDepth >= nearFar.x) && (viewDepth <= nearFar.y)){
+                return shadowCalculationAux(casShadowMapIndex, getShadow2DConf(casShadowMapIndex), NdotL);
             }
         }
     }

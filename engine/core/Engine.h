@@ -28,10 +28,8 @@
 #define MAX_SHADOWCASCADES 4
 #endif
 
-// Projective shadow atlas (directional + spot). Each slot holds one 2D depth map
-// (a spot light, or a single directional cascade) and maps 1:1 to a v_lightProjPos
-// vertex varying, so the slot count is bounded by GPU vertex-output limits: keep the
-// grid small (a 6x6 / 36-slot grid overflows the varyings and breaks shader compiles).
+// Projective shadow atlas (directional + spot), one 2D depth map per slot. Each slot costs
+// 7 fragment uniform vectors, so keep the grid small (GLES 3.0 guarantees only 224).
 #ifndef SHADOW_ATLAS_COLS
 #define SHADOW_ATLAS_COLS 3
 #endif

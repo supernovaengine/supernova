@@ -82,10 +82,11 @@ namespace doriax{
 		Vector4 density_start_end;
 	} fs_fog_t;
 
-	typedef struct vs_shadows_t {
+	// u_fs_shadow_projection, and u_vs_shadows in shader forks that predate it
+	typedef struct shadow_projection_t {
 	    Matrix4 lightViewProjectionMatrix[MAX_SHADOW_ATLAS_SLOTS];
 	    Vector4 shadowParams[MAX_SHADOW_ATLAS_SLOTS]; // normalBias in .x
-	} vs_shadows_t;
+	} shadow_projection_t;
 
 	typedef struct fs_shadows_t {
         Vector4 bias_texSize_nearFar[MAX_SHADOW_ATLAS_SLOTS];
@@ -453,7 +454,7 @@ namespace doriax{
 
 		fs_lighting_t fs_lighting;
 		fs_lighting2d_t fs_lighting2d;
-		vs_shadows_t vs_shadows;
+		shadow_projection_t shadowProjection;
 		fs_shadows_t fs_shadows;
 		fs_point_shadows_t fs_point_shadows;
 		fs_fog_t fs_fog;

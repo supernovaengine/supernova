@@ -167,6 +167,8 @@ int ShaderData::getUniformBlockIndex(UniformBlockType type){
         ustr = "u_vs_shadows";
     }else if (type == UniformBlockType::FS_SHADOWS){
         ustr = "u_fs_shadows";
+    }else if (type == UniformBlockType::FS_SHADOW_PROJECTION){
+        ustr = "u_fs_shadow_projection";
     }else if (type == UniformBlockType::FS_POINT_SHADOWS){
         ustr = "u_fs_point_shadows";
     }else if (type == UniformBlockType::SKY_VS_PARAMS){

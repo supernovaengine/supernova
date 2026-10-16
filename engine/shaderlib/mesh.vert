@@ -95,15 +95,6 @@ in vec3 a_position;
     out vec4 v_color;
 #endif
 
-#ifdef USE_SHADOWS
-    uniform u_vs_shadows {
-        mat4 lightVPMatrix[MAX_SHADOW_ATLAS_SLOTS];
-        vec4 shadowParams[MAX_SHADOW_ATLAS_SLOTS]; // normalBias in .x
-    };
- 
-    out vec4 v_lightProjPos[MAX_SHADOW_ATLAS_SLOTS];
-#endif
-
 #ifdef HAS_INSTANCING
     in vec4 i_matrix_col1;
     in vec4 i_matrix_col2;
@@ -254,16 +245,6 @@ void main() {
         #if defined(HAS_VERTEX_COLOR_VEC3) || defined(HAS_VERTEX_COLOR_VEC4)
             v_color = a_color;
         #endif
-    #endif
-
-    #ifdef USE_SHADOWS
-    for (int i = 0; i < MAX_SHADOW_ATLAS_SLOTS; ++i){
-        #ifdef HAS_NORMALS
-            v_lightProjPos[i] = lightVPMatrix[i] * (worldPos + vec4(worldNormal * shadowParams[i].x, 0.0));
-        #else
-            v_lightProjPos[i] = lightVPMatrix[i] * worldPos;
-        #endif
-    }
     #endif
 
     gl_Position = pbrParams.mvpMatrix * pos;

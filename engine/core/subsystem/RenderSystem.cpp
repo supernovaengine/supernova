@@ -968,12 +968,12 @@ void RenderSystem::processLights(int numLights, CameraComponent& camera, Transfo
                             light.cameras[c].nearFar.x,
                             light.cameras[c].nearFar.y);
                     }else{
-                        vs_shadows.lightViewProjectionMatrix[light.shadowMapIndex+c] = light.cameras[c].lightViewProjectionMatrix;
+                        shadowProjection.lightViewProjectionMatrix[light.shadowMapIndex+c] = light.cameras[c].lightViewProjectionMatrix;
 
                         float projScale = std::max(std::abs(light.cameras[c].lightProjectionMatrix[0][0]),
                                                    std::abs(light.cameras[c].lightProjectionMatrix[1][1]));
                         float texelSizeWorld = (projScale > 0.0f) ? 2.0f / (projScale * (float)shadowAtlasSlotResolution) : 0.0f;
-                        vs_shadows.shadowParams[light.shadowMapIndex+c] = Vector4(light.shadowNormalBias * texelSizeWorld, 0.0, 0.0, 0.0);
+                        shadowProjection.shadowParams[light.shadowMapIndex+c] = Vector4(light.shadowNormalBias * texelSizeWorld, 0.0, 0.0, 0.0);
 
                         fs_shadows.bias_texSize_nearFar[light.shadowMapIndex+c] = Vector4(
                             light.shadowBias,
@@ -3000,6 +3000,7 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint16_t pipelin
             if (p_receiveShadows){
                 mesh.submeshes[i].slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS);
                 mesh.submeshes[i].slotFSShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOWS);
+                mesh.submeshes[i].slotFSShadowProjection = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOW_PROJECTION);
                 mesh.submeshes[i].slotFSPointShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_POINT_SHADOWS);
             }
         }
@@ -4038,7 +4039,8 @@ bool RenderSystem::drawMesh(Entity entity, MeshComponent& mesh, Transform& trans
                 loadSpotMaskTexture(lightingShaderData, render);
                 render.applyUniformBlock(mesh.submeshes[i].slotFSLighting, sizeof(fs_lighting_t), &fs_lighting);
                 if (hasShadows && (mesh.submeshes[i].shaderProperties & (1u << 4))){
-                    render.applyUniformBlock(mesh.submeshes[i].slotVSShadows, sizeof(float) * (20 * MAX_SHADOW_ATLAS_SLOTS), &vs_shadows);
+                    render.applyUniformBlock(mesh.submeshes[i].slotVSShadows, sizeof(shadow_projection_t), &shadowProjection);
+                    render.applyUniformBlock(mesh.submeshes[i].slotFSShadowProjection, sizeof(shadow_projection_t), &shadowProjection);
                     render.applyUniformBlock(mesh.submeshes[i].slotFSShadows, sizeof(fs_shadows_t), &fs_shadows);
                     render.applyUniformBlock(mesh.submeshes[i].slotFSPointShadows, sizeof(fs_point_shadows_t), &fs_point_shadows);
                 }
@@ -5323,6 +5325,7 @@ void RenderSystem::destroyMesh(Entity entity, MeshComponent& mesh, bool clearAss
         submesh.slotVSSprite = -1;
         submesh.slotVSShadows = -1;
         submesh.slotFSShadows = -1;
+        submesh.slotFSShadowProjection = -1;
         submesh.slotFSPointShadows = -1;
         submesh.slotVSSkinning = -1;
         submesh.slotVSMorphTarget = -1;
@@ -6428,6 +6431,7 @@ bool RenderSystem::loadWater(Entity entity, WaterComponent& water, uint16_t pipe
     if (receiveShadows){
         water.slotVSShadows = shaderData.getUniformBlockIndex(UniformBlockType::VS_SHADOWS);
         water.slotFSShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOWS);
+        water.slotFSShadowProjection = shaderData.getUniformBlockIndex(UniformBlockType::FS_SHADOW_PROJECTION);
         water.slotFSPointShadows = shaderData.getUniformBlockIndex(UniformBlockType::FS_POINT_SHADOWS);
     }
     water.customVSParams.resolve(shaderData, "u_vs_customParams");
@@ -6700,7 +6704,8 @@ bool RenderSystem::drawWater(Entity entity, WaterComponent& water, Transform& tr
     if (water.slotFSFog != -1){
         render.applyUniformBlock(water.slotFSFog, sizeof(float) * 8, &fs_fog);
     }
-    render.applyUniformBlock(water.slotVSShadows, sizeof(vs_shadows_t), &vs_shadows);
+    render.applyUniformBlock(water.slotVSShadows, sizeof(shadow_projection_t), &shadowProjection);
+    render.applyUniformBlock(water.slotFSShadowProjection, sizeof(shadow_projection_t), &shadowProjection);
     render.applyUniformBlock(water.slotFSShadows, sizeof(fs_shadows_t), &fs_shadows);
     render.applyUniformBlock(water.slotFSPointShadows, sizeof(fs_point_shadows_t), &fs_point_shadows);
     writeCustomUniforms(water, scene);
@@ -6761,6 +6766,7 @@ void RenderSystem::destroyWater(Entity entity, WaterComponent& water){
     water.slotFSFog = -1;
     water.slotVSShadows = -1;
     water.slotFSShadows = -1;
+    water.slotFSShadowProjection = -1;
     water.slotFSPointShadows = -1;
     water.customVSParams.clear();
     water.customFSParams.clear();

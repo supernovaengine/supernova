@@ -120,6 +120,7 @@ namespace doriax{
         FS_MIRROR,
         VS_SHADOWS,
         FS_SHADOWS,
+        FS_SHADOW_PROJECTION,
         FS_POINT_SHADOWS,
         SKY_VS_PARAMS,
         SKY_FS_PARAMS,

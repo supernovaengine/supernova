@@ -90,12 +90,18 @@ uniform sampler u_waterExclusionMaps_smp;
         vec4 atlasRect[MAX_SHADOW_ATLAS_SLOTS];
     } uShadows;
 
+    // shadows.glsl projects v_position here, so no per-slot varyings are interpolated
+    uniform u_fs_shadow_projection {
+        mat4 lightVPMatrix[MAX_SHADOW_ATLAS_SLOTS];
+        vec4 shadowParams[MAX_SHADOW_ATLAS_SLOTS]; // normalBias in .x
+    } uShadowProjection;
+    #define SHADOW_FRAGMENT_PROJECTION
+    #define SHADOW_OFFSET_NORMAL v_normal
+
     uniform u_fs_point_shadows {
         vec4 bias_texSize_nearFar[MAX_POINT_SHADOW_ATLAS_SLOTS];
         vec4 atlasRect[MAX_POINT_SHADOW_ATLAS_SLOTS];
     } uPointShadows;
-
-    in vec4 v_lightProjPos[MAX_SHADOW_ATLAS_SLOTS];
 
     uniform texture2D u_shadowAtlas;
     uniform samplerShadow u_shadowAtlas_smp;
