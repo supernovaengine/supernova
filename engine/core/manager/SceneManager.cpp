@@ -14,6 +14,9 @@
 #include "thread/ResourceProgress.h"
 
 #include <algorithm>
+#if defined(DORIAX_LINUX) && defined(__GLIBC__)
+#include <malloc.h>
+#endif
 
 using namespace doriax;
 
@@ -578,6 +581,10 @@ void SceneManager::updateLoading() {
 
     // the new scenes hold their own files now
     cancelPreload(currentId);
+#if defined(DORIAX_LINUX) && defined(__GLIBC__)
+    // give back the free pages decoders and replaced scenes left in malloc arenas
+    malloc_trim(0);
+#endif
 }
 
 bool SceneManager::addChildScene(uint32_t id) {
