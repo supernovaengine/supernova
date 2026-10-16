@@ -286,9 +286,9 @@ bool SokolObject::endLoad(uint16_t pipelines, bool enableFaceCulling, bool enabl
     if (pipelines & (int)PipelineType::PIP_DEPTH) {
         sg_pipeline_desc pip_depth_desc = pipeline_desc;
 
+        pip_depth_desc.face_winding = getFaceWinding(windingOrder);
         if (enableFaceCulling){
             pip_depth_desc.cull_mode = getCullMode(cullingMode);
-            pip_depth_desc.face_winding = getFaceWinding(windingOrder);
         }
 
         pip_depth_desc.sample_count = 1;
@@ -313,9 +313,9 @@ bool SokolObject::endLoad(uint16_t pipelines, bool enableFaceCulling, bool enabl
         pip_zprepass_desc.colors[0].write_mask = SG_COLORMASK_NONE;
 
         if (pipelines & (int)PipelineType::PIP_ZPREPASS){
+            pip_zprepass_desc.face_winding = getFaceWinding(windingOrder);
             if (prepassFaceCulling){
                 pip_zprepass_desc.cull_mode = getCullMode(cullingMode);
-                pip_zprepass_desc.face_winding = getFaceWinding(windingOrder);
             }
             zprepass_pip = makePipeline(pip_zprepass_desc);
             if (zprepass_pip.id == SG_INVALID_ID){
@@ -331,9 +331,9 @@ bool SokolObject::endLoad(uint16_t pipelines, bool enableFaceCulling, bool enabl
             if (Engine::isOpenGL()){
                 rttWinding = (windingOrder == WindingOrder::CCW) ? WindingOrder::CW : WindingOrder::CCW;
             }
+            pip_zprepass_desc.face_winding = getFaceWinding(rttWinding);
             if (prepassFaceCulling){
                 pip_zprepass_desc.cull_mode = getCullMode(cullingMode);
-                pip_zprepass_desc.face_winding = getFaceWinding(rttWinding);
             }
             zprepass_rtt_pip = makePipeline(pip_zprepass_desc);
             if (zprepass_rtt_pip.id == SG_INVALID_ID){
@@ -347,9 +347,9 @@ bool SokolObject::endLoad(uint16_t pipelines, bool enableFaceCulling, bool enabl
         // alpha-mask discard. SG_PIXELFORMAT_NONE marks it depth-only in Sokol.
         sg_pipeline_desc pip_shadow_depth_desc = pipeline_desc;
 
+        pip_shadow_depth_desc.face_winding = getFaceWinding(windingOrder);
         if (enableFaceCulling){
             pip_shadow_depth_desc.cull_mode = getCullMode(cullingMode);
-            pip_shadow_depth_desc.face_winding = getFaceWinding(windingOrder);
         }
 
         pip_shadow_depth_desc.sample_count = 1;
@@ -372,9 +372,9 @@ bool SokolObject::endLoad(uint16_t pipelines, bool enableFaceCulling, bool enabl
         //   color[2] = linear base color (.rgb) + hasIBL flag (.a)
         sg_pipeline_desc pip_gbuffer_desc = pipeline_desc;
 
+        pip_gbuffer_desc.face_winding = getFaceWinding(windingOrder);
         if (enableFaceCulling){
             pip_gbuffer_desc.cull_mode = getCullMode(cullingMode);
-            pip_gbuffer_desc.face_winding = getFaceWinding(windingOrder);
         }
 
         pip_gbuffer_desc.sample_count = 1;
@@ -395,9 +395,10 @@ bool SokolObject::endLoad(uint16_t pipelines, bool enableFaceCulling, bool enabl
     if (pipelines & ((int)PipelineType::PIP_DEFAULT | (int)PipelineType::PIP_DEFAULT_NODEPTH)) {
         sg_pipeline_desc pip_default_desc = pipeline_desc;
 
+        // also without culling: double-sided materials read gl_FrontFacing
+        pip_default_desc.face_winding = getFaceWinding(windingOrder);
         if (enableFaceCulling){
             pip_default_desc.cull_mode = getCullMode(cullingMode);
-            pip_default_desc.face_winding = getFaceWinding(windingOrder);
         }
 
         pip_default_desc.colors[0].write_mask = SG_COLORMASK_RGB;
@@ -450,9 +451,9 @@ bool SokolObject::endLoad(uint16_t pipelines, bool enableFaceCulling, bool enabl
         if (Engine::isOpenGL()){
             rttWinding = (windingOrder == WindingOrder::CCW) ? WindingOrder::CW : WindingOrder::CCW;
         }
+        pip_rtt_desc.face_winding = getFaceWinding(rttWinding);
         if (enableFaceCulling){
             pip_rtt_desc.cull_mode = getCullMode(cullingMode);
-            pip_rtt_desc.face_winding = getFaceWinding(rttWinding);
         }
 
         if (pipelines & (int)PipelineType::PIP_RTT){
@@ -485,10 +486,8 @@ bool SokolObject::endLoad(uint16_t pipelines, bool enableFaceCulling, bool enabl
 
         if (pipelines & (int)PipelineType::PIP_RTT_INVERT){
             // planar reflection mirrors handedness, reversing winding once more
-            if (enableFaceCulling){
-                WindingOrder invWinding = (rttWinding == WindingOrder::CCW) ? WindingOrder::CW : WindingOrder::CCW;
-                pip_rtt_desc.face_winding = getFaceWinding(invWinding);
-            }
+            WindingOrder invWinding = (rttWinding == WindingOrder::CCW) ? WindingOrder::CW : WindingOrder::CCW;
+            pip_rtt_desc.face_winding = getFaceWinding(invWinding);
             rtt_invert_pip = makePipeline(pip_rtt_desc);
             if (rtt_invert_pip.id == SG_INVALID_ID){
                 return false;
