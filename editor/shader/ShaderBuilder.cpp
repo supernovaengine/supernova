@@ -715,6 +715,9 @@ bool editor::ShaderBuilder::setupShaderArgs(shadercompiler::args_t& args, Shader
     }
     if (shaderType == ShaderType::MESH){
         args.defines.push_back({"MAX_LIGHTS_2D", std::to_string(MAX_LIGHTS_2D)});
+        if (properties & (1u << 28)){
+            args.defines.push_back({"DIRECTIONAL_LIGHTS_ONLY", "1"});
+        }
     }
     if (shaderType == ShaderType::WATER){
         args.defines.push_back({"MAX_WATER_EXCLUSIONS", std::to_string(MAX_WATER_EXCLUSIONS)});

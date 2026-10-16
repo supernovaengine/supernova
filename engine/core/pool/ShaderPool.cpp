@@ -419,7 +419,7 @@ std::string ShaderPool::getShaderTypeName(ShaderType shaderType, bool lowerCase)
 
 int ShaderPool::getShaderPropertyCount(ShaderType shaderType){
     switch (shaderType) {
-        case ShaderType::MESH:   return 28;
+        case ShaderType::MESH:   return 29;
         case ShaderType::DEPTH:  return 9;
         case ShaderType::GBUFFER: return 10;
         case ShaderType::UI:     return 4;
@@ -469,6 +469,7 @@ std::string ShaderPool::getShaderPropertyName(ShaderType shaderType, int bit, bo
             case 25: return shortName ? "Aop" : "Alpha Opaque";
             case 26: return shortName ? "Ifd" : "Instance Fade";
             case 27: return shortName ? "Tpb" : "Terrain PBR";
+            case 28: return shortName ? "Dlo" : "Directional Lights Only";
         }
     } else if (shaderType == ShaderType::DEPTH) {
         switch (bit) {
@@ -619,6 +620,14 @@ std::shared_ptr<ShaderRender> ShaderPool::get(ShaderType shaderType, uint32_t pr
             } else if (ShaderDataSerializer::readFromFile("shader://"+getShaderFile(shaderStr, ".sdat"), storageKey, tempShaderData)){
                 shared->createShader(tempShaderData);
             } else {
+                // a shader set without the 'Dlo' variant still has the general one
+                if (shaderType == ShaderType::MESH && customId == 0 && (properties & (1u << 28))){
+                    auto fallback = get(shaderType, properties & ~(1u << 28), customId);
+                    if (fallback && fallback->isCreated()){
+                        getMap().erase(shaderKey);
+                        return fallback;
+                    }
+                }
                 addMissingShader(shaderStr);
             }
         }

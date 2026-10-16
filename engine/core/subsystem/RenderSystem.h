@@ -316,6 +316,8 @@ namespace doriax{
 		
 		bool hasLights;
 		bool hasShadows;
+		// every light is directional: meshes load the 'Dlo' shader variant
+		bool onlyDirectionalLights;
 		bool hasFog;
 		bool hasIBL;
 		bool hasReflectionProbes;

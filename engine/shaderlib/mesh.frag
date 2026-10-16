@@ -387,7 +387,11 @@ void main() {
                 //Cannot be in function to avoid GLES2 index errors
                 //TODO: check this again, removed GLES2 support
                 Light light = Light(
+                    #ifdef DIRECTIONAL_LIGHTS_ONLY
+                    LightType_Directional, // constant: the point and spot paths compile out
+                    #else
                     int(lighting.position_type[i].w),
+                    #endif
                     lighting.direction_range[i].xyz,
                     lighting.color_intensity[i].xyz,
                     lighting.position_type[i].xyz,

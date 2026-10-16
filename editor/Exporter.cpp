@@ -3658,9 +3658,30 @@ bool editor::Exporter::buildAndSaveShaders() {
     // retired collapse onto their current equivalent (the std::set dedupes them),
     // instead of exporting stale duplicate variants with '?' in their names.
     {
+        // lights pick the 'Dlo' variant (bit 28) of built-in lit mesh shaders at runtime,
+        // so both versions ship, and excluding either one excludes the pair
+        auto variants = [](ShaderKey key) {
+            key = ShaderPool::normalizeKey(key);
+            std::vector<ShaderKey> keys;
+            if (ShaderPool::getShaderTypeFromKey(key) == ShaderType::MESH && ShaderPool::getCustomIdFromKey(key) == 0) {
+                key &= ~(ShaderKey(1) << 28);
+                if (ShaderPool::getPropertiesFromKey(key) & (1u << 3)) {
+                    keys.push_back(key | (ShaderKey(1) << 28));
+                }
+            }
+            keys.push_back(key);
+            return keys;
+        };
         std::set<ShaderKey> normalizedKeys;
         for (const ShaderKey& key : config.selectedShaderKeys) {
-            normalizedKeys.insert(ShaderPool::normalizeKey(key));
+            for (ShaderKey variant : variants(key)) {
+                normalizedKeys.insert(variant);
+            }
+        }
+        for (ShaderKey key : config.shaderExclusions) {
+            for (ShaderKey variant : variants(key)) {
+                normalizedKeys.erase(variant);
+            }
         }
         config.selectedShaderKeys = std::move(normalizedKeys);
     }

@@ -35,6 +35,18 @@ using namespace doriax;
 namespace {
     constexpr int SPOT_MASK_TILE_SIZE = 256;
 
+    // the lights uploaded to the shaders, false when there are none
+    bool allLightsDirectional(Scene* scene){
+        auto lights = scene->getComponentArray<LightComponent>();
+        size_t count = std::min(lights->size(), (size_t)MAX_LIGHTS);
+        for (size_t i = 0; i < count; i++){
+            if (lights->getComponentFromIndex(i).type != LightType::DIRECTIONAL){
+                return false;
+            }
+        }
+        return count > 0;
+    }
+
     static_assert(sizeof(Matrix4) == sizeof(float) * 16);
 
     bool bindSkinningResource(ObjectRender& render, ShaderData& shader, MeshComponent& mesh){
@@ -303,6 +315,7 @@ RenderSystem::RenderSystem(Scene* scene): SubSystem(scene){
     resumePassRender.setDepthLoadActionLoad();
     currentUnderwater = NULL;
     hasWaterDepth = false;
+    onlyDirectionalLights = false;
     frameTime = 0.0f;
     passResolution = Vector2(0.0f, 0.0f);
 
@@ -360,6 +373,7 @@ RenderSystem::~RenderSystem(){
 void RenderSystem::load(){
     hasLights = false;
     hasShadows = false;
+    onlyDirectionalLights = false;
     hasFog = false;
     hasIBL = false;
     hasReflectionProbes = false;
@@ -2910,6 +2924,10 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint16_t pipelin
         const std::string& meshShaderSrc = mesh.customShader.empty() ? scene->getDefaultCustomShader(ShaderType::MESH) : mesh.customShader;
         const ShaderUniformValues* inheritedUniforms = scene->getInheritedShaderUniforms(ShaderType::MESH, mesh.customShader);
         mesh.submeshes[i].customShaderId = ShaderPool::registerCustomShader(meshShaderSrc);
+        // 'Dlo': built-in shader without the point/spot paths
+        if (p_punctual && meshShaderSrc.empty() && onlyDirectionalLights){
+            mesh.submeshes[i].shaderProperties |= 1u << 28;
+        }
         mesh.submeshes[i].shader = ShaderPool::get(ShaderType::MESH, mesh.submeshes[i].shaderProperties, mesh.submeshes[i].customShaderId);
         // the depth shader feeds shadow maps (casters) and the SSAO depth pre-pass
         // (SSR uses its own G-buffer shader, built below). A depth fork is built even
@@ -8648,6 +8666,13 @@ void RenderSystem::update(double dt){
     }
 
     int numLights = checkLightsAndShadow();
+
+    // light types can change without adding or removing a light
+    bool newOnlyDirectionalLights = hasLights && allLightsDirectional(scene);
+    if (onlyDirectionalLights != newOnlyDirectionalLights){
+        onlyDirectionalLights = newOnlyDirectionalLights;
+        needReloadMeshes();
+    }
 
     auto transforms = scene->getComponentArray<Transform>();
     auto cameras = scene->getComponentArray<CameraComponent>();
