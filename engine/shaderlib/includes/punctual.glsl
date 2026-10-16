@@ -49,6 +49,7 @@ float getSpotAttenuation(vec3 pointToLight, vec3 spotDirection, float outerConeC
     return 0.0;
 }
 
+#ifndef DIRECTIONAL_LIGHTS_ONLY
 float getSpotMaskAttenuation(Light light, vec3 pointToLight, int lightIndex)
 {
     vec3 forward = normalize(light.direction);
@@ -95,6 +96,7 @@ float getSpotMaskAttenuation(Light light, vec3 pointToLight, int lightIndex)
     );
     return texture(sampler2D(u_spotMaskAtlas, u_spotMaskAtlas_smp), atlasUV).r;
 }
+#endif
 
 vec3 getLighIntensity(Light light, vec3 pointToLight, int lightIndex)
 {
@@ -105,6 +107,7 @@ vec3 getLighIntensity(Light light, vec3 pointToLight, int lightIndex)
     {
         rangeAttenuation = getRangeAttenuation(light.range, length(pointToLight));
     }
+    #ifndef DIRECTIONAL_LIGHTS_ONLY
     if (light.type == LightType_Spot)
     {
         if (light.spotMaskAspect > 0.0)
@@ -116,6 +119,7 @@ vec3 getLighIntensity(Light light, vec3 pointToLight, int lightIndex)
             spotAttenuation = getSpotAttenuation(pointToLight, light.direction, light.outerConeCos, light.innerConeCos);
         }
     }
+    #endif
 
     return rangeAttenuation * spotAttenuation * light.intensity * light.color;
 }

@@ -2916,7 +2916,8 @@ std::filesystem::path editor::App::getUserShaderCacheDir(){
     // v32: Water exclusions, appended to u_fs_waterParams.
     // v33: pbr.glsl reads u_fs_texCoordSets.set1 in every UV-set variant.
     // v34: shadow projection in the fragment shader, directional-only variant.
-    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v34";
+    // v35: the directional-only variant declares no point or spot bindings.
+    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v35";
 }
 
 void editor::App::pushTabNotificationStyle(){

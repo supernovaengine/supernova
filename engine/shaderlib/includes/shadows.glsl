@@ -53,6 +53,7 @@ Shadow getShadow2DConf(int index){
     );
 }
 
+#ifndef DIRECTIONAL_LIGHTS_ONLY
 Shadow getShadowCubeConf(int baseIndex){
     return Shadow(
         uPointShadows.bias_texSize_nearFar[baseIndex].x,
@@ -63,6 +64,7 @@ Shadow getShadowCubeConf(int baseIndex){
         vec4(0.0)
     );
 }
+#endif
 
 int directionToCubeFace(vec3 dir) {
     vec3 absDir = abs(dir);
@@ -105,6 +107,7 @@ vec2 getShadowAtlasUV(vec4 rect, vec2 uv) {
     return atlasUV;
 }
 
+#ifndef DIRECTIONAL_LIGHTS_ONLY
 vec4 getShadowCubeMap(int baseIndex, vec3 coords) {
     vec3 dir = normalize(coords);
     int face = directionToCubeFace(dir);
@@ -117,6 +120,7 @@ vec4 getShadowCubeMap(int baseIndex, vec3 coords) {
     vec2 atlasUV = getShadowAtlasUV(rect, uv);
     return texture(sampler2D(u_shadowPointAtlas, u_shadowPointAtlas_smp), atlasUV);
 }
+#endif
 
 float shadowCompare(int shadowMapIndex, float currentDepth, float bias, vec2 texCoords){
     vec4 rect = uShadows.atlasRect[shadowMapIndex];
@@ -212,6 +216,7 @@ float shadowCascadedCalculationPCF(int shadowMapIndex, int numShadowCascades, fl
     return 0.0;
 }
 
+#ifndef DIRECTIONAL_LIGHTS_ONLY
 // use a calculated near-far, not a real camera near-far
 float distanceToDepthValue(vec3 distance, vec2 calcNearFar){
     //https://stackoverflow.com/questions/48654578/omnidirectional-lighting-in-opengl-glsl-4-1
@@ -275,3 +280,4 @@ float shadowCubeCalculationPCF(int shadowMapIndex, vec3 fragToLight, float NdotL
 
     return shadow;
 }
+#endif

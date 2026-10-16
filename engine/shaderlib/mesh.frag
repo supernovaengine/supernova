@@ -127,7 +127,7 @@ uniform u_fs_pbrParams {
     #endif
 #endif
 
-#ifdef USE_PUNCTUAL
+#if defined(USE_PUNCTUAL) && !defined(DIRECTIONAL_LIGHTS_ONLY)
     uniform texture2D u_spotMaskAtlas;
     uniform sampler u_spotMaskAtlas_smp;
 #endif
@@ -173,15 +173,18 @@ uniform u_fs_pbrParams {
         #endif
     #endif
 
-    uniform u_fs_point_shadows {
-        vec4 bias_texSize_nearFar[MAX_POINT_SHADOW_ATLAS_SLOTS];
-        vec4 atlasRect[MAX_POINT_SHADOW_ATLAS_SLOTS];
-    } uPointShadows;
-
     uniform texture2D u_shadowAtlas;
     uniform samplerShadow u_shadowAtlas_smp;
-    uniform texture2D u_shadowPointAtlas;
-    uniform sampler u_shadowPointAtlas_smp;
+
+    #ifndef DIRECTIONAL_LIGHTS_ONLY
+        uniform u_fs_point_shadows {
+            vec4 bias_texSize_nearFar[MAX_POINT_SHADOW_ATLAS_SLOTS];
+            vec4 atlasRect[MAX_POINT_SHADOW_ATLAS_SLOTS];
+        } uPointShadows;
+
+        uniform texture2D u_shadowPointAtlas;
+        uniform sampler u_shadowPointAtlas_smp;
+    #endif
 #endif
 
 struct MaterialInfo{
@@ -432,8 +435,10 @@ void main() {
                             }else if(light.type == LightType_Directional){
                                 float viewDepth = dot(lighting.cameraDir.xyz, toEye);
                                 shadow = 1.0 - shadowCascadedCalculationPCF(light.shadowMapIndex, light.numShadowCascades, viewDepth, NdotL);
+                            #ifndef DIRECTIONAL_LIGHTS_ONLY
                             }else if(light.type == LightType_Point){
                                 shadow = 1.0 - shadowCubeCalculationPCF(light.shadowMapIndex, -pointToLight, NdotL);
+                            #endif
                             }
                         }
                     #endif
