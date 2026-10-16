@@ -4925,7 +4925,7 @@ MeshComponent editor::Stream::decodeMeshComponent(const YAML::Node& node, const 
     // Decode external buffers
     if (node["eBuffers"]) {
         auto eBuffersNode = node["eBuffers"];
-        for (unsigned int i = 0; i < eBuffersNode.size() && i < mesh.eBuffers.size(); i++) {
+        for (unsigned int i = 0; i < eBuffersNode.size() && mesh.eBuffers.validIndex(static_cast<int>(i)); i++) {
             decodeExternalBuffer(mesh.eBuffers[i], eBuffersNode[i]);
         }
         mesh.numExternalBuffers = eBuffersNode.size();
@@ -4936,7 +4936,7 @@ MeshComponent editor::Stream::decodeMeshComponent(const YAML::Node& node, const 
     // Decode submeshes
     if (node["submeshes"]) {
         auto submeshesNode = node["submeshes"];
-        for(unsigned int i = 0; i < submeshesNode.size() && i < mesh.submeshes.size(); i++) {
+        for(unsigned int i = 0; i < submeshesNode.size() && mesh.submeshes.validIndex(static_cast<int>(i)); i++) {
             mesh.submeshes[i] = decodeSubmesh(submeshesNode[i], &mesh.submeshes[i]);
         }
         mesh.numSubmeshes = submeshesNode.size();
@@ -5513,7 +5513,7 @@ SpriteComponent editor::Stream::decodeSpriteComponent(const YAML::Node& node, co
 
         if (framesNode.IsSequence()) {
             sprite.numFramesRect = 0;
-            for (std::size_t i = 0; i < framesNode.size() && i < sprite.framesRect.size(); i++) {
+            for (std::size_t i = 0; i < framesNode.size() && sprite.framesRect.validIndex(static_cast<int>(i)); i++) {
                 if (!framesNode[i] || framesNode[i].IsNull()) {
                     continue;
                 }
@@ -5573,7 +5573,7 @@ TilemapComponent editor::Stream::decodeTilemapComponent(const YAML::Node& node, 
         const YAML::Node& tilesRectNode = node["tilesRect"];
         if (tilesRectNode.IsSequence()) {
             tilemap.numTilesRect = 0;
-            for (std::size_t i = 0; i < tilesRectNode.size() && i < tilemap.tilesRect.size(); i++) {
+            for (std::size_t i = 0; i < tilesRectNode.size() && tilemap.tilesRect.validIndex(static_cast<int>(i)); i++) {
                 if (!tilesRectNode[i] || tilesRectNode[i].IsNull()) {
                     continue;
                 }
@@ -5587,7 +5587,7 @@ TilemapComponent editor::Stream::decodeTilemapComponent(const YAML::Node& node, 
         const YAML::Node& tilesNode = node["tiles"];
         if (tilesNode.IsSequence()) {
             tilemap.numTiles = 0;
-            for (std::size_t i = 0; i < tilesNode.size() && i < tilemap.tiles.size(); i++) {
+            for (std::size_t i = 0; i < tilesNode.size() && tilemap.tiles.validIndex(static_cast<int>(i)); i++) {
                 if (!tilesNode[i] || tilesNode[i].IsNull()) {
                     continue;
                 }
@@ -8188,7 +8188,7 @@ PointsComponent editor::Stream::decodePointsComponent(const YAML::Node& node, co
     points.numFramesRect = 0;
     if (node["framesRect"]) {
         for (const YAML::Node& frameNode : node["framesRect"]) {
-            if (points.numFramesRect < (unsigned int)points.framesRect.size()) {
+            if (points.framesRect.validIndex(static_cast<int>(points.numFramesRect))) {
                 points.framesRect[points.numFramesRect] = decodeSpriteFrameData(frameNode);
                 points.numFramesRect++;
             }

@@ -1935,7 +1935,7 @@ editor::Command* editor::ProjectUtils::buildDuplicateTileCmd(Project* project, u
     }
 
     unsigned int newSlot = tilemap->numTiles;
-    if (newSlot >= tilemap->tiles.size()) {
+    if (!tilemap->tiles.validIndex(static_cast<int>(newSlot))) {
         return nullptr;
     }
 

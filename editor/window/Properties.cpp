@@ -7191,7 +7191,7 @@ void editor::Properties::drawSpriteComponent(ComponentType cpType, SceneProject*
         float spriteFramesArrowWidth = ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.x;
         if (drawSummaryAddButton(ICON_FA_PLUS " Add Frame##sprite_frames_add", spriteFramesArrowWidth)) {
             int freeSlot = (int)sprite.numFramesRect;
-            if (freeSlot < (int)sprite.framesRect.size()) {
+            if (sprite.framesRect.validIndex(freeSlot)) {
                 editor::MultiPropertyCmd* multiCmd = new editor::MultiPropertyCmd();
                 std::string prefix = "framesRect[" + std::to_string(freeSlot) + "]";
                 multiCmd->addPropertyCmd<std::string>(project, sceneProject->id, entities[0], cpType,
@@ -7889,7 +7889,7 @@ void editor::Properties::drawTilemapComponent(ComponentType cpType, SceneProject
         float tileRectsArrowWidth = ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.x;
         if (drawSummaryAddButton(ICON_FA_PLUS " Add Tile Rect##tile_rects_add", tileRectsArrowWidth)) {
             int freeSlot = (int)tilemap.numTilesRect;
-            if (freeSlot < (int)tilemap.tilesRect.size()) {
+            if (tilemap.tilesRect.validIndex(freeSlot)) {
                 editor::MultiPropertyCmd* multiCmd = new editor::MultiPropertyCmd();
                 std::string prefix = "tilesRect[" + std::to_string(freeSlot) + "]";
                 multiCmd->addPropertyCmd<std::string>(project, sceneProject->id, entities[0], cpType,
@@ -7989,7 +7989,7 @@ void editor::Properties::drawTilemapComponent(ComponentType cpType, SceneProject
                     }
                     if (ImGui::Button(ICON_FA_SQUARE_PLUS "##add_tile_from_rect")) {
                         int freeSlot = (int)tilemap.numTiles;
-                        if (freeSlot < (int)tilemap.tiles.size()) {
+                        if (tilemap.tiles.validIndex(freeSlot)) {
                             editor::MultiPropertyCmd* multiCmd = new editor::MultiPropertyCmd();
                             std::string tilePrefix = "tiles[" + std::to_string(freeSlot) + "]";
                             multiCmd->addPropertyCmd<std::string>(project, sceneProject->id, entities[0], cpType,
@@ -8117,7 +8117,7 @@ void editor::Properties::drawTilemapComponent(ComponentType cpType, SceneProject
         float tilesArrowWidth = ImGui::GetFrameHeight() + ImGui::GetStyle().ItemSpacing.x;
         if (drawSummaryAddButton(ICON_FA_PLUS " Add Tile##tilemap_tiles_add", tilesArrowWidth)) {
             int freeSlot = (int)tilemap.numTiles;
-            if (freeSlot < (int)tilemap.tiles.size()) {
+            if (tilemap.tiles.validIndex(freeSlot)) {
                 float defaultWidth = 100.0f;
                 float defaultHeight = 100.0f;
                 if (tilemap.numTilesRect > 0 && tilemap.tilesRect[0].rect.getWidth() > 0.0f && tilemap.tilesRect[0].rect.getHeight() > 0.0f) {

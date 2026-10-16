@@ -5950,7 +5950,7 @@ ActionResult EditorActionExecutor::addTilemapTile(const Json& arguments) {
     }
 
     const unsigned int freeSlot = tilemap->numTiles;
-    if (freeSlot >= tilemap->tiles.size()) {
+    if (!tilemap->tiles.validIndex(static_cast<int>(freeSlot))) {
         return failResult("Tilemap tile array is full.");
     }
 
