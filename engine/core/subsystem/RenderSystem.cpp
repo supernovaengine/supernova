@@ -93,6 +93,20 @@ namespace {
         return mesh.worldAABB != AABB::ZERO && (!instmesh || instmesh->cullInstances);
     }
 
+    // a box without finite bounds counts as inside
+    bool isInsidePlanes(const Plane* planes, int count, const AABB& box){
+        if (!box.isFinite())
+            return true;
+
+        Vector3 center = box.getCenter();
+        Vector3 halfSize = box.getHalfSize();
+        for (int i = 0; i < count; i++){
+            if (planes[i].getSide(center, halfSize) == Plane::Side::NEGATIVE_SIDE)
+                return false;
+        }
+        return true;
+    }
+
     // getCenter() asserts on null/infinite boxes. New foliage (and any empty
     // instanced mesh) leaves worldAABB null; AABB::ZERO is the unloaded default
     // and is not a useful sample point.
@@ -8063,6 +8077,78 @@ Matrix4 RenderSystem::getDirLightProjection(const Matrix4& viewMatrix, const Mat
     return Matrix4::orthoMatrix(minX, maxX, minY, maxY, -maxZ, -minZ);
 }
 
+// Planes around the casters that can shadow a cascade's slice of the view: the slice extruded
+// toward the light, widened by the normal offset and PCF reach. Returns 0 to skip culling.
+int RenderSystem::getShadowReceiverPlanes(const CameraComponent& camera, const LightComponent& light, int cascade, Plane* planes){
+    Matrix4 viewProjection = camera.viewProjectionMatrix;
+    if (camera.type == CameraType::CAMERA_PERSPECTIVE){
+        // cascades are not blended, each one shades only its own slice
+        float fov = atanf(1.f / camera.projectionMatrix[1][1]) * 2.f;
+        float ratio = camera.projectionMatrix[1][1] / camera.projectionMatrix[0][0];
+        const Vector2& slice = light.cameras[cascade].nearFar;
+        viewProjection = Matrix4::perspectiveMatrix(fov, ratio, slice.x, slice.y) * camera.viewMatrix;
+    }
+
+    Matrix4 inverse = viewProjection.inverse();
+    const Matrix4& lightProjection = light.cameras[cascade].lightProjectionMatrix;
+    float texel = 2.0f / (std::max(1u, shadowAtlasSlotResolution) * std::min(std::abs(lightProjection[0][0]), std::abs(lightProjection[1][1])));
+    float margin = (std::abs(light.shadowNormalBias) + 8.0f) * texel;
+    if (!inverse.isValid() || !std::isfinite(margin))
+        return 0;
+
+    Vector3 corners[8];
+    Vector3 center = Vector3::ZERO;
+    const Vector4 clipCorners[8] = {
+        Vector4(-1, 1,-1, 1), Vector4( 1, 1,-1, 1), Vector4( 1,-1,-1, 1), Vector4(-1,-1,-1, 1),
+        Vector4(-1, 1, 1, 1), Vector4( 1, 1, 1, 1), Vector4( 1,-1, 1, 1), Vector4(-1,-1, 1, 1)
+    };
+    for (int c = 0; c < 8; c++){
+        Vector4 corner = inverse * clipCorners[c];
+        if (std::abs(corner.w) < 0.000001f)
+            return 0;
+        corners[c] = Vector3(corner.x, corner.y, corner.z) / corner.w;
+        center += corners[c] / 8.0f;
+    }
+
+    int count = 0;
+
+    // the faces the light leaves through
+    Plane frustum[6];
+    updateCameraFrustumPlanes(viewProjection, frustum);
+    for (int f = 0; f < 6; f++){
+        if (frustum[f].normal.dotProduct(light.worldDirection) < -0.00001f){
+            planes[count] = frustum[f];
+            planes[count].d += margin;
+            count++;
+        }
+    }
+
+    // and planes along the light through the silhouette edges
+    const int edges[12][2] = {{0,1},{1,2},{2,3},{3,0},{4,5},{5,6},{6,7},{7,4},{0,4},{1,5},{2,6},{3,7}};
+    for (const auto& edge : edges){
+        Vector3 normal = (corners[edge[1]] - corners[edge[0]]).crossProduct(light.worldDirection);
+        if (normal.normalizeL() < 0.000001f)
+            continue;
+        if (normal.dotProduct(center - corners[edge[0]]) < 0.0f)
+            normal = -normal;
+
+        Plane plane(normal, corners[edge[0]]);
+        bool silhouette = true;
+        for (const Vector3& corner : corners){
+            if (plane.getDistance(corner) < -0.001f){
+                silhouette = false;
+                break;
+            }
+        }
+        if (silhouette){
+            plane.d += margin + 0.001f;
+            planes[count++] = plane;
+        }
+    }
+
+    return count;
+}
+
 void RenderSystem::updateLightFromScene(LightComponent& light, Transform& transform, CameraComponent& camera, Transform& cameraTransform){
     light.worldDirection = transform.worldRotation * light.direction;
     light.worldUp = (transform.worldRotation * light.getLocalSpotProjectionUp()).normalized();
@@ -9236,6 +9322,16 @@ void RenderSystem::draw(){
         auto drawShadowCasters = [&](LightComponent& light, int cameraIndex, PipelineType pipelineType, int instanceView){
             const LodView shadowLod = (instanceView >= 0) ? shadowLodView(light, cameraIndex, instanceView - 1) : LodView();
             const LodView* lodView = (instanceView >= 0) ? &shadowLod : nullptr;
+
+            // skip casters that cannot shadow the main view (not when other cameras or probes
+            // reuse the maps, or a negative bias lets casters behind a receiver count)
+            Plane receiverPlanes[18];
+            int numReceiverPlanes = 0;
+            CameraComponent* receiverCamera = scene->findComponent<CameraComponent>(mainCameraEntity);
+            if (receiverCamera && light.type == LightType::DIRECTIONAL && !hasMultipleCameras && !hasReflectionProbes && light.shadowBias >= 0.0f){
+                numReceiverPlanes = getShadowReceiverPlanes(*receiverCamera, light, cameraIndex, receiverPlanes);
+            }
+
             for (int i = 0; i < meshes->size(); i++){
                 MeshComponent& mesh = meshes->getComponentFromIndex(i);
                 Entity entity = meshes->getEntity(i);
@@ -9248,6 +9344,11 @@ void RenderSystem::draw(){
                 InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
                 TerrainComponent* terrain = scene->findComponent<TerrainComponent>(entity);
                 TilemapComponent* tilemap = scene->findComponent<TilemapComponent>(entity);
+
+                if (numReceiverPlanes > 0 && !transform->billboard && cullsBatch(mesh, instmesh) &&
+                        !isInsidePlanes(receiverPlanes, numReceiverPlanes, mesh.worldAABB)){
+                    continue;
+                }
 
                 vs_depth_t vsDepthParams;
                 if (transform->billboard && mesh.shadowsBillboard){
