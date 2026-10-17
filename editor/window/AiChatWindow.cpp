@@ -1103,7 +1103,7 @@ void AiChatWindow::drawHeader() {
 
     ImGui::SameLine();
     if (Widgets::iconButton("##AiSettings", ICON_FA_GEAR, buttonSize)) {
-        Backend::getApp().openEditorSettings(EditorSettingsWindow::Tab::AI);
+        Backend::getApp().openEditorSettings(EditorSettingsWindow::Tab::AI, true);
     }
     ImGui::SetItemTooltip("AI settings");
 }
@@ -1214,7 +1214,7 @@ void AiChatWindow::drawTranscript(float height) {
         if (ai::SecretStore::configuredAccounts(service.getSettings()).empty()) {
             ImGui::Spacing();
             if (ImGui::Button(ICON_FA_KEY " Set API key")) {
-                Backend::getApp().openEditorSettings(EditorSettingsWindow::Tab::AI);
+                Backend::getApp().openEditorSettings(EditorSettingsWindow::Tab::AI, true);
             }
         }
         ImGui::EndChild();
@@ -2521,7 +2521,7 @@ void AiChatWindow::drawModelPopup() {
     if (accounts.empty()) {
         ImGui::TextDisabled("No providers configured");
         if (ImGui::Selectable("Add an API key...")) {
-            Backend::getApp().openEditorSettings(EditorSettingsWindow::Tab::AI);
+            Backend::getApp().openEditorSettings(EditorSettingsWindow::Tab::AI, true);
             ImGui::CloseCurrentPopup();
         }
         keepCurrentWindowInsideViewport();

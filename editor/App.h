@@ -354,7 +354,7 @@ namespace doriax::editor{
         TerrainEditWindow* getTerrainEditWindow() const;
         AiChatWindow* getAiChatWindow() const;
         ai::McpServer* getMcpServer() const;
-        void openEditorSettings(EditorSettingsWindow::Tab tab);
+        void openEditorSettings(EditorSettingsWindow::Tab tab, bool expandAiChat = false);
 
         // Window settings methods. Sizes are physical pixels, converted between
         // the saved scale and the uiScale the backend is opening the window on.

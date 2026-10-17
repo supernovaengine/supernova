@@ -43,6 +43,8 @@ namespace doriax::editor {
 
         bool m_isOpen = false;
         std::optional<Tab> m_requestedTab;
+        // Kept until the AI tab draws, which can be a frame after the tab request
+        bool m_expandAiChat = false;
 
         // Build settings are per project, so the dialog edits the open project's
         Project* m_project = nullptr;
@@ -103,7 +105,7 @@ namespace doriax::editor {
         ~EditorSettingsWindow() = default;
 
         // Opens on the given tab, or on the one shown last
-        void open(Project* project, std::optional<Tab> tab = std::nullopt);
+        void open(Project* project, std::optional<Tab> tab = std::nullopt, bool expandAiChat = false);
         void show();
         bool isOpen() const { return m_isOpen; }
     };

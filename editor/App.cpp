@@ -2984,8 +2984,8 @@ editor::ai::McpServer* editor::App::getMcpServer() const{
     return mcpServer;
 }
 
-void editor::App::openEditorSettings(EditorSettingsWindow::Tab tab){
-    editorSettingsWindow.open(&project, tab);
+void editor::App::openEditorSettings(EditorSettingsWindow::Tab tab, bool expandAiChat){
+    editorSettingsWindow.open(&project, tab, expandAiChat);
 }
 
 void editor::App::processNextSaveDialog() {

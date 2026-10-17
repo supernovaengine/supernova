@@ -184,9 +184,10 @@ namespace {
     }
 }
 
-void EditorSettingsWindow::open(Project* project, std::optional<Tab> tab) {
+void EditorSettingsWindow::open(Project* project, std::optional<Tab> tab, bool expandAiChat) {
     m_isOpen = true;
     m_requestedTab = tab;
+    m_expandAiChat = expandAiChat;
     m_project = project;
     m_cacheStatus.clear();
 
@@ -592,10 +593,15 @@ void EditorSettingsWindow::drawWebSettings() {
 
 void EditorSettingsWindow::drawAiSettings() {
     if (beginSettingsPanel("##EditorAiSettingsPanel")) {
-        if (ImGui::CollapsingHeader("AI Chat", ImGuiTreeNodeFlags_DefaultOpen)) {
+        if (m_expandAiChat) {
+            ImGui::SetScrollY(0.0f);
+            ImGui::SetNextItemOpen(true);
+            m_expandAiChat = false;
+        }
+        if (ImGui::CollapsingHeader("AI Chat")) {
             drawAiChatSettings();
         }
-        if (ImGui::CollapsingHeader("MCP Server")) {
+        if (ImGui::CollapsingHeader("MCP Server", ImGuiTreeNodeFlags_DefaultOpen)) {
             drawMcpSettings();
         }
     }
