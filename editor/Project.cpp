@@ -2228,6 +2228,30 @@ Entity editor::Project::createDefaultCamera(SceneType type, Scene* scene) const 
     return defaultCamera;
 }
 
+// A runtime clone has no SceneRender3D, so this stands in for the viewport camera
+// the source scene plays with when it is opened
+Entity editor::Project::createRuntimeCamera3D(Scene* scene, const SceneProject* source) const {
+    Entity entity = scene->createSystemEntity();
+    scene->addComponent<CameraComponent>(entity, {});
+    scene->addComponent<Transform>(entity, {});
+
+    Camera camera(scene, entity);
+    camera.setType(CameraType::CAMERA_PERSPECTIVE);
+    camera.setNearClip(DEFAULT_EDITOR_CAMERA_NEAR);
+    camera.setFarClip(DEFAULT_EDITOR_CAMERA_FAR);
+    camera.setPosition(Vector3(10, 4, 10));
+    camera.setTarget(Vector3(0, 0, 0));
+
+    // start() snapshots open viewports; clones can be built on the startup thread
+    if (source->editorCameraState.IsMap()) {
+        float zoom = 0.0f;
+        float walkSpeedOffset = 0.0f;
+        Stream::decodeEditorCamera(&camera, source->editorCameraState, zoom, walkSpeedOffset);
+    }
+
+    return entity;
+}
+
 void editor::Project::checkUnsavedAndExecute(uint32_t sceneId, std::function<void()> action) {
     SceneProject* sceneProject = getScene(sceneId);
 
@@ -3251,6 +3275,10 @@ editor::SceneProject* editor::Project::createRuntimeCloneFromSource(const SceneP
     //runtime->sceneRender = createSceneRender(runtime->sceneType, runtime->scene);
     runtime->defaultCamera = createDefaultCamera(runtime->sceneType, runtime->scene);
     Stream::decodeSceneProjectEntities(this, runtime.get(), sceneNode);
+    // the scene camera, not defaultCamera, so one a script activates during init still wins
+    if (runtime->sceneType == SceneType::SCENE_3D && getSceneCamera(runtime.get()) == NULL_ENTITY) {
+        runtime->scene->setCamera(createRuntimeCamera3D(runtime->scene, source));
+    }
     pauseEngineScene(runtime->scene, true);
 
     return runtime.release();
@@ -3634,7 +3662,9 @@ void editor::Project::invalidateCustomShaders() {
 }
 
 Entity editor::Project::getSceneCamera(const SceneProject* sceneProject) const {
-    if (sceneProject->mainCamera != NULL_ENTITY && sceneProject->scene->isEntityCreated(sceneProject->mainCamera)) {
+    // removing the CameraComponent leaves mainCamera set
+    if (sceneProject->mainCamera != NULL_ENTITY && sceneProject->scene->isEntityCreated(sceneProject->mainCamera)
+            && sceneProject->scene->findComponent<CameraComponent>(sceneProject->mainCamera)) {
         return sceneProject->mainCamera;
     } else if (sceneProject->defaultCamera != NULL_ENTITY) {
         return sceneProject->defaultCamera;
@@ -3648,8 +3678,11 @@ void editor::Project::prepareRuntimeScene(PlayRuntimeScene& entry) {
 
     entry.runtime->scene->getSystem<MeshSystem>()->setFoliagePreviewEntity(NULL_ENTITY);
 
+    // without one, Scene::load() falls back to the engine default camera
     Entity camera = getSceneCamera(entry.runtime);
-    entry.runtime->scene->setCamera(camera);
+    if (camera != NULL_ENTITY) {
+        entry.runtime->scene->setCamera(camera);
+    }
 
     // play reuses the edit-time Scene without a reload, so re-arm reflection
     // probes: "On Load" (and static capture-once) probes should capture the
@@ -4385,20 +4418,23 @@ bool editor::Project::createNewComponent(uint32_t sceneId, Entity entity, Compon
     return false;
 }
 
-void editor::Project::deleteSceneProject(SceneProject* sceneProject){
-    if (sceneProject->sceneRender) {
-        Camera* editorCam = sceneProject->sceneRender->getCamera();
-        if (editorCam) {
-            float zoom = 0.0f;
-            float walkSpeedOffset = 0.0f;
-            if (sceneProject->sceneType == SceneType::SCENE_2D || sceneProject->sceneType == SceneType::SCENE_UI) {
-                zoom = static_cast<SceneRender2D*>(sceneProject->sceneRender)->getZoom();
-            } else if (sceneProject->sceneType == SceneType::SCENE_3D) {
-                walkSpeedOffset = static_cast<SceneRender3D*>(sceneProject->sceneRender)->getWalkSpeedOffset();
-            }
-            sceneProject->editorCameraState = Stream::encodeEditorCamera(editorCam, zoom, walkSpeedOffset);
-        }
+void editor::Project::storeEditorCameraState(SceneProject* sceneProject){
+    Camera* editorCam = sceneProject->sceneRender ? sceneProject->sceneRender->getCamera() : nullptr;
+    if (!editorCam) {
+        return;
     }
+    float zoom = 0.0f;
+    float walkSpeedOffset = 0.0f;
+    if (sceneProject->sceneType == SceneType::SCENE_2D || sceneProject->sceneType == SceneType::SCENE_UI) {
+        zoom = static_cast<SceneRender2D*>(sceneProject->sceneRender)->getZoom();
+    } else if (sceneProject->sceneType == SceneType::SCENE_3D) {
+        walkSpeedOffset = static_cast<SceneRender3D*>(sceneProject->sceneRender)->getWalkSpeedOffset();
+    }
+    sceneProject->editorCameraState = Stream::encodeEditorCamera(editorCam, zoom, walkSpeedOffset);
+}
+
+void editor::Project::deleteSceneProject(SceneProject* sceneProject){
+    storeEditorCameraState(sceneProject);
 
     if (sceneProject->scene) {
         if (auto meshSystem = sceneProject->scene->getSystem<MeshSystem>())
@@ -9758,6 +9794,13 @@ void editor::Project::start(uint32_t sceneId) {
     sceneProject->playState = ScenePlayState::LOADING;
     editor::getEditorHost().saveAllCodeEditors();
     editor::getEditorHost().requestScenePlayFocus(sceneId);
+
+    // runtime clones of 3D scenes without a camera start from these viewports
+    for (SceneProject& openScene : scenes) {
+        if (openScene.sceneType == SceneType::SCENE_3D) {
+            storeEditorCameraState(&openScene);
+        }
+    }
 
     // Read on the UI thread: the startup thread must not race the settings dialog
     const LocalBuildSettings buildSettings = AppSettings::getBuildSettings(getProjectPath() / "project.yaml");

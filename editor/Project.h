@@ -404,6 +404,7 @@ namespace doriax::editor{
 
         SceneRender* createSceneRender(SceneType type, Scene* scene) const;
         Entity createDefaultCamera(SceneType type, Scene* scene) const;
+        Entity createRuntimeCamera3D(Scene* scene, const SceneProject* source) const;
         Ray screenToRayFromCamera(const CameraComponent& camera, float x, float y) const;
         AABB getEntityWorldAABB(Scene* scene, Entity entity, Scene* mainScene) const;
         AABB getEntityLocalAABB(Scene* scene, Entity entity) const;
@@ -726,6 +727,7 @@ namespace doriax::editor{
         // and was not generated here
         bool writeVersionControlMetadata();
         void deleteSceneProject(SceneProject* sceneProject);
+        void storeEditorCameraState(SceneProject* sceneProject);
         void loadSceneProjectData(SceneProject* sceneProject, const YAML::Node& sceneNode);
         bool saveProject(bool userCalled = false, std::function<void()> callback = nullptr);
         bool saveProjectFile();
