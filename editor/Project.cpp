@@ -4334,6 +4334,24 @@ std::vector<uint32_t> editor::Project::getChildScenes(uint32_t sceneId) const {
     return childSceneIds;
 }
 
+std::vector<uint32_t> editor::Project::getRelatedScenes(uint32_t sceneId) {
+    std::vector<uint32_t> ancestorIds = {sceneId};
+    for (size_t i = 0; i < ancestorIds.size(); i++) {
+        for (const SceneProject& s : scenes) {
+            if (findChildScene(s.childScenes, ancestorIds[i]) != s.childScenes.end() &&
+                std::find(ancestorIds.begin(), ancestorIds.end(), s.id) == ancestorIds.end()) {
+                ancestorIds.push_back(s.id);
+            }
+        }
+    }
+
+    std::vector<uint32_t> relatedSceneIds;
+    for (uint32_t ancestorId : ancestorIds) {
+        collectInvolvedScenes(ancestorId, relatedSceneIds);
+    }
+    return relatedSceneIds;
+}
+
 Entity editor::Project::createNewEntity(uint32_t sceneId, std::string entityName){
     for (int i = 0; i < scenes.size(); i++){
         if (scenes[i].id == sceneId){

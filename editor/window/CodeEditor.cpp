@@ -1096,10 +1096,7 @@ void editor::CodeEditor::offsetToLineCol(const std::string& text, size_t offset,
 }
 
 void editor::CodeEditor::insertLuaEntityProperty(EditorInstance& instance, Entity entity, uint32_t entitySceneId) {
-    SceneProject* sourceSceneProject = project->getScene(entitySceneId);
-    if (!sourceSceneProject || !sourceSceneProject->scene) {
-        sourceSceneProject = project->getSelectedScene();
-    }
+    SceneProject* sourceSceneProject = entitySceneId == 0 ? project->getSelectedScene() : project->getScene(entitySceneId);
     if (!sourceSceneProject || !sourceSceneProject->scene) return;
 
     Scene* scene = sourceSceneProject->scene;
@@ -1174,43 +1171,43 @@ void editor::CodeEditor::insertLuaEntityProperty(EditorInstance& instance, Entit
     instance.propertyInsertUndoIndex = instance.editor->GetUndoIndex();
     updateScriptProperties(instance, instance.editor->GetText());
 
-    SceneProject* selectedScene = project->getSelectedScene();
-    if (!selectedScene || !selectedScene->scene) return;
+    // Link the dropped entity only where its scene can be loaded too
+    for (uint32_t sceneId : project->getRelatedScenes(sourceSceneProject->id)) {
+        SceneProject* sceneProject = project->getScene(sceneId);
+        if (!sceneProject->scene) continue;
 
-    uint32_t storedSceneId = (entitySceneId != selectedScene->id) ? entitySceneId : 0;
+        uint32_t storedSceneId = (sceneId != sourceSceneProject->id) ? sourceSceneProject->id : 0;
 
-    for (Entity sceneEntity : selectedScene->entities) {
-        ScriptComponent* scriptComp = selectedScene->scene->findComponent<ScriptComponent>(sceneEntity);
-        if (!scriptComp) continue;
+        for (Entity sceneEntity : sceneProject->entities) {
+            ScriptComponent* scriptComp = sceneProject->scene->findComponent<ScriptComponent>(sceneEntity);
+            if (!scriptComp) continue;
 
-        for (size_t si = 0; si < scriptComp->scripts.size(); si++) {
-            const ScriptEntry& scriptEntry = scriptComp->scripts[si];
-            if (scriptEntry.type != ScriptType::LUA) continue;
-            if (project->resolveLuaPath(scriptEntry.path) != resolveFilepath(instance.filepath)) continue;
+            for (size_t si = 0; si < scriptComp->scripts.size(); si++) {
+                const ScriptEntry& scriptEntry = scriptComp->scripts[si];
+                if (scriptEntry.type != ScriptType::LUA) continue;
+                if (project->resolveLuaPath(scriptEntry.path) != resolveFilepath(instance.filepath)) continue;
 
-            // A same-named property of another type is not the one just inserted
-            for (size_t pi = 0; pi < scriptEntry.properties.size(); pi++) {
-                if (scriptEntry.properties[pi].name != varName ||
-                    scriptEntry.properties[pi].type != ScriptPropertyType::EntityReference) continue;
+                // A same-named property of another type is not the one just inserted
+                for (size_t pi = 0; pi < scriptEntry.properties.size(); pi++) {
+                    if (scriptEntry.properties[pi].name != varName ||
+                        scriptEntry.properties[pi].type != ScriptPropertyType::EntityReference) continue;
 
-                std::vector<ScriptEntry> newScripts = scriptComp->scripts;
-                newScripts[si].properties[pi].value = EntityReference{entity, storedSceneId};
+                    std::vector<ScriptEntry> newScripts = scriptComp->scripts;
+                    newScripts[si].properties[pi].value = EntityReference{entity, storedSceneId};
 
-                PropertyCmd<std::vector<ScriptEntry>> propCmd(
-                    project, selectedScene->id, sceneEntity,
-                    ComponentType::ScriptComponent, "scripts", newScripts);
-                propCmd.execute();
-                return;
+                    PropertyCmd<std::vector<ScriptEntry>> propCmd(
+                        project, sceneId, sceneEntity,
+                        ComponentType::ScriptComponent, "scripts", newScripts);
+                    propCmd.execute();
+                    break;
+                }
             }
         }
     }
 }
 
 void editor::CodeEditor::insertCppEntityProperty(EditorInstance& instance, Entity entity, uint32_t entitySceneId) {
-    SceneProject* sourceSceneProject = project->getScene(entitySceneId);
-    if (!sourceSceneProject || !sourceSceneProject->scene) {
-        sourceSceneProject = project->getSelectedScene();
-    }
+    SceneProject* sourceSceneProject = entitySceneId == 0 ? project->getSelectedScene() : project->getScene(entitySceneId);
     if (!sourceSceneProject || !sourceSceneProject->scene) return;
 
     Scene* scene = sourceSceneProject->scene;
@@ -1368,15 +1365,15 @@ void editor::CodeEditor::insertCppEntityProperty(EditorInstance& instance, Entit
         }
     }
 
-    SceneProject* selectedScene = project->getSelectedScene();
-    if (!selectedScene || !selectedScene->scene) return;
-
-    uint32_t storedSceneId = (entitySceneId != selectedScene->id) ? entitySceneId : 0;
     std::string inMemoryContent = headerInstance ? headerInstance->editor->GetText() : "";
+    std::vector<uint32_t> relatedSceneIds = project->getRelatedScenes(sourceSceneProject->id);
 
     // Refresh every entity referencing this header and link the dropped one
     for (auto& sceneProject : project->getScenes()) {
         if (!sceneProject.scene) continue;
+
+        bool isRelated = std::find(relatedSceneIds.begin(), relatedSceneIds.end(), sceneProject.id) != relatedSceneIds.end();
+        uint32_t storedSceneId = (sceneProject.id != sourceSceneProject->id) ? sourceSceneProject->id : 0;
 
         for (Entity sceneEntity : sceneProject.entities) {
             ScriptComponent* scriptComp = sceneProject.scene->findComponent<ScriptComponent>(sceneEntity);
@@ -1390,7 +1387,7 @@ void editor::CodeEditor::insertCppEntityProperty(EditorInstance& instance, Entit
                 project->updateScriptProperties(&sceneProject, sceneEntity, newScripts, inMemoryContent, resolveFilepath(headerPath).string());
 
                 for (ScriptEntry& newScript : newScripts) {
-                    if (newScript.headerPath != headerPath.string()) continue;
+                    if (!isRelated || newScript.headerPath != headerPath.string()) continue;
 
                     for (ScriptProperty& property : newScript.properties) {
                         if (property.name == varName && property.type == ScriptPropertyType::EntityReference) {

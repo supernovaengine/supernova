@@ -814,6 +814,8 @@ namespace doriax::editor{
         bool isChildSceneStartActive(uint32_t sceneId, uint32_t childSceneId) const;
         void setChildSceneStartActive(uint32_t sceneId, uint32_t childSceneId, bool startActive);
         std::vector<uint32_t> getChildScenes(uint32_t sceneId) const;
+        // The scene, its ancestors and their descendants
+        std::vector<uint32_t> getRelatedScenes(uint32_t sceneId);
 
         Entity findObjectByRay(uint32_t sceneId, float x, float y, uint32_t* outSceneId = nullptr);
         // A viewport click only lands on entities with a Transform and bounds of their own

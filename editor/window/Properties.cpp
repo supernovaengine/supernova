@@ -2259,7 +2259,7 @@ bool editor::Properties::drawSummaryAddButton(const std::string& label, float tr
 
 editor::Properties::EntityPickerResult editor::Properties::drawEntityPickerPopup(
         const std::string& popupId, const Signature& filter,
-        SceneProject* owningScene, bool includeChildScenes,
+        SceneProject* owningScene, bool includeRelatedScenes,
         Entity currentValue, uint32_t currentValueSceneId,
         const std::vector<Entity>& excludeEntities) {
 
@@ -2278,25 +2278,15 @@ editor::Properties::EntityPickerResult editor::Properties::drawEntityPickerPopup
         for (char& c : searchStr) c = (char)tolower((unsigned char)c);
 
         // Build list of (SceneProject*, storedSceneId) to display
-        // storedSceneId = 0 for owning scene entities, actual scene ID for child scene entities
+        // storedSceneId = 0 for owning scene entities, actual scene ID for related scene entities
         std::vector<std::pair<SceneProject*, uint32_t>> scenesToShow;
         scenesToShow.emplace_back(owningScene, (uint32_t)0);
 
-        if (includeChildScenes) {
-            std::unordered_set<uint32_t> visited;
-            visited.insert(owningScene->id);
-            std::vector<uint32_t> toVisit;
-            for (uint32_t childId : project->getChildScenes(owningScene->id))
-                toVisit.push_back(childId);
-            while (!toVisit.empty()) {
-                uint32_t sid = toVisit.back(); toVisit.pop_back();
-                if (visited.count(sid)) continue;
-                visited.insert(sid);
-                SceneProject* child = project->getScene(sid);
-                if (child && child->scene)
-                    scenesToShow.emplace_back(child, sid);
-                for (uint32_t childId : project->getChildScenes(sid))
-                    if (!visited.count(childId)) toVisit.push_back(childId);
+        if (includeRelatedScenes) {
+            for (uint32_t sid : project->getRelatedScenes(owningScene->id)) {
+                SceneProject* related = project->getScene(sid);
+                if (sid != owningScene->id && related->scene)
+                    scenesToShow.emplace_back(related, sid);
             }
         }
 

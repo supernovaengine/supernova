@@ -285,7 +285,7 @@ namespace doriax::editor{
             uint32_t sceneId = 0;
         };
 
-        EntityPickerResult drawEntityPickerPopup(const std::string& popupId, const Signature& filter, SceneProject* owningScene, bool includeChildScenes, Entity currentValue, uint32_t currentValueSceneId = 0, const std::vector<Entity>& excludeEntities = {});
+        EntityPickerResult drawEntityPickerPopup(const std::string& popupId, const Signature& filter, SceneProject* owningScene, bool includeRelatedScenes, Entity currentValue, uint32_t currentValueSceneId = 0, const std::vector<Entity>& excludeEntities = {});
         void syncSubSelection(SceneProject* sceneProject, Entity entity, int tileIndex, int instanceIndex);
 
         void beginTable(ComponentType cpType, float firstColSize, std::string nameAddon = "");
