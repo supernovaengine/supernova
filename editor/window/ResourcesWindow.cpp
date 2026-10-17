@@ -2480,13 +2480,12 @@ void editor::ResourcesWindow::saveMaterialFile(const fs::path& directory, const 
     scanDirectory(currentPath);
 }
 
-void editor::ResourcesWindow::saveEntityFile(const fs::path& directory, const char* entityContent, size_t contentLen) {
-    std::string yamlString;
-    if (contentLen >= sizeof(EntityPayload)) {
-        yamlString = std::string(entityContent + sizeof(EntityPayload), contentLen - sizeof(EntityPayload));
+void editor::ResourcesWindow::saveEntityFile(const fs::path& directory, const std::string& entityYaml) {
+    if (entityYaml.empty()) {
+        return;
     }
 
-    YAML::Node entityNode = YAML::Load(yamlString);
+    YAML::Node entityNode = YAML::Load(entityYaml);
 
     std::string entityName = "Bundle";
     if (entityNode["name"]) {
@@ -2809,15 +2808,13 @@ void editor::ResourcesWindow::show() {
             saveMaterialFile(currentPath, materialContent, contentLen, sourcePtr);
         }
         if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("entity", ImGuiDragDropFlags_AcceptBeforeDelivery)) {
-            const char* entityContent = (const char*)payload->Data;
-            size_t contentLen = payload->DataSize;
             const EntityPayload* entityPayload = static_cast<const EntityPayload*>(payload->Data);
             bool sameScene = (entityPayload->entitySceneId == 0 || entityPayload->entitySceneId == project->getSelectedSceneId());
 
             if (!sameScene) {
                 ImGui::SetTooltip("Entity belongs to another scene");
             } else if (payload->IsDelivery()) {
-                saveEntityFile(currentPath, entityContent, contentLen);
+                saveEntityFile(currentPath, Backend::getApp().getStructureWindow()->encodeDraggedEntities(entityPayload->entity));
             }
         }
         ImGui::EndDragDropTarget();

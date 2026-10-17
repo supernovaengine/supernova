@@ -115,7 +115,7 @@ namespace doriax::editor{
         void handleSceneFilesDropAsChildScenes(const std::vector<std::string>& filePaths, uint32_t ownerSceneId);
         void showAddChildSceneMenu();
 
-        std::vector<char> buildEntityPayload(const TreeNode& node);
+        bool hasPlayCreatedEntity(const std::vector<Entity>& entities) const;
         std::filesystem::path getBundleSaveDirectory() const;
         void saveNodeAsBundle(const TreeNode& node);
 
@@ -133,6 +133,8 @@ namespace doriax::editor{
 
         void show();
         void revealEntity(uint32_t sceneId, Entity entity);
+        // YAML of the dragged entity, or of the selection it belongs to
+        std::string encodeDraggedEntities(Entity draggedEntity);
         void setOpen(bool open);
         bool isOpen() const;
     };

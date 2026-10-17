@@ -271,7 +271,7 @@ namespace doriax::editor {
 
         void refreshCurrentDirectory();
         fs::path getCurrentPath() const { return currentPath; }
-        void saveEntityFile(const fs::path& directory, const char* entityContent, size_t contentLen);
+        void saveEntityFile(const fs::path& directory, const std::string& entityYaml);
 
         void show();
         void setOpen(bool open);

@@ -1088,18 +1088,25 @@ void editor::Structure::markMatchingNodes(TreeNode& node, const std::string& sea
     }
 }
 
-std::vector<char> editor::Structure::buildEntityPayload(const TreeNode& node) {
+bool editor::Structure::hasPlayCreatedEntity(const std::vector<Entity>& entities) const {
+    // Stop destroys runtime entities, so none can be moved, referenced or saved as a bundle
+    for (Entity entity : entities) {
+        if (cachedPlayCreatedEntities.count(entity) > 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+std::string editor::Structure::encodeDraggedEntities(Entity draggedEntity) {
     SceneProject* sceneProject = project->getSelectedScene();
     if (!sceneProject || !sceneProject->scene) {
-        return {};
+        return "";
     }
 
-    std::vector<Entity> draggedEntities = getTopLevelSelectedEntities(node.id);
-    // Stop destroys runtime entities, so none can be moved, referenced or saved as a bundle
-    for (Entity entity : draggedEntities) {
-        if (cachedPlayCreatedEntities.count(entity) > 0) {
-            return {};
-        }
+    std::vector<Entity> draggedEntities = getTopLevelSelectedEntities(draggedEntity);
+    if (hasPlayCreatedEntity(draggedEntities)) {
+        return "";
     }
     std::vector<Entity> exportEntities = draggedEntities;
 
@@ -1111,25 +1118,10 @@ std::vector<char> editor::Structure::buildEntityPayload(const TreeNode& node) {
     if (exportEntities.size() == 1) {
         entityData = Stream::encodeEntity(draggedEntities[0], sceneProject->scene, project, sceneProject);
     } else {
-        // Embed the full export data (including virtual action children) in the entity payload.
-        // Structure uses the EntityPayload header for reparenting; Resources uses the YAML tail.
         entityData = Stream::encodeEntitySelection(exportEntities, sceneProject->scene, project, sceneProject);
     }
 
-    std::string yamlString = YAML::Dump(entityData);
-
-    size_t yamlSize = yamlString.size();
-    std::vector<char> payloadData(sizeof(EntityPayload) + yamlSize);
-
-    EntityPayload* payload = reinterpret_cast<EntityPayload*>(payloadData.data());
-    payload->entity = node.id;
-    payload->parent = node.parent;
-    payload->order = node.order;
-    payload->hasTransform = node.hasTransform;
-    payload->entitySceneId = sceneProject->id;
-    memcpy(payloadData.data() + sizeof(EntityPayload), yamlString.data(), yamlSize);
-
-    return payloadData;
+    return YAML::Dump(entityData);
 }
 
 std::filesystem::path editor::Structure::getBundleSaveDirectory() const {
@@ -1148,10 +1140,7 @@ void editor::Structure::saveNodeAsBundle(const TreeNode& node) {
         return;
     }
 
-    std::vector<char> payloadData = buildEntityPayload(node);
-    if (!payloadData.empty()) {
-        resourcesWindow->saveEntityFile(getBundleSaveDirectory(), payloadData.data(), payloadData.size());
-    }
+    resourcesWindow->saveEntityFile(getBundleSaveDirectory(), encodeDraggedEntities(node.id));
 }
 
 void editor::Structure::showTreeNode(editor::TreeNode& node) {
@@ -1330,12 +1319,15 @@ void editor::Structure::showTreeNode(editor::TreeNode& node) {
 
     if (!node.isChildScene && !isChildSceneEntity && !node.isPlayCreated) {
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-            // Add entity drag drop payload for dragging to resources
-            if (!node.isScene) {
-                std::vector<char> payloadData = buildEntityPayload(node);
-                if (!payloadData.empty()) {
-                    ImGui::SetDragDropPayload("entity", payloadData.data(), payloadData.size());
-                }
+            // Resources encodes the entities on drop, large hierarchies are slow to encode
+            if (!node.isScene && !ImGui::GetDragDropPayload() && !hasPlayCreatedEntity(getTopLevelSelectedEntities(node.id))) {
+                EntityPayload payload;
+                payload.entity = node.id;
+                payload.parent = node.parent;
+                payload.order = node.order;
+                payload.hasTransform = node.hasTransform;
+                payload.entitySceneId = project->getSelectedSceneId();
+                ImGui::SetDragDropPayload("entity", &payload, sizeof(EntityPayload));
             }
 
             ImGui::Text("Moving %s", node.name.c_str());
@@ -1346,25 +1338,13 @@ void editor::Structure::showTreeNode(editor::TreeNode& node) {
     // Child scene entities: allow drag for cross-scene entity reference (ExternalEntity properties)
     if (isChildSceneEntity && !node.isScene) {
         if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-            SceneProject* childSceneProject = project->getScene(node.entitySceneId);
-            if (childSceneProject && childSceneProject->scene) {
-                YAML::Node entityData = Stream::encodeEntity(node.id, childSceneProject->scene, project, childSceneProject);
-                std::string yamlString = YAML::Dump(entityData);
-
-                size_t yamlSize = yamlString.size();
-                size_t payloadSize = sizeof(EntityPayload) + yamlSize;
-                std::vector<char> payloadData(payloadSize);
-
-                EntityPayload* payload = reinterpret_cast<EntityPayload*>(payloadData.data());
-                payload->entity = node.id;
-                payload->parent = node.parent;
-                payload->order = node.order;
-                payload->hasTransform = node.hasTransform;
-                payload->entitySceneId = node.entitySceneId;
-                memcpy(payloadData.data() + sizeof(EntityPayload), yamlString.data(), yamlSize);
-
-                ImGui::SetDragDropPayload("entity", payloadData.data(), payloadSize);
-            }
+            EntityPayload payload;
+            payload.entity = node.id;
+            payload.parent = node.parent;
+            payload.order = node.order;
+            payload.hasTransform = node.hasTransform;
+            payload.entitySceneId = node.entitySceneId;
+            ImGui::SetDragDropPayload("entity", &payload, sizeof(EntityPayload));
 
             ImGui::Text("Reference %s", node.name.c_str());
             ImGui::EndDragDropSource();
