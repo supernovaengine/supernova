@@ -4,6 +4,7 @@
 // ProjectSaveDialog.cpp
 #include "ProjectSaveDialog.h"
 #include "util/FileDialogs.h"
+#include "util/FileUtils.h"
 #include "Backend.h"
 #include "window/Widgets.h"
 #include "external/IconsFontAwesome6.h"
@@ -63,18 +64,18 @@ void ProjectSaveDialog::show() {
         ImGui::SameLine();
         if (ImGui::Button("Browse")) {
             // Get home directory as default path
-            std::string homeDirPath;
             #ifdef _WIN32
-            homeDirPath = std::filesystem::path(getenv("USERPROFILE")).string();
+            const wchar_t* homeDir = _wgetenv(L"USERPROFILE");
             #else
-            homeDirPath = std::filesystem::path(getenv("HOME")).string();
+            const char* homeDir = std::getenv("HOME");
             #endif
+            const std::string homeDirPath = homeDir ? FileUtils::pathToUtf8(fs::path(homeDir)) : "";
             
             // Open folder picker dialog
             std::string selectedPath = FileDialogs::openFileDialog(homeDirPath, 0, true);
             
             if (!selectedPath.empty()) {
-                m_projectPath = selectedPath;
+                m_projectPath = FileUtils::pathFromUtf8(selectedPath);
             }
         }
 

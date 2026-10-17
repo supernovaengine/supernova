@@ -17,6 +17,7 @@
 
 #include "util/CrashHandler.h"
 #include "util/FileDialogs.h"
+#include "util/FileUtils.h"
 #include "util/ProjectUtils.h"
 #include "util/Util.h"
 
@@ -189,15 +190,15 @@ void editor::App::openProjectFunc(){
 
     auto openProject = [this]() {
         #ifdef _WIN32
-        const char* homeDir = std::getenv("USERPROFILE");
+        const wchar_t* homeDir = _wgetenv(L"USERPROFILE");
         #else
         const char* homeDir = std::getenv("HOME");
         #endif
         const std::string selectedDir = FileDialogs::openFileDialog(
-            homeDir ? homeDir : "", FILE_DIALOG_ALL, true);
+            homeDir ? FileUtils::pathToUtf8(std::filesystem::path(homeDir)) : "", FILE_DIALOG_ALL, true);
         if (selectedDir.empty()) return;
 
-        const std::filesystem::path projectDir(selectedDir);
+        const std::filesystem::path projectDir = FileUtils::pathFromUtf8(selectedDir);
         if (!std::filesystem::exists(projectDir / "project.yaml")) {
             registerAlert("Error", "The selected directory is not a valid project. No project.yaml file found!");
             return;

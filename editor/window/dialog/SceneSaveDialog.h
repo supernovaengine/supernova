@@ -21,7 +21,7 @@ private:
 
     bool m_isOpen = false;
     fs::path m_projectPath;
-    std::string m_selectedPath;
+    fs::path m_selectedPath;
     char m_fileNameBuffer[256] = "";
 
     std::function<void(const fs::path&)> m_onSave;

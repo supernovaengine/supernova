@@ -33,14 +33,14 @@ public:
         fs::path executablePath;
 
 #ifdef _WIN32
-        std::vector<char> buffer(MAX_PATH);
+        std::vector<wchar_t> buffer(MAX_PATH);
         while (true) {
-            const DWORD size = GetModuleFileNameA(nullptr, buffer.data(), static_cast<DWORD>(buffer.size()));
+            const DWORD size = GetModuleFileNameW(nullptr, buffer.data(), static_cast<DWORD>(buffer.size()));
             if (size == 0) {
                 return {};
             }
             if (size < buffer.size()) {
-                executablePath = std::string(buffer.data(), size);
+                executablePath = std::wstring(buffer.data(), size);
                 break;
             }
             buffer.resize(buffer.size() * 2);
@@ -160,7 +160,10 @@ public:
 
     // Writes a temporary file and renames it over the target, so a failed save keeps the old file
     static bool writeFileReplacing(const std::filesystem::path& filePath, const std::string& content) {
-        const std::filesystem::path tempPath = filePath.parent_path() / ("." + pathToUtf8(filePath.filename()) + ".tmp");
+        std::filesystem::path tempName = ".";
+        tempName += filePath.filename();
+        tempName += ".tmp";
+        const std::filesystem::path tempPath = filePath.parent_path() / tempName;
         std::ofstream ofs(tempPath, std::ios::out | std::ios::binary | std::ios::trunc);
         ofs.write(content.data(), static_cast<std::streamsize>(content.size()));
         ofs.close();

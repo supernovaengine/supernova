@@ -34,7 +34,7 @@ void SceneSaveDialog::open(const fs::path& projectPath, const fs::path& initialD
         }
     }
 
-    m_selectedPath = selectedPath.lexically_normal().string();
+    m_selectedPath = selectedPath.lexically_normal();
     m_onSave = onSave;
     m_onCancel = onCancel;
 
@@ -76,7 +76,7 @@ void SceneSaveDialog::show() {
                 ImGui::SetNextItemOpen(rootOpen, ImGuiCond_Always);
 
                 // Project root is always highlighted if selected
-                bool isRootSelected = (m_selectedPath == m_projectPath.string());
+                bool isRootSelected = (m_selectedPath == m_projectPath);
 
                 // Use empty label for the tree node itself
                 if (ImGui::TreeNodeEx("##root", 
@@ -95,7 +95,7 @@ void SceneSaveDialog::show() {
                     // If clicked, select the project root directory
                     if (ImGui::IsItemClicked() || 
                         (ImGui::IsMouseClicked(0) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))) {
-                        m_selectedPath = m_projectPath.string();
+                        m_selectedPath = m_projectPath;
                     }
 
                     // Recursively display directory tree
@@ -130,7 +130,7 @@ void SceneSaveDialog::show() {
 
         // Validation
         bool canSave = !fileName.empty();
-        fs::path fullPath = fs::path(m_selectedPath) / fileName;
+        fs::path fullPath = m_selectedPath / fileName;
         bool fileExists = fs::exists(fullPath);
 
         if (fileExists) {
@@ -222,7 +222,7 @@ void SceneSaveDialog::displayDirectoryTree(const fs::path& rootPath, const fs::p
             ImGuiTreeNodeFlags nodeFlags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_SpanFullWidth;
 
             // Highlight the selected directory
-            bool isSelected = (m_selectedPath == dirPath.string());
+            bool isSelected = (m_selectedPath == dirPath);
             if (isSelected) {
                 nodeFlags |= ImGuiTreeNodeFlags_Selected;
             }
@@ -268,7 +268,7 @@ void SceneSaveDialog::displayDirectoryTree(const fs::path& rootPath, const fs::p
             // Handle directory selection on click (include the whole row)
             if (ImGui::IsItemClicked() || 
                 (ImGui::IsMouseClicked(0) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))) {
-                m_selectedPath = dirPath.string();
+                m_selectedPath = dirPath;
             }
 
             // If node is open, recursively display subdirectories
