@@ -7,6 +7,20 @@
 
 using namespace doriax;
 
+namespace {
+    // owns the face data, a project switch frees the Texture before the render queue runs
+    struct TextureFaceCleanup{
+        std::shared_ptr<std::array<TextureData,6>> data;
+        size_t face;
+    };
+
+    void cleanupTextureFace(void* cleanupData){
+        TextureFaceCleanup* cleanup = static_cast<TextureFaceCleanup*>(cleanupData);
+        TextureData::cleanupTexture(&cleanup->data->at(cleanup->face));
+        delete cleanup;
+    }
+}
+
 Texture::Texture(){
     this->render = NULL;
     this->framebuffer = NULL;
@@ -519,7 +533,7 @@ TextureRender* Texture::getRender(TextureRender* fallBackTexture){
 
     if (render && releaseDataAfterLoad && data){
         for (int f = 0; f < numFaces; f++){
-            SystemRender::scheduleCleanup(TextureData::cleanupTexture, &data->at(f));
+            SystemRender::scheduleCleanup(cleanupTextureFace, new TextureFaceCleanup{data, (size_t)f});
         }
     }
 
