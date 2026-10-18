@@ -2831,8 +2831,9 @@ bool MeshSystem::raycastTerrainSurface(const Ray& ray, TerrainComponent& terrain
 
         const float normalizedX = std::clamp((localX + halfSize) / terrain.terrainSize, 0.0f, 1.0f);
         const float normalizedZ = std::clamp((localZ + halfSize) / terrain.terrainSize, 0.0f, 1.0f);
-        const float texelX = normalizedX * static_cast<float>(width - 1);
-        const float texelZ = normalizedZ * static_cast<float>(height - 1);
+        // texel centres at (i + 0.5) / size, as the terrain vertex shader samples them
+        const float texelX = std::clamp(normalizedX * static_cast<float>(width) - 0.5f, 0.0f, static_cast<float>(width - 1));
+        const float texelZ = std::clamp(normalizedZ * static_cast<float>(height) - 0.5f, 0.0f, static_cast<float>(height - 1));
         const int lowerX = std::clamp(static_cast<int>(std::floor(texelX)), 0, width - 1);
         const int lowerZ = std::clamp(static_cast<int>(std::floor(texelZ)), 0, height - 1);
         const int upperX = std::min(lowerX + 1, width - 1);
@@ -3404,8 +3405,9 @@ void MeshSystem::sampleTerrainSurface(TerrainComponent& terrain, float localX, f
     const float halfSize = terrain.terrainSize * 0.5f;
 
     auto sampleHeight = [&](float x, float z){
-        const float texelX = std::clamp((x + halfSize) / terrain.terrainSize, 0.0f, 1.0f) * (width - 1);
-        const float texelZ = std::clamp((z + halfSize) / terrain.terrainSize, 0.0f, 1.0f) * (mapHeight - 1);
+        // texel centres at (i + 0.5) / size, as the terrain vertex shader samples them
+        const float texelX = std::clamp(std::clamp((x + halfSize) / terrain.terrainSize, 0.0f, 1.0f) * width - 0.5f, 0.0f, static_cast<float>(width - 1));
+        const float texelZ = std::clamp(std::clamp((z + halfSize) / terrain.terrainSize, 0.0f, 1.0f) * mapHeight - 0.5f, 0.0f, static_cast<float>(mapHeight - 1));
         const int lowerX = std::clamp(static_cast<int>(std::floor(texelX)), 0, width - 1);
         const int lowerZ = std::clamp(static_cast<int>(std::floor(texelZ)), 0, mapHeight - 1);
         const int upperX = std::min(lowerX + 1, width - 1);

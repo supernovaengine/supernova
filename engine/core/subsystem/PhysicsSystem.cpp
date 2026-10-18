@@ -1443,29 +1443,43 @@ bool PhysicsSystem::createShape3DForIndex(Entity entity, Body3DComponent& body, 
             }
         }
 
+        // samples span the terrain edge to edge, like the rendered surface
+        const float sampleSpacing = terrain->terrainSize / static_cast<float>(samplesSize - 1);
         JPH::Vec3 terrainOffset = JPH::Vec3(-terrain->terrainSize / 2.0, 0.0f, -terrain->terrainSize / 2.0);
-        JPH::Vec3 terrainScale = JPH::Vec3(terrain->terrainSize / samplesSize, terrain->maxHeight, terrain->terrainSize / samplesSize);
+        JPH::Vec3 terrainScale = JPH::Vec3(sampleSpacing, terrain->maxHeight, sampleSpacing);
 
         const unsigned char* heightPixels = static_cast<const unsigned char*>(textureData.getData());
         const int heightChannels = textureData.getChannels();
         const int heightBytesPerChannel = TextureData::getBytesPerChannel(textureData.getColorFormat());
+        const int texWidth = textureData.getWidth();
+        const int texHeight = textureData.getHeight();
+
+        auto texel = [&](int tx, int ty) -> float {
+            tx = std::clamp(tx, 0, texWidth - 1);
+            ty = std::clamp(ty, 0, texHeight - 1);
+            const size_t texelIndex = (static_cast<size_t>(ty) * texWidth + tx);
+            const size_t index = texelIndex * static_cast<size_t>(heightChannels) * static_cast<size_t>(heightBytesPerChannel);
+            if (heightBytesPerChannel >= 2){
+                const unsigned int raw = static_cast<unsigned int>(heightPixels[index]) |
+                                         (static_cast<unsigned int>(heightPixels[index + 1]) << 8);
+                return static_cast<float>(raw) / 65535.0f;
+            }
+            return heightPixels[index] / 255.0f;
+        };
 
         float* samples = new float[samplesSize * samplesSize];
         for (unsigned int x = 0; x < samplesSize; x++){
             for (unsigned int y = 0; y < samplesSize; y++){
-                int posX = floor(textureData.getWidth() * x / samplesSize);
-                int posY = floor(textureData.getHeight() * y / samplesSize);
-                const size_t texelIndex = (static_cast<size_t>(posY) * textureData.getWidth() + posX);
-                const size_t index = texelIndex * static_cast<size_t>(heightChannels) * static_cast<size_t>(heightBytesPerChannel);
-                float val;
-                if (heightBytesPerChannel >= 2){
-                    const unsigned int raw = static_cast<unsigned int>(heightPixels[index]) |
-                                             (static_cast<unsigned int>(heightPixels[index + 1]) << 8);
-                    val = static_cast<float>(raw) / 65535.0f;
-                }else{
-                    val = heightPixels[index] / 255.0f;
-                }
-                samples[x + (y * samplesSize)] = val;
+                // same lookup as the terrain vertex shader: linear filtering, texel centres at (i + 0.5) / size
+                const float fx = (static_cast<float>(x) / (samplesSize - 1)) * texWidth - 0.5f;
+                const float fy = (static_cast<float>(y) / (samplesSize - 1)) * texHeight - 0.5f;
+                const int x0 = static_cast<int>(std::floor(fx));
+                const int y0 = static_cast<int>(std::floor(fy));
+                const float ax = fx - x0;
+                const float ay = fy - y0;
+                const float top = texel(x0, y0) * (1.0f - ax) + texel(x0 + 1, y0) * ax;
+                const float bottom = texel(x0, y0 + 1) * (1.0f - ax) + texel(x0 + 1, y0 + 1) * ax;
+                samples[x + (y * samplesSize)] = top * (1.0f - ay) + bottom * ay;
             }
         }
 

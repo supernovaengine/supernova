@@ -675,6 +675,11 @@ bool editor::TerrainEditWindow::ensureEditableMap(Project* project, SceneProject
     return true;
 }
 
+// Texel coordinate of a terrain-local position, centres at (i + 0.5) / size like the terrain shader and MeshSystem
+static float terrainTexel(float local, float terrainSize, int size){
+    return ((local + terrainSize * 0.5f) / terrainSize) * static_cast<float>(size) - 0.5f;
+}
+
 // Bilinearly sample a normalized [0,1] height at a float texel coordinate.
 float editor::TerrainEditWindow::bilinearHeightSample(const unsigned char* pixels, int width, int height, int channels, int bytesPerChannel, float texelX, float texelY){
     if (!pixels || width <= 0 || height <= 0 || channels <= 0){
@@ -763,34 +768,8 @@ bool editor::TerrainEditWindow::raycastTerrainStrokeSurface(const Ray& localRay,
             return false;
         }
 
-        sampledHeight = 0.0f;
-        if (!pixels || width <= 0 || height <= 0 || channels <= 0){
-            return true;
-        }
-
-        const float normalizedX = std::clamp((localX + halfSize) / terrainSize, 0.0f, 1.0f);
-        const float normalizedZ = std::clamp((localZ + halfSize) / terrainSize, 0.0f, 1.0f);
-        const float texelX = normalizedX * static_cast<float>(width - 1);
-        const float texelZ = normalizedZ * static_cast<float>(height - 1);
-        const int lowerX = std::clamp(static_cast<int>(std::floor(texelX)), 0, width - 1);
-        const int lowerZ = std::clamp(static_cast<int>(std::floor(texelZ)), 0, height - 1);
-        const int upperX = std::min(lowerX + 1, width - 1);
-        const int upperZ = std::min(lowerZ + 1, height - 1);
-        const float blendX = texelX - static_cast<float>(lowerX);
-        const float blendZ = texelZ - static_cast<float>(lowerZ);
-
-        auto samplePixel = [&](int sampleX, int sampleZ){
-            const size_t texelIndex = static_cast<size_t>(sampleZ) * static_cast<size_t>(width) + static_cast<size_t>(sampleX);
-            return decodeHeightTexel(pixels, texelIndex, channels, bytesPerChannel);
-        };
-
-        const float height00 = samplePixel(lowerX, lowerZ);
-        const float height10 = samplePixel(upperX, lowerZ);
-        const float height01 = samplePixel(lowerX, upperZ);
-        const float height11 = samplePixel(upperX, upperZ);
-        const float lowerBlend = height00 + (height10 - height00) * blendX;
-        const float upperBlend = height01 + (height11 - height01) * blendX;
-        sampledHeight = (lowerBlend + (upperBlend - lowerBlend) * blendZ) * maxHeight;
+        sampledHeight = bilinearHeightSample(pixels, width, height, channels, bytesPerChannel,
+                                             terrainTexel(localX, terrainSize, width), terrainTexel(localZ, terrainSize, height)) * maxHeight;
         return true;
     };
 
@@ -1634,14 +1613,14 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
 
     const TerrainBrushMode mode = stroke.effectiveMode;
     const float halfSize = terrain.terrainSize * 0.5f;
-    auto texelOfX = [&](float local){ return ((local + halfSize) / terrain.terrainSize) * static_cast<float>(width - 1); };
-    auto texelOfY = [&](float local){ return ((local + halfSize) / terrain.terrainSize) * static_cast<float>(height - 1); };
+    auto texelOfX = [&](float local){ return terrainTexel(local, terrain.terrainSize, width); };
+    auto texelOfY = [&](float local){ return terrainTexel(local, terrain.terrainSize, height); };
     const float centerX = texelOfX(localPoint.x);
     const float centerY = texelOfY(localPoint.z);
     // Per-axis texel radii keep the brush circular in world space on non-square
     // maps, and float precision allows sub-texel radii for very small brushes.
-    const float radiusX = std::max(0.01f, (brushSize / terrain.terrainSize) * static_cast<float>(width - 1));
-    const float radiusY = std::max(0.01f, (brushSize / terrain.terrainSize) * static_cast<float>(height - 1));
+    const float radiusX = std::max(0.01f, (brushSize / terrain.terrainSize) * static_cast<float>(width));
+    const float radiusY = std::max(0.01f, (brushSize / terrain.terrainSize) * static_cast<float>(height));
 
     // A ramp is one line from the stroke start to the cursor, so its stamp spans the segment
     const bool rampBrush = mode == TerrainBrushMode::Ramp;
@@ -1698,8 +1677,8 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
         rampAxisLengthSq = rampAxis.x * rampAxis.x + rampAxis.y * rampAxis.y;
         if (stroke.heightReferenceValid){
             auto referenceHeight = [&](float localX, float localZ){
-                const float refX = ((localX + halfSize) / terrain.terrainSize) * static_cast<float>(stroke.heightReferenceWidth - 1);
-                const float refY = ((localZ + halfSize) / terrain.terrainSize) * static_cast<float>(stroke.heightReferenceHeight - 1);
+                const float refX = terrainTexel(localX, terrain.terrainSize, stroke.heightReferenceWidth);
+                const float refY = terrainTexel(localZ, terrain.terrainSize, stroke.heightReferenceHeight);
                 return bilinearHeightSample(stroke.heightReferencePixels.data(), stroke.heightReferenceWidth, stroke.heightReferenceHeight,
                                             stroke.heightReferenceChannels, stroke.heightReferenceBytesPerChannel, refX, refY);
             };
@@ -1709,7 +1688,7 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
     }
 
     // One noise cell every noiseSize world units, so the field stays put as the brush moves
-    const float noiseFrequency = terrain.terrainSize / (static_cast<float>(std::max(1, width - 1)) * std::max(0.01f, noiseSize));
+    const float noiseFrequency = terrain.terrainSize / (static_cast<float>(std::max(1, width)) * std::max(0.01f, noiseSize));
     // Levels include both ends of the range, so N of them leave N-1 intervals
     const float terraceIntervals = static_cast<float>(std::clamp(terraceSteps, MIN_TERRACE_STEPS, MAX_TERRACE_STEPS) - 1);
     // For Stamp the mask is the relief, not the falloff
@@ -1765,11 +1744,9 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
             return false;
         }
     }
-    const float maskSpanX = static_cast<float>(std::max(1, width - 1));
-    const float maskSpanY = static_cast<float>(std::max(1, height - 1));
     auto maskedOut = [&](int x, int y){
-        const float localX = (static_cast<float>(x) / maskSpanX) * terrain.terrainSize - halfSize;
-        const float localZ = (static_cast<float>(y) / maskSpanY) * terrain.terrainSize - halfSize;
+        const float localX = ((static_cast<float>(x) + 0.5f) / static_cast<float>(width)) * terrain.terrainSize - halfSize;
+        const float localZ = ((static_cast<float>(y) + 0.5f) / static_cast<float>(height)) * terrain.terrainSize - halfSize;
         float surfaceHeight = 0.0f;
         Vector3 normal(0.0f, 1.0f, 0.0f);
         meshSystem->sampleTerrainSurface(terrain, localX, localZ, surfaceHeight, normal);
@@ -1835,7 +1812,7 @@ bool editor::TerrainEditWindow::stampBrush(TerrainComponent& terrain, TextureDat
     bool touched = false;
     if (mode == TerrainBrushMode::Erode){
         // Droplets are released over time, and the leftover fraction carries to the next stamp
-        const float texelSize = terrain.terrainSize / static_cast<float>(std::max(1, width - 1));
+        const float texelSize = terrain.terrainSize / static_cast<float>(std::max(1, width));
         const float heightScale = (texelSize > std::numeric_limits<float>::epsilon()) ? terrain.maxHeight / texelSize : 1.0f;
         stroke.erodeCarry += radiusX * radiusY * ERODE_DROPLETS_PER_SECOND * brushStrength * deltaTime;
         const int droplets = static_cast<int>(stroke.erodeCarry);
@@ -3635,10 +3612,8 @@ bool editor::TerrainEditWindow::updateCursor(Scene* scene, const Ray& ray, Terra
         const float clampedZ = std::clamp(localZ, -halfSize, halfSize);
         float surfaceHeight = 0.0f;
         if (heightPixels){
-            const float u = (clampedX + halfSize) / terrainSize;
-            const float v = (clampedZ + halfSize) / terrainSize;
             surfaceHeight = bilinearHeightSample(heightPixels, mapWidth, mapHeight, mapChannels, mapBytesPerChannel,
-                                                 u * static_cast<float>(mapWidth - 1), v * static_cast<float>(mapHeight - 1)) * terrain.maxHeight;
+                                                 terrainTexel(clampedX, terrainSize, mapWidth), terrainTexel(clampedZ, terrainSize, mapHeight)) * terrain.maxHeight;
         }
         return transform.modelMatrix * Vector3(clampedX, surfaceHeight + lift, clampedZ);
     };
