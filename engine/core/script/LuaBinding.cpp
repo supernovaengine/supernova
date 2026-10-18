@@ -89,6 +89,7 @@ using namespace doriax;
 
 
 lua_State *LuaBinding::luastate = NULL;
+unsigned int LuaBinding::luaStateGeneration = 0;
 
 // modules the engine itself loads, anything after this is project code
 static std::set<std::string> baselineLuaModules;
@@ -121,6 +122,7 @@ LuaBinding::~LuaBinding() {
 
 void LuaBinding::createLuaState(){
     LuaBinding::luastate = luaL_newstate();
+    luaStateGeneration++;
 
     registerClasses(luastate);
     configureProjectLuaLoader();
@@ -131,6 +133,10 @@ void LuaBinding::createLuaState(){
 
 lua_State* LuaBinding::getLuaState(){
     return luastate;
+}
+
+unsigned int LuaBinding::getLuaStateGeneration(){
+    return luaStateGeneration;
 }
 
 std::string LuaBinding::getLuaStackErrorString(lua_State* L, int index) {

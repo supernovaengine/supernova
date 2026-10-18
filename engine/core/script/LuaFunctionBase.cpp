@@ -39,28 +39,33 @@ LuaFunctionBase::LuaFunctionBase(lua_State *vm): m_vm(vm) {
     store_function();
 }
 
-LuaFunctionBase::LuaFunctionBase(const LuaFunctionBase &other): m_vm(other.m_vm) {
+LuaFunctionBase::LuaFunctionBase(const LuaFunctionBase &other): m_vm(other.m_vm), m_generation(other.m_generation) {
     // copy the registry reference
     lua_rawgeti(m_vm, LUA_REGISTRYINDEX, other.m_func);
     m_func = luaL_ref(m_vm, LUA_REGISTRYINDEX);
 }
 
 LuaFunctionBase::~LuaFunctionBase(){
-    // delete the reference from registry
-    if (LuaBinding::getLuaState()){ //check if state is not closed
-        if (lua_isfunction(m_vm, -1)) {
-            luaL_unref(m_vm, LUA_REGISTRYINDEX, m_func);
-        }
-    }
+    release();
 }
 
 LuaFunctionBase& LuaFunctionBase::operator=(const LuaFunctionBase &other){
     if (this != &other) {
+        release();
         m_vm = other.m_vm;
+        m_generation = other.m_generation;
         lua_rawgeti(m_vm, LUA_REGISTRYINDEX, other.m_func);
         m_func = luaL_ref(m_vm, LUA_REGISTRYINDEX);
     }
     return *this;
+}
+
+void LuaFunctionBase::release(){
+    // the main state, m_vm can be a coroutine already collected
+    lua_State* L = LuaBinding::getLuaState();
+    if (L && LuaBinding::getLuaStateGeneration() == m_generation) {
+        luaL_unref(L, LUA_REGISTRYINDEX, m_func);
+    }
 }
 
 void LuaFunctionBase::store_function(){
@@ -73,6 +78,7 @@ void LuaFunctionBase::store_function(){
     }
     // store it in registry for later use
     m_func = luaL_ref(m_vm, LUA_REGISTRYINDEX);
+    m_generation = LuaBinding::getLuaStateGeneration();
 }
 
 void LuaFunctionBase::push_function(lua_State *vm, int func){

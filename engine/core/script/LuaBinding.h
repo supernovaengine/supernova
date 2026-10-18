@@ -21,6 +21,7 @@ namespace doriax {
         
     private:
         static lua_State *luastate;
+        static unsigned int luaStateGeneration;
         
         static void createLuaState();
         static int setLuaPath(const char* path);
@@ -60,6 +61,8 @@ namespace doriax {
         virtual ~LuaBinding();
         
         static lua_State* getLuaState();
+        // grows each time the state is created
+        static unsigned int getLuaStateGeneration();
         
         // old lua function call
         static void luaCallback(int nargs, int nresults, int msgh);
