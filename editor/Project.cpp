@@ -4672,8 +4672,15 @@ void editor::Project::copyEngineApiToProject() {
 
         // Sync only files whose contents actually changed so reopening the editor
         // does not touch header timestamps and force a rebuild of game scripts.
-        for (const auto& dirEntry : std::filesystem::recursive_directory_iterator(engineApiSource)) {
+        for (auto it = std::filesystem::recursive_directory_iterator(engineApiSource); it != std::filesystem::recursive_directory_iterator(); ++it) {
+            const auto& dirEntry = *it;
             editor::getEditorHost().reportLoadingProgress();
+
+            // vendored iOS SDKs, only the Xcode export uses them and it reads the engine folder
+            if (dirEntry.is_directory() && dirEntry.path().extension() == ".xcframework") {
+                it.disable_recursion_pending();
+                continue;
+            }
 
             if (dirEntry.is_regular_file()) {
                 auto ext = dirEntry.path().extension().string();
