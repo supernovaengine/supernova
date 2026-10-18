@@ -15,6 +15,7 @@
 #include "subsystem/AudioSystem.h"
 #include "subsystem/PhysicsSystem.h"
 #include "manager/BundleManager.h"
+#include "object/EntityHandle.h"
 #include "util/Color.h"
 
 using namespace doriax;
@@ -49,6 +50,8 @@ Scene::~Scene(){
     getSystem<AudioSystem>()->stopSceneSounds();
     // a later scene at this address would find its bundle instances
     BundleManager::forgetInstances(this);
+    // and a Lua wrapper collected after this would destroy its entity in it
+    EntityHandle::forgetScene(this);
     destroy();
 }
 

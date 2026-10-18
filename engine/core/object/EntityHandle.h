@@ -38,6 +38,9 @@ namespace doriax{
         bool isEntityOwned() const;
         void setEntityOwned(bool entityOwned);
 
+        // By a deleted scene, so its owning handles stop destroying entities in it
+        static void forgetScene(Scene* scene);
+
         template <typename T>
         void addComponent() {
             scene->addComponent<T>(entity);

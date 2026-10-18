@@ -3,12 +3,42 @@
 
 #include "EntityHandle.h"
 
+#include <mutex>
+#include <unordered_map>
+#include <unordered_set>
+
 using namespace doriax;
+
+namespace {
+    struct OwnedHandles{
+        std::mutex mutex;
+        std::unordered_map<Scene*, std::unordered_set<EntityHandle*>> handles;
+    };
+
+    // Never destroyed: a global scene, as in the project template, is destroyed after it
+    OwnedHandles& ownedHandles(){
+        static OwnedHandles* owned = new OwnedHandles();
+        return *owned;
+    }
+
+    void trackOwned(Scene* scene, EntityHandle* handle){
+        OwnedHandles& owned = ownedHandles();
+        std::lock_guard<std::mutex> lock(owned.mutex);
+        owned.handles[scene].insert(handle);
+    }
+
+    void untrackOwned(Scene* scene, EntityHandle* handle){
+        OwnedHandles& owned = ownedHandles();
+        std::lock_guard<std::mutex> lock(owned.mutex);
+        owned.handles[scene].erase(handle);
+    }
+}
 
 EntityHandle::EntityHandle(Scene* scene){
     this->scene = scene;
     this->entity = scene->createEntity();
     this->entityOwned = true;
+    trackOwned(scene, this);
 }
 
 EntityHandle::EntityHandle(Scene* scene, Entity entity){
@@ -18,8 +48,12 @@ EntityHandle::EntityHandle(Scene* scene, Entity entity){
 }
 
 EntityHandle::~EntityHandle(){
-    if (scene && entityOwned)
-        scene->destroyEntity(entity);
+    if (scene && entityOwned){
+        untrackOwned(scene, this);
+        // a script may have destroyed it already
+        if (scene->isEntityCreated(entity))
+            scene->destroyEntity(entity);
+    }
 }
 
 // Copies are non-owning observers: at most one handle may own an entity, otherwise the
@@ -33,9 +67,9 @@ EntityHandle::EntityHandle(const EntityHandle& rhs){
 
 EntityHandle& EntityHandle::operator=(const EntityHandle& rhs){
     if (this != &rhs){
+        setEntityOwned(false);
         scene = rhs.scene;
         entity = rhs.entity;
-        entityOwned = false;
     }
 
     return *this;
@@ -46,16 +80,18 @@ EntityHandle& EntityHandle::operator=(const EntityHandle& rhs){
 EntityHandle::EntityHandle(EntityHandle&& rhs) noexcept{
     scene = rhs.scene;
     entity = rhs.entity;
-    entityOwned = rhs.entityOwned;
-    rhs.entityOwned = false;
+    entityOwned = false;
+    setEntityOwned(rhs.entityOwned);
+    rhs.setEntityOwned(false);
 }
 
 EntityHandle& EntityHandle::operator=(EntityHandle&& rhs) noexcept{
     if (this != &rhs){
+        setEntityOwned(false);
         scene = rhs.scene;
         entity = rhs.entity;
-        entityOwned = rhs.entityOwned;
-        rhs.entityOwned = false;
+        setEntityOwned(rhs.entityOwned);
+        rhs.setEntityOwned(false);
     }
 
     return *this;
@@ -82,5 +118,23 @@ bool EntityHandle::isEntityOwned() const{
 }
 
 void EntityHandle::setEntityOwned(bool entityOwned){
+    if (scene && this->entityOwned != entityOwned){
+        if (entityOwned)
+            trackOwned(scene, this);
+        else
+            untrackOwned(scene, this);
+    }
     this->entityOwned = entityOwned;
+}
+
+void EntityHandle::forgetScene(Scene* scene){
+    OwnedHandles& owned = ownedHandles();
+    std::lock_guard<std::mutex> lock(owned.mutex);
+    auto it = owned.handles.find(scene);
+    if (it == owned.handles.end())
+        return;
+    for (EntityHandle* handle : it->second){
+        handle->entityOwned = false;
+    }
+    owned.handles.erase(it);
 }
