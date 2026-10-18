@@ -130,6 +130,7 @@ namespace doriax{
         float minHeight = 0; //normalized against the terrain maxHeight
         float maxHeight = 1;
         float drawDistance = 50;
+        float minDrawDistance = 0; // nearer ones are skipped, so a layer copy can be its far detail level
         unsigned int seed = 0;
         bool castShadows = true; // off spares grass-scale scatter the shadow cascades
     };

@@ -3653,6 +3653,7 @@ void MeshSystem::updateFoliageLayer(TerrainComponent& terrain, TerrainFoliageLay
             instmesh.distanceFade = true;
             instmesh.fadeStart = fadeStart;
             instmesh.fadeEnd = fadeEnd;
+            instmesh.cullNearDistance = preview ? 0.0f : std::clamp(layer.minDrawDistance, 0.0f, drawDistance);
             mesh.castShadows = layer.castShadows;
 
             // Grows with headroom and never shrinks, so a draw distance drag rebuilds little.

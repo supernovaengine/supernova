@@ -84,8 +84,12 @@ namespace doriax{
         float fadeEnd = 0;
         Vector3 fadeEyeLocal; //camera in model space, where the range is measured
 
+        // instances nearer than this model-space XZ distance are dropped (0 = none), set by foliage
+        float cullNearDistance = 0;
+
         // fade range the render lists were cut at (render system cache)
         float lastFadeCullEnd = -1;
+        float lastCullNear = 0;
         Vector3 lastFadeCullEye;
 
         bool instancedBillboard = false;

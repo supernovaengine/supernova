@@ -97,6 +97,14 @@ namespace {
         return instmesh.fadeEnd;
     }
 
+    // distance inside which instances are dropped, a CPU cut that works with any shader
+    float instanceCullNear(const InstancedMeshComponent& instmesh){
+        if (!(instmesh.cullNearDistance > 0.0f) || !std::isfinite(instmesh.cullNearDistance)){
+            return 0.0f;
+        }
+        return instmesh.cullNearDistance;
+    }
+
     // shadow-map texels of error a caster may lose, well inside the PCF blur
     const float SHADOW_LOD_TEXELS = 2.0f;
 
@@ -7918,11 +7926,14 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
     const float localRadius = hasBounds ? mesh.verticesAABB.getHalfSize().length() : 0.0f;
 
     const float cullEnd = instanceFadeCullEnd(instmesh, mesh, *scene);
+    const float cullNear = instanceCullNear(instmesh);
     instmesh.lastFadeCullEnd = cullEnd;
+    instmesh.lastCullNear = cullNear;
     instmesh.lastFadeCullEye = instmesh.fadeEyeLocal;
     // small margin for CPU/GPU float differences at the edge
     const float cullRadius = cullEnd + std::max(0.0001f, cullEnd * 0.00001f);
     const float cullRadiusSquared = cullRadius * cullRadius;
+    const float cullNearSquared = cullNear * cullNear;
 
     Quaternion bRotation;
     if (instmesh.instancedBillboard){
@@ -7947,6 +7958,9 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
             const float dx = instmesh.instances[i].position.x - instmesh.fadeEyeLocal.x;
             const float dz = instmesh.instances[i].position.z - instmesh.fadeEyeLocal.z;
             if (cullEnd >= 0.0f && dx * dx + dz * dz > cullRadiusSquared){
+                continue;
+            }
+            if (dx * dx + dz * dz < cullNearSquared){
                 continue;
             }
             Matrix4 translateMatrix = Matrix4::translateMatrix(instmesh.instances[i].position);
@@ -8937,7 +8951,8 @@ void RenderSystem::update(double dt){
 
             InstancedMeshComponent* instmesh = scene->findComponent<InstancedMeshComponent>(entity);
             if (instmesh){
-                if (instmesh->distanceFade){
+                const float cullNear = instanceCullNear(*instmesh);
+                if (instmesh->distanceFade || cullNear > 0.0f){
                     // The range is a model-space distance, so the eye moves into that space
                     // instead: scaling the range into world space breaks on a scaled mesh.
                     const Matrix4 inverseModel = transform.modelMatrix.inverse();
@@ -8948,9 +8963,10 @@ void RenderSystem::update(double dt){
                 bool sortTransparentInstances = mesh.transparent && batchSort;
 
                 const float cullEnd = instanceFadeCullEnd(*instmesh, mesh, *scene);
-                const bool fadeSelectionChanged = cullEnd != instmesh->lastFadeCullEnd ||
-                    (cullEnd >= 0.0f && (instmesh->fadeEyeLocal.x != instmesh->lastFadeCullEye.x ||
-                                        instmesh->fadeEyeLocal.z != instmesh->lastFadeCullEye.z));
+                const bool eyeMoved = instmesh->fadeEyeLocal.x != instmesh->lastFadeCullEye.x ||
+                                      instmesh->fadeEyeLocal.z != instmesh->lastFadeCullEye.z;
+                const bool fadeSelectionChanged = cullEnd != instmesh->lastFadeCullEnd || cullNear != instmesh->lastCullNear ||
+                    ((cullEnd >= 0.0f || cullNear > 0.0f) && eyeMoved);
                 bool instancesNeedUpdate = instmesh->needUpdateInstances || mesh.needUpdateAABB ||
                     batchSortChanged || fadeSelectionChanged;
 

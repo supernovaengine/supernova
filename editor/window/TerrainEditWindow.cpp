@@ -3171,6 +3171,10 @@ void editor::TerrainEditWindow::show(){
             if (ImGui::DragFloat("##foliage_distance", &layer.drawDistance, 1.0f, 1.0f, 500.0f, "%.0f")){
                 setFoliageLayerProperty("drawDistance", std::max(1.0f, layer.drawDistance));
             }
+            terrainPropertyRow("Min distance", "Instances nearer than this are skipped, so a copy of the layer with a simpler mesh can take over past this one's draw distance.");
+            if (ImGui::DragFloat("##foliage_min_distance", &layer.minDrawDistance, 1.0f, 0.0f, 500.0f, "%.0f")){
+                setFoliageLayerProperty("minDrawDistance", std::max(0.0f, layer.minDrawDistance));
+            }
             terrainPropertyRow("Cast shadows", "Turn off for grass-scale scatter so it skips the shadow cascades.");
             if (ImGui::Checkbox("##foliage_cast_shadows", &layer.castShadows)){
                 setFoliageLayerProperty("castShadows", layer.castShadows);
