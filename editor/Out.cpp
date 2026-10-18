@@ -11,6 +11,13 @@
 #include <iostream>
 #include <mutex>
 
+#ifdef _WIN32
+    #ifndef NOMINMAX
+        #define NOMINMAX
+    #endif
+    #include <windows.h>
+#endif
+
 using namespace doriax::editor;
 
 OutputWindow* Out::outputWindow = nullptr;
@@ -45,6 +52,24 @@ std::string timestamp() {
     char buffer[32];
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &parts);
     return buffer;
+}
+
+// Windows paths and e.what() come in the ANSI code page, the log is UTF-8
+std::string toUtf8(const std::string& text) {
+#ifdef _WIN32
+    if (text.empty() || MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, text.data(), static_cast<int>(text.size()), nullptr, 0) > 0) {
+        return text;
+    }
+    const int wideSize = MultiByteToWideChar(CP_ACP, 0, text.data(), static_cast<int>(text.size()), nullptr, 0);
+    std::wstring wide(wideSize, L'\0');
+    MultiByteToWideChar(CP_ACP, 0, text.data(), static_cast<int>(text.size()), wide.data(), wideSize);
+    const int size = WideCharToMultiByte(CP_UTF8, 0, wide.data(), wideSize, nullptr, 0, nullptr, nullptr);
+    std::string utf8(size, '\0');
+    WideCharToMultiByte(CP_UTF8, 0, wide.data(), wideSize, utf8.data(), size, nullptr, nullptr);
+    return utf8;
+#else
+    return text;
+#endif
 }
 
 void writeToLogFile(LogType type, const std::string& message) {
@@ -90,7 +115,9 @@ void Out::setLogFile(const std::filesystem::path& path) {
                   << timestamp() << " ===" << std::endl;
 }
 
-void Out::logMessage(LogType type, const std::string& message, const char* fallbackPrefix, std::ostream& fallbackStream) {
+void Out::logMessage(LogType type, const std::string& text, const char* fallbackPrefix, std::ostream& fallbackStream) {
+    const std::string message = toUtf8(text);
+
     // Before the hop to the main thread, so a worker's last message still reaches the file.
     writeToLogFile(type, message);
 
