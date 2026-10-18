@@ -36,7 +36,12 @@ namespace {
 
     // Prepared at install time: a crashing process may not be able to allocate anymore,
     // so nothing below builds a string or takes a lock.
+#if defined(_WIN32)
+    // wide, the ANSI code page can't hold every path
+    wchar_t logPath[4096] = {0};
+#else
     char logPath[4096] = {0};
+#endif
     char exePath[4096] = {0};
     bool installed = false;
 
@@ -44,9 +49,24 @@ namespace {
     // handler, must not recurse. The second entry still reports, a third dies where it is.
     std::atomic<int> fatalEntries{0};
 
+#if defined(_WIN32)
+    // Not on the stack, a stack overflow leaves the handler little of it
+    wchar_t wideName[4096];
+    char moduleName[4096];
+
+    // UTF-8, as the log
+    void moduleFileName(HMODULE module, char* out, int outSize) {
+        const DWORD length = GetModuleFileNameW(module, wideName, (DWORD)(sizeof(wideName) / sizeof(wideName[0])));
+        if (length == 0 || length >= sizeof(wideName) / sizeof(wideName[0]) ||
+                WideCharToMultiByte(CP_UTF8, 0, wideName, -1, out, outSize, nullptr, nullptr) == 0) {
+            out[0] = '\0';
+        }
+    }
+#endif
+
     void captureExecutablePath() {
     #if defined(_WIN32)
-        if (GetModuleFileNameA(nullptr, exePath, (DWORD)sizeof(exePath)) == 0) exePath[0] = '\0';
+        moduleFileName(nullptr, exePath, (int)sizeof(exePath));
     #elif defined(__APPLE__)
         uint32_t size = (uint32_t)sizeof(exePath);
         if (_NSGetExecutablePath(exePath, &size) != 0) exePath[0] = '\0';
@@ -61,8 +81,8 @@ namespace {
     const FileHandle kInvalidFile = INVALID_HANDLE_VALUE;
 
     FileHandle openReportFile() {
-        if (logPath[0] == '\0') return kInvalidFile;
-        return CreateFileA(logPath, FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE,
+        if (logPath[0] == L'\0') return kInvalidFile;
+        return CreateFileW(logPath, FILE_APPEND_DATA, FILE_SHARE_READ | FILE_SHARE_WRITE,
             nullptr, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, nullptr);
     }
 
@@ -119,15 +139,33 @@ namespace {
         }
     }
 
-    void writeBacktrace(FileHandle file) {
 #if defined(_WIN32)
-        void* frames[64];
-        USHORT count = CaptureStackBackTrace(0, 64, frames, nullptr);
-        if (count == 0) {
-            writeLine(file, "  <no backtrace available>");
-            return;
+    void writeFrame(FileHandle file, int index, DWORD64 address, HANDLE process, bool symbols, SYMBOL_INFO* symbol) {
+        // A Release build has no .pdb to name anything, module+offset still locates it.
+        moduleName[0] = '\0';
+        unsigned long long moduleOffset = 0;
+        HMODULE module = nullptr;
+        if (GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCWSTR)(uintptr_t)address, &module) && module) {
+            moduleFileName(module, moduleName, (int)sizeof(moduleName));
+            moduleOffset = (unsigned long long)(address - (DWORD64)(uintptr_t)module);
         }
 
+        DWORD64 displacement = 0;
+        if (symbols && SymFromAddr(process, address, &displacement, symbol)) {
+            writeFormatted(file, "  #%d %s(+0x%llx) %s+0x%llx\n", index,
+                moduleName[0] ? moduleName : "?", moduleOffset,
+                symbol->Name, (unsigned long long)displacement);
+        } else {
+            writeFormatted(file, "  #%d %s(+0x%llx)\n", index,
+                moduleName[0] ? moduleName : "?", moduleOffset);
+        }
+    }
+#endif
+
+    // faultContext starts the walk where it faulted, a handler's own stack can stop at the dispatcher
+    void writeBacktrace(FileHandle file, const void* faultContext = nullptr) {
+#if defined(_WIN32)
         HANDLE process = GetCurrentProcess();
         SymSetOptions(SYMOPT_UNDNAME | SYMOPT_DEFERRED_LOADS);
         const bool symbols = SymInitialize(process, nullptr, TRUE) != FALSE;
@@ -137,27 +175,33 @@ namespace {
         symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
         symbol->MaxNameLen = 255;
 
-        for (USHORT i = 0; i < count; i++) {
-            // A Release build has no .pdb to name anything, module+offset still locates it.
-            char moduleName[MAX_PATH] = {0};
-            unsigned long long moduleOffset = 0;
-            HMODULE module = nullptr;
-            if (GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                    GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, (LPCSTR)frames[i], &module) && module) {
-                GetModuleFileNameA(module, moduleName, (DWORD)sizeof(moduleName));
-                moduleOffset = (unsigned long long)((uintptr_t)frames[i] - (uintptr_t)module);
-            }
-
-            DWORD64 displacement = 0;
-            if (symbols && SymFromAddr(process, (DWORD64)(uintptr_t)frames[i], &displacement, symbol)) {
-                writeFormatted(file, "  #%d %s(+0x%llx) %s+0x%llx\n", (int)i,
-                    moduleName[0] ? moduleName : "?", moduleOffset,
-                    symbol->Name, (unsigned long long)displacement);
-            } else {
-                writeFormatted(file, "  #%d %s(+0x%llx)\n", (int)i,
-                    moduleName[0] ? moduleName : "?", moduleOffset);
+        int count = 0;
+    #if defined(_M_X64) || defined(__x86_64__)
+        if (faultContext) {
+            // a copy, StackWalk64 changes it, and static like the buffers above
+            static CONTEXT context;
+            context = *static_cast<const CONTEXT*>(faultContext);
+            STACKFRAME64 frame = {};
+            frame.AddrPC.Offset = context.Rip;
+            frame.AddrPC.Mode = AddrModeFlat;
+            frame.AddrFrame.Offset = context.Rbp;
+            frame.AddrFrame.Mode = AddrModeFlat;
+            frame.AddrStack.Offset = context.Rsp;
+            frame.AddrStack.Mode = AddrModeFlat;
+            while (count < 64 && StackWalk64(IMAGE_FILE_MACHINE_AMD64, process, GetCurrentThread(), &frame, &context,
+                    nullptr, SymFunctionTableAccess64, SymGetModuleBase64, nullptr) && frame.AddrPC.Offset != 0) {
+                writeFrame(file, count++, frame.AddrPC.Offset, process, symbols, symbol);
             }
         }
+    #endif
+        if (count == 0) {
+            void* frames[64];
+            const USHORT captured = CaptureStackBackTrace(0, 64, frames, nullptr);
+            for (USHORT i = 0; i < captured; i++) {
+                writeFrame(file, count++, (DWORD64)(uintptr_t)frames[i], process, symbols, symbol);
+            }
+        }
+        if (count == 0) writeLine(file, "  <no backtrace available>");
 
         if (symbols) SymCleanup(process);
 #elif defined(DORIAX_HAS_EXECINFO)
@@ -175,7 +219,7 @@ namespace {
 #endif
     }
 
-    void report(const char* reason) {
+    void report(const char* reason, const void* faultContext = nullptr) {
         FileHandle file = openReportFile();
 
         writeLine(file, "");
@@ -187,7 +231,7 @@ namespace {
         }
         // An optimized build names few frames: resolve module+offset against this binary.
         writeLine(file, "backtrace:");
-        writeBacktrace(file);
+        writeBacktrace(file, faultContext);
         writeLine(file, "========================================================");
         writeLine(file, "");
 
@@ -260,11 +304,20 @@ namespace {
             return EXCEPTION_CONTINUE_SEARCH;
         }
 
-        char reason[128];
-        const unsigned long code = info && info->ExceptionRecord ?
-            (unsigned long)info->ExceptionRecord->ExceptionCode : 0;
-        snprintf(reason, sizeof(reason), "unhandled exception, code 0x%08lx", code);
-        report(reason);
+        char reason[256];
+        const EXCEPTION_RECORD* record = info ? info->ExceptionRecord : nullptr;
+        const unsigned long code = record ? (unsigned long)record->ExceptionCode : 0;
+        if (code == EXCEPTION_ACCESS_VIOLATION && record->NumberParameters >= 2) {
+            const ULONG_PTR operation = record->ExceptionInformation[0];
+            snprintf(reason, sizeof(reason), "access violation %s 0x%llx",
+                operation == 1 ? "writing" : (operation == 8 ? "executing" : "reading"),
+                (unsigned long long)record->ExceptionInformation[1]);
+        } else if (code == EXCEPTION_STACK_OVERFLOW) {
+            snprintf(reason, sizeof(reason), "stack overflow");
+        } else {
+            snprintf(reason, sizeof(reason), "unhandled exception, code 0x%08lx", code);
+        }
+        report(reason, info ? info->ContextRecord : nullptr);
 
         return EXCEPTION_CONTINUE_SEARCH;
     }
@@ -273,9 +326,13 @@ namespace {
 }
 
 void editor::CrashHandler::install(const std::filesystem::path& logFile) {
+#if defined(_WIN32)
+    const std::wstring path = logFile.wstring();
+#else
     const std::string path = logFile.string();
-    if (path.size() < sizeof(logPath)) {
-        std::memcpy(logPath, path.c_str(), path.size() + 1);
+#endif
+    if (path.size() < sizeof(logPath) / sizeof(logPath[0])) {
+        std::memcpy(logPath, path.c_str(), (path.size() + 1) * sizeof(logPath[0]));
     }
 
     if (installed) {
@@ -287,15 +344,14 @@ void editor::CrashHandler::install(const std::filesystem::path& logFile) {
 
     std::set_terminate(handleTerminate);
 
-    std::signal(SIGSEGV, handleSignal);
     std::signal(SIGABRT, handleSignal);
+#if defined(_WIN32)
+    // faults reach the filter with their context, a CRT signal handler gets none
+    SetUnhandledExceptionFilter(handleWindowsException);
+#else
+    std::signal(SIGSEGV, handleSignal);
     std::signal(SIGILL, handleSignal);
     std::signal(SIGFPE, handleSignal);
-#if !defined(_WIN32)
     std::signal(SIGBUS, handleSignal);
-#endif
-
-#if defined(_WIN32)
-    SetUnhandledExceptionFilter(handleWindowsException);
 #endif
 }
