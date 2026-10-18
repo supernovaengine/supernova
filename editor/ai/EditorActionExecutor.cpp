@@ -2403,6 +2403,7 @@ ActionResult EditorActionExecutor::dispatch(const std::string& name,
     if (name == "set_shader_uniform") return setShaderUniform(arguments);
     if (name == "create_terrain_heightmap") return createTerrainHeightmap(arguments);
     if (name == "import_project_model") return importProjectModel(arguments);
+    if (name == "reload_project_model") return reloadProjectModel(arguments);
     if (name == "search_curated_assets") return searchCuratedAssets(arguments, cancel);
     if (name == "download_curated_asset") return downloadCuratedAsset(arguments, cancel);
     if (name == "read_resource_file") return readResourceFile(arguments);
@@ -5362,6 +5363,44 @@ ActionResult EditorActionExecutor::importProjectModel(const Json& arguments) {
 
     return okResult("Imported project model through ModelLoadCmd.",
                     Json{{"scene_id", sceneId}, {"entity_id", cmd->getEntity()}});
+}
+
+ActionResult EditorActionExecutor::reloadProjectModel(const Json& arguments) {
+    uint32_t sceneId = resolveSceneId(project, arguments);
+    SceneProject* sceneProject = project->getScene(sceneId);
+    if (!sceneProject || !sceneProject->scene) {
+        return failResult("Scene not found.");
+    }
+    if (project->isAnyScenePlaying()) {
+        return failResult(busyError(project, "reloading a model"));
+    }
+    Entity entity = resolveEntity(sceneProject, arguments);
+    if (entity == NULL_ENTITY) {
+        return failResult("Entity not found.");
+    }
+    ModelComponent* model = sceneProject->scene->findComponent<ModelComponent>(entity);
+    if (!model || model->filename.empty()) {
+        return failResult("The entity has no model file to reload.");
+    }
+
+    const std::string filename = model->filename;
+    // an earlier load still running here would finish on top of the reload
+    if (sceneProject->scene->getSystem<MeshSystem>()->isAsyncModelLoadPending(entity, filename)) {
+        return failResult("The model is still loading. Retry once it finishes.");
+    }
+    // read before anything changes, so a missing or broken file leaves the model as it is
+    if (!project->prepareModelFile(filename) || !MeshSystem::reparseModelFile(filename)) {
+        return failResult("Can't read the model file. Check read_output_log for the reason.");
+    }
+    if (!CommandHandle::get(sceneId)->addCommandNoMerge(
+            new ModelLoadCmd(project, sceneId, entity, filename, model->mergeStaticMeshes))) {
+        return failResult("Failed to reload the model.");
+    }
+
+    return okResult("Reloaded the model through ModelLoadCmd.",
+                    Json{{"scene_id", sceneId},
+                         {"entity_id", entity},
+                         {"model_path", assetPathToAi(project, filename)}});
 }
 
 ActionResult EditorActionExecutor::searchCuratedAssets(const Json& arguments, const std::atomic<bool>* cancel) {

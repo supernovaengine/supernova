@@ -567,6 +567,16 @@ const std::vector<ToolDefinition>& cachedTools() {
             false
         },
         {
+            "reload_project_model",
+            "Reload a model entity after its file changed on disk, through ModelLoadCmd. Mesh children follow the new file's nodes and keep their settings by node name.",
+            objectSchema({
+                {"scene_id", integerSchema("Scene id. Omit to use the selected scene")},
+                {"entity_id", integerSchema("Model entity id")},
+                {"entity_name", stringSchema("Model entity name, used only when entity_id is omitted")}
+            }),
+            false
+        },
+        {
             "create_folder",
             "Create a folder inside the project through CreateDirCmd.",
             objectSchema({
@@ -1517,7 +1527,8 @@ ValidationResult EditorActionRegistry::validate(const std::string& name, const J
     if (name == "read_output_log") {
         return ok();
     }
-    if (name == "inspect_entity" || name == "delete_entity" || name == "duplicate_entity") {
+    if (name == "inspect_entity" || name == "delete_entity" || name == "duplicate_entity" ||
+        name == "reload_project_model") {
         return hasEntitySelector(arguments) ? ok() : fail(name + " requires entity_id or entity_name.");
     }
     if (name == "inspect_component" || name == "add_component" || name == "remove_component" ||
@@ -2214,6 +2225,9 @@ std::string EditorActionRegistry::describe(const std::string& name, const Json& 
     }
     if (name == "import_project_model") {
         return "Import model " + arguments.value("model_path", "");
+    }
+    if (name == "reload_project_model") {
+        return "Reload model";
     }
     if (name == "search_curated_assets") {
         return "Search " + arguments.value("provider", "curated assets") +

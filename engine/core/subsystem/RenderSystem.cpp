@@ -24,6 +24,7 @@
 #include <algorithm>
 #include <array>
 #include <cmath>
+#include <iterator>
 #include <limits>
 #include <map>
 #include <random>
@@ -35,10 +36,10 @@ using namespace doriax;
 namespace {
     constexpr int SPOT_MASK_TILE_SIZE = 256;
 
-    // the lights uploaded to the shaders, false when there are none
+    // every light, not just the selected ones, so the variant does not change with the camera
     bool allLightsDirectional(Scene* scene){
         auto lights = scene->getComponentArray<LightComponent>();
-        size_t count = std::min(lights->size(), (size_t)MAX_LIGHTS);
+        size_t count = lights->size();
         for (size_t i = 0; i < count; i++){
             if (lights->getComponentFromIndex(i).type != LightType::DIRECTIONAL){
                 return false;
@@ -611,24 +612,102 @@ void RenderSystem::createEmptyTextures(){
     }
 }
 
-int RenderSystem::checkLightsAndShadow(){
+// Past MAX_LIGHTS lit lights, directional ones go first, then the nearest to the eye.
+// One in use counts as 10% nearer, so close ones do not swap every frame.
+std::vector<size_t> RenderSystem::chooseLights(const Vector3& eye, const std::vector<size_t>& inUse){
+    auto lights = scene->getComponentArray<LightComponent>();
+
+    std::vector<std::pair<float, size_t>> candidates;
+    for (size_t i = 0; i < lights->size(); i++){
+        const LightComponent& light = lights->getComponentFromIndex(i);
+        if (light.intensity <= 0.0f)
+            continue;
+        float score = -1.0f;
+        if (light.type != LightType::DIRECTIONAL){
+            Transform* transform = scene->findComponent<Transform>(lights->getEntity(i));
+            score = ((transform ? transform->worldPosition : Vector3::ZERO) - eye).squaredLength();
+            if (std::binary_search(inUse.begin(), inUse.end(), i))
+                score *= 0.81f;
+        }
+        candidates.push_back({score, i});
+    }
+    if (candidates.size() > (size_t)MAX_LIGHTS){
+        std::nth_element(candidates.begin(), candidates.begin() + MAX_LIGHTS, candidates.end());
+        candidates.resize(MAX_LIGHTS);
+    }
+
+    // component order, so a light keeps its slot while the set stays the same
+    std::vector<size_t> chosen;
+    for (const auto& candidate : candidates){
+        chosen.push_back(candidate.second);
+    }
+    std::sort(chosen.begin(), chosen.end());
+    return chosen;
+}
+
+void RenderSystem::selectLights(const Vector3& eye){
+    std::vector<size_t> chosen = chooseLights(eye, activeLights);
+    // shadow slots have their own culled instances
+    if (chosen != activeLights){
+        instanceViewsDirty = true;
+    }
+    activeLights = std::move(chosen);
+}
+
+// A view other than the main camera's picks its own lights. The main ones it keeps stay in
+// their slots, with shadows and masks; the other slots go to nearer lights, without them.
+void RenderSystem::applyViewLights(const Vector3& eye){
+    if (activeLights.size() < (size_t)MAX_LIGHTS)
+        return;
+
+    std::vector<size_t> chosen = chooseLights(eye, activeLights);
+    std::vector<size_t> nearer;
+    std::set_difference(chosen.begin(), chosen.end(), activeLights.begin(), activeLights.end(), std::back_inserter(nearer));
+    size_t next = 0;
+    for (int slot = 0; slot < MAX_LIGHTS && next < nearer.size(); slot++){
+        if (!std::binary_search(chosen.begin(), chosen.end(), activeLights[slot])){
+            setLightSlot(slot, nearer[next++]);
+        }
+    }
+}
+
+void RenderSystem::setLightSlot(int slot, size_t index){
+    auto lights = scene->getComponentArray<LightComponent>();
+    const LightComponent& light = lights->getComponentFromIndex(index);
+    Transform* transform = scene->findComponent<Transform>(lights->getEntity(index));
+    const Vector3 worldPosition = transform ? transform->worldPosition : Vector3::ZERO;
+
+    int type = 0;
+    if (light.type == LightType::POINT)
+        type = 1;
+    if (light.type == LightType::SPOT)
+        type = 2;
+
+    fs_lighting.direction_range[slot] = Vector4(light.worldDirection.x, light.worldDirection.y, light.worldDirection.z, light.range);
+    fs_lighting.color_intensity[slot] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
+    fs_lighting.position_type[slot] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
+    fs_lighting.inCon_ouCon_shadows_cascades[slot] = Vector4(light.innerConeCos, light.outerConeCos, light.shadowMapIndex, light.numShadowCascades);
+    fs_lighting.spotUp_maskAspect[slot] = Vector4(
+        light.worldUp.x,
+        light.worldUp.y,
+        light.worldUp.z,
+        (light.type == LightType::SPOT && light.spotMaskReady) ? light.spotMaskAspect : 0.0f);
+}
+
+void RenderSystem::checkLightsAndShadow(){
     hasLights = false;
     hasShadows = false;
 
     auto lights = scene->getComponentArray<LightComponent>();
 
-    int numLights = lights->size();
-    if (numLights > MAX_LIGHTS)
-        numLights = MAX_LIGHTS;
-
     if (scene->getLightState() == LightState::AUTO){
-        if (numLights > 0)
+        if (lights->size() > 0)
             hasLights = true;
     }else if (scene->getLightState() == LightState::ON){
         hasLights = true;
     }
-    
-    for (int i = 0; i < numLights; i++){
+
+    for (size_t i = 0; i < lights->size(); i++){
         LightComponent& light = lights->getComponentFromIndex(i);
         if (light.shadows){
             hasShadows = true;
@@ -648,8 +727,6 @@ int RenderSystem::checkLightsAndShadow(){
 
     if (numLights2D > 0)
         hasLights2D = true;
-
-    return numLights;
 }
 
 bool RenderSystem::loadLights(int numLights){
@@ -659,11 +736,14 @@ bool RenderSystem::loadLights(int numLights){
     unsigned int maxPointSlotResolution = 0;
 
     auto lights = scene->getComponentArray<LightComponent>();
-    
-    for (int i = 0; i < numLights; i++){
-        LightComponent& light = lights->getComponentFromIndex(i);
 
-        light.shadowMapIndex = -1;
+    // every light, so the shadow passes skip the unselected ones
+    for (size_t i = 0; i < lights->size(); i++){
+        lights->getComponentFromIndex(i).shadowMapIndex = -1;
+    }
+
+    for (int i = 0; i < numLights; i++){
+        LightComponent& light = lights->getComponentFromIndex(activeLights[i]);
         
         if (light.shadows){
             if (light.type == LightType::DIRECTIONAL &&
@@ -684,7 +764,7 @@ bool RenderSystem::loadLights(int numLights){
     }
 
     for (int i = 0; i < numLights; i++){
-        LightComponent& light = lights->getComponentFromIndex(i);
+        LightComponent& light = lights->getComponentFromIndex(activeLights[i]);
         if (!light.shadows) continue;
 
         if (light.type == LightType::SPOT){
@@ -703,7 +783,7 @@ bool RenderSystem::loadLights(int numLights){
     }
 
     for (int i = 0; i < numLights; i++){
-        LightComponent& light = lights->getComponentFromIndex(i);
+        LightComponent& light = lights->getComponentFromIndex(activeLights[i]);
         if (!light.shadows || light.type != LightType::POINT) continue;
 
         if ((freePointSlot + SHADOW_CUBE_FACES) <= MAX_POINT_SHADOW_ATLAS_SLOTS){
@@ -717,7 +797,7 @@ bool RenderSystem::loadLights(int numLights){
         if (!ensureShadowAtlas(maxProjectiveSlotResolution, freeProjectiveSlot)){
             Log::warn("Failed to create projective shadow atlas");
             for (int i = 0; i < numLights; i++){
-                LightComponent& light = lights->getComponentFromIndex(i);
+                LightComponent& light = lights->getComponentFromIndex(activeLights[i]);
                 if (light.shadows && light.type != LightType::POINT){
                     light.shadowMapIndex = -1;
                 }
@@ -740,7 +820,7 @@ bool RenderSystem::loadLights(int numLights){
         if (!ensureShadowPointAtlas(maxPointSlotResolution)){
             Log::warn("Failed to create point shadow atlas");
             for (int i = 0; i < numLights; i++){
-                LightComponent& light = lights->getComponentFromIndex(i);
+                LightComponent& light = lights->getComponentFromIndex(activeLights[i]);
                 if (light.shadows && light.type == LightType::POINT){
                     light.shadowMapIndex = -1;
                 }
@@ -765,13 +845,15 @@ void RenderSystem::updateSpotMaskAtlas(int numLights){
     std::array<std::shared_ptr<std::array<TextureData, 6>>, MAX_LIGHTS> sourceOwners;
     std::array<bool, MAX_LIGHTS> previousReady{};
     std::array<float, MAX_LIGHTS> previousAspects{};
+    std::array<int, MAX_LIGHTS> committedSlots;
+    committedSlots.fill(-1);
 
     for (int i = 0; i < MAX_LIGHTS; i++){
         if (i >= numLights){
             continue;
         }
 
-        LightComponent& light = lights->getComponentFromIndex(i);
+        LightComponent& light = lights->getComponentFromIndex(activeLights[i]);
         previousReady[i] = light.spotMaskReady;
         previousAspects[i] = light.spotMaskAspect;
 
@@ -805,16 +887,21 @@ void RenderSystem::updateSpotMaskAtlas(int numLights){
             bool hasSource = acceptSource(pooledSource);
 
             if (!hasSource){
-                const SpotMaskAtlasEntry& committedEntry = spotMaskAtlasEntries[i];
-                const bool canReuseCommittedTile =
-                    spotMaskAtlasCreated &&
-                    pooledSource &&
-                    pooledSource.get() == committedEntry.sourceOwner &&
-                    sourceId == committedEntry.sourceId &&
-                    !committedEntry.empty();
+                // from any slot, as the light selection can move a light to another one
+                for (int j = 0; j < MAX_LIGHTS; j++){
+                    const SpotMaskAtlasEntry& committedEntry = spotMaskAtlasEntries[j];
+                    if (spotMaskAtlasCreated &&
+                        pooledSource &&
+                        pooledSource.get() == committedEntry.sourceOwner &&
+                        sourceId == committedEntry.sourceId &&
+                        !committedEntry.empty()){
+                        committedSlots[i] = j;
+                        break;
+                    }
+                }
 
-                if (canReuseCommittedTile){
-                    newEntries[i] = committedEntry;
+                if (committedSlots[i] >= 0){
+                    newEntries[i] = spotMaskAtlasEntries[committedSlots[i]];
                 }else{
                     TextureLoadResult result = light.spotMask.load();
                     if (result.state == ResourceLoadState::Finished){
@@ -827,7 +914,7 @@ void RenderSystem::updateSpotMaskAtlas(int numLights){
 
     auto applyCommittedReadiness = [&](){
         for (int i = 0; i < numLights; i++){
-            LightComponent& light = lights->getComponentFromIndex(i);
+            LightComponent& light = lights->getComponentFromIndex(activeLights[i]);
             const bool ready =
                 spotMaskAtlasCreated &&
                 !newEntries[i].empty() &&
@@ -842,7 +929,9 @@ void RenderSystem::updateSpotMaskAtlas(int numLights){
             }
         }
 
-        for (int i = numLights; i < static_cast<int>(lights->size()); i++){
+        for (size_t i = 0; i < lights->size(); i++){
+            if (std::binary_search(activeLights.begin(), activeLights.end(), i))
+                continue;
             LightComponent& light = lights->getComponentFromIndex(i);
             if (light.spotMaskReady || std::abs(light.spotMaskAspect - 1.0f) > 0.0001f){
                 light.spotMaskReady = false;
@@ -889,6 +978,14 @@ void RenderSystem::updateSpotMaskAtlas(int numLights){
         if (sources[i] &&
             (rebuildAllTiles || !spotMaskAtlasCreated || !(newEntries[i] == spotMaskAtlasEntries[i]))){
             rasterizeSpotMaskTile(*sources[i], i, atlasWidth, newPixels);
+        }else if (committedSlots[i] >= 0 && committedSlots[i] != i){
+            for (int y = 0; y < SPOT_MASK_TILE_SIZE; y++){
+                const size_t row = static_cast<size_t>(y) * static_cast<size_t>(atlasWidth);
+                std::copy_n(
+                    spotMaskAtlasPixels.begin() + row + static_cast<size_t>(committedSlots[i] * SPOT_MASK_TILE_SIZE),
+                    SPOT_MASK_TILE_SIZE,
+                    newPixels.begin() + row + static_cast<size_t>(i * SPOT_MASK_TILE_SIZE));
+            }
         }else if (newEntries[i].empty() &&
                   (rebuildAllTiles || !spotMaskAtlasEntries[i].empty())){
             const int tileStart = i * SPOT_MASK_TILE_SIZE;
@@ -939,7 +1036,7 @@ void RenderSystem::updateSpotMaskAtlas(int numLights){
     // The atlas owns its resampled copy, so honor the source Texture's normal
     // release-after-upload policy instead of retaining full-resolution pixels.
     for (int i = 0; i < numLights; i++){
-        LightComponent& light = lights->getComponentFromIndex(i);
+        LightComponent& light = lights->getComponentFromIndex(activeLights[i]);
         if (sourceOwners[i] && light.spotMask.isReleaseDataAfterLoad()){
             sourceOwners[i]->at(0).releaseImageData();
             spotMaskAtlasEntries[i].sourcePixels = nullptr;
@@ -958,20 +1055,7 @@ void RenderSystem::processLights(int numLights, CameraComponent& camera, Transfo
     auto lights = scene->getComponentArray<LightComponent>();
 
     for (int i = 0; i < numLights; i++){
-        LightComponent& light = lights->getComponentFromIndex(i);
-        Entity entity = lights->getEntity(i);
-        Transform* transform = scene->findComponent<Transform>(entity);
-
-        Vector3 worldPosition;
-        if (transform){
-            worldPosition = Vector3(transform->worldPosition);
-        }
-
-        int type = 0;
-        if (light.type == LightType::POINT)
-            type = 1;
-        if (light.type == LightType::SPOT)
-            type = 2;
+        LightComponent& light = lights->getComponentFromIndex(activeLights[i]);
 
         if (light.shadows){
             if (light.shadowMapIndex >= 0){
@@ -1011,15 +1095,7 @@ void RenderSystem::processLights(int numLights, CameraComponent& camera, Transfo
             // and reclaims a slot automatically once one frees up.
         }
 
-        fs_lighting.direction_range[i] = Vector4(light.worldDirection.x, light.worldDirection.y, light.worldDirection.z, light.range);
-        fs_lighting.color_intensity[i] = Vector4(light.color.x, light.color.y, light.color.z, light.intensity);
-        fs_lighting.position_type[i] = Vector4(worldPosition.x, worldPosition.y, worldPosition.z, (float)type);
-        fs_lighting.inCon_ouCon_shadows_cascades[i] = Vector4(light.innerConeCos, light.outerConeCos, light.shadowMapIndex, light.numShadowCascades);
-        fs_lighting.spotUp_maskAspect[i] = Vector4(
-            light.worldUp.x,
-            light.worldUp.y,
-            light.worldUp.z,
-            (light.type == LightType::SPOT && light.spotMaskReady) ? light.spotMaskAspect : 0.0f);
+        setLightSlot(i, activeLights[i]);
     }
 
     // PCF tap radius of the 3D shadow filter, packed into cameraDir.w
@@ -1623,11 +1699,11 @@ void RenderSystem::renderReflectionProbeCapture(){
     captureCamera.farClip = std::max(probe->farClip, captureCamera.nearClip + 0.001f);
     updateCamera(captureCamera, captureTransform);
 
-    Vector4 previousEye = fs_lighting.eyePos;
-    Vector4 previousCameraDir = fs_lighting.cameraDir;
+    const fs_lighting_t mainLighting = fs_lighting;
     fs_lighting.eyePos = Vector4(capturePosition.x, capturePosition.y, capturePosition.z, 0.0f);
     fs_lighting.cameraDir = Vector4(captureCamera.worldDirection.x, captureCamera.worldDirection.y,
-                                    captureCamera.worldDirection.z, previousCameraDir.w);
+                                    captureCamera.worldDirection.z, mainLighting.cameraDir.w);
+    applyViewLights(capturePosition);
 
     capturingReflectionProbe = true;
     passResolution = Vector2((float)resolution, (float)resolution);
@@ -1665,8 +1741,7 @@ void RenderSystem::renderReflectionProbeCapture(){
 
     runtime.capturePass.endRenderPass();
     capturingReflectionProbe = false;
-    fs_lighting.eyePos = previousEye;
-    fs_lighting.cameraDir = previousCameraDir;
+    fs_lighting = mainLighting;
 
     delete captureCamera.framebuffer;
     captureCamera.framebuffer = nullptr;
@@ -3708,8 +3783,7 @@ std::vector<RenderSystem::ShadowSlot> RenderSystem::collectShadowSlots(){
         return slots;
 
     auto lights = scene->getComponentArray<LightComponent>();
-    int shadowLightCount = std::min((int)lights->size(), MAX_LIGHTS);
-    for (int l = 0; l < shadowLightCount; l++){
+    for (size_t l = 0; l < lights->size(); l++){
         LightComponent& light = lights->getComponentFromIndex(l);
         if (light.type == LightType::POINT || light.intensity <= 0 || !light.shadows || light.shadowMapIndex < 0)
             continue;
@@ -7017,7 +7091,7 @@ void RenderSystem::drawUnderwater(WaterComponent& water, CameraComponent& camera
         }
 
         auto lights = scene->getComponentArray<LightComponent>();
-        for (int i = 0; i < std::min((int)lights->size(), MAX_LIGHTS); i++){
+        for (size_t i = 0; i < lights->size(); i++){
             const LightComponent& sceneLight = lights->getComponentFromIndex(i);
             if (sceneLight.type == LightType::DIRECTIONAL){
                 const float fromAbove = std::max(-sceneLight.worldDirection.normalized().y, 0.0f);
@@ -8679,7 +8753,7 @@ void RenderSystem::update(double dt){
         return;
     }
 
-    int numLights = checkLightsAndShadow();
+    checkLightsAndShadow();
 
     // light types can change without adding or removing a light
     bool newOnlyDirectionalLights = hasLights && allLightsDirectional(scene);
@@ -8871,6 +8945,8 @@ void RenderSystem::update(double dt){
         needReloadWater();
     }
 
+    selectLights(mainCameraTransform.worldPosition);
+    int numLights = (int)activeLights.size();
     loadLights(numLights);
     updateSpotMaskAtlas(numLights);
     loadLights2D();
@@ -9363,7 +9439,6 @@ void RenderSystem::draw(){
     if (hasShadows){
         auto lights = scene->getComponentArray<LightComponent>();
         auto meshes = scene->getComponentArray<MeshComponent>();
-        int shadowLightCount = std::min((int)lights->size(), MAX_LIGHTS);
 
         // a projective slot has its own culled instance view; point faces draw everything
         auto drawShadowCasters = [&](LightComponent& light, int cameraIndex, PipelineType pipelineType, int instanceView){
@@ -9440,7 +9515,7 @@ void RenderSystem::draw(){
 
         // All projective slots share one pass: clear once, then viewport/scissor per slot.
         bool projectivePassStarted = false;
-        for (int l = 0; l < shadowLightCount; l++){
+        for (size_t l = 0; l < lights->size(); l++){
             LightComponent& light = lights->getComponentFromIndex(l);
             if (light.type == LightType::POINT ||
                 light.intensity <= 0 || !light.shadows ||
@@ -9476,7 +9551,7 @@ void RenderSystem::draw(){
 
         // Point shadows keep the packed-color depth per-face pass (PIP_DEPTH).
         bool pointAtlasSlotWritten = false;
-        for (int l = 0; l < shadowLightCount; l++){
+        for (size_t l = 0; l < lights->size(); l++){
             LightComponent& light = lights->getComponentFromIndex(l);
             if (light.type != LightType::POINT ||
                 light.intensity <= 0 || !light.shadows ||
@@ -9596,6 +9671,7 @@ void RenderSystem::draw(){
         cameraOrder.push_back((int)cameras->getIndex(mainCameraEntity));
     }
 
+    const fs_lighting_t mainLighting = fs_lighting;
     for (int i : cameraOrder){
         Entity cameraEntity = cameras->getEntity(i);
         CameraComponent& camera = cameras->getComponentFromIndex(i);
@@ -9608,6 +9684,11 @@ void RenderSystem::draw(){
 
         if (!isMainCamera && !camera.renderToTexture){
             continue; // camera is not used
+        }
+
+        fs_lighting = mainLighting;
+        if (!isMainCamera){
+            applyViewLights(cameraTransform.worldPosition);
         }
 
         int terrainView = 0;
@@ -10211,6 +10292,7 @@ void RenderSystem::draw(){
         }
 
     }
+    fs_lighting = mainLighting;
 
     // waves move after drawing, so Water::getHeight in the next update matches the next draw
     advanceWaters();

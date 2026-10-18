@@ -370,6 +370,8 @@ namespace doriax{
 		// Main camera position for the instance distance fade: the colour and depth passes must
 		// fade against the same point or a shadow outlives its instance.
 		Vector3 fadeEyePosition;
+		// light component indices in the shader slots, sorted
+		std::vector<size_t> activeLights;
 
 		// culled instances of every instanced mesh for one view, uploaded once per frame
 		struct InstanceView{
@@ -576,7 +578,11 @@ namespace doriax{
 		void updateMVP(size_t index, Transform& transform, CameraComponent& camera, Transform& cameraTransform);
 
 		void createEmptyTextures();
-		int checkLightsAndShadow();
+		std::vector<size_t> chooseLights(const Vector3& eye, const std::vector<size_t>& inUse);
+		void selectLights(const Vector3& eye);
+		void applyViewLights(const Vector3& eye);
+		void setLightSlot(int slot, size_t index);
+		void checkLightsAndShadow();
 		bool loadLights(int numLights);
 		void processLights(int numLights, CameraComponent& camera, Transform& cameraTransform);
 		void updateSpotMaskAtlas(int numLights);

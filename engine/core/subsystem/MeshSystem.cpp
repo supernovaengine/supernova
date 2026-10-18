@@ -1487,18 +1487,38 @@ bool MeshSystem::preloadModel(const std::string& filename, std::shared_ptr<void>
     // the worker leaves the build open for the scene that uses the model
     ResourceProgress::completeBuild(std::hash<std::string>{}(getAsyncModelLoadKey(nullptr, filename)));
 
-    if (obj){
-        data = ModelPool::addObj(poolKey, result->objModel);
-    }else{
-        data = ModelPool::addGLTF(poolKey, result->gltfModel);
-        // as loadGLTF does, so the scene finds the textures pooled
-        for (auto& prebuilt : result->prebuiltTextures){
-            if (prebuilt.second){
-                TextureDataPool::put(prebuilt.first, prebuilt.second);
-            }
-        }
+    data = poolModelResult(poolKey, *result);
+    return true;
+}
+
+std::shared_ptr<void> MeshSystem::poolModelResult(const std::string& poolKey, const AsyncModelLoadResult& result){
+    if (result.obj){
+        return ModelPool::addObj(poolKey, result.objModel);
     }
 
+    std::shared_ptr<void> data = ModelPool::addGLTF(poolKey, result.gltfModel);
+    // as loadGLTF does, so the scene finds the textures pooled
+    for (const auto& prebuilt : result.prebuiltTextures){
+        if (prebuilt.second){
+            TextureDataPool::put(prebuilt.first, prebuilt.second);
+        }
+    }
+    return data;
+}
+
+bool MeshSystem::reparseModelFile(const std::string& filename){
+    const bool obj = FileData::getFilePathExtension(filename) == "obj";
+    std::shared_ptr<AsyncModelLoadResult> result = loadModelFileOnWorker(filename, obj, 0);
+    if (!result->warn.empty()){
+        Log::warn("Loading model (%s): %s", filename.c_str(), result->warn.c_str());
+    }
+    if (!result->success || !result->err.empty()){
+        Log::error("Can't load model (%s): %s", filename.c_str(), result->err.c_str());
+        return false;
+    }
+
+    invalidateModelFile(filename);
+    poolModelResult(getModelFilenameKey(filename), *result);
     return true;
 }
 

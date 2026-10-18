@@ -3550,7 +3550,7 @@ void editor::Project::collectSceneShaderKeys(const SceneProject* sceneProject, s
             bool sceneShadows = false;
             if (scene->getLightState() != LightState::OFF){
                 auto lights = scene->getComponentArray<LightComponent>();
-                for (int i = 0; i < std::min((int)lights->size(), MAX_LIGHTS); i++){
+                for (size_t i = 0; i < lights->size(); i++){
                     sceneShadows = sceneShadows || lights->getComponentFromIndex(i).shadows;
                 }
             }

@@ -103,6 +103,7 @@ namespace doriax{
         static bool isAsyncModelLoadPending(const Scene* scene, const std::string& filename);
         static bool isModelPreloading(const std::string& filename);
         static std::shared_ptr<AsyncModelLoadResult> loadModelFileOnWorker(const std::string& filename, bool obj, uint64_t buildId);
+        static std::shared_ptr<void> poolModelResult(const std::string& poolKey, const AsyncModelLoadResult& result);
         template<typename T>
         static bool isValidGLTFIndex(int index, const std::vector<T>& values) {
             return index >= 0 && static_cast<size_t>(index) < values.size();
@@ -237,6 +238,8 @@ namespace doriax{
         static void releasePreloadedModel(const std::string& filename);
         // Drops the cached parse and images of a file that changed on disk, even while in use
         static void invalidateModelFile(const std::string& filename);
+        // Parses a changed file in place of its cached model, which stays when the parse fails
+        static bool reparseModelFile(const std::string& filename);
 
         // Caps the resolution glTF images are decoded to on the CALLING thread (0 = full resolution).
         // Used by the thumbnail worker so previews don't decode/upload full-size 4K maps.

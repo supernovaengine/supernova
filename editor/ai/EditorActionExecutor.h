@@ -113,6 +113,7 @@ private:
     bool validateCustomShaderValue(const std::string& propertyName, const Json& args, std::string& error) const;
     ActionResult createTerrainHeightmap(const Json& arguments);
     ActionResult importProjectModel(const Json& arguments);
+    ActionResult reloadProjectModel(const Json& arguments);
     ActionResult searchCuratedAssets(const Json& arguments, const std::atomic<bool>* cancel);
     ActionResult downloadCuratedAsset(const Json& arguments, const std::atomic<bool>* cancel);
 
