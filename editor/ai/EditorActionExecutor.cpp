@@ -15,6 +15,7 @@
 #include "Catalog.h"
 #include "Exporter.h"
 #include "Stream.h"
+#include "render/SceneRender.h"
 #include "util/CxxStandards.h"
 #include "util/ProjectUtils.h"
 #include "util/FileUtils.h"
@@ -2374,6 +2375,8 @@ ActionResult EditorActionExecutor::dispatch(const std::string& name,
     if (name == "unlink_material") return unlinkMaterial(arguments);
     if (name == "create_material_file") return createMaterialFile(arguments);
     if (name == "set_terrain_textures") return setTerrainTextures(arguments);
+    if (name == "set_terrain_foliage_layer") return setTerrainFoliageLayer(arguments);
+    if (name == "set_editor_camera") return setEditorCamera(arguments);
     if (name == "create_terrain_blendmap") return createTerrainBlendmap(arguments);
     if (name == "add_terrain_collision") return addTerrainCollision(arguments);
     if (name == "create_script") return createScript(arguments);
@@ -3703,9 +3706,17 @@ ActionResult EditorActionExecutor::setTerrainTextures(const Json& arguments) {
 
     Texture blendMap;
     if (readTexture("blendmap_path", blendMap)) {
+        int slot = 0;
+        if (arguments.contains("blendmap_index")) {
+            slot = arguments["blendmap_index"].is_number_integer() ? arguments["blendmap_index"].get<int>() : -1;
+            if (slot < 0 || slot >= MAX_TERRAIN_BLENDMAPS) {
+                delete multiCmd;
+                return failResult("blendmap_index must be between 0 and " + std::to_string(MAX_TERRAIN_BLENDMAPS - 1) + ".");
+            }
+        }
         // The whole vector is set at once, so filling a slot can also grow it
-        if (blendMaps.empty()) blendMaps.resize(1);
-        blendMaps[0] = blendMap;
+        if (blendMaps.size() <= (size_t)slot) blendMaps.resize(slot + 1);
+        blendMaps[slot] = blendMap;
         blendMapsChanged = true;
     }
 
@@ -3753,6 +3764,32 @@ ActionResult EditorActionExecutor::setTerrainTextures(const Json& arguments) {
                 layersChanged = true;
             }
         }
+
+        if (arguments.contains("layer_uv_scale")) {
+            const Json& v = arguments["layer_uv_scale"];
+            if (!v.is_object() || !v.value("x", Json()).is_number() || !v.value("y", Json()).is_number()) {
+                delete multiCmd;
+                return failResult("layer_uv_scale must be an object with numeric x and y.");
+            }
+            layer.uvScale = Vector2(v["x"].get<float>(), v["y"].get<float>());
+            layersChanged = true;
+            changed++;
+        }
+        struct LayerFactor { const char* arg; float TerrainSurfaceLayer::* factor; };
+        static const LayerFactor layerFactors[] = {
+            {"layer_normal_strength", &TerrainSurfaceLayer::normalStrength},
+            {"layer_roughness_factor", &TerrainSurfaceLayer::roughnessFactor}
+        };
+        for (const LayerFactor& entry : layerFactors) {
+            if (!arguments.contains(entry.arg)) continue;
+            if (!arguments[entry.arg].is_number()) {
+                delete multiCmd;
+                return failResult(std::string(entry.arg) + " must be a number.");
+            }
+            layer.*entry.factor = arguments[entry.arg].get<float>();
+            layersChanged = true;
+            changed++;
+        }
     }
 
     if (!error.empty()) {
@@ -3775,6 +3812,154 @@ ActionResult EditorActionExecutor::setTerrainTextures(const Json& arguments) {
     }
     CommandHandle::get(sceneId)->addCommandNoMerge(multiCmd);
     return okResult("Set terrain texture paths through the command history.");
+}
+
+ActionResult EditorActionExecutor::setTerrainFoliageLayer(const Json& arguments) {
+    uint32_t sceneId = resolveSceneId(project, arguments);
+    SceneProject* sceneProject = project->getScene(sceneId);
+    if (!sceneProject || !sceneProject->scene) return failResult("Scene not found.");
+    Entity entity = resolveTerrainEntity(project, sceneProject, arguments);
+    if (entity == NULL_ENTITY) return failResult("Terrain entity not found.");
+
+    TerrainComponent& terrain = sceneProject->scene->getComponent<TerrainComponent>(entity);
+    std::vector<TerrainFoliageLayer> layers = terrain.foliageLayers;
+
+    int index = -1;
+    if (arguments.contains("layer_index")) {
+        index = arguments["layer_index"].is_number_integer() ? arguments["layer_index"].get<int>() : -1;
+        if (index < 0 || index >= (int)layers.size()) {
+            return failResult("layer_index must name an existing foliage layer (0-" + std::to_string((int)layers.size() - 1) +
+                              "). Omit it to append a layer.");
+        }
+    }
+
+    const bool remove = arguments.value("remove", false);
+    std::string message;
+    if (remove) {
+        if (index < 0) return failResult("remove needs layer_index.");
+        layers.erase(layers.begin() + index);
+        message = "Removed terrain foliage layer " + std::to_string(index) + " through the command history.";
+    } else {
+        if (index < 0) {
+            layers.emplace_back();
+            index = (int)layers.size() - 1;
+        }
+        TerrainFoliageLayer& layer = layers[index];
+
+        auto readPath = [&](const char* arg, std::string& out) -> std::string {
+            if (!arguments.contains(arg)) return "";
+            if (!arguments[arg].is_string()) return std::string(arg) + " must be a string.";
+            fs::path rel = arguments[arg].get<std::string>();
+            if (rel.empty()) { out.clear(); return ""; }
+            if (!PathUtils::isSafeRelativePath(rel) || !fs::exists(project->getProjectPath() / rel)) {
+                return std::string(arg) + " must be an existing safe project-relative path.";
+            }
+            if (!isInsideAssets(project, rel)) return outsideAssetsError(project, arg);
+            out = assetPathFromAi(project, rel);
+            return "";
+        };
+
+        std::string error = readPath("mesh_path", layer.meshPath);
+        if (!error.empty()) return failResult(error);
+
+        std::string densityPath;
+        error = readPath("density_map_path", densityPath);
+        if (!error.empty()) return failResult(error);
+        if (arguments.contains("density_map_path")) {
+            layer.densityMap = densityPath.empty() ? Texture() : Texture(densityPath);
+        }
+
+        struct FloatField { const char* arg; float TerrainFoliageLayer::* field; };
+        static const FloatField floatFields[] = {
+            {"density", &TerrainFoliageLayer::density},
+            {"min_scale", &TerrainFoliageLayer::minScale},
+            {"max_scale", &TerrainFoliageLayer::maxScale},
+            {"rotation_jitter", &TerrainFoliageLayer::rotationJitter},
+            {"align_to_normal", &TerrainFoliageLayer::alignToNormal},
+            {"min_slope", &TerrainFoliageLayer::minSlope},
+            {"max_slope", &TerrainFoliageLayer::maxSlope},
+            {"min_height", &TerrainFoliageLayer::minHeight},
+            {"max_height", &TerrainFoliageLayer::maxHeight},
+            {"draw_distance", &TerrainFoliageLayer::drawDistance},
+            {"min_draw_distance", &TerrainFoliageLayer::minDrawDistance}
+        };
+        for (const FloatField& entry : floatFields) {
+            if (!arguments.contains(entry.arg)) continue;
+            if (!arguments[entry.arg].is_number()) return failResult(std::string(entry.arg) + " must be a number.");
+            layer.*entry.field = arguments[entry.arg].get<float>();
+        }
+        if (arguments.contains("seed")) {
+            if (!arguments["seed"].is_number_integer() || arguments["seed"].get<long long>() < 0) {
+                return failResult("seed must be a non-negative integer.");
+            }
+            layer.seed = arguments["seed"].get<unsigned int>();
+        }
+        if (arguments.contains("cast_shadows")) {
+            if (!arguments["cast_shadows"].is_boolean()) return failResult("cast_shadows must be a boolean.");
+            layer.castShadows = arguments["cast_shadows"].get<bool>();
+        }
+        if (layer.minScale > layer.maxScale) return failResult("min_scale must not exceed max_scale.");
+        message = "Set terrain foliage layer " + std::to_string(index) + " through the command history.";
+    }
+
+    auto onChanged = [project = this->project, sceneId, entity]() {
+        SceneProject* sp = project ? project->getScene(sceneId) : nullptr;
+        TerrainComponent* t = sp && sp->scene ? sp->scene->findComponent<TerrainComponent>(entity) : nullptr;
+        if (t) t->needUpdateFoliage = true;
+    };
+    auto* multiCmd = new MultiPropertyCmd();
+    multiCmd->addPropertyCmd<std::vector<TerrainFoliageLayer>>(project, sceneId, entity, ComponentType::TerrainComponent,
+                                                               "foliageLayers", layers, onChanged);
+    CommandHandle::get(sceneId)->addCommandNoMerge(multiCmd);
+
+    Json data = {{"layer_index", remove ? -1 : index}, {"layer_count", (int)layers.size()}};
+    return okResult(message, data);
+}
+
+ActionResult EditorActionExecutor::setEditorCamera(const Json& arguments) {
+    uint32_t sceneId = resolveSceneId(project, arguments);
+    SceneProject* sceneProject = project->getScene(sceneId);
+    if (!sceneProject || !sceneProject->scene) return failResult("Scene not found.");
+    if (sceneProject->sceneType != SceneType::SCENE_3D) return failResult("set_editor_camera works on 3D scenes.");
+    if (!sceneProject->sceneRender || !sceneProject->sceneRender->getCamera()) {
+        return failResult("The scene has no Scene view yet. Open it with open_scene first.");
+    }
+
+    auto readVector = [&](const char* arg, Vector3& out) -> bool {
+        if (!arguments.contains(arg) || !arguments[arg].is_object()) return false;
+        const Json& v = arguments[arg];
+        if (!v.value("x", Json()).is_number() || !v.value("y", Json()).is_number() || !v.value("z", Json()).is_number()) return false;
+        out = Vector3(v["x"].get<float>(), v["y"].get<float>(), v["z"].get<float>());
+        return true;
+    };
+    Vector3 position, target;
+    if (!readVector("position", position) || !readVector("target", target)) {
+        return failResult("position and target need numeric x, y and z.");
+    }
+    if ((target - position).length() < 1e-4f) return failResult("target must differ from position.");
+
+    const bool gameView = !sceneProject->sceneRender->isCameraDetached() &&
+        (sceneProject->playState == ScenePlayState::PLAYING || sceneProject->playState == ScenePlayState::PAUSED);
+    if (gameView) {
+        return failResult("The Scene view shows the game camera while playing. Detach the camera (F8) or stop play mode first.");
+    }
+    // a preview keeps showing the scene camera
+    const bool leftPreview = sceneProject->sceneRender->isPreviewCameraActive();
+    if (leftPreview) sceneProject->sceneRender->clearPreviewCamera();
+
+    Camera* camera = sceneProject->sceneRender->getCamera();
+    camera->setPosition(position);
+    // straight up or down would make the default up vector parallel to the view
+    const Vector3 dir = (target - position).normalized();
+    if (std::abs(dir.y) > 0.99f) {
+        camera->setUp(0, 0, dir.y > 0 ? -1.0f : 1.0f);
+    } else {
+        camera->setUp(0, 1, 0);
+    }
+    camera->setTarget(target);
+    sceneProject->needUpdateRender = true;
+    Backend::getApp().requestRedraw();
+    return okResult(leftPreview ? "Left the camera preview and moved the editor camera." : "Moved the editor camera.");
 }
 
 ActionResult EditorActionExecutor::createTerrainBlendmap(const Json& arguments) {

@@ -83,6 +83,8 @@ private:
     ActionResult unlinkMaterial(const Json& arguments);
     ActionResult createMaterialFile(const Json& arguments);
     ActionResult setTerrainTextures(const Json& arguments);
+    ActionResult setTerrainFoliageLayer(const Json& arguments);
+    ActionResult setEditorCamera(const Json& arguments);
     ActionResult createTerrainBlendmap(const Json& arguments);
     ActionResult addTerrainCollision(const Json& arguments);
     ActionResult createScript(const Json& arguments);

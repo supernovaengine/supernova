@@ -645,6 +645,7 @@ const std::vector<ToolDefinition>& cachedTools() {
                 {"entity_name", stringSchema("Terrain entity name, used only when entity_id is omitted")},
                 {"heightmap_path", stringSchema("Optional project-relative heightmap texture path")},
                 {"blendmap_path", stringSchema("Optional project-relative blendmap texture path")},
+                {"blendmap_index", integerSchema("Blend map slot blendmap_path fills, 0-2: slot 0 weights layers 0-2, slot 1 layers 3-5, slot 2 layers 6-8. Defaults to 0")},
                 {"detail_red_path", stringSchema("Optional project-relative color texture path for layer 1")},
                 {"detail_green_path", stringSchema("Optional project-relative color texture path for layer 2")},
                 {"detail_blue_path", stringSchema("Optional project-relative color texture path for layer 3")},
@@ -655,7 +656,47 @@ const std::vector<ToolDefinition>& cachedTools() {
                 {"layer_roughness_path", stringSchema("Optional project-relative layer roughness map path, read from green")},
                 {"layer_metallic_path", stringSchema("Optional project-relative layer metallic map path, read from blue")},
                 {"layer_occlusion_path", stringSchema("Optional project-relative layer occlusion map path, read from red")},
-                {"layer_height_path", stringSchema("Optional project-relative layer height map path, used only for blending")}
+                {"layer_height_path", stringSchema("Optional project-relative layer height map path, used only for blending")},
+                {"layer_uv_scale", vector2Schema("Optional layer tiling, multiplying the terrain's detail tiling")},
+                {"layer_normal_strength", numberSchema("Optional layer normal map strength")},
+                {"layer_roughness_factor", numberSchema("Optional layer roughness factor")}
+            }),
+            false
+        },
+        {
+            "set_editor_camera",
+            "Move the editor's Scene view camera of a 3D scene: place it at position and aim it at target, to frame what you want to inspect. It changes only the editor view, never the scene or its cameras.",
+            objectSchema({
+                {"scene_id", integerSchema("Scene id. Omit to use the selected scene")},
+                {"position", vector3Schema("Camera position in world space")},
+                {"target", vector3Schema("World point the camera looks at")}
+            }, {"position", "target"}),
+            true
+        },
+        {
+            "set_terrain_foliage_layer",
+            "Add, change or remove one foliage layer of a terrain as one undoable step. A foliage layer scatters a single-mesh model (the geometry must sit on the file's root node) where its density map is painted; instances are resolved at runtime around the camera. Omit layer_index to append a new layer; give it to change that layer, or with remove to delete it. Fields left out keep their value (or the default on a new layer). Paths must be inside the assets directory.",
+            objectSchema({
+                {"scene_id", integerSchema("Scene id. Omit to use the selected scene")},
+                {"entity_id", integerSchema("Terrain entity id")},
+                {"entity_name", stringSchema("Terrain entity name, used only when entity_id is omitted")},
+                {"layer_index", integerSchema("Foliage layer to change or remove. Omit to append a new layer")},
+                {"remove", boolSchema("True removes the layer at layer_index")},
+                {"mesh_path", stringSchema("Project-relative glTF/GLB/OBJ model to scatter")},
+                {"density_map_path", stringSchema("Project-relative grayscale density map, stretched over the whole terrain")},
+                {"density", numberSchema("Instances per square world unit where the density map is white")},
+                {"min_scale", numberSchema("Smallest random uniform scale")},
+                {"max_scale", numberSchema("Largest random uniform scale")},
+                {"rotation_jitter", numberSchema("Share of a full turn of random yaw, 0-1")},
+                {"align_to_normal", numberSchema("0 stands instances upright, 1 lays them along the surface")},
+                {"min_slope", numberSchema("Lowest ground slope in degrees")},
+                {"max_slope", numberSchema("Steepest ground slope in degrees")},
+                {"min_height", numberSchema("Lowest ground height, normalized against the terrain maxHeight")},
+                {"max_height", numberSchema("Highest ground height, normalized against the terrain maxHeight")},
+                {"draw_distance", numberSchema("Distance from the camera where instances stop drawing")},
+                {"min_draw_distance", numberSchema("Distance from the camera inside which instances are skipped (0 = none). A copy of a layer with a simpler mesh, min_draw_distance near the original's draw_distance and a longer draw_distance becomes its far level of detail")},
+                {"seed", integerSchema("Random seed of the scatter")},
+                {"cast_shadows", boolSchema("Whether the instances cast shadows")}
             }),
             false
         },
@@ -2054,6 +2095,13 @@ std::string EditorActionRegistry::describe(const std::string& name, const Json& 
     }
     if (name == "set_terrain_textures") {
         return "Set terrain textures";
+    }
+    if (name == "set_editor_camera") {
+        return "Move editor camera";
+    }
+    if (name == "set_terrain_foliage_layer") {
+        if (arguments.value("remove", false)) return "Remove terrain foliage layer";
+        return arguments.contains("layer_index") ? "Change terrain foliage layer" : "Add terrain foliage layer";
     }
     if (name == "create_terrain_blendmap") {
         return "Create terrain blendmap";
