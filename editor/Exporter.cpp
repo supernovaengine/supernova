@@ -12,6 +12,7 @@
 #include "util/FileUtils.h"
 #include "util/MsBuildProgress.h"
 #include "util/ShaderHeaderBuilder.h"
+#include "util/Util.h"
 #include "pool/ShaderPool.h"
 #include "resources/icons/doriax-favicon_png.h"
 
@@ -111,6 +112,29 @@ namespace {
         for (unsigned char& byte : data) {
             byte ^= key;
         }
+    }
+
+    // the export folder relative to root when it lies inside it, so a copy walking root can
+    // leave it out; empty otherwise
+    fs::path nestedExportDir(const fs::path& root, const fs::path& targetDir) {
+        std::error_code ec;
+        const fs::path target = fs::weakly_canonical(targetDir, ec);
+        if (ec) return {};
+        const fs::path rel = target.lexically_relative(fs::weakly_canonical(root, ec));
+        if (ec || rel.empty() || rel == "." || *rel.begin() == "..") return {};
+        return rel;
+    }
+
+    // relPath is relative to the root nestedExportDir() was given
+    bool isInsideExportDir(const fs::path& relPath, const fs::path& exportDir) {
+        return !exportDir.empty() && editor::Util::isInsidePath(relPath, exportDir);
+    }
+
+    // what Android Studio or Xcode leave in a workspace they build
+    bool isIdeOutput(const fs::path& path) {
+        static const std::set<std::string> names = {".gradle", ".idea", ".cxx", ".externalNativeBuild", "build",
+            "captures", "local.properties", "xcuserdata", "DerivedData", ".DS_Store"};
+        return names.count(path.filename().string()) > 0 || path.extension() == ".iml";
     }
 
     bool isReservedPackName(std::string name) {
@@ -824,6 +848,19 @@ fs::path editor::Exporter::getAssetsSourceDir() const {
     return fs::weakly_canonical(assetsSrc, ec);
 }
 
+fs::path editor::Exporter::getLuaSourceDir() const {
+    fs::path luaSrc = config.luaDir;
+    if (luaSrc.empty()) {
+        return {};
+    }
+    if (luaSrc.is_relative()) {
+        luaSrc = project->getProjectPath() / luaSrc;
+    }
+
+    std::error_code ec;
+    return fs::weakly_canonical(luaSrc, ec);
+}
+
 std::string editor::Exporter::getAppName() const {
     if (project->getName().empty()) {
         return "doriax-project";
@@ -903,6 +940,14 @@ bool editor::Exporter::checkTargetDir() {
     }
 
     std::error_code ec;
+    // the export can go inside these, but as one of them it would copy itself
+    const fs::path target = fs::weakly_canonical(config.targetDir, ec);
+    if (project && !ec && (target == fs::weakly_canonical(project->getProjectPath(), ec) ||
+                           target == getAssetsSourceDir() || target == getLuaSourceDir())) {
+        setError("Target directory cannot be the project, assets or Lua directory");
+        return false;
+    }
+
     if (!fs::exists(config.targetDir, ec)) {
         fs::create_directories(config.targetDir, ec);
         if (ec) {
@@ -1782,10 +1827,14 @@ bool editor::Exporter::copyAssets() {
     fs::path assetsDst = getExportProjectRoot() / "assets";
     fs::create_directories(assetsDst, ec);
 
+    // an export folder inside the assets tree must not copy itself
+    const fs::path exportDir = nestedExportDir(assetsSrc, config.targetDir);
+
     // References are relative to this directory, so its contents become the export root
     for (auto& entry : fs::recursive_directory_iterator(assetsSrc, fs::directory_options::skip_permission_denied, ec)) {
         fs::path relPath = fs::relative(entry.path(), assetsSrc, ec);
         if (ec || relPath.empty()) continue;
+        if (isInsideExportDir(relPath, exportDir)) continue;
 
         // Skip hidden directories (starting with '.') and build directories
         std::string firstComponent = relPath.begin()->string();
@@ -1870,17 +1919,12 @@ bool editor::Exporter::copyLua() {
     luaCopiedSources.clear();
     luaExportedPaths.clear();
 
-    fs::path luaSrc = config.luaDir;
+    const fs::path luaSrc = getLuaSourceDir();
     if (luaSrc.empty()) {
         return true; // No Lua directory configured, skip
     }
-    if (luaSrc.is_relative()) {
-        luaSrc = project->getProjectPath() / luaSrc;
-    }
 
     std::error_code ec;
-    luaSrc = fs::weakly_canonical(luaSrc, ec);
-
     if (!fs::exists(luaSrc, ec)) {
         return true; // Lua directory doesn't exist, not an error
     }
@@ -1895,11 +1939,14 @@ bool editor::Exporter::copyLua() {
     // same path; Android merges both trees into one and fails the build on duplicates.
     const bool luaRootIsAssetsRoot = (luaSrc == getAssetsSourceDir());
 
+    const fs::path exportDir = nestedExportDir(luaSrc, config.targetDir);
+
     for (auto it = fs::recursive_directory_iterator(luaSrc, fs::directory_options::skip_permission_denied, ec);
          it != fs::recursive_directory_iterator(); ++it) {
         auto& entry = *it;
         fs::path relPath = fs::relative(entry.path(), luaSrc, ec);
         if (ec || relPath.empty()) continue;
+        if (isInsideExportDir(relPath, exportDir)) { it.disable_recursion_pending(); continue; }
 
         // Skip hidden directories (starting with '.') and build directories
         std::string firstComponent = relPath.begin()->string();
@@ -1934,6 +1981,7 @@ bool editor::Exporter::copyCppScripts() {
 
     std::error_code ec;
     std::set<std::string> copiedPaths;
+    const fs::path exportDir = nestedExportDir(projectRoot, config.targetDir);
     const fs::path normalizedProjectRoot = projectRoot.lexically_normal();
     const auto projectRelativePath = [&](const fs::path& path) {
         const fs::path relPath = path.lexically_normal().lexically_relative(normalizedProjectRoot);
@@ -1995,7 +2043,7 @@ bool editor::Exporter::copyCppScripts() {
              it != fs::recursive_directory_iterator(); ++it) {
             const auto& entry = *it;
             const fs::path relPath = projectRelativePath(entry.path());
-            if (relPath.empty()) {
+            if (relPath.empty() || isInsideExportDir(relPath, exportDir)) {
                 if (entry.is_directory()) it.disable_recursion_pending();
                 continue;
             }
@@ -2036,13 +2084,14 @@ bool editor::Exporter::copyCppScripts() {
             for (auto it = fs::recursive_directory_iterator(rootPath, fs::directory_options::skip_permission_denied);
                  it != fs::recursive_directory_iterator(); ++it) {
                 const std::string name = it->path().filename().string();
-                if (it->is_directory() && (name.empty() || name[0] == '.' || name == "build")) {
+                const fs::path relPath = projectRelativePath(it->path());
+                if ((it->is_directory() && (name.empty() || name[0] == '.' || name == "build"))
+                    || isInsideExportDir(relPath, exportDir)) {
                     it.disable_recursion_pending();
                     continue;
                 }
                 if (!it->is_regular_file() || !isCppSourceFile(it->path())) continue;
 
-                const fs::path relPath = projectRelativePath(it->path());
                 if (relPath.empty() || !copiedPaths.insert(it->path().string()).second) continue;
 
                 const fs::path dstPath = scriptsDst / relPath;
@@ -2097,7 +2146,8 @@ void editor::Exporter::copyTree(const fs::path& src, const fs::path& dst, std::e
 #endif
 }
 
-void editor::Exporter::copyTreeIfChanged(const fs::path& src, const fs::path& dst, std::error_code& ec, bool pruneStale) {
+void editor::Exporter::copyTreeIfChanged(const fs::path& src, const fs::path& dst, std::error_code& ec, bool pruneStale,
+                                         bool skipIdeOutput) {
 #ifdef _WIN32
     // Prefix absolute paths so Win32 APIs used by std::filesystem can traverse
     // directory trees beyond the legacy MAX_PATH limit (see copyTree).
@@ -2141,7 +2191,9 @@ void editor::Exporter::copyTreeIfChanged(const fs::path& src, const fs::path& ds
     const fs::path dstAdj = adjustPath(dst);
     try {
         fs::create_directories(dstAdj);
-        for (const auto& entry : fs::recursive_directory_iterator(srcAdj)) {
+        for (auto it = fs::recursive_directory_iterator(srcAdj); it != fs::recursive_directory_iterator(); ++it) {
+            const auto& entry = *it;
+            if (skipIdeOutput && isIdeOutput(entry.path())) { it.disable_recursion_pending(); continue; }
             const fs::path target = dstAdj / fs::relative(entry.path(), srcAdj);
             if (entry.is_directory()) {
                 fs::create_directories(target);
@@ -2161,7 +2213,8 @@ void editor::Exporter::copyTreeIfChanged(const fs::path& src, const fs::path& ds
         if (pruneStale) {
             std::vector<fs::path> stale;
             for (const auto& entry : fs::recursive_directory_iterator(dstAdj)) {
-                if (!fs::exists(srcAdj / fs::relative(entry.path(), dstAdj))) {
+                // also IDE output copied by older exports
+                if (!fs::exists(srcAdj / fs::relative(entry.path(), dstAdj)) || (skipIdeOutput && isIdeOutput(entry.path()))) {
                     stale.push_back(entry.path());
                 }
             }
@@ -2211,7 +2264,7 @@ bool editor::Exporter::copyEngine() {
         }
         // Content-compare copy: unchanged files keep their mtime so the
         // Desktop/Web build cache stays incremental across exports.
-        copyTreeIfChanged(src, dst, ec, pruneStale);
+        copyTreeIfChanged(src, dst, ec, pruneStale, name == "workspaces");
         if (ec) {
             setError("Failed to copy " + name + " directory: " + ec.message());
             return false;

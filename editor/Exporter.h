@@ -123,6 +123,8 @@ namespace doriax::editor {
         fs::path getExportProjectRoot() const;
         // Canonical directory copyAssets() reads from
         fs::path getAssetsSourceDir() const;
+        // Canonical directory copyLua() reads from, empty without one
+        fs::path getLuaSourceDir() const;
         static bool shouldSkipExportSupportFile(const fs::path& relativePath);
         static bool isCppHeaderFile(const fs::path& path);
         static bool isCppSourceFile(const fs::path& path);
@@ -174,7 +176,8 @@ namespace doriax::editor {
         std::string buildScriptDirIncludes() const;
 
         static void copyTree(const fs::path& src, const fs::path& dst, std::error_code& ec);
-        static void copyTreeIfChanged(const fs::path& src, const fs::path& dst, std::error_code& ec, bool pruneStale = false);
+        static void copyTreeIfChanged(const fs::path& src, const fs::path& dst, std::error_code& ec, bool pruneStale = false,
+                                      bool skipIdeOutput = false);
 
     public:
         Exporter();
