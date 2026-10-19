@@ -125,6 +125,7 @@ namespace doriax::editor {
         fs::path getAssetsSourceDir() const;
         // Canonical directory copyLua() reads from, empty without one
         fs::path getLuaSourceDir() const;
+        bool isExportDir(const fs::directory_entry& entry) const;
         static bool shouldSkipExportSupportFile(const fs::path& relativePath);
         static bool isCppHeaderFile(const fs::path& path);
         static bool isCppSourceFile(const fs::path& path);

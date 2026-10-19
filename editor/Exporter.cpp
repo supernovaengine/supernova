@@ -12,7 +12,6 @@
 #include "util/FileUtils.h"
 #include "util/MsBuildProgress.h"
 #include "util/ShaderHeaderBuilder.h"
-#include "util/Util.h"
 #include "pool/ShaderPool.h"
 #include "resources/icons/doriax-favicon_png.h"
 
@@ -112,22 +111,6 @@ namespace {
         for (unsigned char& byte : data) {
             byte ^= key;
         }
-    }
-
-    // the export folder relative to root when it lies inside it, so a copy walking root can
-    // leave it out; empty otherwise
-    fs::path nestedExportDir(const fs::path& root, const fs::path& targetDir) {
-        std::error_code ec;
-        const fs::path target = fs::weakly_canonical(targetDir, ec);
-        if (ec) return {};
-        const fs::path rel = target.lexically_relative(fs::weakly_canonical(root, ec));
-        if (ec || rel.empty() || rel == "." || *rel.begin() == "..") return {};
-        return rel;
-    }
-
-    // relPath is relative to the root nestedExportDir() was given
-    bool isInsideExportDir(const fs::path& relPath, const fs::path& exportDir) {
-        return !exportDir.empty() && editor::Util::isInsidePath(relPath, exportDir);
     }
 
     // what Android Studio or Xcode leave in a workspace they build
@@ -859,6 +842,19 @@ fs::path editor::Exporter::getLuaSourceDir() const {
 
     std::error_code ec;
     return fs::weakly_canonical(luaSrc, ec);
+}
+
+// This export's folders, or one another export left in the project
+bool editor::Exporter::isExportDir(const fs::directory_entry& entry) const {
+    std::error_code ec;
+    if (!entry.is_directory(ec)) return false;
+
+    const fs::path& dir = entry.path();
+    if (fs::equivalent(dir, config.targetDir, ec) || fs::equivalent(dir, config.destinationDir, ec)) return true;
+
+    const std::string appName = getAppName();
+    return fs::is_regular_file(dir / "doriax.py", ec) || fs::is_regular_file(dir / (appName + ".wasm"), ec) ||
+           fs::is_regular_file(dir / appName, ec) || fs::is_regular_file(dir / (appName + ".exe"), ec);
 }
 
 std::string editor::Exporter::getAppName() const {
@@ -1834,18 +1830,17 @@ bool editor::Exporter::copyAssets() {
     fs::path assetsDst = getExportProjectRoot() / "assets";
     fs::create_directories(assetsDst, ec);
 
-    // an export folder inside the assets tree must not copy itself
-    const fs::path exportDir = nestedExportDir(assetsSrc, config.targetDir);
-
     // References are relative to this directory, so its contents become the export root
-    for (auto& entry : fs::recursive_directory_iterator(assetsSrc, fs::directory_options::skip_permission_denied, ec)) {
+    for (auto it = fs::recursive_directory_iterator(assetsSrc, fs::directory_options::skip_permission_denied, ec);
+         it != fs::recursive_directory_iterator(); ++it) {
+        const auto& entry = *it;
         fs::path relPath = fs::relative(entry.path(), assetsSrc, ec);
         if (ec || relPath.empty()) continue;
-        if (isInsideExportDir(relPath, exportDir)) continue;
+        if (isExportDir(entry)) { it.disable_recursion_pending(); continue; }
 
         // Skip hidden directories (starting with '.') and build directories
         std::string firstComponent = relPath.begin()->string();
-        if (!firstComponent.empty() && (firstComponent[0] == '.' || firstComponent == "build")) continue;
+        if (!firstComponent.empty() && (firstComponent[0] == '.' || firstComponent == "build")) { it.disable_recursion_pending(); continue; }
 
         // The engine loads a "resources.pak" at the asset root, so the name is reserved.
         // Matched without case and before the regular-file skip: a directory aliases it too.
@@ -1946,14 +1941,12 @@ bool editor::Exporter::copyLua() {
     // same path; Android merges both trees into one and fails the build on duplicates.
     const bool luaRootIsAssetsRoot = (luaSrc == getAssetsSourceDir());
 
-    const fs::path exportDir = nestedExportDir(luaSrc, config.targetDir);
-
     for (auto it = fs::recursive_directory_iterator(luaSrc, fs::directory_options::skip_permission_denied, ec);
          it != fs::recursive_directory_iterator(); ++it) {
         auto& entry = *it;
         fs::path relPath = fs::relative(entry.path(), luaSrc, ec);
         if (ec || relPath.empty()) continue;
-        if (isInsideExportDir(relPath, exportDir)) { it.disable_recursion_pending(); continue; }
+        if (isExportDir(entry)) { it.disable_recursion_pending(); continue; }
 
         // Skip hidden directories (starting with '.') and build directories
         std::string firstComponent = relPath.begin()->string();
@@ -1988,7 +1981,6 @@ bool editor::Exporter::copyCppScripts() {
 
     std::error_code ec;
     std::set<std::string> copiedPaths;
-    const fs::path exportDir = nestedExportDir(projectRoot, config.targetDir);
     const fs::path normalizedProjectRoot = projectRoot.lexically_normal();
     const auto projectRelativePath = [&](const fs::path& path) {
         const fs::path relPath = path.lexically_normal().lexically_relative(normalizedProjectRoot);
@@ -2050,7 +2042,7 @@ bool editor::Exporter::copyCppScripts() {
              it != fs::recursive_directory_iterator(); ++it) {
             const auto& entry = *it;
             const fs::path relPath = projectRelativePath(entry.path());
-            if (relPath.empty() || isInsideExportDir(relPath, exportDir)) {
+            if (relPath.empty() || isExportDir(entry)) {
                 if (entry.is_directory()) it.disable_recursion_pending();
                 continue;
             }
@@ -2093,7 +2085,7 @@ bool editor::Exporter::copyCppScripts() {
                 const std::string name = it->path().filename().string();
                 const fs::path relPath = projectRelativePath(it->path());
                 if ((it->is_directory() && (name.empty() || name[0] == '.' || name == "build"))
-                    || isInsideExportDir(relPath, exportDir)) {
+                    || isExportDir(*it)) {
                     it.disable_recursion_pending();
                     continue;
                 }
