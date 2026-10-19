@@ -2396,6 +2396,7 @@ ActionResult EditorActionExecutor::dispatch(const std::string& name,
     if (name == "revert_bundle_component") return revertBundleComponent(arguments);
     if (name == "set_standalone_bundle") return setStandaloneBundle(arguments);
     if (name == "export_project") return exportProject(arguments, cancel);
+    if (name == "set_export_shaders") return setExportShaders(arguments);
     if (name == "generate_shaders") return generateShaders(arguments, cancel);
     if (name == "fork_shader") return forkShader(arguments);
     if (name == "write_shader_file") return writeShaderFile(arguments);
@@ -4761,6 +4762,123 @@ ActionResult EditorActionExecutor::exportProject(const Json& arguments, const st
         return failResult(progress.errorMessage.empty() ? "Export failed." : progress.errorMessage);
     }
     return okResult("Exported project.", Json{{"target_dir", config.targetDir.generic_string()}});
+}
+
+ActionResult EditorActionExecutor::setExportShaders(const Json& arguments) {
+    // type[:properties][@forkBasePath]
+    auto parseSpecs = [&](const char* field, bool requireFiles, std::vector<ShaderKey>& keys, std::string& error) {
+        if (!arguments.contains(field)) return true;
+        const Json& list = arguments[field];
+        if (!list.is_array()) {
+            error = std::string(field) + " must be an array of shader specs.";
+            return false;
+        }
+        for (const Json& item : list) {
+            if (!item.is_string()) {
+                error = std::string(field) + " must hold strings such as mesh:4184 or ssao.";
+                return false;
+            }
+            const std::string spec = item.get<std::string>();
+            const size_t customSeparator = spec.find('@');
+            const std::string builtIn = spec.substr(0, customSeparator);
+            const size_t separator = builtIn.find(':');
+            ShaderType type;
+            if (!ShaderPool::parseShaderTypeToken(builtIn.substr(0, separator), type)) {
+                error = "Unknown shader type in '" + spec + "'.";
+                return false;
+            }
+            uint32_t properties = 0;
+            if (separator != std::string::npos) {
+                const std::string mask = builtIn.substr(separator + 1);
+                size_t used = 0;
+                unsigned long long value = 0;
+                try {
+                    value = std::stoull(mask, &used, 0);
+                } catch (...) {
+                    used = 0;
+                }
+                if (mask.empty() || used != mask.size() || value > 0xFFFFFFFFull) {
+                    error = "Invalid property mask in '" + spec + "'.";
+                    return false;
+                }
+                properties = static_cast<uint32_t>(value);
+            }
+            uint16_t customId = 0;
+            if (customSeparator != std::string::npos) {
+                const std::string customShader = spec.substr(customSeparator + 1);
+                if (customShader.empty()) {
+                    error = "Missing custom shader path after '@' in '" + spec + "'.";
+                    return false;
+                }
+                if (requireFiles) {
+                    const Util::CustomShaderPaths paths = Util::resolveCustomShaderPaths(customShader);
+                    if (!fs::exists(project->getProjectPath() / paths.vert) || !fs::exists(project->getProjectPath() / paths.frag)) {
+                        error = "'" + spec + "' references missing files (" + paths.vert + ", " + paths.frag + ").";
+                        return false;
+                    }
+                }
+                customId = ShaderPool::registerCustomShader(customShader);
+            }
+            keys.push_back(ShaderPool::normalizeKey(ShaderPool::getShaderKey(type, properties, customId)));
+        }
+        return true;
+    };
+
+    if (arguments.contains("clear") && !arguments["clear"].is_boolean()) {
+        return failResult("clear must be a boolean.");
+    }
+    std::vector<ShaderKey> add, remove, exclude, include;
+    std::string error;
+    if (!parseSpecs("add", true, add, error) || !parseSpecs("remove", false, remove, error) ||
+        !parseSpecs("exclude", false, exclude, error) || !parseSpecs("include", false, include, error)) {
+        return failResult(error);
+    }
+
+    auto erasePaired = [](std::set<ShaderKey>& keys, ShaderKey key) {
+        for (ShaderKey variant : Exporter::getPairedShaderKeys(key)) keys.erase(variant);
+    };
+
+    ShaderOverrides& shaders = project->getShaderOverrides();
+    const ShaderOverrides previous = shaders;
+    const bool clear = arguments.value("clear", false);
+    const bool changing = clear || !add.empty() || !remove.empty() || !exclude.empty() || !include.empty();
+    if (clear) {
+        shaders.additions.clear();
+        shaders.exclusions.clear();
+    }
+    for (ShaderKey key : add) {
+        shaders.additions.insert(key);
+        erasePaired(shaders.exclusions, key);
+    }
+    for (ShaderKey key : remove) {
+        erasePaired(shaders.additions, key);
+    }
+    for (ShaderKey key : exclude) {
+        shaders.exclusions.insert(key);
+        erasePaired(shaders.additions, key);
+    }
+    for (ShaderKey key : include) {
+        erasePaired(shaders.exclusions, key);
+    }
+    if (changing && !project->saveProjectFile()) {
+        shaders = previous;
+        return failResult("Failed to save the project with the new export shader overrides.");
+    }
+
+    auto specs = [](const std::set<ShaderKey>& keys) {
+        Json list = Json::array();
+        for (ShaderKey key : keys) {
+            std::string spec = ShaderPool::getShaderTypeName(ShaderPool::getShaderTypeFromKey(key), true);
+            const uint32_t properties = ShaderPool::getPropertiesFromKey(key);
+            if (properties) spec += ":" + std::to_string(properties);
+            const uint16_t customId = ShaderPool::getCustomIdFromKey(key);
+            if (customId) spec += "@" + ShaderPool::getCustomShaderName(customId);
+            list.push_back(spec);
+        }
+        return list;
+    };
+    return okResult(changing ? "Updated the export shader overrides." : "Read the export shader overrides.",
+        Json{{"additions", specs(shaders.additions)}, {"exclusions", specs(shaders.exclusions)}});
 }
 
 ActionResult EditorActionExecutor::generateShaders(const Json& arguments, const std::atomic<bool>* cancel) {

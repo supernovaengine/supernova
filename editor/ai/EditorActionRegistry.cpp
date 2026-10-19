@@ -924,6 +924,18 @@ const std::vector<ToolDefinition>& cachedTools() {
             false
         },
         {
+            "set_export_shaders",
+            "Edit the shader variants every export adds to or leaves out of what the saved scenes use (project.yaml export.shaderAdditions/shaderExclusions, the overrides the Export window lists), and return both lists. An export ships only the shaders of each scene's saved state, so a variant that appears only at runtime, such as a script toggling Scene.ssaoEnabled or ssrEnabled, must be added here or its meshes fail to load in the exported game. A spec is type or type:properties with a decimal or 0x property mask, as scene files and the shaders command write them: mesh:4184, ssao, gbuffer:12. A forked shader adds its project-relative base path after @: mesh:4184@shaders/myMesh. A built-in lit mesh variant (property bit 3) ships with its bit 28 twin, so every field applies to both. Call with no arguments to read the lists.",
+            objectSchema({
+                {"add", {{"type", "array"}, {"description", "Specs to add to the additions (taken out of the exclusions)"}, {"items", {{"type", "string"}}}}},
+                {"remove", {{"type", "array"}, {"description", "Specs to take out of the additions"}, {"items", {{"type", "string"}}}}},
+                {"exclude", {{"type", "array"}, {"description", "Specs no export should ship (taken out of the additions)"}, {"items", {{"type", "string"}}}}},
+                {"include", {{"type", "array"}, {"description", "Specs to take out of the exclusions"}, {"items", {{"type", "string"}}}}},
+                {"clear", boolSchema("Empty both lists before applying the other fields")}
+            }),
+            false
+        },
+        {
             "generate_shaders",
             "Generate selected shaders using the editor shader builder.",
             objectSchema({
@@ -2181,6 +2193,9 @@ std::string EditorActionRegistry::describe(const std::string& name, const Json& 
     }
     if (name == "set_standalone_bundle") {
         return "Set standalone bundle " + arguments.value("bundle_path", "");
+    }
+    if (name == "set_export_shaders") {
+        return "Set export shader overrides";
     }
     if (name == "export_project") {
         return "Export project to " + arguments.value("target_dir", "");

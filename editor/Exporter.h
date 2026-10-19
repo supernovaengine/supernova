@@ -191,6 +191,8 @@ namespace doriax::editor {
         bool isRunning() const;
 
         static std::string getShaderDisplayName(ShaderType type, uint32_t properties, uint16_t customId = 0);
+        // a built-in lit mesh key ships and drops with its 'Dlo' (bit 28) twin
+        static std::vector<ShaderKey> getPairedShaderKeys(ShaderKey key);
         static std::string getCMakeGraphicBackend(::doriax::ShaderBackend backend);
         static EmsdkInfo detectEmsdk(const std::string& overridePath);
     };

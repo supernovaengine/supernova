@@ -104,6 +104,7 @@ private:
     ActionResult revertBundleComponent(const Json& arguments);
     ActionResult setStandaloneBundle(const Json& arguments);
     ActionResult exportProject(const Json& arguments, const std::atomic<bool>* cancel);
+    ActionResult setExportShaders(const Json& arguments);
     ActionResult generateShaders(const Json& arguments, const std::atomic<bool>* cancel);
     ActionResult forkShader(const Json& arguments);
     ActionResult writeShaderFile(const Json& arguments);
