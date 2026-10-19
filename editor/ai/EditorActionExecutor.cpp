@@ -3424,6 +3424,8 @@ ActionResult EditorActionExecutor::controlPlayMode(const Json& arguments) {
     if (!project->getScene(sceneId)) return failResult("Scene not found.");
 
     const std::string action = lower(arguments.value("action", ""));
+    if (action == "start" && !project->getScene(sceneId)->scene) return failResult("Scene is not open. Use open_scene first.");
+
     if (action == "start") project->start(sceneId);
     else if (action == "pause") project->pause(sceneId);
     else if (action == "resume") project->resume(sceneId);
