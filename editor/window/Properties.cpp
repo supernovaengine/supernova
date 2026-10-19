@@ -1445,27 +1445,11 @@ void editor::Properties::applyCameraTexture(Entity cameraEntity, ComponentType c
 // property. Laid out with the project's standard "<label> | <input>" property table,
 // including the rotate-left reset button when a row differs from the Catalog default. Each
 // change commits a PropertyCmd that copies the current per-entity Texture and mutates only
-// the chosen field, then invalidates the cached GPU texture so the new sampler is rebuilt on
-// the next getRender().
+// the chosen field.
 void editor::Properties::drawTextureSettingsPopup(const char* popupId, ComponentType cpType, const std::string& id, SceneProject* sceneProject, std::vector<Entity>& entities, std::function<void()> onValueChanged){
     ImGui::SetNextWindowSizeConstraints(ImVec2(19 * ImGui::GetFontSize(), 0), ImVec2(FLT_MAX, FLT_MAX));
     if (!ImGui::BeginPopup(popupId))
         return;
-
-    // Sampler settings (filter/wrap) are baked into the GPU texture at creation and the
-    // TexturePool caches by id, so simply changing the value is not enough: we must drop
-    // the cached render to force a rebuild. Routing this through the command's
-    // onValueChanged makes it fire on both execute and undo, keeping the two directions
-    // consistent (and it also chains any caller-provided callback).
-    auto invalidateAndNotify = [sceneProject, entities, cpType, id, onValueChanged](){
-        for (const Entity& entity : entities){
-            Texture* ref = Catalog::getPropertyRef<Texture>(sceneProject->scene, entity, cpType, id);
-            if (ref)
-                ref->invalidateRender();
-        }
-        if (onValueChanged)
-            onValueChanged();
-    };
 
     // Applies mutator to a copy of each selected entity's texture and commits a PropertyCmd
     // per entity whose texture actually changed. The mutator returns false to skip an entity.
@@ -1479,7 +1463,7 @@ void editor::Properties::drawTextureSettingsPopup(const char* popupId, Component
             if (!mutator(modified) || modified == *valueRef)
                 continue;
 
-            cmd = new PropertyCmd<Texture>(project, sceneProject->id, entity, cpType, id, modified, invalidateAndNotify);
+            cmd = new PropertyCmd<Texture>(project, sceneProject->id, entity, cpType, id, modified, onValueChanged);
             CommandHandle::get(project->getSelectedSceneId())->addCommand(cmd);
         }
         finishProperty = true;
@@ -1990,7 +1974,7 @@ Texture editor::Properties::getMaterialPreview(const Material& material, const s
     auto texPending = [](const Texture& t) {
         if (t.isFramebuffer() || CameraTextureLink::isCameraTexture(t))
             return false; // framebuffer textures never enter the pool
-        std::string tid = t.getId();
+        std::string tid = t.getRenderId();
         return !tid.empty() && !TexturePool::get(tid);
     };
 

@@ -36,6 +36,14 @@ using namespace doriax;
 
 namespace {
 
+// with repeat, linear filtering bleeds the opposite edge into the border
+Texture edgeClampedTexture(const std::string& path) {
+    Texture texture(path);
+    texture.setWrapU(TextureWrap::CLAMP_TO_EDGE);
+    texture.setWrapV(TextureWrap::CLAMP_TO_EDGE);
+    return texture;
+}
+
 constexpr float VIEWPORT_GIZMO_SIZE = 100.0f;
 
 }
@@ -536,7 +544,8 @@ void editor::SceneWindow::handleResourceFileDragDrop(SceneProject* sceneProject)
                                         }
                                         originalTex = mesh->submeshes[0].material.baseColorTexture;
                                     }
-                                    Texture newTex(droppedAssetPath);
+                                    const bool isSprite = sceneProject->scene->findComponent<SpriteComponent>(selEntity) != nullptr;
+                                    Texture newTex = isSprite ? edgeClampedTexture(droppedAssetPath) : Texture(droppedAssetPath);
                                     if (mesh->submeshes[0].material.baseColorTexture != newTex) {
                                         mesh->submeshes[0].material.baseColorTexture = newTex;
                                         mesh->submeshes[0].needUpdateTexture = true;
@@ -565,7 +574,7 @@ void editor::SceneWindow::handleResourceFileDragDrop(SceneProject* sceneProject)
                                         selUI = ui;
                                         originalTex = ui->texture;
                                     }
-                                    Texture newTex(droppedAssetPath);
+                                    Texture newTex = edgeClampedTexture(droppedAssetPath);
                                     if (ui->texture != newTex) {
                                         ui->texture = newTex;
                                         ui->needUpdateTexture = true;
@@ -673,14 +682,14 @@ void editor::SceneWindow::handleResourceFileDragDrop(SceneProject* sceneProject)
                                     cmd = new CreateEntityCmd(project, sceneProject->id, "Sprite", EntityCreationType::SPRITE);
 
                                     cmd->addProperty<Vector3>(ComponentType::Transform, "position", rreturn.point);
-                                    cmd->addProperty<Texture>(ComponentType::MeshComponent, "submeshes[0].material.baseColorTexture", Texture(droppedAssetPath));
+                                    cmd->addProperty<Texture>(ComponentType::MeshComponent, "submeshes[0].material.baseColorTexture", edgeClampedTexture(droppedAssetPath));
                                     cmd->addProperty<unsigned int>(ComponentType::SpriteComponent, "width", tempImage->getWidth());
                                     cmd->addProperty<unsigned int>(ComponentType::SpriteComponent, "height", tempImage->getHeight());
                                 } else {
                                     cmd = new CreateEntityCmd(project, sceneProject->id, "Image", EntityCreationType::IMAGE);
 
                                     cmd->addProperty<Vector3>(ComponentType::Transform, "position", rreturn.point);
-                                    cmd->addProperty<Texture>(ComponentType::UIComponent, "texture", Texture(droppedAssetPath));
+                                    cmd->addProperty<Texture>(ComponentType::UIComponent, "texture", edgeClampedTexture(droppedAssetPath));
                                     cmd->addProperty<unsigned int>(ComponentType::UILayoutComponent, "width", tempImage->getWidth());
                                     cmd->addProperty<unsigned int>(ComponentType::UILayoutComponent, "height", tempImage->getHeight());
                                 }

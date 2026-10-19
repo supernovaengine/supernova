@@ -3204,15 +3204,8 @@ ActionResult EditorActionExecutor::setTextureSettings(const Json& arguments) {
         return okResult("Texture settings already match the requested values.");
     }
 
-    // Sampler settings are baked into the GPU texture, so the command's callback drops the
-    // cached render on both execute and undo (same pattern as the editor's settings popup).
-    Scene* scene = sceneProject->scene;
-    auto onChanged = [scene, entity, component, propertyName]() {
-        Texture* ref = Catalog::getPropertyRef<Texture>(scene, entity, component, propertyName);
-        if (ref) ref->invalidateRender();
-    };
     CommandHandle::get(sceneId)->addCommandNoMerge(new PropertyCmd<Texture>(
-        project, sceneId, entity, component, propertyName, modified, onChanged));
+        project, sceneId, entity, component, propertyName, modified));
     return okResult("Texture settings applied through the command history.");
 }
 

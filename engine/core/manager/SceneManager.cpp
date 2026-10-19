@@ -431,8 +431,8 @@ void SceneManager::startPreload(uint32_t id) {
 
         SceneResources resources = sceneEntry->resources();
         for (const Texture& texture : resources.textures) {
-            auto sameId = [&texture](const Texture& other) { return other.getId() == texture.getId(); };
-            if (std::none_of(pending.textures.begin(), pending.textures.end(), sameId)) {
+            auto sameRender = [&texture](const Texture& other) { return other.getRenderId() == texture.getRenderId(); };
+            if (std::none_of(pending.textures.begin(), pending.textures.end(), sameRender)) {
                 pending.textures.push_back(texture);
             }
         }
@@ -488,13 +488,14 @@ void SceneManager::updatePreloads() {
 
         for (auto it = pending.textures.begin(); it != pending.textures.end();) {
             const std::string id = it->getId();
-            auto release = [id]() {
-                TexturePool::remove(id);
+            const std::string renderId = it->getRenderId();
+            auto release = [id, renderId]() {
+                TexturePool::remove(renderId);
                 TextureDataPool::remove(id);
             };
 
             // on the GPU for a running scene, held so the switch does not free it
-            if (std::shared_ptr<TextureRender> render = TexturePool::get(id)) {
+            if (std::shared_ptr<TextureRender> render = TexturePool::get(renderId)) {
                 keep(render, release);
                 it = pending.textures.erase(it);
                 continue;

@@ -612,7 +612,7 @@ static bool visitTexturePaths(Texture& texture, const std::function<bool(std::st
 
     // Renders keep drawing the old GPU texture until the new one exists, so the new path loads
     // before the old texture is released. Kept in the pool, it would show for a reused name.
-    if (TexturePool::get(texture.getId())) {
+    if (TexturePool::get(texture.getRenderId())) {
         const bool asyncLoading = Engine::isAsyncLoading();
         Engine::setAsyncLoading(false);
         updated.getRender();
@@ -784,8 +784,8 @@ SceneResources editor::Project::collectResourcesInRegistry(EntityRegistry* regis
             file.setAlphaBorderAuto(true);
         }
 
-        auto sameId = [&file](const Texture& other) { return other.getId() == file.getId(); };
-        if (std::none_of(resources.textures.begin(), resources.textures.end(), sameId)) {
+        auto sameRender = [&file](const Texture& other) { return other.getRenderId() == file.getRenderId(); };
+        if (std::none_of(resources.textures.begin(), resources.textures.end(), sameRender)) {
             resources.textures.push_back(file);
         }
     };

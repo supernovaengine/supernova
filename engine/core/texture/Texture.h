@@ -95,6 +95,8 @@ namespace doriax{
             // keeps a null data pointer even though it is not empty().
             bool hasData() const;
             std::string getId() const;
+            // the TexturePool key: the id plus a non-default sampler state
+            std::string getRenderId() const;
 
             size_t getNumFaces() const;
             TextureType getType() const;
