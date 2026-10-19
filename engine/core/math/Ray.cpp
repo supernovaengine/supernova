@@ -312,6 +312,9 @@ RayReturn Ray::intersects(const Sphere& sphere) const{
         if (t < 0){
             t = ( -b + sqrt(d) ) / (2 * a);
         }
+        if (t < 0 || t > 1){
+            return NO_HIT;
+        }
 
         Vector3 point = getPoint(t);
         Vector3 normal = (point - sphere.center).normalize();
@@ -347,7 +350,7 @@ RayReturn Ray::intersects(const Body2D& body) const{
         const b2RayCastInput rayCastInput = {bOrigin, translation, 1.0};
         b2CastOutput castOutput = b2Shape_RayCast(shapeid, &rayCastInput);
 
-        if (castOutput.hit){
+        if (castOutput.hit && castOutput.fraction < closestFraction){
             closestFraction = castOutput.fraction;
             intersectionPoint = castOutput.point;
             intersectionNormal = castOutput.normal;
