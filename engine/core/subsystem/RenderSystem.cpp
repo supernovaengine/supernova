@@ -8004,10 +8004,16 @@ void RenderSystem::updateInstancedMesh(InstancedMeshComponent& instmesh, MeshCom
     instmesh.lastFadeCullEnd = cullEnd;
     instmesh.lastCullNear = cullNear;
     instmesh.lastFadeCullEye = instmesh.fadeEyeLocal;
+    // Margins that let the eye move before the cuts are redone: past fadeEnd the shader has shrunk
+    // instances to nothing, while the hard near cut gives up only a small share of its distance.
+    const float slackFar = (cullEnd >= 0.0f) ? std::max(0.25f, 0.04f * (instmesh.fadeEnd - instmesh.fadeStart)) : 0.0f;
+    const float slackNear = std::min(0.25f, 0.1f * cullNear);
+    instmesh.lastCullSlack = (cullNear > 0.0f) ? slackNear : slackFar; // the near one is the tighter
     // small margin for CPU/GPU float differences at the edge
-    const float cullRadius = cullEnd + std::max(0.0001f, cullEnd * 0.00001f);
+    const float cullRadius = cullEnd + slackFar + std::max(0.0001f, cullEnd * 0.00001f);
     const float cullRadiusSquared = cullRadius * cullRadius;
-    const float cullNearSquared = cullNear * cullNear;
+    const float cullNearRadius = cullNear - slackNear;
+    const float cullNearSquared = cullNearRadius * cullNearRadius;
 
     Quaternion bRotation;
     if (instmesh.instancedBillboard){
@@ -9039,8 +9045,10 @@ void RenderSystem::update(double dt){
                 bool sortTransparentInstances = mesh.transparent && batchSort;
 
                 const float cullEnd = instanceFadeCullEnd(*instmesh, mesh, *scene);
-                const bool eyeMoved = instmesh->fadeEyeLocal.x != instmesh->lastFadeCullEye.x ||
-                                      instmesh->fadeEyeLocal.z != instmesh->lastFadeCullEye.z;
+                // redone only once the eye moves past the slack the lists were cut with
+                const float eyeDx = instmesh->fadeEyeLocal.x - instmesh->lastFadeCullEye.x;
+                const float eyeDz = instmesh->fadeEyeLocal.z - instmesh->lastFadeCullEye.z;
+                const bool eyeMoved = eyeDx * eyeDx + eyeDz * eyeDz > instmesh->lastCullSlack * instmesh->lastCullSlack;
                 const bool fadeSelectionChanged = cullEnd != instmesh->lastFadeCullEnd || cullNear != instmesh->lastCullNear ||
                     ((cullEnd >= 0.0f || cullNear > 0.0f) && eyeMoved);
                 bool instancesNeedUpdate = instmesh->needUpdateInstances || mesh.needUpdateAABB ||
@@ -9050,7 +9058,9 @@ void RenderSystem::update(double dt){
                     updateInstancedMesh(*instmesh, mesh, transform, mainCamera, mainCameraTransform);
                 }
 
-                if (instancesNeedUpdate || ((mainCamera.needUpdate || transform.needUpdate) && sortTransparentInstances)){
+                // billboards face the camera, so like a transparent sort they follow it every move
+                const bool followsCamera = sortTransparentInstances || instmesh->instancedBillboard;
+                if (instancesNeedUpdate || ((mainCamera.needUpdate || transform.needUpdate) && followsCamera)){
                     // The instance buffer is shared by every camera and sokol allows one
                     // sg_update_buffer per frame (VALIDATE_UPDATEBUF_ONCE), so the main camera
                     // fixes the batch order and every other camera reuses it.

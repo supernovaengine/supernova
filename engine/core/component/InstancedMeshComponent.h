@@ -91,6 +91,7 @@ namespace doriax{
         float lastFadeCullEnd = -1;
         float lastCullNear = 0;
         Vector3 lastFadeCullEye;
+        float lastCullSlack = 0; // eye movement the lists still cover
 
         bool instancedBillboard = false;
         bool instancedCylindricalBillboard = false;
