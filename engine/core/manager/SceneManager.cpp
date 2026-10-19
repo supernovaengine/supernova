@@ -140,8 +140,10 @@ bool SceneManager::loadScene(uint32_t id) {
         return false;
     }
 
-    // input callbacks run between frames, but still inside the scenes being replaced
-    if (Engine::isFrameRunning() || Engine::getMainScene()) {
+    // input callbacks run between frames, but still inside the scenes being replaced, and the
+    // start scene waits for the first frame when a loading scene can cover it
+    const bool coverStart = loadingSceneId != 0 && canShowLoadingScene(id);
+    if (Engine::isFrameRunning() || Engine::getMainScene() || coverStart) {
         if (pendingId && *pendingId != id) {
             Log::warn("SceneManager: scene %u replaces pending scene %u", id, *pendingId);
         }

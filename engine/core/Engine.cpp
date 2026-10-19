@@ -750,8 +750,14 @@ void Engine::endCompositeFramebuffer(){
 
     framebuffer = nullptr;
 
-    if (mainScene)
-        mainScene->getSystem<RenderSystem>()->presentFramebufferToSwapchain(&compositeFramebuffer);
+    // the loading scene covers the start as a layer, before there is a main scene
+    Scene* scene = mainScene;
+    if (!scene){
+        std::lock_guard<std::mutex> lock(sceneListMutex);
+        scene = scenes.empty() ? nullptr : scenes.front();
+    }
+    if (scene)
+        scene->getSystem<RenderSystem>()->presentFramebufferToSwapchain(&compositeFramebuffer);
 }
 
 void Engine::clearPools(){
