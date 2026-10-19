@@ -1620,7 +1620,7 @@ bool editor::Exporter::loadAndSaveAllScenes() {
     auto saveFuture = savePromise.get_future();
     std::string importError;
 
-    editor::getEditorHost().enqueueMainThreadTask([this, &savePromise, &importError]() {
+    auto saveScenes = [this, &savePromise, &importError]() {
         try {
             std::vector<uint32_t> temporarilyLoaded;
             auto& scenes = project->getScenes();
@@ -1686,7 +1686,14 @@ bool editor::Exporter::loadAndSaveAllScenes() {
         } catch (...) {
             savePromise.set_exception(std::current_exception());
         }
-    });
+    };
+
+    // AI and MCP exports already run on the main thread
+    if (editor::getEditorHost().isMainThread()) {
+        saveScenes();
+    } else {
+        editor::getEditorHost().enqueueMainThreadTask(saveScenes);
+    }
 
     try {
         if (!saveFuture.get()) {
