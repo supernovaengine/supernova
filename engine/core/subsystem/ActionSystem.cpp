@@ -925,7 +925,8 @@ Quaternion ActionSystem::getQuaternionModifierValue(float& value, Quaternion& fr
 
 Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, SpriteComponent& sprite){
     if (frames.size() > 0){
-        int id = frames[(int)(frames.size() * value)];
+        size_t frameIndex = std::min(static_cast<size_t>(frames.size() * value), frames.size() - 1);
+        int id = frames[frameIndex];
 
         if (sprite.framesRect.validIndex(id) && (unsigned int)id < sprite.numFramesRect){
             return sprite.framesRect[id].rect;
@@ -937,7 +938,8 @@ Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames
 
 Rect ActionSystem::getSpriteModifierValue(float& value, std::vector<int>& frames, PointsComponent& points){
     if (frames.size() > 0){
-        int id = frames[(int)(frames.size() * value)];
+        size_t frameIndex = std::min(static_cast<size_t>(frames.size() * value), frames.size() - 1);
+        int id = frames[frameIndex];
 
         if (points.framesRect.validIndex(id) && (unsigned int)id < points.numFramesRect){
             return points.framesRect[id].rect;
