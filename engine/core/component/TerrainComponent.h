@@ -146,6 +146,8 @@ namespace doriax{
         std::vector<TerrainSurfaceLayer> surfaceLayers;
 
         std::vector<TerrainFoliageLayer> foliageLayers;
+        // Runtime quality setting: scales every foliage layer's draw distances (1 = as authored)
+        float foliageDistanceScale = 1.0f;
 
         bool autoSetRanges = true;
         bool heightMapLoaded = false;

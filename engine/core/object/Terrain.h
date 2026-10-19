@@ -46,6 +46,10 @@ namespace doriax{
         void setMaxHeight(float maxHeight);
         float getMaxHeight() const;
 
+        // quality setting: scales the draw distances of every foliage layer (1 = as authored)
+        void setFoliageDistanceScale(float scale);
+        float getFoliageDistanceScale() const;
+
         void setResolution(int resolution);
         int getResolution() const;
 

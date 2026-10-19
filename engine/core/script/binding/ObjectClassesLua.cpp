@@ -667,6 +667,7 @@ void LuaBinding::registerObjectClasses(lua_State *L){
         .addFunction("getNumLayers", &Terrain::getNumLayers)
         .addProperty("size", &Terrain::getSize, &Terrain::setSize)
         .addProperty("maxHeight", &Terrain::getMaxHeight, &Terrain::setMaxHeight)
+        .addProperty("foliageDistanceScale", &Terrain::getFoliageDistanceScale, &Terrain::setFoliageDistanceScale)
         .addProperty("resolution", &Terrain::getResolution, &Terrain::setResolution)
         .addProperty("textureBaseTiles", &Terrain::getTextureBaseTiles, &Terrain::setTextureBaseTiles)
         .addProperty("textureDetailTiles", &Terrain::getTextureDetailTiles, &Terrain::setTextureDetailTiles)

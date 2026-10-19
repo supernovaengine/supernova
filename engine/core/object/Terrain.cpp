@@ -188,6 +188,18 @@ float Terrain::getMaxHeight() const{
     return terrain.maxHeight;
 }
 
+void Terrain::setFoliageDistanceScale(float scale){
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    terrain.foliageDistanceScale = std::max(0.0f, scale);
+}
+
+float Terrain::getFoliageDistanceScale() const{
+    TerrainComponent& terrain = getComponent<TerrainComponent>();
+
+    return terrain.foliageDistanceScale;
+}
+
 void Terrain::setResolution(int resolution){
     TerrainComponent& terrain = getComponent<TerrainComponent>();
     MeshComponent& mesh = getComponent<MeshComponent>();

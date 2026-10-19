@@ -3551,7 +3551,13 @@ void MeshSystem::updateFoliageLayer(TerrainComponent& terrain, TerrainFoliageLay
     const int placementRadius = std::max(1, static_cast<int>(std::ceil(terrain.terrainSize * 0.5f / TERRAIN_FOLIAGE_CELL_SIZE)));
     const int maxBatchSide = static_cast<int>(std::sqrt(TERRAIN_FOLIAGE_MAX_CHUNK_INSTANCES / attempts));
     const int previewRadius = (placementRadius + maxBatchSide - 1) / maxBatchSide;
-    const float drawDistance = std::max(0.0f, layer.drawDistance);
+    const float distanceScale = std::max(0.0f, terrain.foliageDistanceScale);
+    const float drawDistance = std::max(0.0f, layer.drawDistance * distanceScale);
+    // an empty fade range turns fading off, so the camera's own chunk would draw at full size
+    if (!preview && drawDistance <= 0.0f){
+        destroyFoliageInstances(instances);
+        return;
+    }
     const int batchSide = preview ? (placementRadius + previewRadius - 1) / previewRadius :
         static_cast<int>(std::clamp(std::ceil(drawDistance / (TERRAIN_FOLIAGE_CELL_SIZE * TERRAIN_FOLIAGE_TARGET_BATCH_RADIUS)), 1.0f, static_cast<float>(maxBatchSide)));
     const float chunkSize = TERRAIN_FOLIAGE_CELL_SIZE * batchSide;
@@ -3673,7 +3679,7 @@ void MeshSystem::updateFoliageLayer(TerrainComponent& terrain, TerrainFoliageLay
             instmesh.distanceFade = true;
             instmesh.fadeStart = fadeStart;
             instmesh.fadeEnd = fadeEnd;
-            instmesh.cullNearDistance = preview ? 0.0f : std::clamp(layer.minDrawDistance, 0.0f, drawDistance);
+            instmesh.cullNearDistance = preview ? 0.0f : std::clamp(layer.minDrawDistance * distanceScale, 0.0f, drawDistance);
             mesh.castShadows = layer.castShadows;
 
             // Grows with headroom and never shrinks, so a draw distance drag rebuilds little.
