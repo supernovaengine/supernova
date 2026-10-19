@@ -9,8 +9,8 @@
 
 using namespace doriax;
 
-std::string StringUtils::toUTF8(wchar_t codepoint){
-    uint32_t cp = static_cast<uint32_t>(codepoint);
+namespace {
+std::string encodeCodepointUtf8(uint32_t cp){
 
     // Replace invalid Unicode scalar values.
     if (cp > 0x10FFFFu || (cp >= 0xD800u && cp <= 0xDFFFu)) {
@@ -34,6 +34,11 @@ std::string StringUtils::toUTF8(wchar_t codepoint){
         out.push_back(static_cast<char>(0x80u | (cp & 0x3Fu)));
     }
     return out;
+}
+} // namespace
+
+std::string StringUtils::toUTF8(wchar_t codepoint){
+    return encodeCodepointUtf8(static_cast<uint32_t>(codepoint));
 }
 
 std::vector<uint32_t> StringUtils::decodeUtf8ToCodepoints(const std::string& text, bool& hadInvalid) {
@@ -194,7 +199,7 @@ void StringUtils::eraseCodepointsUtf8(std::string& text, size_t startIndex, size
 
     text.clear();
     for (uint32_t cp : codepoints) {
-        text += toUTF8(static_cast<wchar_t>(cp));
+        text += encodeCodepointUtf8(cp);
     }
 }
 
@@ -209,7 +214,7 @@ void StringUtils::insertUtf8AtCodepoint(std::string& text, size_t cpIndex, const
 
     text.clear();
     for (uint32_t cp : codepoints) {
-        text += toUTF8(static_cast<wchar_t>(cp));
+        text += encodeCodepointUtf8(cp);
     }
 }
 
