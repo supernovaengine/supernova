@@ -4747,6 +4747,9 @@ ActionResult EditorActionExecutor::exportProject(const Json& arguments, const st
     config.luaDir = project->getLuaPath();
     config.startSceneId = static_cast<uint32_t>(arguments.value("start_scene_id", static_cast<int>(project->getStartSceneId())));
     config.packNativeResources = project->shouldPackNativeResources();
+    // the overrides saved with the project, as the Export window applies them
+    config.shaderAdditions = project->getShaderOverrides().additions;
+    config.shaderExclusions = project->getShaderOverrides().exclusions;
     std::string error;
     config.selectedBackends = parseBackendList(arguments.value("backends", "all"), error);
     if (!error.empty()) return failResult(error);

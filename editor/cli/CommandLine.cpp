@@ -547,6 +547,11 @@ int CommandLine::runExportCommand(int argc, char** argv, const char* executableN
     config.packNativeResources = project.shouldPackNativeResources();
     config.selectedBackends   = options.backends;
     config.shaderKeysOverride = options.shaderKeys;
+    // saved overrides apply unless --shader gives the exact list
+    if (options.shaderKeys.empty()) {
+        config.shaderAdditions = project.getShaderOverrides().additions;
+        config.shaderExclusions = project.getShaderOverrides().exclusions;
+    }
 
     if (!options.startScene.empty() && config.startSceneId == 0) {
         Out::warning("Start scene not found: %s", options.startScene.c_str());
