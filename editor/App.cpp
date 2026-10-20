@@ -255,6 +255,7 @@ enum class AppMenuCommand : uint32_t {
     ResumeScene,
     StopScene,
     DetachCamera,
+    Fullscreen,
     RemoveScene,
     About,
     Documentation,
@@ -448,6 +449,8 @@ editor::PlatformMenuModel editor::App::buildMenuModel(){
 
     PlatformMenuItem detachCameraItem = menuShortcut(AppMenuCommand::DetachCamera, "Detach Camera", "F8", canDetachCamera);
     detachCameraItem.checked = canDetachCamera && selectedScene->sceneRender && selectedScene->sceneRender->isCameraDetached();
+    PlatformMenuItem fullscreenItem = menuShortcut(AppMenuCommand::Fullscreen, "Full Screen", "F11", isPlaying || isPaused);
+    fullscreenItem.checked = sceneWindow->isFullscreen();
 
     menu.menus.push_back(menuSubmenu("Scene", {
         menuSubmenu("New Scene", {
@@ -461,6 +464,7 @@ editor::PlatformMenuModel editor::App::buildMenuModel(){
         menuShortcut(AppMenuCommand::ResumeScene, "Resume", "F5", canResume),
         menuShortcut(AppMenuCommand::StopScene, "Stop", "F7", canStop),
         detachCameraItem,
+        fullscreenItem,
         menuSeparator(),
         menuCommand(AppMenuCommand::RemoveScene, "Remove Scene from Project", canRemove)
     }));
@@ -673,6 +677,9 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
         case AppMenuCommand::DetachCamera:
             project.toggleCameraDetached(project.getSelectedSceneId());
             break;
+        case AppMenuCommand::Fullscreen:
+            sceneWindow->toggleFullscreen(project.getSelectedSceneId());
+            break;
         case AppMenuCommand::RemoveScene: {
             const uint32_t sceneId = project.getSelectedSceneId();
             if (project.getSelectedScene() && !project.isAnyScenePlaying() &&
@@ -717,7 +724,8 @@ void editor::App::executeMenuCommand(const PlatformMenuCommand& command){
                 "F5    Run current scene / Resume\n"
                 "F6    Pause\n"
                 "F7    Stop\n"
-                "F8    Detach / attach camera\n\n"
+                "F8    Detach / attach camera\n"
+                "F11    Full screen\n\n"
                 "SCENE VIEW\n"
                 "W / E / R    Move / Rotate / Scale\n"
                 "T    Toggle local / global transforms\n"
@@ -1799,6 +1807,9 @@ void editor::App::show(){
             }
             if (ImGui::IsKeyPressed(ImGuiKey_F8, false)) {
                 project.toggleCameraDetached(selectedSceneId);
+            }
+            if (ImGui::IsKeyPressed(ImGuiKey_F11, false)) {
+                sceneWindow->toggleFullscreen(selectedSceneId);
             }
         }
         if (ImGui::IsKeyPressed(ImGuiKey_F1)) executeMenuCommand({static_cast<uint32_t>(AppMenuCommand::Documentation), {}});
