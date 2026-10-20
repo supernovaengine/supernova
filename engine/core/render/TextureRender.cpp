@@ -43,9 +43,9 @@ bool TextureRender::createTextureCubeWithMips(
 bool TextureRender::createFramebufferTexture(
                 TextureType type, bool depth, bool shadowMap, int width, int height,
                 TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV,
-                ColorFormat colorFormat){
+                ColorFormat colorFormat, int numMipmaps){
     if (Engine::isViewLoaded() && !isCreated())
-        return backend.createFramebufferTexture(type, depth, shadowMap, width, height, minFilter, magFilter, wrapU, wrapV, colorFormat);
+        return backend.createFramebufferTexture(type, depth, shadowMap, width, height, minFilter, magFilter, wrapU, wrapV, colorFormat, numMipmaps);
     else
         return false;
 }

@@ -51,9 +51,9 @@ void SokolCamera::setStoreDepth(bool storeDepth){
     pass.action.depth.store_action = storeDepth ? SG_STOREACTION_STORE : SG_STOREACTION_DONTCARE;
 }
 
-void SokolCamera::startRenderPass(FramebufferRender* framebuffer, size_t face){
+void SokolCamera::startRenderPass(FramebufferRender* framebuffer, size_t face, int mip){
     pass.swapchain = {};
-    pass.attachments = framebuffer->backend.get(face);
+    pass.attachments = framebuffer->backend.get(face, mip);
     //SokolCmdQueue::add_command_begin_pass(pass);
     sg_begin_pass(pass);
 }

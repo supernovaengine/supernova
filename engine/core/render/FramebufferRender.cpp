@@ -33,6 +33,13 @@ bool FramebufferRender::createDepthOnlyFramebuffer(int width, int height, Textur
         return false;
 }
 
+bool FramebufferRender::createCubeMipFramebuffer(int size, int mips){
+    if (Engine::isViewLoaded() && !isCreated())
+        return backend.createCubeMipFramebuffer(size, mips);
+    else
+        return false;
+}
+
 bool FramebufferRender::createFramebufferMRT(int width, int height, TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV, int numColor, const ColorFormat* formats){
     if (Engine::isViewLoaded() && !isCreated())
         return backend.createFramebufferMRT(width, height, minFilter, magFilter, wrapU, wrapV, numColor, formats);

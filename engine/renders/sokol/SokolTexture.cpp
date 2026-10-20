@@ -486,7 +486,7 @@ void SokolTexture::createTextureView(const char* label){
 bool SokolTexture::createFramebufferTexture(
             TextureType type, bool depth, bool shadowMap, int width, int height,
             TextureFilter minFilter, TextureFilter magFilter, TextureWrap wrapU, TextureWrap wrapV,
-            ColorFormat colorFormat){
+            ColorFormat colorFormat, int numMipmaps){
     sg_image_desc img_desc = {0};
     if (depth){
         img_desc.usage.depth_stencil_attachment = true;
@@ -497,6 +497,7 @@ bool SokolTexture::createFramebufferTexture(
     img_desc.width = width;
     img_desc.height = height;
     img_desc.num_slices = (type == TextureType::TEXTURE_CUBE)? 6 : 1;
+    img_desc.num_mipmaps = numMipmaps;
 
     sg_sampler_desc sampler_desc = {0};
     sampler_desc.min_filter = getFilter(minFilter);

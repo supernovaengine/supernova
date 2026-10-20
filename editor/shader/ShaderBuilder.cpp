@@ -700,6 +700,9 @@ bool editor::ShaderBuilder::setupShaderArgs(shadercompiler::args_t& args, Shader
     }else if (shaderType == ShaderType::UNDERWATER){
         args.vert_file = "fullscreen.vert";
         args.frag_file = "underwater.frag";
+    }else if (shaderType == ShaderType::PROBE_FILTER){
+        args.vert_file = "fullscreen.vert";
+        args.frag_file = "probe_filter.frag";
     }else{
         return false;
     }

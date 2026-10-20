@@ -72,6 +72,11 @@ namespace doriax{
 		Vector4 boxMax_lod;       // xyz = influence AABB max, w = max available mip LOD
 	} fs_reflection_probe_t;
 
+	typedef struct fs_probe_filter_t {
+		Vector4 params; // x = roughness, y = cube face, z = samples (taps per side when downsampling), w = 1 to downsample
+		Vector4 source; // x = destination level size, y = source base size, z = source mip count
+	} fs_probe_filter_t;
+
 	typedef struct vs_shadow2d_t {
 		Vector4 lightPos_range; // xy = light world pos, w = range
 		Vector4 offset;         // x = NDC x offset for the polar seam duplication (-2, 0, +2)
@@ -362,9 +367,23 @@ namespace doriax{
 			unsigned int observedCaptureRevision = 0;
 			Vector3 capturePosition;
 			Vector3 capturedPosition;
+			// the capture prefiltered into one roughness per mip level
+			FramebufferRender filteredFramebuffer;
+			bool needFilter = false;
 		};
 
 		std::unordered_map<Entity, std::unique_ptr<ReflectionProbeRuntime>> reflectionProbeRuntimes;
+
+		// prefilter of the finished captures (probe_filter.frag)
+		bool probeFilterLoaded;
+		FramebufferRender probeSourceFramebuffer; // box-filtered mip chain of the capture
+		int probeSourceSize;
+		CameraRender probeFilterPassRender;
+		ObjectRender probeFilterRender;
+		std::shared_ptr<ShaderRender> probeFilterShader;
+		fs_probe_filter_t fs_probe_filter;
+		int probeFilterSlotParams;
+
 		// Each mirror's reflection camera. Kept here so the authored component stays copiable.
 		std::unordered_map<Entity, Entity> mirrorCameras;
 		// Main camera position for the instance distance fade: the colour and depth passes must
@@ -599,6 +618,9 @@ namespace doriax{
 		void updateSkyEnvironment(SkyComponent& sky);
 		void updateReflectionProbes(double dt);
 		void renderReflectionProbeCapture();
+		void loadProbeFilter();
+		void destroyProbeFilter();
+		void filterReflectionProbes();
 		void releaseReflectionProbeMaps(ReflectionProbeRuntime& runtime);
 		void destroyReflectionProbe(Entity entity, ReflectionProbeComponent& probe);
 		bool selectReflectionProbe(const Vector3& worldPosition, fs_reflection_probe_t& params, TextureRender*& texture);

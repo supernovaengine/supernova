@@ -114,6 +114,10 @@ bool ShaderPool::parseShaderTypeToken(const std::string& typeToken, ShaderType& 
         shaderType = ShaderType::UNDERWATER;
         return true;
     }
+    if (typeToken == "probefilter") {
+        shaderType = ShaderType::PROBE_FILTER;
+        return true;
+    }
 
     return false;
 }
@@ -413,6 +417,7 @@ std::string ShaderPool::getShaderTypeName(ShaderType shaderType, bool lowerCase)
         case ShaderType::POSTPROCESS: return lowerCase ? "postprocess" : "Post-process";
         case ShaderType::WATER:  return lowerCase ? "water"  : "Water";
         case ShaderType::UNDERWATER: return lowerCase ? "underwater" : "Underwater";
+        case ShaderType::PROBE_FILTER: return lowerCase ? "probefilter" : "Probe Filter";
         default:                 return lowerCase ? "unknown": "Unknown";
     }
 }

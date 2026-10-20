@@ -5,6 +5,7 @@
 #include "Log.h"
 #include "SokolCmdQueue.h"
 #include "Engine.h"
+#include <algorithm>
 
 using namespace doriax;
 
@@ -28,6 +29,9 @@ SokolFramebuffer::SokolFramebuffer(const SokolFramebuffer& rhs){
     depthAttachmentView = rhs.depthAttachmentView;
     depthTexture = rhs.depthTexture;
     numColorAttachments = rhs.numColorAttachments;
+    mipColorViews = rhs.mipColorViews;
+    mipDepthTextures = rhs.mipDepthTextures;
+    mipDepthViews = rhs.mipDepthViews;
 }
 
 SokolFramebuffer& SokolFramebuffer::operator=(const SokolFramebuffer& rhs){
@@ -40,6 +44,9 @@ SokolFramebuffer& SokolFramebuffer::operator=(const SokolFramebuffer& rhs){
     depthAttachmentView = rhs.depthAttachmentView;
     depthTexture = rhs.depthTexture;
     numColorAttachments = rhs.numColorAttachments;
+    mipColorViews = rhs.mipColorViews;
+    mipDepthTextures = rhs.mipDepthTextures;
+    mipDepthViews = rhs.mipDepthViews;
 
     return *this;
 }
@@ -234,7 +241,26 @@ void SokolFramebuffer::destroyFramebuffer(){
                 sg_destroy_view(depthAttachmentView);
             }
         }
+
+        for (std::vector<sg_view>* views : {&mipColorViews, &mipDepthViews}){
+            for (sg_view view : *views){
+                if (view.id == SG_INVALID_ID)
+                    continue;
+                if (Engine::isAsyncThread()){
+                    SokolCmdQueue::add_command_destroy_view(view);
+                }else{
+                    sg_destroy_view(view);
+                }
+            }
+        }
     }
+
+    for (TextureRender& texture : mipDepthTextures){
+        texture.destroyTexture();
+    }
+    mipColorViews.clear();
+    mipDepthTextures.clear();
+    mipDepthViews.clear();
 
     for (int a = 0; a < MAX_COLOR_ATTACHMENTS; a++){
         colorTexture[a].destroyTexture();
@@ -318,8 +344,74 @@ const void* SokolFramebuffer::getD3D11HandlerDSV() const{
     return nullptr;
 }
 
-sg_attachments SokolFramebuffer::get(size_t face){
+bool SokolFramebuffer::createCubeMipFramebuffer(int size, int mips){
+    destroyFramebuffer();
+
+    numColorAttachments = 1;
+
+    bool colorCreated = colorTexture[0].createFramebufferTexture(TextureType::TEXTURE_CUBE, false, false, size, size,
+            TextureFilter::LINEAR_MIPMAP_LINEAR, TextureFilter::LINEAR, TextureWrap::CLAMP_TO_EDGE, TextureWrap::CLAMP_TO_EDGE,
+            ColorFormat::RGBA, mips);
+    bool depthCreated = depthTexture.createFramebufferTexture(TextureType::TEXTURE_2D, true, false, size, size,
+            TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::CLAMP_TO_EDGE, TextureWrap::CLAMP_TO_EDGE);
+    if (!colorCreated || !depthCreated){
+        destroyFramebuffer();
+        return false;
+    }
+
+    auto makeView = [](const sg_view_desc& desc){
+        return Engine::isAsyncThread() ? SokolCmdQueue::add_command_make_view(desc) : sg_make_view(desc);
+    };
+
+    for (int face = 0; face < 6; face++){
+        sg_view_desc desc = {0};
+        desc.color_attachment.image = colorTexture[0].backend.get();
+        desc.color_attachment.slice = face;
+        desc.label = "framebuffer-cube-mip-color-view";
+        colorAttachmentViews[0][face] = makeView(desc);
+    }
+    sg_view_desc depthDesc = {0};
+    depthDesc.depth_stencil_attachment.image = depthTexture.backend.get();
+    depthDesc.label = "framebuffer-cube-mip-depth-view";
+    depthAttachmentView = makeView(depthDesc);
+
+    mipDepthTextures.resize(std::max(0, mips - 1));
+    for (int level = 1; level < mips; level++){
+        int levelSize = std::max(1, size >> level);
+        if (!mipDepthTextures[level - 1].createFramebufferTexture(TextureType::TEXTURE_2D, true, false, levelSize, levelSize,
+                TextureFilter::LINEAR, TextureFilter::LINEAR, TextureWrap::CLAMP_TO_EDGE, TextureWrap::CLAMP_TO_EDGE)){
+            destroyFramebuffer();
+            return false;
+        }
+        sg_view_desc levelDepth = {0};
+        levelDepth.depth_stencil_attachment.image = mipDepthTextures[level - 1].backend.get();
+        levelDepth.label = "framebuffer-cube-mip-depth-view";
+        mipDepthViews.push_back(makeView(levelDepth));
+        for (int face = 0; face < 6; face++){
+            sg_view_desc desc = {0};
+            desc.color_attachment.image = colorTexture[0].backend.get();
+            desc.color_attachment.mip_level = level;
+            desc.color_attachment.slice = face;
+            desc.label = "framebuffer-cube-mip-color-view";
+            mipColorViews.push_back(makeView(desc));
+        }
+    }
+
+    bool created = isCreated();
+    if (!created){
+        destroyFramebuffer();
+    }
+    return created;
+}
+
+sg_attachments SokolFramebuffer::get(size_t face, int mip){
     sg_attachments attachments = {};
+
+    if (mip > 0 && mip <= (int)mipDepthViews.size()){
+        attachments.colors[0] = mipColorViews[(mip - 1) * 6 + face];
+        attachments.depth_stencil = mipDepthViews[mip - 1];
+        return attachments;
+    }
 
     if (numColorAttachments > 1){
         // MRT framebuffers are 2D (single face); bind every color attachment.

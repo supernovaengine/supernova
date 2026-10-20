@@ -174,6 +174,7 @@ static bool parseShaderTypeName(const std::string& value, ShaderType& out) {
     if (token == "postprocess" || token == "post") { out = ShaderType::POSTPROCESS; return true; }
     if (token == "water")                       { out = ShaderType::WATER;  return true; }
     if (token == "underwater")                  { out = ShaderType::UNDERWATER; return true; }
+    if (token == "probefilter")                 { out = ShaderType::PROBE_FILTER; return true; }
     return false;
 }
 

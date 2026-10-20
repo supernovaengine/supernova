@@ -38,8 +38,8 @@ void CameraRender::setStoreDepth(bool storeDepth){
     backend.setStoreDepth(storeDepth);
 }
 
-void CameraRender::startRenderPass(FramebufferRender* framebuffer, size_t face){
-    backend.startRenderPass(framebuffer, face);
+void CameraRender::startRenderPass(FramebufferRender* framebuffer, size_t face, int mip){
+    backend.startRenderPass(framebuffer, face, mip);
 }
 
 void CameraRender::startRenderPass(int width, int height){

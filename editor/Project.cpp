@@ -3730,6 +3730,10 @@ void editor::Project::collectSceneShaderKeys(const SceneProject* sceneProject, s
         keys.insert(ShaderPool::getShaderKey(ShaderType::SSAO_BLUR, 0));
     }
 
+    if (hasReflectionProbes) {
+        keys.insert(ShaderPool::getShaderKey(ShaderType::PROBE_FILTER, 0));
+    }
+
     if (scene->isSSREnabled()) {
         keys.insert(ShaderPool::getShaderKey(ShaderType::SSR, 0));
         keys.insert(ShaderPool::getShaderKey(ShaderType::SSR_BLUR, 0));

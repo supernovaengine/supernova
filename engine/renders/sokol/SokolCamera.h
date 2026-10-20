@@ -28,7 +28,7 @@ namespace doriax{
         void setDepthLoadActionLoad();
         void setStoreDepth(bool storeDepth);
 
-        void startRenderPass(FramebufferRender* framebuffer, size_t face);
+        void startRenderPass(FramebufferRender* framebuffer, size_t face, int mip);
         void startRenderPass(int width, int height);
         void startRenderPass();
 
