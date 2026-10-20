@@ -701,8 +701,9 @@ bool editor::Project::visitAssetPathsInRegistry(EntityRegistry* registry, const 
         }
 
         for (TerrainFoliageLayer& layer : terrain.foliageLayers) {
-            if (visitTexturePaths(layer.densityMap, transform) ||
-                (!layer.meshPath.empty() && transform(layer.meshPath))) {
+            bool layerChanged = visitTexturePaths(layer.densityMap, transform);
+            layerChanged |= !layer.meshPath.empty() && transform(layer.meshPath);
+            if (layerChanged) {
                 terrain.needUpdateFoliage = true;
                 changed = true;
             }
