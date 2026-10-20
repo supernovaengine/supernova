@@ -121,7 +121,7 @@ namespace doriax::editor{
         // older source counts as missing and is written again.
         static const char* const sceneSourceHeader;
 
-        static std::string createScene(int indentSpaces, Scene* scene, std::string name, std::vector<Entity> entities, Entity camera, const fs::path& projectPath, const fs::path& generatedPath, const std::vector<BundleInstanceInfo>& bundleInstances = {}, const SceneResources& resources = {});
+        static std::string createScene(int indentSpaces, Scene* scene, uint32_t sceneId, std::string name, std::vector<Entity> entities, Entity camera, const fs::path& projectPath, const fs::path& generatedPath, const std::vector<BundleInstanceInfo>& bundleInstances = {}, const SceneResources& resources = {});
 
         static std::string createBundle(const std::filesystem::path& bundlePath, EntityRegistry* registry, const std::vector<Entity>& registryEntities, const fs::path& projectPath, const fs::path& generatedPath);
         static std::string createBundleHeader(const std::filesystem::path& bundlePath);
