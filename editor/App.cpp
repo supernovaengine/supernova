@@ -2920,7 +2920,8 @@ std::filesystem::path editor::App::getUserShaderCacheDir(){
     // v35: the directional-only variant declares no point or spot bindings.
     // v36: probe_filter prefilters runtime reflection probe captures into roughness mips.
     // v37: probe_filter downsamples each level from the one above.
-    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v37";
+    // v38: ssr fades out rough surfaces (SSR_MAX_ROUGHNESS).
+    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v38";
 }
 
 void editor::App::pushTabNotificationStyle(){
