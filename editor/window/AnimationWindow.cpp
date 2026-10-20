@@ -14,6 +14,7 @@
 #include "command/type/MultiPropertyCmd.h"
 #include "command/type/CreateEntityCmd.h"
 #include "command/type/CreateTrackKeyCmd.h"
+#include "command/type/AddActionFrameCmd.h"
 
 #include "component/ActionComponent.h"
 #include "component/AnimationComponent.h"
@@ -1403,15 +1404,14 @@ void editor::AnimationWindow::drawToolbar(float width, AnimationComponent& anim,
     ImGui::SameLine();
 
     // Add Action
+    EntityCreationType selectedType = EntityCreationType::EMPTY;
+    std::string entityName;
+    bool selected = false;
     ImGui::BeginDisabled(isPreviewing);
     if (ImGui::Button(ICON_FA_PLUS " Add Action")) {
         ImGui::OpenPopup("##add_action_popup");
     }
     if (ImGui::BeginPopup("##add_action_popup")) {
-        EntityCreationType selectedType = EntityCreationType::EMPTY;
-        std::string entityName;
-        bool selected = false;
-
         if (ImGui::MenuItem(ICON_FA_PLUS "  Empty Action")) {
             selected = true;
         }
@@ -1475,53 +1475,6 @@ void editor::AnimationWindow::drawToolbar(float width, AnimationComponent& anim,
             selectedType = EntityCreationType::MORPH_TRACKS;
             entityName = "MorphTracks";
             selected = true;
-        }
-
-        if (selected) {
-            // If a frame is selected, add to the same track, otherwise track 0
-            uint32_t targetTrack = 0;
-            if (selectedFrameIndex >= 0 && selectedFrameIndex < (int)anim.actions.size()) {
-                targetTrack = anim.actions[selectedFrameIndex].track;
-            }
-
-            Entity actionEntity = NULL_ENTITY;
-            if (selectedType != EntityCreationType::EMPTY) {
-                Entity target = scene->findComponent<ActionComponent>(selectedEntity)
-                    ? scene->getComponent<ActionComponent>(selectedEntity).target
-                    : NULL_ENTITY;
-                auto* cmd = new CreateEntityCmd(project, selectedSceneId, entityName, selectedType, target);
-                CommandHandle::get(selectedSceneId)->addCommandNoMerge(cmd);
-                actionEntity = cmd->getEntity();
-            }
-
-            // Duration 0 = auto: the frame follows the action's own duration.
-            // Empty frames have no action to resolve, so give a visible default.
-            float newDuration = (actionEntity != NULL_ENTITY) ? 0.0f : 1.0f;
-            ActionFrame newFrame = {0.0f, newDuration, actionEntity, targetTrack};
-
-            // Find non-overlapping track (zero-length frames floored so they still
-            // spread onto free tracks)
-            float newFrameDur = std::max(effectiveFrameDuration(newFrame, scene), 0.01f);
-            bool overlap;
-            do {
-                overlap = false;
-                for (const auto& a : anim.actions) {
-                    if (a.track == newFrame.track) {
-                        float startA = a.startTime;
-                        float endA = a.startTime + std::max(effectiveFrameDuration(a, scene), 0.01f);
-                        float startB = newFrame.startTime;
-                        float endB = newFrame.startTime + newFrameDur;
-                        if (std::max(startA, startB) < std::min(endA, endB)) {
-                            overlap = true;
-                            newFrame.track++;
-                            break;
-                        }
-                    }
-                }
-            } while (overlap);
-
-            anim.actions.push_back(newFrame);
-            selectedFrameIndex = anim.actions.size() - 1;
         }
 
         ImGui::EndPopup();
@@ -1752,6 +1705,22 @@ void editor::AnimationWindow::drawToolbar(float width, AnimationComponent& anim,
         } else {
             keyNotice.clear();
         }
+    }
+
+    // Done last: an Animation action adds an AnimationComponent, which can move anim
+    if (selected) {
+        // If a frame is selected, add to the same track, otherwise track 0
+        uint32_t targetTrack = 0;
+        if (selectedFrameIndex >= 0 && selectedFrameIndex < (int)anim.actions.size()) {
+            targetTrack = anim.actions[selectedFrameIndex].track;
+        }
+        Entity target = scene->findComponent<ActionComponent>(selectedEntity)
+            ? scene->getComponent<ActionComponent>(selectedEntity).target
+            : NULL_ENTITY;
+
+        selectedFrameIndex = (int)anim.actions.size();
+        CommandHandle::get(sceneProject->id)->addCommandNoMerge(new AddActionFrameCmd(
+            project, sceneProject->id, selectedEntity, target, selectedType, entityName, targetTrack));
     }
 }
 
@@ -2736,6 +2705,8 @@ void editor::AnimationWindow::show() {
 
     // Draw toolbar
     drawToolbar(ImGui::GetContentRegionAvail().x, *animComp, scene, sceneProject);
+    // The toolbar can add an AnimationComponent, which can move this one
+    animComp = &scene->getComponent<AnimationComponent>(selectedEntity);
 
     ImGui::Separator();
 
