@@ -1722,7 +1722,7 @@ bool editor::Exporter::copyGenerated() try {
     };
 
     if (fs::exists(generatedSrc)) {
-        for (auto& entry : fs::recursive_directory_iterator(generatedSrc)) {
+        for (auto& entry : fs::recursive_directory_iterator(generatedSrc, fs::directory_options::skip_permission_denied)) {
             fs::path relativePath = fs::relative(entry.path(), generatedSrc);
 
             if (entry.is_regular_file() && excludedFiles.count(relativePath.filename().string())) {
@@ -1849,10 +1849,11 @@ bool editor::Exporter::copyAssets() try {
     fs::create_directories(assetsDst);
 
     // References are relative to this directory, so its contents become the export root
-    for (auto it = fs::recursive_directory_iterator(assetsSrc);
+    for (auto it = fs::recursive_directory_iterator(assetsSrc, fs::directory_options::skip_permission_denied);
          it != fs::recursive_directory_iterator(); ++it) {
         const auto& entry = *it;
         fs::path relPath = fs::relative(entry.path(), assetsSrc);
+        if (relPath.empty()) continue;
         if (isExportDir(entry)) { it.disable_recursion_pending(); continue; }
 
         // Skip hidden directories (starting with '.') and build directories
@@ -1952,10 +1953,11 @@ bool editor::Exporter::copyLua() try {
     // same path; Android merges both trees into one and fails the build on duplicates.
     const bool luaRootIsAssetsRoot = (luaSrc == getAssetsSourceDir());
 
-    for (auto it = fs::recursive_directory_iterator(luaSrc);
+    for (auto it = fs::recursive_directory_iterator(luaSrc, fs::directory_options::skip_permission_denied);
          it != fs::recursive_directory_iterator(); ++it) {
         auto& entry = *it;
         fs::path relPath = fs::relative(entry.path(), luaSrc);
+        if (relPath.empty()) continue;
         if (isExportDir(entry)) { it.disable_recursion_pending(); continue; }
 
         // Skip hidden directories (starting with '.') and build directories
@@ -2048,7 +2050,7 @@ bool editor::Exporter::copyCppScripts() try {
 
     // Preserve unregistered support headers for project-root-relative includes.
     try {
-        for (auto it = fs::recursive_directory_iterator(projectRoot);
+        for (auto it = fs::recursive_directory_iterator(projectRoot, fs::directory_options::skip_permission_denied);
              it != fs::recursive_directory_iterator(); ++it) {
             const auto& entry = *it;
             const fs::path relPath = projectRelativePath(entry.path());
@@ -2090,7 +2092,7 @@ bool editor::Exporter::copyCppScripts() try {
         if (!fs::is_directory(rootPath)) continue;
 
         try {
-            for (auto it = fs::recursive_directory_iterator(rootPath);
+            for (auto it = fs::recursive_directory_iterator(rootPath, fs::directory_options::skip_permission_denied);
                  it != fs::recursive_directory_iterator(); ++it) {
                 const std::string name = it->path().filename().string();
                 const fs::path relPath = projectRelativePath(it->path());
