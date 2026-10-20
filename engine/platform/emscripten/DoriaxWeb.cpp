@@ -756,7 +756,7 @@ int DoriaxWeb::doriax_input(const char code[32]){
     if (!strcmp(code,"KeyZ")) return D_KEY_Z;
     if (!strcmp(code,"BracketLeft")) return D_KEY_LEFT_BRACKET; /* [ */
     if (!strcmp(code,"Backslash")) return D_KEY_BACKSLASH;  /* \ */
-    if (!strcmp(code,"BracketLeft")) return D_KEY_RIGHT_BRACKET;  /* ] */
+    if (!strcmp(code,"BracketRight")) return D_KEY_RIGHT_BRACKET;  /* ] */
     if (!strcmp(code,"Backquote")) return D_KEY_GRAVE_ACCENT; /* ` */
 
     if (!strcmp(code,"Escape")) return D_KEY_ESCAPE;
@@ -810,12 +810,12 @@ int DoriaxWeb::doriax_input(const char code[32]){
     if (!strcmp(code,"ShiftLeft")) return D_KEY_LEFT_SHIFT;
     if (!strcmp(code,"ControlLeft")) return D_KEY_LEFT_CONTROL;
     if (!strcmp(code,"AltLeft")) return D_KEY_LEFT_ALT;
-    if (!strcmp(code,"OSLeft")) return D_KEY_LEFT_SUPER;
+    if (!strcmp(code,"MetaLeft")) return D_KEY_LEFT_SUPER;
     if (!strcmp(code,"ShiftRight")) return D_KEY_RIGHT_SHIFT;
     if (!strcmp(code,"ControlRight")) return D_KEY_RIGHT_CONTROL;
     if (!strcmp(code,"AltRight")) return D_KEY_RIGHT_ALT;
-    if (!strcmp(code,"OSRight")) return D_KEY_RIGHT_SUPER;
-    if (!strcmp(code,"Menu")) return D_KEY_MENU;
+    if (!strcmp(code,"MetaRight")) return D_KEY_RIGHT_SUPER;
+    if (!strcmp(code,"ContextMenu")) return D_KEY_MENU;
 
 
     return 0;
