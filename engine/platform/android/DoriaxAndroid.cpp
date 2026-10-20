@@ -149,7 +149,9 @@ std::string DoriaxAndroid::getStringForKey(const char *key, const std::string& d
     jstring strKey = env->NewStringUTF(key);
     jstring strDefaultValue = env->NewStringUTF(defaultValue.c_str());
     jstring rv = (jstring)env->CallObjectMethod(jniData.userSettingsObjRef, jniData.getStringForKeyRef, strKey, strDefaultValue);
-    std::string value = env->GetStringUTFChars(rv, 0);
+    const char* chars = env->GetStringUTFChars(rv, nullptr);
+    std::string value = chars;
+    env->ReleaseStringUTFChars(rv, chars);
     env->DeleteLocalRef(strKey);
     env->DeleteLocalRef(strDefaultValue);
     env->DeleteLocalRef(rv);
