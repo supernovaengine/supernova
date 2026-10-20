@@ -612,16 +612,11 @@ void ActionSystem::spriteActionUpdate(double dt, Entity entity, ActionComponent&
     spriteanim.spriteFrameCount += dt * 1000;
     while (spriteanim.spriteFrameCount >= spriteanim.framesTime[spriteanim.frameTimeIndex]) {
 
-        spriteanim.spriteFrameCount -= spriteanim.framesTime[spriteanim.frameTimeIndex];
+        int frameTime = spriteanim.framesTime[spriteanim.frameTimeIndex];
+        spriteanim.spriteFrameCount -= frameTime;
 
         spriteanim.frameIndex++;
         spriteanim.frameTimeIndex++;
-
-        if (spriteanim.frameIndex == spriteanim.framesSize - 1) {
-            if (!spriteanim.loop) {
-                actionStop(entity);
-            }
-        }
 
         if (spriteanim.frameIndex >= spriteanim.framesSize){
             spriteanim.frameIndex = 0;
@@ -634,6 +629,16 @@ void ActionSystem::spriteActionUpdate(double dt, Entity entity, ActionComponent&
             spriteanim.frameTimeIndex = 0;
 
         setSpriteTextureRect(mesh, sprite, spriteanim);
+
+        // checked after the wrap so a single frame animation also stops
+        if (!spriteanim.loop && spriteanim.frameIndex == spriteanim.framesSize - 1) {
+            actionStop(entity);
+            return;
+        }
+
+        // zero time frames advance once per update
+        if (frameTime <= 0)
+            break;
     }
 }
 

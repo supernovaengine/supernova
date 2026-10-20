@@ -329,6 +329,10 @@ RayReturn Ray::intersects(const Sphere& sphere) const{
 RayReturn Ray::intersects(const Body2D& body) const{
     Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
 
+    if (!b2Body_IsValid(bodycomp.body)){
+        return NO_HIT;
+    }
+
     float ptmScale = body.getPointsToMeterScale();
 
     Vector3 end = origin + direction;
@@ -338,6 +342,9 @@ RayReturn Ray::intersects(const Body2D& body) const{
     b2Vec2 translation = b2Sub(bEnd, bOrigin);
 
     const int shapesCount = b2Body_GetShapeCount(bodycomp.body);
+    if (shapesCount == 0){
+        return NO_HIT;
+    }
     std::vector<b2ShapeId> shapeIds(shapesCount);
     int returnCount = b2Body_GetShapes(bodycomp.body, &shapeIds.front(), shapesCount);
 
@@ -370,6 +377,10 @@ RayReturn Ray::intersects(const Body2D& body) const{
 
 RayReturn Ray::intersects(const Body2D& body, size_t shape) const{
     Body2DComponent& bodycomp = body.getComponent<Body2DComponent>();
+
+    if (shape >= bodycomp.numShapes || !b2Shape_IsValid(bodycomp.shapes[shape].shape)){
+        return NO_HIT;
+    }
 
     float ptmScale = body.getPointsToMeterScale();
 

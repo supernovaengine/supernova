@@ -108,6 +108,7 @@ void Tilemap::addRect(int id, const std::string& name, const std::string& textur
     if ((unsigned int)(id + 1) > tilemap.numTilesRect){
         tilemap.numTilesRect = id + 1;
     }
+    tilemap.needUpdateTilemap = true;
 }
 
 void Tilemap::addRect(int id, const std::string& name, const std::string& texture, Rect rect){
@@ -283,7 +284,10 @@ TileData& Tilemap::getTile(const std::string& name){
 void Tilemap::setReserveTiles(unsigned int reserveTiles){
     TilemapComponent& tilemap = getComponent<TilemapComponent>();
 
-    tilemap.reserveTiles = reserveTiles;
+    if (tilemap.reserveTiles != reserveTiles){
+        tilemap.reserveTiles = reserveTiles;
+        tilemap.needUpdateTilemap = true;
+    }
 }
 
 unsigned int Tilemap::getReserveTiles() const{

@@ -34,12 +34,10 @@ std::filesystem::path userConfigDirectory() {
 }
 
 bool isWritableDirectory(const std::filesystem::path& dir) {
+    // A directory, so an existing file with this name is never truncated
     const std::filesystem::path probe = dir / ".doriax_write_test";
     std::error_code ec;
-    {
-        std::ofstream f(probe);
-        if (!f.is_open()) return false;
-    }
+    if (!std::filesystem::create_directory(probe, ec)) return false;
     std::filesystem::remove(probe, ec);
     return true;
 }
