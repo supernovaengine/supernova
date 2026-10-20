@@ -152,6 +152,7 @@ void Tilemap::removeRect(int id){
                 tilemap.tiles[i].rectId--;
             }
         }
+        tilemap.needUpdateTilemap = true;
     }else{
         Log::error("Error removing rect with id %i", id);
     }
@@ -170,6 +171,7 @@ void Tilemap::clearRects(){
         tilemap.tilesRect[i] = TileRectData{};
     }
     tilemap.numTilesRect = 0;
+    tilemap.needUpdateTilemap = true;
 }
 
 TileRectData& Tilemap::getRect(int id){
@@ -257,6 +259,7 @@ void Tilemap::clearTiles(){
         tilemap.tiles[i] = TileData{};
     }
     tilemap.numTiles = 0;
+    tilemap.needUpdateTilemap = true;
 }
 
 TileData& Tilemap::getTile(int id){
