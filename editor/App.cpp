@@ -2918,7 +2918,8 @@ std::filesystem::path editor::App::getUserShaderCacheDir(){
     // v33: pbr.glsl reads u_fs_texCoordSets.set1 in every UV-set variant.
     // v34: shadow projection in the fragment shader, directional-only variant.
     // v35: the directional-only variant declares no point or spot bindings.
-    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v35";
+    // v36: probe_filter prefilters runtime reflection probe captures into roughness mips.
+    return App::getUserCacheBaseDir() / "doriax" / "shaders" / "v36";
 }
 
 void editor::App::pushTabNotificationStyle(){
