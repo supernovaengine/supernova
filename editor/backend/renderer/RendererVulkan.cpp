@@ -235,6 +235,9 @@ bool Renderer::State::createVulkanDevice(){
     requiredFeatures.pNext = &vulkan13;
     requiredFeatures.features.samplerAnisotropy = VK_TRUE;
     requiredFeatures.features.dualSrcBlend = VK_TRUE;
+    // out-of-range buffer reads return zeros instead of hanging the GPU (seen on Intel)
+    requiredFeatures.features.robustBufferAccess =
+        supported.features.robustBufferAccess;
     requiredFeatures.features.textureCompressionBC =
         supported.features.textureCompressionBC;
     requiredFeatures.features.textureCompressionETC2 =
