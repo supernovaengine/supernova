@@ -1614,18 +1614,18 @@ bool editor::Exporter::loadAndSaveAllScenes() {
 
     std::promise<bool> savePromise;
     auto saveFuture = savePromise.get_future();
-    std::string importError;
+    std::string error;
 
-    auto saveScenes = [this, &savePromise, &importError]() {
+    auto saveScenes = [this, &savePromise, &error]() {
         try {
             std::vector<uint32_t> temporarilyLoaded;
             auto& scenes = project->getScenes();
 
             // Imports done before this export reload into the open scenes first
-            bool imported = project->flushFbxReloads(importError);
+            bool ok = project->flushFbxReloads(error);
 
             // Load all unloaded scenes (opened=false to avoid UI side-effects)
-            for (size_t i = 0; imported && i < scenes.size(); i++) {
+            for (size_t i = 0; ok && i < scenes.size(); i++) {
                 auto& sceneProject = scenes[i];
                 if (sceneProject.filepath.empty() || sceneProject.scene) {
                     continue;
@@ -1636,15 +1636,18 @@ bool editor::Exporter::loadAndSaveAllScenes() {
             }
 
             // Every FBX model needs its current import before the sources describe it
-            imported = imported && project->prepareFbxModelsForExport(importError);
+            ok = ok && project->prepareFbxModelsForExport(error);
 
             // Save all scenes to regenerate their .cpp sources
-            for (size_t i = 0; imported && i < scenes.size(); i++) {
+            for (size_t i = 0; ok && i < scenes.size(); i++) {
                 auto& sceneProject = scenes[i];
                 if (sceneProject.filepath.empty() || !sceneProject.scene) {
                     continue;
                 }
-                project->saveSceneToPath(sceneProject.id, sceneProject.filepath);
+                if (!project->saveSceneToPath(sceneProject.id, sceneProject.filepath)) {
+                    error = "Failed to save scene \"" + sceneProject.name + "\", see Output for details";
+                    ok = false;
+                }
             }
 
             // A disabled backend silently drops its components from the generated sources
@@ -1678,7 +1681,7 @@ bool editor::Exporter::loadAndSaveAllScenes() {
                 }
             }
 
-            savePromise.set_value(imported);
+            savePromise.set_value(ok);
         } catch (...) {
             savePromise.set_exception(std::current_exception());
         }
@@ -1693,7 +1696,7 @@ bool editor::Exporter::loadAndSaveAllScenes() {
 
     try {
         if (!saveFuture.get()) {
-            setError(importError);
+            setError(error);
             return false;
         }
     } catch (const std::exception& e) {

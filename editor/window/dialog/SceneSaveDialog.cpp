@@ -5,6 +5,7 @@
 #include "SceneSaveDialog.h"
 #include "external/IconsFontAwesome6.h"
 #include "Backend.h"
+#include "util/Util.h"
 #include <algorithm>
 #include <utility>
 #include <vector>
@@ -129,11 +130,16 @@ void SceneSaveDialog::show() {
         }
 
         // Validation
-        bool canSave = !fileName.empty();
         fs::path fullPath = m_selectedPath / fileName;
-        bool fileExists = fs::exists(fullPath);
+        // ".." or an absolute path in the name would leave the folders listed above
+        bool insideProject = Util::isInsidePath(fullPath, m_projectPath);
+        bool canSave = !fileName.empty() && insideProject;
+        std::error_code ec;
+        bool fileExists = insideProject && fs::exists(fullPath, ec);
 
-        if (fileExists) {
+        if (!fileName.empty() && !insideProject) {
+            ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Scene files must be inside the project folder.");
+        } else if (fileExists) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Warning: File already exists and will be overwritten!");
         }
 

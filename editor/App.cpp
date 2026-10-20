@@ -3044,7 +3044,7 @@ void editor::App::processNextSaveDialog() {
                         popSaveDialogQueueItem();
 
                         if (!success) {
-                            Backend::getApp().registerAlert("Error", "Scene could not be saved. Scene files must stay inside the project folder; see Output for details.");
+                            Backend::getApp().registerAlert("Error", "Scene could not be saved. See Output for details.");
                         }
                         if (completionCallback) {
                             completionCallback(success);

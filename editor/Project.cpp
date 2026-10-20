@@ -3921,6 +3921,9 @@ bool editor::Project::loadScene(fs::path filepath, bool opened, bool isNewScene,
                 return false;
             }
             targetScene->filepath = relPath;
+            if (*relPath.begin() == "..") {
+                Out::warning("Scene file is outside the project folder and cannot be saved or exported until it is moved inside: %s", fullPath.lexically_normal().string().c_str());
+            }
         } else {
             auto it = std::find_if(scenes.begin(), scenes.end(),
                 [this, &fullPath](const SceneProject& scene) { 
