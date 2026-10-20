@@ -377,6 +377,7 @@ namespace doriax{
 		// prefilter of the finished captures (probe_filter.frag)
 		bool probeFilterLoaded;
 		TextureRender probeSourceMap; // box-filtered mip chain of the capture
+		TextureRender probeReduceMap; // scratch target while building the source chain
 		int probeSourceSize;
 		CameraRender probeFilterPassRender;
 		ObjectRender probeFilterRender;

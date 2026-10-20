@@ -12,7 +12,7 @@ uniform sampler u_probeSource_smp;
 
 uniform u_fs_probeFilterParams {
     vec4 params; // x = roughness, y = cube face, z = samples (taps per side when downsampling), w = 1 to downsample
-    vec4 source; // x = destination level size, y = source base size, z = source mip count
+    vec4 source; // x = destination level size, y = source base size, z = source mip count, w = source level when downsampling
 } filterParams;
 
 #include "includes/srgb.glsl"
@@ -46,7 +46,7 @@ vec3 sampleSource(vec3 direction, float lod){
 }
 
 vec3 downsample(int face){
-    // taps x taps bilinear reads over the footprint of this texel in the capture
+    // taps x taps bilinear reads over the footprint of this texel in the source
     int taps = int(filterParams.params.z + 0.5);
     float texel = 1.0 / filterParams.source.x;
     vec3 sum = vec3(0.0);
@@ -55,7 +55,7 @@ vec3 downsample(int face){
         for (int i = 0; i < MAX_TAPS; i++){
             if (i >= taps) break;
             vec2 offset = (vec2(float(i), float(j)) + 0.5) / float(taps) - 0.5;
-            sum += sampleSource(faceDirection(face, v_texcoord + offset * texel), 0.0);
+            sum += sampleSource(faceDirection(face, v_texcoord + offset * texel), filterParams.source.w);
         }
     }
     return sum / float(taps * taps);

@@ -1798,6 +1798,7 @@ void RenderSystem::destroyProbeFilter(){
     }
 
     probeSourceMap.destroyTexture();
+    probeReduceMap.destroyTexture();
 
     probeSourceSize = 0;
     probeFilterSlotParams = -1;
@@ -1831,7 +1832,8 @@ void RenderSystem::filterReflectionProbes(){
         };
         if (!probeSourceMap.isCreated() || probeSourceSize != sourceSize){
             probeSourceMap.destroyTexture();
-            if (!createMap(probeSourceMap, sourceSize, sourceLevels))
+            probeReduceMap.destroyTexture();
+            if (!createMap(probeSourceMap, sourceSize, sourceLevels) || !createMap(probeReduceMap, sourceSize, sourceLevels))
                 continue;
             probeSourceSize = sourceSize;
         }
@@ -1849,15 +1851,23 @@ void RenderSystem::filterReflectionProbes(){
             probeFilterPassRender.endRenderPass();
         };
 
-        // every level averaged from the capture, so no pass reads the image it writes
-        for (int level = 0; level < sourceLevels; level++){
+        auto downsampleLevel = [&](TextureRender& target, TextureRender& source, int level, int sourceLevel, int sourceBaseSize){
             const int levelSize = sourceSize >> level;
-            const float taps = (float)std::min(16, (captureSize + levelSize - 1) / levelSize);
+            const int sourceLevelSize = sourceBaseSize >> sourceLevel;
+            const float taps = (float)std::min(16, (sourceLevelSize + levelSize - 1) / levelSize);
             for (int face = 0; face < 6; face++){
                 fs_probe_filter.params = Vector4(0.0f, (float)face, taps, 1.0f);
-                fs_probe_filter.source = Vector4((float)levelSize, (float)captureSize, 1.0f, 0.0f);
-                filterPass(probeSourceMap, runtime.captureFramebuffer.getColorTexture(), level, face);
+                fs_probe_filter.source = Vector4((float)levelSize, (float)sourceBaseSize, 1.0f, (float)sourceLevel);
+                filterPass(target, source, level, face);
             }
+        };
+
+        // each level is a 2x2 box of the one above, reduced into probeReduceMap and
+        // copied back, as a pass can't sample the texture it renders to
+        downsampleLevel(probeSourceMap, runtime.captureFramebuffer.getColorTexture(), 0, 0, captureSize);
+        for (int level = 1; level < sourceLevels; level++){
+            downsampleLevel(probeReduceMap, probeSourceMap, level, level - 1, sourceSize);
+            downsampleLevel(probeSourceMap, probeReduceMap, level, level, sourceSize);
         }
 
         for (int level = 0; level < levels; level++){
