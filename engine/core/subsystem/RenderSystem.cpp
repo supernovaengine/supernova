@@ -1816,7 +1816,11 @@ void RenderSystem::filterReflectionProbes(){
         if (!probeFilterLoaded)
             return;
 
-        const int sourceSize = (int)runtime.resolution;
+        const int size = IBLEnvironment::SPECULAR_BASE_SIZE;
+        const int levels = IBLEnvironment::SPECULAR_MIPS;
+        const int captureSize = (int)runtime.resolution;
+        // like IBLEnvironment, the chain starts no larger than the prefiltered map
+        const int sourceSize = std::min(captureSize, size);
         int sourceLevels = 1;
         while ((sourceSize >> sourceLevels) > 0)
             sourceLevels++;
@@ -1827,8 +1831,6 @@ void RenderSystem::filterReflectionProbes(){
             probeSourceSize = sourceSize;
         }
 
-        const int size = IBLEnvironment::SPECULAR_BASE_SIZE;
-        const int levels = IBLEnvironment::SPECULAR_MIPS;
         if (!runtime.filteredFramebuffer.isCreated() && !runtime.filteredFramebuffer.createCubeMipFramebuffer(size, levels))
             continue;
 
@@ -1845,10 +1847,11 @@ void RenderSystem::filterReflectionProbes(){
 
         // every level averaged from the capture, so no pass reads the image it writes
         for (int level = 0; level < sourceLevels; level++){
-            const float taps = (float)std::min(16, 1 << level);
+            const int levelSize = sourceSize >> level;
+            const float taps = (float)std::min(16, (captureSize + levelSize - 1) / levelSize);
             for (int face = 0; face < 6; face++){
                 fs_probe_filter.params = Vector4(0.0f, (float)face, taps, 1.0f);
-                fs_probe_filter.source = Vector4((float)(sourceSize >> level), (float)sourceSize, 1.0f, 0.0f);
+                fs_probe_filter.source = Vector4((float)levelSize, (float)captureSize, 1.0f, 0.0f);
                 filterPass(probeSourceFramebuffer, runtime.captureFramebuffer.getColorTexture(), level, face);
             }
         }
