@@ -368,7 +368,7 @@ namespace doriax{
 			Vector3 capturePosition;
 			Vector3 capturedPosition;
 			// the capture prefiltered into one roughness per mip level
-			FramebufferRender filteredFramebuffer;
+			TextureRender filteredMap;
 			bool needFilter = false;
 		};
 
@@ -376,7 +376,7 @@ namespace doriax{
 
 		// prefilter of the finished captures (probe_filter.frag)
 		bool probeFilterLoaded;
-		FramebufferRender probeSourceFramebuffer; // box-filtered mip chain of the capture
+		TextureRender probeSourceMap; // box-filtered mip chain of the capture
 		int probeSourceSize;
 		CameraRender probeFilterPassRender;
 		ObjectRender probeFilterRender;

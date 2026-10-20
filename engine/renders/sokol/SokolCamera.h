@@ -15,6 +15,8 @@ namespace doriax{
 
     private:
         sg_pass pass;
+        // attachment view of a texture pass, released when the pass ends
+        sg_view textureView;
 
     public:
         SokolCamera();
@@ -28,7 +30,8 @@ namespace doriax{
         void setDepthLoadActionLoad();
         void setStoreDepth(bool storeDepth);
 
-        void startRenderPass(FramebufferRender* framebuffer, size_t face, int mip);
+        void startRenderPass(FramebufferRender* framebuffer, size_t face);
+        void startRenderPass(TextureRender* texture, size_t face, int mip);
         void startRenderPass(int width, int height);
         void startRenderPass();
 

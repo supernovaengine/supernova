@@ -65,7 +65,7 @@ void SokolSystem::setup(){
     desc.image_pool_size = 2048; //default: 128
     desc.sampler_pool_size = 2048; //default: 64
     desc.view_pool_size = 4096; //default: 256 (texture, storage-buffer and attachment views)
-    desc.pipeline_pool_size = 16384; //default: 64 (up to 11 per object, and each foliage chunk is an object)
+    desc.pipeline_pool_size = 16384; //default: 64 (up to 12 per object, and each foliage chunk is an object)
     desc.shader_pool_size = 1024; //default: 64 (one per ShaderType+properties variant)
     desc.environment = System::instance().getSokolEnvironment();
     desc.logger.func = sokol_log;

@@ -491,7 +491,7 @@ void RenderSystem::destroy(){
     // its Transform and updateReflectionProbes never revisited it)
     for (auto& entry : reflectionProbeRuntimes){
         entry.second->captureFramebuffer.destroyFramebuffer();
-        entry.second->filteredFramebuffer.destroyFramebuffer();
+        entry.second->filteredMap.destroyTexture();
         releaseReflectionProbeMaps(*entry.second);
     }
     reflectionProbeRuntimes.clear();
@@ -1386,7 +1386,7 @@ void RenderSystem::destroyReflectionProbe(Entity entity, ReflectionProbeComponen
     auto it = reflectionProbeRuntimes.find(entity);
     if (it != reflectionProbeRuntimes.end()){
         it->second->captureFramebuffer.destroyFramebuffer();
-        it->second->filteredFramebuffer.destroyFramebuffer();
+        it->second->filteredMap.destroyTexture();
         releaseReflectionProbeMaps(*it->second);
         reflectionProbeRuntimes.erase(it);
     }
@@ -1496,7 +1496,7 @@ void RenderSystem::updateReflectionProbes(double dt){
                 activeReflectionProbe = NULL_ENTITY;
             runtime.captureInProgress = false;
             runtime.captureFramebuffer.destroyFramebuffer();
-            runtime.filteredFramebuffer.destroyFramebuffer();
+            runtime.filteredMap.destroyTexture();
             runtime.resolution = 0;
             runtime.nextFace = 0;
             runtime.ready = false;
@@ -1623,8 +1623,8 @@ bool RenderSystem::selectReflectionProbe(const Vector3& worldPosition, fs_reflec
     bool hasPrefilteredMap = selectedRuntime->prefilteredMap && selectedRuntime->prefilteredMap->isCreated();
     if (hasPrefilteredMap){
         texture = selectedRuntime->prefilteredMap.get();
-    }else if (selectedRuntime->filteredFramebuffer.isCreated()){
-        texture = &selectedRuntime->filteredFramebuffer.getColorTexture();
+    }else if (selectedRuntime->filteredMap.isCreated()){
+        texture = &selectedRuntime->filteredMap;
         hasPrefilteredMap = true;
     }else{
         if (!selectedRuntime->captureFramebuffer.isCreated())
@@ -1782,7 +1782,7 @@ void RenderSystem::loadProbeFilter(){
     probeFilterRender.beginLoad(PrimitiveType::TRIANGLES);
     probeFilterRender.setShader(probeFilterShader.get());
     probeFilterSlotParams = probeFilterShader.get()->shaderData.getUniformBlockIndex(UniformBlockType::PROBE_FILTER_FS_PARAMS);
-    if (!probeFilterRender.endLoad(PIP_RTT_NOBLEND, false, true, CullingMode::BACK, WindingOrder::CCW))
+    if (!probeFilterRender.endLoad(PIP_RTT_COLORONLY, false, false, CullingMode::BACK, WindingOrder::CCW))
         return;
 
     probeFilterLoaded = true;
@@ -1797,7 +1797,7 @@ void RenderSystem::destroyProbeFilter(){
         ShaderPool::remove(ShaderType::PROBE_FILTER, 0);
     }
 
-    probeSourceFramebuffer.destroyFramebuffer();
+    probeSourceMap.destroyTexture();
 
     probeSourceSize = 0;
     probeFilterSlotParams = -1;
@@ -1824,20 +1824,24 @@ void RenderSystem::filterReflectionProbes(){
         int sourceLevels = 1;
         while ((sourceSize >> sourceLevels) > 0)
             sourceLevels++;
-        if (!probeSourceFramebuffer.isCreated() || probeSourceSize != sourceSize){
-            probeSourceFramebuffer.destroyFramebuffer();
-            if (!probeSourceFramebuffer.createCubeMipFramebuffer(sourceSize, sourceLevels))
+        auto createMap = [](TextureRender& map, int mapSize, int mapLevels){
+            return map.createFramebufferTexture(TextureType::TEXTURE_CUBE, false, false, mapSize, mapSize,
+                    TextureFilter::LINEAR_MIPMAP_LINEAR, TextureFilter::LINEAR, TextureWrap::CLAMP_TO_EDGE, TextureWrap::CLAMP_TO_EDGE,
+                    ColorFormat::RGBA, mapLevels);
+        };
+        if (!probeSourceMap.isCreated() || probeSourceSize != sourceSize){
+            probeSourceMap.destroyTexture();
+            if (!createMap(probeSourceMap, sourceSize, sourceLevels))
                 continue;
             probeSourceSize = sourceSize;
         }
-
-        if (!runtime.filteredFramebuffer.isCreated() && !runtime.filteredFramebuffer.createCubeMipFramebuffer(size, levels))
+        if (!runtime.filteredMap.isCreated() && !createMap(runtime.filteredMap, size, levels))
             continue;
 
         ShaderData& sd = probeFilterShader.get()->shaderData;
-        auto filterPass = [&](FramebufferRender& target, TextureRender& source, int level, int face){
+        auto filterPass = [&](TextureRender& target, TextureRender& source, int level, int face){
             probeFilterPassRender.startRenderPass(&target, (size_t)face, level);
-            if (probeFilterRender.beginDraw(PIP_RTT_NOBLEND)){
+            if (probeFilterRender.beginDraw(PIP_RTT_COLORONLY)){
                 probeFilterRender.addTexture(sd.getTextureIndex(TextureShaderType::PROBESOURCE), ShaderStageType::FRAGMENT, &source);
                 probeFilterRender.applyUniformBlock(probeFilterSlotParams, sizeof(fs_probe_filter_t), &fs_probe_filter);
                 probeFilterRender.draw(0, 3, 1);
@@ -1852,7 +1856,7 @@ void RenderSystem::filterReflectionProbes(){
             for (int face = 0; face < 6; face++){
                 fs_probe_filter.params = Vector4(0.0f, (float)face, taps, 1.0f);
                 fs_probe_filter.source = Vector4((float)levelSize, (float)captureSize, 1.0f, 0.0f);
-                filterPass(probeSourceFramebuffer, runtime.captureFramebuffer.getColorTexture(), level, face);
+                filterPass(probeSourceMap, runtime.captureFramebuffer.getColorTexture(), level, face);
             }
         }
 
@@ -1861,7 +1865,7 @@ void RenderSystem::filterReflectionProbes(){
             for (int face = 0; face < 6; face++){
                 fs_probe_filter.params = Vector4(roughness, (float)face, 64.0f, 0.0f);
                 fs_probe_filter.source = Vector4((float)(size >> level), (float)sourceSize, (float)sourceLevels, 0.0f);
-                filterPass(runtime.filteredFramebuffer, probeSourceFramebuffer.getColorTexture(), level, face);
+                filterPass(runtime.filteredMap, probeSourceMap, level, face);
             }
         }
 

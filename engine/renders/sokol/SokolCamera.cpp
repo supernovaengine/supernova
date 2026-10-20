@@ -14,9 +14,12 @@ using namespace doriax;
 SokolCamera::SokolCamera(){
     pass = {0};
     pass.action.colors[0].load_action = SG_LOADACTION_LOAD;
+    textureView.id = SG_INVALID_ID;
 }
 
-SokolCamera::SokolCamera(const SokolCamera& rhs) : pass(rhs.pass) {}
+SokolCamera::SokolCamera(const SokolCamera& rhs) : pass(rhs.pass) {
+    textureView.id = SG_INVALID_ID;
+}
 
 SokolCamera& SokolCamera::operator=(const SokolCamera& rhs) { 
     pass = rhs.pass; 
@@ -51,10 +54,26 @@ void SokolCamera::setStoreDepth(bool storeDepth){
     pass.action.depth.store_action = storeDepth ? SG_STOREACTION_STORE : SG_STOREACTION_DONTCARE;
 }
 
-void SokolCamera::startRenderPass(FramebufferRender* framebuffer, size_t face, int mip){
+void SokolCamera::startRenderPass(FramebufferRender* framebuffer, size_t face){
     pass.swapchain = {};
-    pass.attachments = framebuffer->backend.get(face, mip);
+    pass.attachments = framebuffer->backend.get(face);
     //SokolCmdQueue::add_command_begin_pass(pass);
+    sg_begin_pass(pass);
+}
+
+void SokolCamera::startRenderPass(TextureRender* texture, size_t face, int mip){
+    sg_view_desc view_desc = {0};
+    view_desc.color_attachment.image = texture->backend.get();
+    view_desc.color_attachment.mip_level = mip;
+    view_desc.color_attachment.slice = (int)face;
+    view_desc.label = "texture-pass-color-view";
+    textureView = sg_make_view(view_desc);
+
+    pass.swapchain = {};
+    // with no view the empty attachments would begin a swapchain pass
+    pass.swapchain.invalid = (textureView.id == SG_INVALID_ID);
+    pass.attachments = {};
+    pass.attachments.colors[0] = textureView;
     sg_begin_pass(pass);
 }
 
@@ -105,4 +124,9 @@ void SokolCamera::applyScissor(Rect rect){
 void SokolCamera::endRenderPass(){
     //SokolCmdQueue::add_command_end_pass();
     sg_end_pass();
+
+    if (textureView.id != SG_INVALID_ID){
+        sg_destroy_view(textureView);
+        textureView.id = SG_INVALID_ID;
+    }
 }
