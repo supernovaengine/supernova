@@ -5656,8 +5656,14 @@ bool editor::Project::saveSceneFile(SceneProject* sceneProject, const std::files
 
     std::error_code ec;
     fs::path relPath = fs::relative(fullPath, getProjectPath(), ec);
-    if (ec || relPath.empty()) {
-        Out::error("Scene filepath must be relative to project path: %s", path.string().c_str());
+    if (ec || relPath.empty() || relPath.is_absolute() || relPath == "." || *relPath.begin() == "..") {
+        Out::error("Scene filepath must be inside the project folder: %s", path.string().c_str());
+        return false;
+    }
+
+    fs::create_directories(fullPath.parent_path(), ec);
+    if (ec) {
+        Out::error("Failed to create scene directory: %s", ec.message().c_str());
         return false;
     }
 

@@ -3036,29 +3036,22 @@ void editor::App::processNextSaveDialog() {
                 bool saveStarted = false;
                 SceneProject* sceneProject = project.getScene(sceneId);
                 if (sceneProject) {
-                    // Create directory if it doesn't exist
-                    std::filesystem::create_directories(fullPath.parent_path());
+                    // Project validates the external path before creating directories
+                    // or changing the scene's persisted filepath.
+                    saveStarted = true;
+                    project.saveSceneToPathAsync(sceneId, fullPath, [this, completionCallback](bool success) {
+                        saveDialogInProgress = false;
+                        popSaveDialogQueueItem();
 
-                    // Save the scene
-                    std::error_code ec;
-                    fs::path relPath = fs::relative(fullPath, project.getProjectPath(), ec);
-                    if (ec || relPath.empty()) {
-                        Out::error("Scene filepath must be relative to project path: %s", fullPath.string().c_str());
-                        Backend::getApp().registerAlert("Error", "Scene file must be inside the project folder.");
-                    } else {
-                        sceneProject->filepath = relPath;
-                        saveStarted = true;
-                        project.saveSceneToPathAsync(sceneId, fullPath, [this, completionCallback](bool success) {
-                            saveDialogInProgress = false;
-                            popSaveDialogQueueItem();
+                        if (!success) {
+                            Backend::getApp().registerAlert("Error", "Scene could not be saved. Scene files must stay inside the project folder; see Output for details.");
+                        }
+                        if (completionCallback) {
+                            completionCallback(success);
+                        }
 
-                            if (completionCallback) {
-                                completionCallback(success);
-                            }
-
-                            processNextSaveDialog();
-                        });
-                    }
+                        processNextSaveDialog();
+                    });
                 }
 
                 if (!saveStarted) {
