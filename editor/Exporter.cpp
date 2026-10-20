@@ -1704,15 +1704,14 @@ bool editor::Exporter::loadAndSaveAllScenes() {
     return true;
 }
 
-bool editor::Exporter::copyGenerated() {
+bool editor::Exporter::copyGenerated() try {
     setProgress("Copying generated files...", 0.2f);
 
     fs::path generatedSrc = project->getProjectInternalPath() / "generated";
     fs::path generatedDst = getExportProjectRoot();
     cppExportedPaths.clear();
 
-    std::error_code ec;
-    fs::create_directories(generatedDst, ec);
+    fs::create_directories(generatedDst);
 
     // main.cpp is handled separately below. PlatformEditor.* is the GLFW host
     // the editor used to emit into every project; projects created before it
@@ -1722,9 +1721,9 @@ bool editor::Exporter::copyGenerated() {
         "main.cpp", "PlatformEditor.h", "PlatformEditor.cpp"
     };
 
-    if (fs::exists(generatedSrc, ec)) {
-        for (auto& entry : fs::recursive_directory_iterator(generatedSrc, fs::directory_options::skip_permission_denied, ec)) {
-            fs::path relativePath = fs::relative(entry.path(), generatedSrc, ec);
+    if (fs::exists(generatedSrc)) {
+        for (auto& entry : fs::recursive_directory_iterator(generatedSrc)) {
+            fs::path relativePath = fs::relative(entry.path(), generatedSrc);
 
             if (entry.is_regular_file() && excludedFiles.count(relativePath.filename().string())) {
                 continue;
@@ -1732,24 +1731,28 @@ bool editor::Exporter::copyGenerated() {
 
             fs::path destPath = generatedDst / relativePath;
             if (entry.is_directory()) {
-                fs::create_directories(destPath, ec);
+                fs::create_directories(destPath);
             } else if (entry.is_regular_file()) {
-                fs::create_directories(destPath.parent_path(), ec);
-                fs::copy_file(entry.path(), destPath, fs::copy_options::overwrite_existing, ec);
-                if (!ec) cppExportedPaths.insert(relativePath);
+                fs::create_directories(destPath.parent_path());
+                fs::copy_file(entry.path(), destPath, fs::copy_options::overwrite_existing);
+                cppExportedPaths.insert(relativePath);
             }
         }
     }
 
     // Process main.cpp: copy from Generator output but strip editor-specific parts
     fs::path mainSrc = generatedSrc / "main.cpp";
-    if (fs::exists(mainSrc, ec)) {
+    if (fs::exists(mainSrc)) {
         std::ifstream ifs(mainSrc, std::ios::in | std::ios::binary);
         if (!ifs) {
             setError("Failed to read generated main.cpp");
             return false;
         }
         std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        if (ifs.bad()) {
+            setError("Failed to read generated main.cpp");
+            return false;
+        }
         ifs.close();
 
         // Remove the entry point (the exported build compiles the engine's own
@@ -1789,12 +1792,15 @@ bool editor::Exporter::copyGenerated() {
             }
         }
 
-        FileUtils::writeIfChanged(generatedDst / "main.cpp", content);
+        if (!FileUtils::writeIfChanged(generatedDst / "main.cpp", content)) {
+            setError("Failed to write exported main.cpp");
+            return false;
+        }
     }
 
     // Also copy scene_scripts.cpp
     fs::path sceneScriptsSrc = project->getProjectInternalPath() / "scene_scripts.cpp";
-    if (fs::exists(sceneScriptsSrc, ec)) {
+    if (fs::exists(sceneScriptsSrc)) {
         std::ifstream ifs(sceneScriptsSrc, std::ios::in | std::ios::binary);
         if (!ifs) {
             setError("Failed to read generated scene_scripts.cpp");
@@ -1802,6 +1808,10 @@ bool editor::Exporter::copyGenerated() {
         }
 
         std::string content((std::istreambuf_iterator<char>(ifs)), std::istreambuf_iterator<char>());
+        if (ifs.bad()) {
+            setError("Failed to read generated scene_scripts.cpp");
+            return false;
+        }
         const std::string editorOnlyComment = "// Doriax API headers for this project are provided by .doriax/engine-api; see generated CMakeLists.txt for local and upstream source references.\n";
         const std::string exportComment = "// This file binds scene script metadata to compiled C++ and Lua scripts for the current build configuration.\n";
         size_t commentPos = content.find(editorOnlyComment);
@@ -1809,33 +1819,40 @@ bool editor::Exporter::copyGenerated() {
             content.replace(commentPos, editorOnlyComment.size(), exportComment);
         }
 
-        FileUtils::writeIfChanged(generatedDst / "scene_scripts.cpp", content);
+        if (!FileUtils::writeIfChanged(generatedDst / "scene_scripts.cpp", content)) {
+            setError("Failed to write exported scene_scripts.cpp");
+            return false;
+        }
         cppExportedPaths.insert("scene_scripts.cpp");
     }
 
     return true;
+} catch (const fs::filesystem_error& e) {
+    setError("Failed to copy generated files: " + std::string(e.what()));
+    return false;
+} catch (const std::ios_base::failure& e) {
+    setError("Failed to read or write generated files: " + std::string(e.what()));
+    return false;
 }
 
-bool editor::Exporter::copyAssets() {
+bool editor::Exporter::copyAssets() try {
     setProgress("Copying assets...", 0.35f);
 
     const fs::path assetsSrc = getAssetsSourceDir();
 
-    std::error_code ec;
-    if (!fs::exists(assetsSrc, ec)) {
+    if (!fs::exists(assetsSrc)) {
         setError("Assets directory does not exist: " + assetsSrc.string());
         return false;
     }
 
     fs::path assetsDst = getExportProjectRoot() / "assets";
-    fs::create_directories(assetsDst, ec);
+    fs::create_directories(assetsDst);
 
     // References are relative to this directory, so its contents become the export root
-    for (auto it = fs::recursive_directory_iterator(assetsSrc, fs::directory_options::skip_permission_denied, ec);
+    for (auto it = fs::recursive_directory_iterator(assetsSrc);
          it != fs::recursive_directory_iterator(); ++it) {
         const auto& entry = *it;
-        fs::path relPath = fs::relative(entry.path(), assetsSrc, ec);
-        if (ec || relPath.empty()) continue;
+        fs::path relPath = fs::relative(entry.path(), assetsSrc);
         if (isExportDir(entry)) { it.disable_recursion_pending(); continue; }
 
         // Skip hidden directories (starting with '.') and build directories
@@ -1862,7 +1879,7 @@ bool editor::Exporter::copyAssets() {
             fs::path importRelPath = relPath;
             importRelPath += ".glb";
             // The engine loads the import from that path, so no asset can have it
-            if (fs::exists(assetsSrc / importRelPath, ec)) {
+            if (fs::exists(assetsSrc / importRelPath)) {
                 setError("Cannot export: " + importRelPath.generic_string() + " would replace the import of " +
                     relPath.generic_string() + ". Rename it.");
                 return false;
@@ -1876,12 +1893,8 @@ bool editor::Exporter::copyAssets() {
                 return false;
             }
             const fs::path importPath = assetsDst / importRelPath;
-            fs::create_directories(importPath.parent_path(), ec);
-            fs::copy_file(glbPath, importPath, fs::copy_options::overwrite_existing, ec);
-            if (ec) {
-                setError("Failed to copy the import of " + relPath.generic_string() + ": " + ec.message());
-                return false;
-            }
+            fs::create_directories(importPath.parent_path());
+            fs::copy_file(glbPath, importPath, fs::copy_options::overwrite_existing);
             continue;
         }
 
@@ -1897,24 +1910,23 @@ bool editor::Exporter::copyAssets() {
                              relPath.generic_string().c_str());
                 continue;
             }
-            fs::remove(getExportProjectRoot() / "lua" / relPath, ec);
-            if (ec) {
-                setError("Failed to remove " + relPath.generic_string() + " from the exported lua directory: " + ec.message());
-                return false;
-            }
+            fs::remove(getExportProjectRoot() / "lua" / relPath);
             Out::warning("\"%s\" exists in both the Lua and assets directories; only the asset is exported",
                          relPath.generic_string().c_str());
         }
 
         fs::path destPath = assetsDst / relPath;
-        fs::create_directories(destPath.parent_path(), ec);
-        fs::copy_file(entry.path(), destPath, fs::copy_options::overwrite_existing, ec);
+        fs::create_directories(destPath.parent_path());
+        fs::copy_file(entry.path(), destPath, fs::copy_options::overwrite_existing);
     }
 
     return true;
+} catch (const fs::filesystem_error& e) {
+    setError("Failed to copy assets: " + std::string(e.what()));
+    return false;
 }
 
-bool editor::Exporter::copyLua() {
+bool editor::Exporter::copyLua() try {
     setProgress("Copying Lua scripts...", 0.3f);
 
     // Cleared before the early returns: with no lua tree, assets keeps the Lua files
@@ -1926,8 +1938,7 @@ bool editor::Exporter::copyLua() {
         return true; // No Lua directory configured, skip
     }
 
-    std::error_code ec;
-    if (!fs::exists(luaSrc, ec)) {
+    if (!fs::exists(luaSrc)) {
         return true; // Lua directory doesn't exist, not an error
     }
 
@@ -1936,16 +1947,15 @@ bool editor::Exporter::copyLua() {
 
     // A directory of its own holds only what the scripts need, so all of it ships. With
     // the default "." the Lua root is the project root, where the allowlist filters.
-    const bool luaRootIsProjectRoot = (luaSrc == fs::weakly_canonical(project->getProjectPath(), ec));
+    const bool luaRootIsProjectRoot = (luaSrc == fs::weakly_canonical(project->getProjectPath()));
     // Sharing the assets root, copyAssets() ships everything but the Lua sources under the
     // same path; Android merges both trees into one and fails the build on duplicates.
     const bool luaRootIsAssetsRoot = (luaSrc == getAssetsSourceDir());
 
-    for (auto it = fs::recursive_directory_iterator(luaSrc, fs::directory_options::skip_permission_denied, ec);
+    for (auto it = fs::recursive_directory_iterator(luaSrc);
          it != fs::recursive_directory_iterator(); ++it) {
         auto& entry = *it;
-        fs::path relPath = fs::relative(entry.path(), luaSrc, ec);
-        if (ec || relPath.empty()) continue;
+        fs::path relPath = fs::relative(entry.path(), luaSrc);
         if (isExportDir(entry)) { it.disable_recursion_pending(); continue; }
 
         // Skip hidden directories (starting with '.') and build directories
@@ -1962,24 +1972,24 @@ bool editor::Exporter::copyLua() {
         if (luaRootIsProjectRoot && !isLuaExportFile(entry.path())) continue;
 
         fs::path destPath = luaDst / relPath;
-        fs::create_directories(destPath.parent_path(), ec);
-        fs::copy_file(entry.path(), destPath, fs::copy_options::overwrite_existing, ec);
-        if (!ec) {
-            luaCopiedSources.insert(entry.path().lexically_normal());
-            luaExportedPaths.insert(relPath.lexically_normal());
-        }
+        fs::create_directories(destPath.parent_path());
+        fs::copy_file(entry.path(), destPath, fs::copy_options::overwrite_existing);
+        luaCopiedSources.insert(entry.path().lexically_normal());
+        luaExportedPaths.insert(relPath.lexically_normal());
     }
 
     return true;
+} catch (const fs::filesystem_error& e) {
+    setError("Failed to copy Lua scripts: " + std::string(e.what()));
+    return false;
 }
 
-bool editor::Exporter::copyCppScripts() {
+bool editor::Exporter::copyCppScripts() try {
     setProgress("Copying C++ scripts...", 0.4f);
 
     fs::path scriptsDst = getExportProjectRoot() / "scripts";
     const fs::path projectRoot = project->getProjectPath();
 
-    std::error_code ec;
     std::set<std::string> copiedPaths;
     const fs::path normalizedProjectRoot = projectRoot.lexically_normal();
     const auto projectRelativePath = [&](const fs::path& path) {
@@ -2003,13 +2013,13 @@ bool editor::Exporter::copyCppScripts() {
                 if (copiedPaths.count(pathKey)) continue;
                 copiedPaths.insert(pathKey);
 
-                if (fs::exists(srcPath, ec)) {
+                if (fs::exists(srcPath)) {
                     const fs::path relPath = projectRelativePath(srcPath);
                     if (!relPath.empty()) {
                         fs::path dstPath = scriptsDst / relPath;
-                        fs::create_directories(dstPath.parent_path(), ec);
-                        fs::copy_file(srcPath, dstPath, fs::copy_options::overwrite_existing, ec);
-                        if (!ec) cppExportedPaths.insert(fs::path("scripts") / relPath);
+                        fs::create_directories(dstPath.parent_path());
+                        fs::copy_file(srcPath, dstPath, fs::copy_options::overwrite_existing);
+                        cppExportedPaths.insert(fs::path("scripts") / relPath);
                     }
                 }
             }
@@ -2024,12 +2034,12 @@ bool editor::Exporter::copyCppScripts() {
                 if (copiedPaths.count(pathKey)) continue;
                 copiedPaths.insert(pathKey);
 
-                if (fs::exists(hdrPath, ec)) {
+                if (fs::exists(hdrPath)) {
                     const fs::path relPath = projectRelativePath(hdrPath);
                     if (!relPath.empty()) {
                         fs::path dstPath = scriptsDst / relPath;
-                        fs::create_directories(dstPath.parent_path(), ec);
-                        fs::copy_file(hdrPath, dstPath, fs::copy_options::overwrite_existing, ec);
+                        fs::create_directories(dstPath.parent_path());
+                        fs::copy_file(hdrPath, dstPath, fs::copy_options::overwrite_existing);
                     }
                 }
             }
@@ -2038,7 +2048,7 @@ bool editor::Exporter::copyCppScripts() {
 
     // Preserve unregistered support headers for project-root-relative includes.
     try {
-        for (auto it = fs::recursive_directory_iterator(projectRoot, fs::directory_options::skip_permission_denied);
+        for (auto it = fs::recursive_directory_iterator(projectRoot);
              it != fs::recursive_directory_iterator(); ++it) {
             const auto& entry = *it;
             const fs::path relPath = projectRelativePath(entry.path());
@@ -2077,10 +2087,10 @@ bool editor::Exporter::copyCppScripts() {
         }
 
         const fs::path rootPath = normalizedProjectRoot / relDir;
-        if (!fs::is_directory(rootPath, ec)) continue;
+        if (!fs::is_directory(rootPath)) continue;
 
         try {
-            for (auto it = fs::recursive_directory_iterator(rootPath, fs::directory_options::skip_permission_denied);
+            for (auto it = fs::recursive_directory_iterator(rootPath);
                  it != fs::recursive_directory_iterator(); ++it) {
                 const std::string name = it->path().filename().string();
                 const fs::path relPath = projectRelativePath(it->path());
@@ -2094,9 +2104,9 @@ bool editor::Exporter::copyCppScripts() {
                 if (relPath.empty() || !copiedPaths.insert(it->path().string()).second) continue;
 
                 const fs::path dstPath = scriptsDst / relPath;
-                fs::create_directories(dstPath.parent_path(), ec);
-                fs::copy_file(it->path(), dstPath, fs::copy_options::overwrite_existing, ec);
-                if (!ec) cppExportedPaths.insert(fs::path("scripts") / relPath);
+                fs::create_directories(dstPath.parent_path());
+                fs::copy_file(it->path(), dstPath, fs::copy_options::overwrite_existing);
+                cppExportedPaths.insert(fs::path("scripts") / relPath);
             }
         } catch (const fs::filesystem_error& e) {
             setError("Failed to copy script directory: " + std::string(e.what()));
@@ -2107,16 +2117,15 @@ bool editor::Exporter::copyCppScripts() {
     // Goes to the project root, not scripts/, because that is where the exported
     // CMakeLists includes it from.
     const fs::path userBuildFile = projectRoot / "ProjectBuild.cmake";
-    if (fs::is_regular_file(userBuildFile, ec)) {
+    if (fs::is_regular_file(userBuildFile)) {
         fs::copy_file(userBuildFile, getExportProjectRoot() / "ProjectBuild.cmake",
-                      fs::copy_options::overwrite_existing, ec);
-        if (ec) {
-            setError("Failed to copy ProjectBuild.cmake: " + ec.message());
-            return false;
-        }
+                      fs::copy_options::overwrite_existing);
     }
 
     return true;
+} catch (const fs::filesystem_error& e) {
+    setError("Failed to copy C++ scripts: " + std::string(e.what()));
+    return false;
 }
 
 void editor::Exporter::copyTree(const fs::path& src, const fs::path& dst, std::error_code& ec) {
