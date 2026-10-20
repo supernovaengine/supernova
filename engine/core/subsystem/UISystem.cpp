@@ -39,6 +39,7 @@ UISystem::UISystem(Scene* scene): SubSystem(scene){
     anchorReferenceHeight = 0;
 
     pendingImages = false;
+    pendingHighSurrogate = 0;
 }
 
 UISystem::~UISystem(){
@@ -1241,7 +1242,7 @@ void UISystem::setTextEditCursorFromLocalX(TextEditComponent& textedit, TextComp
     textedit.needUpdateTextEdit = true;
 }
 
-bool UISystem::handleTextEditCharInput(TextEditComponent& textedit, TextComponent& text, UIComponent& ui, wchar_t codepoint){
+bool UISystem::handleTextEditCharInput(TextEditComponent& textedit, TextComponent& text, UIComponent& ui, uint32_t codepoint){
     if (textedit.disabled){
         return false;
     }
@@ -2666,7 +2667,18 @@ void UISystem::resetButtonStates() {
     }
 }
 
-bool UISystem::eventOnCharInput(wchar_t codepoint){
+bool UISystem::eventOnCharInput(wchar_t input){
+    // Windows, macOS and iOS send a character past U+FFFF as two UTF-16 halves
+    uint32_t codepoint = static_cast<uint32_t>(input);
+    if (codepoint >= 0xD800 && codepoint <= 0xDBFF){
+        pendingHighSurrogate = codepoint;
+        return false;
+    }
+    if (codepoint >= 0xDC00 && codepoint <= 0xDFFF && pendingHighSurrogate != 0){
+        codepoint = 0x10000 + ((pendingHighSurrogate - 0xD800) << 10) + (codepoint - 0xDC00);
+    }
+    pendingHighSurrogate = 0;
+
     auto layouts = scene->getComponentArray<UILayoutComponent>();
     for (int i = 0; i < layouts->size(); i++){
         Entity entity = layouts->getEntity(i);
