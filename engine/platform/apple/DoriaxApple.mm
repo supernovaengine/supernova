@@ -458,7 +458,7 @@ std::string DoriaxApple::getAssetPath(){
 #endif
     }
 
-    return [path cStringUsingEncoding:NSASCIIStringEncoding];
+    return [path UTF8String];
 }
 
 std::string DoriaxApple::getUserDataPath(){
@@ -481,7 +481,7 @@ std::string DoriaxApple::getLuaPath(){
 #endif
     }
 
-    return [path cStringUsingEncoding:NSASCIIStringEncoding];
+    return [path UTF8String];
 }
 
 std::string DoriaxApple::getShaderPath(){
@@ -497,7 +497,7 @@ std::string DoriaxApple::getShaderPath(){
 #endif
     }
 
-    return [path cStringUsingEncoding:NSASCIIStringEncoding];
+    return [path UTF8String];
 }
 
 bool DoriaxApple::getBoolForKey(const char *key, bool defaultValue){
