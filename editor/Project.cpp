@@ -3623,10 +3623,14 @@ void editor::Project::collectSceneShaderKeys(const SceneProject* sceneProject, s
 
         if (signature.test(scene->getComponentId<MeshComponent>())) {
             const MeshComponent& mesh = scene->getComponent<MeshComponent>(entity);
-            if (mesh.loaded) {
+            // a reload keeps the mesh unloaded until its new shaders have built
+            if (mesh.loaded || mesh.submeshes[0].shader) {
                 uint16_t customShaderId = effectiveShaderId(mesh.customShader, ShaderType::MESH);
                 uint16_t customDepthShaderId = ShaderPool::registerCustomShader(mesh.customDepthShader);
                 for (unsigned int s = 0; s < mesh.numSubmeshes; ++s) {
+                    if (!mesh.loaded && !mesh.submeshes[s].shader) {
+                        continue;
+                    }
                     uint32_t meshProperties = mesh.submeshes[s].shaderProperties;
                     // Saving/exporting can happen before RenderSystem has reloaded
                     // meshes after a probe was added. Derive the required IBL
@@ -3678,21 +3682,21 @@ void editor::Project::collectSceneShaderKeys(const SceneProject* sceneProject, s
 
         if (signature.test(scene->getComponentId<UIComponent>())) {
             const UIComponent& ui = scene->getComponent<UIComponent>(entity);
-            if (ui.loaded) {
+            if (ui.loaded || ui.shader) {
                 insertKeys(ShaderType::UI, ui.shaderProperties, effectiveShaderId(ui.customShader, ShaderType::UI));
             }
         }
 
         if (signature.test(scene->getComponentId<PointsComponent>())) {
             const PointsComponent& pts = scene->getComponent<PointsComponent>(entity);
-            if (pts.loaded) {
+            if (pts.loaded || pts.shader) {
                 insertKeys(ShaderType::POINTS, pts.shaderProperties, effectiveShaderId(pts.customShader, ShaderType::POINTS));
             }
         }
 
         if (signature.test(scene->getComponentId<LinesComponent>())) {
             const LinesComponent& ln = scene->getComponent<LinesComponent>(entity);
-            if (ln.loaded) {
+            if (ln.loaded || ln.shader) {
                 insertKeys(ShaderType::LINES, ln.shaderProperties, effectiveShaderId(ln.customShader, ShaderType::LINES));
             }
         }
