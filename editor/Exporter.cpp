@@ -3811,6 +3811,10 @@ bool editor::Exporter::buildAndSaveShaders() {
             try {
                 // Synchronous build without cache
                 ShaderData resultData = shaderBuilder.buildShaderForExport(shaderKey, project, backend);
+                // Spares the game compiling HLSL at every start; Json keeps the readable source
+                if (backend == ShaderBackend::D3D11 && config.shaderOutputFormat != ShaderOutputFormat::Json) {
+                    ShaderBuilder::compileHlslBytecode(resultData);
+                }
 
                 std::string basename = shaderStr + "_" + fmtStr;
                 std::string err;
