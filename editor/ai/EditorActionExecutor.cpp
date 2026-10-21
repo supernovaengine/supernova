@@ -1504,22 +1504,22 @@ std::string optionalString(const Json& args, const char* key, const char* fallba
 }
 
 // Lua entries are stored relative to the Lua root, so they resolve through it first
-std::string scriptPathToAi(Project* project, const ScriptEntry& entry) {
+fs::path scriptPath(Project* project, const ScriptEntry& entry) {
     if (entry.path.empty() || entry.type != ScriptType::LUA) {
         return entry.path;
     }
-    return project->normalizeToProjectRelative(project->resolveLuaPath(entry.path)).generic_string();
+    return project->normalizeToProjectRelative(project->resolveLuaPath(entry.path));
 }
 
-// Script entries may store absolute paths, so compare them project-relative.
-std::string normalizeScriptPath(Project* project, const std::string& value) {
-    fs::path path(value);
+// Script entries may store absolute paths, so compare them project-relative. Compared as
+// paths, the ANSI entries match the UTF-8 paths the AI sends.
+fs::path normalizeScriptPath(Project* project, fs::path path) {
     if (path.is_absolute() && project) {
         std::error_code ec;
         fs::path relative = fs::relative(path, project->getProjectPath(), ec);
         if (!ec) path = relative;
     }
-    return path.lexically_normal().generic_string();
+    return path.lexically_normal();
 }
 
 // Catalog exposes scripts as an opaque Custom property, so entries are listed here instead.
@@ -1530,8 +1530,8 @@ Json scriptEntriesJson(Project* project, const std::vector<ScriptEntry>& scripts
         Json entry = {{"index", i},
                       {"type", scriptTypeName(script.type)},
                       {"class_name", script.className},
-                      {"path", scriptPathToAi(project, script)},
-                      {"header_path", script.headerPath},
+                      {"path", FileUtils::pathToGenericUtf8(scriptPath(project, script))},
+                      {"header_path", FileUtils::pathToGenericUtf8(script.headerPath)},
                       {"enabled", script.enabled}};
         if (script.type == ScriptType::CPP && !script.headerPath.empty() &&
                 !script.className.empty()) {
@@ -1564,8 +1564,8 @@ bool resolveScriptIndex(Project* project, const std::vector<ScriptEntry>& script
     }
 
     const std::string className = optionalString(args, "class_name");
-    const std::string path = className.empty()
-        ? normalizeScriptPath(project, optionalString(args, "path")) : "";
+    const fs::path path = className.empty()
+        ? normalizeScriptPath(project, FileUtils::pathFromUtf8(optionalString(args, "path"))) : fs::path();
     if (className.empty() && path.empty()) {
         error = "Select the script entry with index, class_name, or path.";
         return false;
@@ -1574,7 +1574,7 @@ bool resolveScriptIndex(Project* project, const std::vector<ScriptEntry>& script
     std::vector<size_t> matches;
     for (size_t i = 0; i < scripts.size(); i++) {
         const bool match = className.empty()
-            ? (normalizeScriptPath(project, scriptPathToAi(project, scripts[i])) == path ||
+            ? (normalizeScriptPath(project, scriptPath(project, scripts[i])) == path ||
                normalizeScriptPath(project, scripts[i].headerPath) == path)
             : scripts[i].className == className;
         if (match) matches.push_back(i);
@@ -4206,7 +4206,7 @@ ActionResult EditorActionExecutor::attachScript(const Json& arguments) {
     // repoint its entry instead of leaving a stale duplicate behind.
     size_t index = scripts.size();
     for (size_t i = 0; i < scripts.size(); i++) {
-        if (normalizeScriptPath(project, scriptPathToAi(project, scripts[i])) == normalizeScriptPath(project, scriptPathToAi(project, entry)) ||
+        if (normalizeScriptPath(project, scriptPath(project, scripts[i])) == normalizeScriptPath(project, scriptPath(project, entry)) ||
             (scripts[i].type == entry.type && scripts[i].className == entry.className)) {
             index = i;
             break;
@@ -4350,7 +4350,7 @@ ActionResult EditorActionExecutor::updateScriptFile(const Json& arguments) {
         return failResult("Failed to write script file.");
     }
 
-    const std::string relString = rel.lexically_normal().generic_string();
+    const fs::path relPath = rel.lexically_normal();
     int refreshedComponents = 0;
     for (auto& sceneProject : project->getScenes()) {
         if (!sceneProject.scene) continue;
@@ -4361,11 +4361,11 @@ ActionResult EditorActionExecutor::updateScriptFile(const Json& arguments) {
 
             bool matchesFile = false;
             for (const ScriptEntry& scriptEntry : scriptComponent->scripts) {
-                if (!scriptEntry.path.empty() && normalizeScriptPath(project, scriptPathToAi(project, scriptEntry)) == relString) {
+                if (!scriptEntry.path.empty() && normalizeScriptPath(project, scriptPath(project, scriptEntry)) == relPath) {
                     matchesFile = true;
                     break;
                 }
-                if (!scriptEntry.headerPath.empty() && normalizeScriptPath(project, scriptEntry.headerPath) == relString) {
+                if (!scriptEntry.headerPath.empty() && normalizeScriptPath(project, scriptEntry.headerPath) == relPath) {
                     matchesFile = true;
                     break;
                 }
@@ -4388,7 +4388,7 @@ ActionResult EditorActionExecutor::updateScriptFile(const Json& arguments) {
     if (resourcesWindow) {
         resourcesWindow->refreshCurrentDirectory();
     }
-    Out::info("AI updated script file: %s", relString.c_str());
+    Out::info("AI updated script file: %s", relPath.generic_string().c_str());
 
     const std::string verifyStep =
         "Verify this change before telling the user it works: start the scene with "
@@ -4398,7 +4398,7 @@ ActionResult EditorActionExecutor::updateScriptFile(const Json& arguments) {
         "is clean, stop play with control_play_mode (action=stop).";
 
     return okResult("Updated script file. Now verify it by running the scene (see next_step).",
-                    Json{{"path", relString},
+                    Json{{"path", FileUtils::pathToGenericUtf8(relPath)},
                          {"bytes", content.size()},
                          {"refreshed_script_components", refreshedComponents},
                          {"next_step", verifyStep}});
