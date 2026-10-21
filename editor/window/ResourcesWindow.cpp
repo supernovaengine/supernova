@@ -716,7 +716,7 @@ void editor::ResourcesWindow::renderPathBreadcrumb(const ImVec2& size) {
         for (const auto& part : currentPath.lexically_relative(rootPath)) {
             if (part == "." || part.empty()) continue;
             accumulated /= part;
-            segments.emplace_back(part.string(), accumulated);
+            segments.emplace_back(FileUtils::pathToUtf8(part), accumulated);
         }
     }
 
@@ -782,7 +782,7 @@ void editor::ResourcesWindow::renderPathBreadcrumb(const ImVec2& size) {
             ImGui::EndDragDropTarget();
         }
         if (ImGui::IsItemHovered()) {
-            ImGui::SetTooltip("%s", segments[i].second.string().c_str());
+            ImGui::SetTooltip("%s", FileUtils::pathToUtf8(segments[i].second).c_str());
             segmentTooltipShown = true;
         }
         ImGui::PopID();
@@ -805,7 +805,7 @@ void editor::ResourcesWindow::renderPathBreadcrumb(const ImVec2& size) {
 
     ImGui::EndChild();
     if (!segmentTooltipShown && !currentPath.empty()) {
-        ImGui::SetItemTooltip("%s", currentPath.string().c_str());
+        ImGui::SetItemTooltip("%s", FileUtils::pathToUtf8(currentPath).c_str());
     }
     ImGui::PopStyleColor();
 
@@ -1414,7 +1414,7 @@ void editor::ResourcesWindow::renderFileListing(bool showDirectories){
         int fileCount = 0;
         for (const auto& fileName : selectedFiles){
             if (fileCount < 10){
-                ImGui::BulletText("%s", fileName.c_str());
+                ImGui::BulletText("%s", FileUtils::pathToUtf8(fs::path(fileName)).c_str());
             }
             fileCount++;
         }
@@ -1509,8 +1509,8 @@ const std::vector<fs::path>& editor::ResourcesWindow::treeSubdirectories(const f
 
 void editor::ResourcesWindow::renderDirectoryTree(const fs::path& rootPath) {
     std::string rootFullPath = rootPath.string();
-    std::string rootDisplayName = rootPath.filename().string();
-    if (rootDisplayName.empty()) rootDisplayName = rootPath.string(); // Handle root paths like C:/ or /
+    std::string rootDisplayName = FileUtils::pathToUtf8(rootPath.filename());
+    if (rootDisplayName.empty()) rootDisplayName = FileUtils::pathToUtf8(rootPath); // Handle root paths like C:/ or /
 
     bool isRootSelected = (treeSelectedPath == rootPath);
     ImGuiTreeNodeFlags rootFlags = ImGuiTreeNodeFlags_OpenOnArrow;
@@ -1645,8 +1645,9 @@ void editor::ResourcesWindow::scanDirectory(const fs::path& path) {
         std::error_code entryEc;
         fileEntry.isDirectory = entry.is_directory(entryEc) && !entryEc;
 
-        fileEntry.displayName = BidiText::toVisual(fileEntry.name);
-        std::string baseName = fileEntry.name;
+        const std::string utf8Name = FileUtils::pathToUtf8(entry.path().filename());
+        fileEntry.displayName = BidiText::toVisual(utf8Name);
+        std::string baseName = utf8Name;
         if (!fileEntry.isDirectory){
             size_t dotPos = baseName.rfind('.');
             if (dotPos != std::string::npos)
@@ -1849,14 +1850,16 @@ void editor::ResourcesWindow::handleNewItem(){
                 }
 
                 try {
-                    fs::path newItemPath = newItemDirectory / itemName;
+                    fs::path newItemPath = newItemDirectory / FileUtils::pathFromUtf8(itemName);
 
                     // Check if the name is already taken
-                    if (fs::exists(newItemPath)) {
+                    if (!FileUtils::isNarrowPath(newItemPath)) {
+                        ImGui::OpenPopup("Invalid Name");
+                    } else if (fs::exists(newItemPath)) {
                         ImGui::OpenPopup("Name Already Exists");
                     } else {
                         if (isFolder) {
-                            project->getProjectCommandHistory()->addCommand(new CreateDirCmd(itemName, newItemDirectory.string()));
+                            project->getProjectCommandHistory()->addCommand(new CreateDirCmd(newItemPath.filename().string(), newItemDirectory.string()));
                         } else {
                             project->getProjectCommandHistory()->addCommand(new CreateFileCmd(project, newItemPath, content));
                         }
@@ -1931,7 +1934,7 @@ void editor::ResourcesWindow::startRename(const std::string& fileName){
     isRenaming = true;
     renameSelectPending = true;
     fileBeingRenamed = fileName;
-    strncpy(nameBuffer, fileName.c_str(), sizeof(nameBuffer) - 1);
+    strncpy(nameBuffer, FileUtils::pathToUtf8(fs::path(fileName)).c_str(), sizeof(nameBuffer) - 1);
     nameBuffer[sizeof(nameBuffer) - 1] = '\0';
 }
 
@@ -1944,7 +1947,7 @@ void editor::ResourcesWindow::handleRename(){
     }
 
     if (ImGui::BeginPopupModal("Rename File", &isRenaming, ImGuiWindowFlags_AlwaysAutoResize)) {
-        ImGui::Text("Rename '%s' to:", fileBeingRenamed.c_str());
+        ImGui::Text("Rename '%s' to:", FileUtils::pathToUtf8(fs::path(fileBeingRenamed)).c_str());
 
         // Auto-focus the input field when the popup opens
         if (ImGui::IsWindowAppearing()) {
@@ -1983,17 +1986,19 @@ void editor::ResourcesWindow::handleRename(){
 
         bool confirmed = ImGui::Button("OK", ImVec2(buttonWidth, 0)) || enterPressed;
         if (confirmed) {
-            std::string newName = nameBuffer;
-            if (!newName.empty() && newName != fileBeingRenamed) {
+            fs::path newName = FileUtils::pathFromUtf8(nameBuffer);
+            if (!newName.empty() && newName != fs::path(fileBeingRenamed)) {
                 try {
                     fs::path oldPath = currentPath / fileBeingRenamed;
                     fs::path newPath = currentPath / newName;
 
                     // Check if the target file already exists
-                    if (fs::exists(newPath)) {
+                    if (!FileUtils::isNarrowPath(newPath)) {
+                        ImGui::OpenPopup("Invalid Name");
+                    } else if (fs::exists(newPath)) {
                         ImGui::OpenPopup("File Already Exists");
                     } else {
-                        project->getProjectCommandHistory()->addCommand(new RenameFileCmd(project, fileBeingRenamed, newName, currentPath.string()));
+                        project->getProjectCommandHistory()->addCommand(new RenameFileCmd(project, fileBeingRenamed, newName.string(), currentPath.string()));
                         codeEditor->handleFileRename(oldPath, newPath);
                         imageViewerWindow->handleFileRename(oldPath, newPath);
                         scanDirectory(currentPath);

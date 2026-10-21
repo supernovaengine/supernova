@@ -31,7 +31,7 @@ void UIUtils::directoryTreeBrowser(const std::filesystem::path& currentPath,
         std::sort(subDirs.begin(), subDirs.end());
 
         for (const auto& dirPath : subDirs) {
-            std::string name = dirPath.filename().string();
+            std::string name = FileUtils::pathToUtf8(dirPath.filename());
 
             ImGui::PushID(dirPath.string().c_str());
             ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_OpenOnArrow |
