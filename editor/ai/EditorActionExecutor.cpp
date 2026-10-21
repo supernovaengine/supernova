@@ -1301,7 +1301,7 @@ std::string outsideAssetsError(Project* project, const std::string& argument) {
 
 std::string assetPathToAi(Project* project, const std::string& stored) {
     if (stored.empty()) return stored;
-    return project->normalizeToProjectRelative(project->resolveAssetPath(stored)).generic_string();
+    return FileUtils::pathToGenericUtf8(project->normalizeToProjectRelative(project->resolveAssetPath(stored)));
 }
 
 // String properties holding an asset reference instead of plain text
@@ -1404,7 +1404,7 @@ bool safeRelativePath(Project* project, const Json& args, const char* key, fs::p
         error = std::string(key) + " is required.";
         return false;
     }
-    rel = fs::path(args[key].get<std::string>()).lexically_normal();
+    rel = FileUtils::pathFromUtf8(args[key].get<std::string>()).lexically_normal();
     if (rel.empty()) rel = ".";
     if (!PathUtils::isSafeRelativePath(rel)) {
         error = std::string(key) + " must be a safe project-relative path.";
@@ -1444,7 +1444,7 @@ bool isUnusedSubmeshProperty(Scene* scene, Entity entity, const std::string& pro
 
 // Empty or new directory outside the current project, like the Save Project dialog
 bool prepareNewProjectDirectory(Project* project, const Json& args, fs::path& path, std::string& error) {
-    path = fs::path(args.value("path", "")).lexically_normal();
+    path = FileUtils::pathFromUtf8(args.value("path", "")).lexically_normal();
     if (!path.has_filename()) path = path.parent_path();
     if (!path.is_absolute()) {
         error = "path must be an absolute directory.";
@@ -1452,7 +1452,7 @@ bool prepareNewProjectDirectory(Project* project, const Json& args, fs::path& pa
     }
     std::error_code ec;
     if (fs::exists(path, ec) && (!fs::is_directory(path, ec) || !fs::is_empty(path, ec))) {
-        error = "path must be an empty directory or not exist yet: " + path.string();
+        error = "path must be an empty directory or not exist yet: " + FileUtils::pathToUtf8(path);
         return false;
     }
     // Canonical, so a symlinked temp path can't hide inside the project
@@ -1460,7 +1460,7 @@ bool prepareNewProjectDirectory(Project* project, const Json& args, fs::path& pa
     const fs::path target = fs::weakly_canonical(path, pathEc);
     const fs::path current = fs::weakly_canonical(project->getProjectPath(), projectEc);
     if (pathEc || projectEc) {
-        error = "Could not resolve " + path.string() + ".";
+        error = "Could not resolve " + FileUtils::pathToUtf8(path) + ".";
         return false;
     }
     const fs::path relative = target.lexically_relative(current);
@@ -1471,7 +1471,7 @@ bool prepareNewProjectDirectory(Project* project, const Json& args, fs::path& pa
     // saveProjectToPath only creates the last level
     fs::create_directories(path, ec);
     if (ec) {
-        error = "Could not create " + path.string() + ": " + ec.message();
+        error = "Could not create " + FileUtils::pathToUtf8(path) + ": " + ec.message();
         return false;
     }
     return true;
@@ -1668,15 +1668,16 @@ Command* buildPropertyCommand(Project* project, uint32_t sceneId, Entity entity,
             {
                 std::string value = args["string_value"].get<std::string>();
                 if (isAssetPathProperty(propertyName) && !value.empty()) {
-                    if (!PathUtils::isSafeRelativePath(value)) {
+                    const fs::path rel = FileUtils::pathFromUtf8(value);
+                    if (!PathUtils::isSafeRelativePath(rel)) {
                         error = propertyName + " must be a safe project-relative path.";
                         return nullptr;
                     }
-                    if (!isInsideAssets(project, value)) {
+                    if (!isInsideAssets(project, rel)) {
                         error = outsideAssetsError(project, propertyName);
                         return nullptr;
                     }
-                    value = assetPathFromAi(project, value);
+                    value = assetPathFromAi(project, rel);
                 }
                 return new PropertyCmd<std::string>(project, sceneId, entity, component, propertyName, value, onChanged);
             }
@@ -1784,15 +1785,16 @@ Command* buildPropertyCommand(Project* project, uint32_t sceneId, Entity entity,
                 }
                 std::string value = requested[i];
                 if (!value.empty()) {
-                    if (!PathUtils::isSafeRelativePath(value)) {
+                    const fs::path rel = FileUtils::pathFromUtf8(value);
+                    if (!PathUtils::isSafeRelativePath(rel)) {
                         error = propertyName + " must hold safe project-relative paths.";
                         return nullptr;
                     }
-                    if (!isInsideAssets(project, value)) {
+                    if (!isInsideAssets(project, rel)) {
                         error = outsideAssetsError(project, propertyName);
                         return nullptr;
                     }
-                    value = assetPathFromAi(project, value);
+                    value = assetPathFromAi(project, rel);
                 }
                 fonts[i] = value;
             }
@@ -1807,7 +1809,7 @@ Command* buildPropertyCommand(Project* project, uint32_t sceneId, Entity entity,
             std::vector<std::string> paths;
             std::istringstream texturePath(args["texture_path"].get<std::string>());
             for (std::string path; std::getline(texturePath, path, '|');) {
-                fs::path rel(path);
+                fs::path rel = FileUtils::pathFromUtf8(path);
                 if (!PathUtils::isSafeRelativePath(rel)) {
                     error = "texture_path must be a safe project-relative path.";
                     return nullptr;
@@ -2438,14 +2440,14 @@ ActionResult EditorActionExecutor::dispatch(const std::string& name,
 ActionResult EditorActionExecutor::getProjectSummary() {
     Json data;
     data["name"] = project->getName();
-    data["path"] = project->getProjectPath().string();
+    data["path"] = FileUtils::pathToUtf8(project->getProjectPath());
     data["selected_scene_id"] = project->getSelectedSceneId();
     data["start_scene_id"] = project->getStartSceneId();
-    data["assets_dir"] = project->getAssetsDir().generic_string();
-    data["lua_dir"] = project->getLuaDir().generic_string();
+    data["assets_dir"] = FileUtils::pathToGenericUtf8(project->getAssetsDir());
+    data["lua_dir"] = FileUtils::pathToGenericUtf8(project->getLuaDir());
     data["script_dirs"] = Json::array();
     for (const fs::path& scriptDir : project->getScriptDirs()) {
-        data["script_dirs"].push_back(scriptDir.generic_string());
+        data["script_dirs"].push_back(FileUtils::pathToGenericUtf8(scriptDir));
     }
     data["cxx_standard"] = project->getCxxStandard();
     data["canvas"] = {{"width", project->getCanvasWidth()}, {"height", project->getCanvasHeight()}};
@@ -2454,7 +2456,7 @@ ActionResult EditorActionExecutor::getProjectSummary() {
     data["loading"] = loadingSettingsJson(project->getLoadingSettings());
     data["standalone_bundles"] = Json::array();
     for (const fs::path& bundlePath : project->getStandaloneBundles()) {
-        data["standalone_bundles"].push_back(bundlePath.generic_string());
+        data["standalone_bundles"].push_back(FileUtils::pathToGenericUtf8(bundlePath));
     }
     data["scenes"] = Json::array();
     for (const auto& scene : project->getScenes()) {
@@ -2465,7 +2467,7 @@ ActionResult EditorActionExecutor::getProjectSummary() {
             {"opened", scene.opened},
             {"modified", scene.isModified},
             {"main_camera", scene.mainCamera},
-            {"filepath", scene.filepath.generic_string()},
+            {"filepath", FileUtils::pathToGenericUtf8(scene.filepath)},
             {"entity_count", scene.entities.size()},
             {"selected_entities", scene.selectedEntities.size()}
         });
@@ -3222,7 +3224,7 @@ ActionResult EditorActionExecutor::addProjectScene(const Json& arguments) {
     const uint32_t existingSceneId = project->findSceneByPath(sceneRel);
     if (existingSceneId != NULL_PROJECT_SCENE) {
         return okResult("Scene is already part of the project.",
-                        Json{{"scene_path", sceneRel.generic_string()}, {"scene_id", existingSceneId}});
+                        Json{{"scene_path", FileUtils::pathToGenericUtf8(sceneRel)}, {"scene_id", existingSceneId}});
     }
 
     if (!fs::exists(project->getProjectPath() / sceneRel)) {
@@ -3240,7 +3242,7 @@ ActionResult EditorActionExecutor::addProjectScene(const Json& arguments) {
     project->saveProjectFile();
     const SceneProject* sceneProject = project->getScene(sceneId);
     return okResult("Added the scene to the project.",
-                    Json{{"scene_path", sceneRel.generic_string()},
+                    Json{{"scene_path", FileUtils::pathToGenericUtf8(sceneRel)},
                          {"scene_id", sceneId},
                          {"name", sceneProject ? sceneProject->name : std::string()}});
 }
@@ -3310,7 +3312,7 @@ ActionResult EditorActionExecutor::saveScene(const Json& arguments) {
     if (sceneProject->filepath.empty()) {
         return warningResult("The scene has no file yet, so the editor asked the user where to save it. Pass path to save it directly.");
     }
-    return okResult("Saving scene.", Json{{"scene_id", sceneId}, {"path", sceneProject->filepath.generic_string()}});
+    return okResult("Saving scene.", Json{{"scene_id", sceneId}, {"path", FileUtils::pathToGenericUtf8(sceneProject->filepath)}});
 }
 
 ActionResult EditorActionExecutor::saveAllScenes() {
@@ -3492,7 +3494,7 @@ ActionResult EditorActionExecutor::loadChildSceneInline(const Json& arguments) {
 }
 
 ActionResult EditorActionExecutor::createFolder(const Json& arguments) {
-    fs::path parentRel = arguments.value("parent_path", std::string());
+    fs::path parentRel = FileUtils::pathFromUtf8(arguments.value("parent_path", std::string()));
     fs::path parentFull = project->getProjectPath();
     if (!parentRel.empty()) {
         parentRel = parentRel.lexically_normal();
@@ -3505,7 +3507,7 @@ ActionResult EditorActionExecutor::createFolder(const Json& arguments) {
         return failResult("Parent directory does not exist.");
     }
 
-    const std::string name = arguments.value("name", "");
+    const std::string name = FileUtils::pathFromUtf8(arguments.value("name", "")).string();
     if (name.empty() || fs::path(name).filename().string() != name) {
         return failResult("Folder name must be a single safe path segment.");
     }
@@ -3519,7 +3521,7 @@ ActionResult EditorActionExecutor::renameResource(const Json& arguments) {
     fs::path rel;
     if (!safeRelativePath(project, arguments, "path", rel, error, true)) return failResult(error);
 
-    const std::string newName = arguments.value("new_name", "");
+    const std::string newName = FileUtils::pathFromUtf8(arguments.value("new_name", "")).string();
     if (newName.empty() || fs::path(newName).filename().string() != newName) {
         return failResult("new_name must be a single filename, not a path.");
     }
@@ -3547,7 +3549,7 @@ ActionResult EditorActionExecutor::deleteResource(const Json& arguments) {
 }
 
 ActionResult EditorActionExecutor::importResourceFile(const Json& arguments) {
-    fs::path source = arguments.value("source_path", "");
+    fs::path source = FileUtils::pathFromUtf8(arguments.value("source_path", ""));
     if (source.empty() || source.is_relative() || !fs::exists(source)) {
         return failResult("source_path must be an existing absolute path.");
     }
@@ -3681,7 +3683,7 @@ ActionResult EditorActionExecutor::setTerrainTextures(const Json& arguments) {
     // Resolves an argument to an assets-relative texture, or reports why it cannot
     auto readTexture = [&](const char* arg, Texture& out) -> bool {
         if (!arguments.contains(arg) || !arguments[arg].is_string()) return false;
-        fs::path rel = arguments[arg].get<std::string>();
+        fs::path rel = FileUtils::pathFromUtf8(arguments[arg].get<std::string>());
         if (!PathUtils::isSafeRelativePath(rel) || !fs::exists(project->getProjectPath() / rel)) {
             error = std::string(arg) + " must be an existing safe project-relative path.";
             return false;
@@ -3846,7 +3848,7 @@ ActionResult EditorActionExecutor::setTerrainFoliageLayer(const Json& arguments)
         auto readPath = [&](const char* arg, std::string& out) -> std::string {
             if (!arguments.contains(arg)) return "";
             if (!arguments[arg].is_string()) return std::string(arg) + " must be a string.";
-            fs::path rel = arguments[arg].get<std::string>();
+            fs::path rel = FileUtils::pathFromUtf8(arguments[arg].get<std::string>());
             if (rel.empty()) { out.clear(); return ""; }
             if (!PathUtils::isSafeRelativePath(rel) || !fs::exists(project->getProjectPath() / rel)) {
                 return std::string(arg) + " must be an existing safe project-relative path.";
@@ -4041,7 +4043,7 @@ ActionResult EditorActionExecutor::createScript(const Json& arguments) {
     if (entity == NULL_ENTITY) return failResult("Entity not found.");
 
     const std::string className = sanitizeIdentifier(arguments.value("class_name", "NewScript"), "NewScript");
-    fs::path targetRel = arguments.value("target_dir", std::string("scripts"));
+    fs::path targetRel = FileUtils::pathFromUtf8(arguments.value("target_dir", std::string("scripts")));
     if (!PathUtils::isSafeRelativePath(targetRel)) return failResult("target_dir must be a safe project-relative directory.");
     fs::path targetFull = project->getProjectPath() / targetRel;
     std::error_code ec;
@@ -4468,7 +4470,7 @@ ActionResult EditorActionExecutor::createSourceFile(const Json& arguments) {
     }
 
     return okResult("Created source file (see next_step).",
-                    Json{{"path", rel.generic_string()},
+                    Json{{"path", FileUtils::pathToGenericUtf8(rel)},
                          {"bytes", content.size()},
                          {"in_script_dir", inScriptDir},
                          {"next_step", nextStep}});
@@ -4496,7 +4498,7 @@ ActionResult EditorActionExecutor::setProjectScriptDirs(const Json& arguments) {
             return failResult("directories must contain only strings.");
         }
         const std::string raw = entry.get<std::string>();
-        fs::path directory = fs::path(raw).lexically_normal();
+        fs::path directory = FileUtils::pathFromUtf8(raw).lexically_normal();
         if (!PathUtils::isSafeRelativePath(directory) && !isConfigured(directory)) {
             return failResult("A new script directory must be project-relative and inside the project: " + raw +
                               ". The project root and outside directories are added by the user in Project Settings; "
@@ -4515,7 +4517,7 @@ ActionResult EditorActionExecutor::setProjectScriptDirs(const Json& arguments) {
 
     Json scriptDirs = Json::array();
     for (const fs::path& directory : directories) {
-        scriptDirs.push_back(directory.generic_string());
+        scriptDirs.push_back(FileUtils::pathToGenericUtf8(directory));
     }
 
     project->setScriptDirs(std::move(directories));
@@ -4738,13 +4740,13 @@ ActionResult EditorActionExecutor::setStandaloneBundle(const Json& arguments) {
     project->setStandaloneBundles(std::move(bundlePaths));
     project->saveProjectFile();
     return okResult(standalone ? "Added the bundle to the standalone bundles." : "Removed the bundle from the standalone bundles.",
-        Json{{"bundle_path", bundleRel.generic_string()}, {"standalone", standalone}});
+        Json{{"bundle_path", FileUtils::pathToGenericUtf8(bundleRel)}, {"standalone", standalone}});
 }
 
 ActionResult EditorActionExecutor::exportProject(const Json& arguments, const std::atomic<bool>* cancel) {
     if (cancel && cancel->load()) return failResult("Export cancelled.");
     ExportConfig config;
-    config.targetDir = arguments.value("target_dir", "");
+    config.targetDir = FileUtils::pathFromUtf8(arguments.value("target_dir", ""));
     // Stored references are relative to these roots, so they are not overridable
     config.assetsDir = project->getAssetsPath();
     config.luaDir = project->getLuaPath();
@@ -4763,7 +4765,7 @@ ActionResult EditorActionExecutor::exportProject(const Json& arguments, const st
     if (!success) {
         return failResult(progress.errorMessage.empty() ? "Export failed." : progress.errorMessage);
     }
-    return okResult("Exported project.", Json{{"target_dir", config.targetDir.generic_string()}});
+    return okResult("Exported project.", Json{{"target_dir", FileUtils::pathToGenericUtf8(config.targetDir)}});
 }
 
 ActionResult EditorActionExecutor::setExportShaders(const Json& arguments) {
@@ -4886,7 +4888,7 @@ ActionResult EditorActionExecutor::setExportShaders(const Json& arguments) {
 ActionResult EditorActionExecutor::generateShaders(const Json& arguments, const std::atomic<bool>* cancel) {
     if (cancel && cancel->load()) return failResult("Shader generation cancelled.");
     ExportConfig config;
-    config.targetDir = arguments.value("target_dir", "");
+    config.targetDir = FileUtils::pathFromUtf8(arguments.value("target_dir", ""));
     std::string error;
     config.selectedBackends = parseBackendList(arguments.value("backends", "all"), error);
     if (!error.empty()) return failResult(error);
@@ -4906,7 +4908,7 @@ ActionResult EditorActionExecutor::generateShaders(const Json& arguments, const 
     if (!success) {
         return failResult(progress.errorMessage.empty() ? "Shader generation failed." : progress.errorMessage);
     }
-    return okResult("Generated shaders.", Json{{"target_dir", config.targetDir.generic_string()}});
+    return okResult("Generated shaders.", Json{{"target_dir", FileUtils::pathToGenericUtf8(config.targetDir)}});
 }
 
 bool EditorActionExecutor::validateCustomShaderValue(const std::string& propertyName, const Json& args, std::string& error) const {
@@ -4943,8 +4945,8 @@ ActionResult EditorActionExecutor::forkShader(const Json& arguments) {
                            (arguments.contains("entity_name") && arguments["entity_name"].is_string());
     const std::string shaderTypeArg = arguments.value("shader_type", "");
     const bool forkIncludes = arguments.value("fork_includes", false);
-    const fs::path targetDirectory = fs::path(arguments.value(
-        "directory", ProjectUtils::defaultShaderForkDir().generic_string())).lexically_normal();
+    const fs::path targetDirectory = FileUtils::pathFromUtf8(arguments.value(
+        "directory", FileUtils::pathToGenericUtf8(ProjectUtils::defaultShaderForkDir()))).lexically_normal();
     if (targetDirectory != "." && !PathUtils::isSafeRelativePath(targetDirectory)) {
         return failResult("directory must be a safe project-relative path.");
     }
@@ -5352,7 +5354,7 @@ ActionResult EditorActionExecutor::writeShaderFile(const Json& arguments) {
     Out::info("AI wrote shader file: %s", rel.generic_string().c_str());
 
     return okResult("Wrote shader file.",
-                    Json{{"path", rel.generic_string()},
+                    Json{{"path", FileUtils::pathToGenericUtf8(rel)},
                          {"bytes", content.size()}});
 }
 
@@ -5451,7 +5453,7 @@ ActionResult EditorActionExecutor::importProjectModel(const Json& arguments) {
         return failResult("Model import is only supported in 3D scenes.");
     }
 
-    fs::path relPath(arguments.value("model_path", ""));
+    fs::path relPath = FileUtils::pathFromUtf8(arguments.value("model_path", ""));
     if (!PathUtils::isSafeRelativePath(relPath) || !Util::isModelFile(relPath.string())) {
         return failResult("model_path must be a safe project-relative .gltf, .glb, .obj, or .fbx file.");
     }
@@ -5731,7 +5733,7 @@ ActionResult EditorActionExecutor::readResourceFile(const Json& arguments) {
     }
 
     return okResult("Read resource file.",
-                    Json{{"path", rel.lexically_normal().generic_string()},
+                    Json{{"path", FileUtils::pathToGenericUtf8(rel.lexically_normal())},
                          {"bytes", content.size()},
                          {"content", content}});
 }
@@ -5804,7 +5806,7 @@ ActionResult EditorActionExecutor::readEngineSource(const Json& arguments) {
     if (!arguments.contains("path") || !arguments["path"].is_string()) {
         return failResult("read_engine_source requires path.");
     }
-    fs::path rel = fs::path(arguments["path"].get<std::string>()).lexically_normal();
+    fs::path rel = FileUtils::pathFromUtf8(arguments["path"].get<std::string>()).lexically_normal();
     if (!PathUtils::isSafeRelativePath(rel)) {
         return warningResult(
             "path must be a safe engine-source-relative path, "
@@ -5852,7 +5854,7 @@ ActionResult EditorActionExecutor::readEngineSource(const Json& arguments) {
     }
 
     return okResult("Read engine source file.",
-                    Json{{"path", rel.generic_string()}, {"content", content}});
+                    Json{{"path", FileUtils::pathToGenericUtf8(rel)}, {"content", content}});
 }
 
 ActionResult EditorActionExecutor::readOutputLog(const Json& arguments) {
@@ -5909,7 +5911,7 @@ ActionResult EditorActionExecutor::openScene(const Json& arguments) {
     // a focused scene window would select its own scene back
     getEditorHost().requestScenePlayFocus(project->getSelectedSceneId());
     return okResult("Requested scene open.",
-                    Json{{"scene_path", rel.lexically_normal().generic_string()},
+                    Json{{"scene_path", FileUtils::pathToGenericUtf8(rel.lexically_normal())},
                          {"selected_scene_id", project->getSelectedSceneId()}});
 }
 
@@ -5994,14 +5996,14 @@ ActionResult EditorActionExecutor::deleteScene(const Json& arguments) {
     }
     return okResult("Removed scene from project through the project command history.",
                     Json{{"removed_scene_id", sceneId}, {"removed_scene_name", sceneName},
-                         {"scene_path", scenePath.generic_string()},
+                         {"scene_path", FileUtils::pathToGenericUtf8(scenePath)},
                          {"selected_scene_id", project->getSelectedSceneId()}});
 }
 
 ActionResult EditorActionExecutor::saveProject(const Json& arguments) {
     if (arguments.contains("path") && arguments["path"].is_string()) {
         if (!project->isTempProject()) {
-            return failResult("The project already lives at " + project->getProjectPath().string() + "; save it without path.");
+            return failResult("The project already lives at " + FileUtils::pathToUtf8(project->getProjectPath()) + "; save it without path.");
         }
         if (project->isAnyScenePlaying()) {
             return failResult(busyError(project, "moving the project"));
@@ -6019,15 +6021,15 @@ ActionResult EditorActionExecutor::saveProject(const Json& arguments) {
             project->setName(name);
         }
         if (!project->saveProjectToPath(path)) {
-            return failResult("Failed to save the project to " + path.string() + ".");
+            return failResult("Failed to save the project to " + FileUtils::pathToUtf8(path) + ".");
         }
-        return okResult("Moved the project out of the temp folder.", Json{{"path", path.string()}});
+        return okResult("Moved the project out of the temp folder.", Json{{"path", FileUtils::pathToUtf8(path)}});
     }
 
     if (!project->saveProject(false)) {
         return failResult("Failed to save project.");
     }
-    return okResult("Saved project.", Json{{"path", project->getProjectPath().string()}});
+    return okResult("Saved project.", Json{{"path", FileUtils::pathToUtf8(project->getProjectPath())}});
 }
 
 ActionResult EditorActionExecutor::setProjectSettings(const Json& arguments) {
@@ -6096,7 +6098,7 @@ ActionResult EditorActionExecutor::createProject(const Json& arguments) {
     }
     std::string name = optionalString(arguments, "name");
     if (name.empty()) {
-        name = path.filename().string();
+        name = FileUtils::pathToUtf8(path.filename());
     }
 
     Project* target = project;
@@ -6111,13 +6113,13 @@ ActionResult EditorActionExecutor::createProject(const Json& arguments) {
         return failResult(kProjectChangeBusy);
     }
     return okResult("Creating the project, which opens after this call. Save its scene with save_scene and path.",
-                    Json{{"path", path.string()}, {"name", name}});
+                    Json{{"path", FileUtils::pathToUtf8(path)}, {"name", name}});
 }
 
 ActionResult EditorActionExecutor::openProject(const Json& arguments) {
     std::string error;
     if (!canSwitchProject(project, error)) return failResult(error);
-    const fs::path path = fs::path(arguments.value("path", "")).lexically_normal();
+    const fs::path path = FileUtils::pathFromUtf8(arguments.value("path", "")).lexically_normal();
     if (!path.is_absolute() || !fs::exists(path / "project.yaml")) {
         return failResult("path must be an absolute project directory holding project.yaml.");
     }
@@ -6126,7 +6128,7 @@ ActionResult EditorActionExecutor::openProject(const Json& arguments) {
     if (!getEditorHost().requestProjectChange([target, path]() { target->loadProject(path); })) {
         return failResult(kProjectChangeBusy);
     }
-    return okResult("Opening the project, which loads after this call.", Json{{"path", path.string()}});
+    return okResult("Opening the project, which loads after this call.", Json{{"path", FileUtils::pathToUtf8(path)}});
 }
 
 ActionResult EditorActionExecutor::copyResource(const Json& arguments) {
@@ -6147,8 +6149,8 @@ ActionResult EditorActionExecutor::copyResource(const Json& arguments) {
         new CopyFileCmd(project, std::vector<std::string>{sourceFull.string()}, targetFull.string(), true));
     if (resourcesWindow) resourcesWindow->refreshCurrentDirectory();
     return okResult("Copied resource through the project command history.",
-                    Json{{"source_path", sourceRel.generic_string()},
-                         {"target_dir", targetRel.generic_string()}});
+                    Json{{"source_path", FileUtils::pathToGenericUtf8(sourceRel)},
+                         {"target_dir", FileUtils::pathToGenericUtf8(targetRel)}});
 }
 
 ActionResult EditorActionExecutor::updateMaterialFile(const Json& arguments) {
@@ -6182,7 +6184,7 @@ ActionResult EditorActionExecutor::updateMaterialFile(const Json& arguments) {
 
     Out::info("AI updated material file: %s", rel.generic_string().c_str());
     return okResult("Updated material file through the project command history.",
-                    Json{{"path", rel.lexically_normal().generic_string()}, {"bytes", normalizedContent.size()}});
+                    Json{{"path", FileUtils::pathToGenericUtf8(rel.lexically_normal())}, {"bytes", normalizedContent.size()}});
 }
 
 ActionResult EditorActionExecutor::setComponentProperties(const Json& arguments) {
@@ -6263,7 +6265,7 @@ ActionResult EditorActionExecutor::inspectScene(const Json& arguments) {
         {"type", sceneTypeName(sceneProject->sceneType)},
         {"opened", sceneProject->opened},
         {"modified", sceneProject->isModified},
-        {"filepath", sceneProject->filepath.generic_string()},
+        {"filepath", FileUtils::pathToGenericUtf8(sceneProject->filepath)},
         {"main_camera", sceneProject->mainCamera},
         {"entity_count", sceneProject->entities.size()},
         {"selected_entities", project->getSelectedEntities(sceneId)},
