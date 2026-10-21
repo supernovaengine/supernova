@@ -826,8 +826,8 @@ const std::vector<ToolDefinition>& cachedTools() {
             "set_project_cxx_standard",
             "Set the project's C++ language standard (" + cxxStandardList() + "). The next play or export builds with it, and an export compiles the engine with it too. Read the current value from get_project_summary (cxx_standard). Do not edit CMAKE_CXX_STANDARD in the generated CMakeLists.txt.",
             objectSchema({
-                {"cxx_standard", {{"type", "integer"}, {"enum", cxxStandards},
-                    {"description", "C++ standard year: " + cxxStandardList()}}}
+                // Gemini rejects integer enums.
+                {"cxx_standard", integerSchema("C++ standard year: " + cxxStandardList())}
             }, {"cxx_standard"}),
             false
         },
