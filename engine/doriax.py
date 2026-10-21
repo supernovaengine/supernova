@@ -59,6 +59,17 @@ def find_ninja():
             return ninja
     return None
 
+def cached_generator(build_dir):
+    # A configured build directory can't change generator
+    try:
+        with open(os.path.join(build_dir, "CMakeCache.txt"), encoding="utf-8", errors="replace") as cache:
+            for line in cache:
+                if line.startswith("CMAKE_GENERATOR:INTERNAL="):
+                    return line.split("=", 1)[1].strip()
+    except OSError:
+        pass
+    return None
+
 def pbx_string(value):
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
@@ -167,8 +178,10 @@ def build():
     if platform in XCODE_PLATFORMS:
         generator = "Xcode"
     elif generator is None and platform == "web" and host_platform() == "windows":
-        # emcmake looks for Ninja only on PATH, where Visual Studio does not put its own
-        ninja = find_ninja()
+        # emcmake needs a generator on Windows: the build directory's, else Ninja, which
+        # emcmake looks for only on PATH, where Visual Studio does not put its own
+        generator = cached_generator(build_dir)
+        ninja = find_ninja() if generator is None else None
         if ninja:
             generator = "Ninja"
             cmake_command.append("-DCMAKE_MAKE_PROGRAM=" + ninja)
