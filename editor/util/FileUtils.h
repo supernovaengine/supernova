@@ -205,6 +205,16 @@ public:
         const auto utf8 = path.generic_u8string();
         return std::string(utf8.begin(), utf8.end());
     }
+
+    // False when string() would throw, as on Windows for names outside the ANSI code page
+    static bool isNarrowPath(const std::filesystem::path& path) {
+        try {
+            (void)path.string();
+            return true;
+        } catch (const std::exception&) {
+            return false;
+        }
+    }
 };
 
 } // namespace doriax::editor

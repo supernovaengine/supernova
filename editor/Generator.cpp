@@ -989,6 +989,9 @@ void editor::Generator::writeSourceFiles(const fs::path& projectPath, const fs::
         try {
             for (auto it = fs::recursive_directory_iterator(rootPath, fs::directory_options::skip_permission_denied);
                  it != fs::recursive_directory_iterator(); ++it) {
+                if (!FileUtils::isNarrowPath(it->path())) {
+                    continue;
+                }
                 // Hidden and build directories hold the generated sources the
                 // target already compiles through PROJECT_SOURCE and FACTORY_SOURCES.
                 const std::string name = it->path().filename().string();

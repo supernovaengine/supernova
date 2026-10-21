@@ -1950,6 +1950,9 @@ void editor::Project::importFbxModels() {
     std::error_code ec;
     for (fs::recursive_directory_iterator it(getAssetsPath(), fs::directory_options::skip_permission_denied, ec), end;
          !ec && it != end; it.increment(ec)) {
+        if (!FileUtils::isNarrowPath(it->path())) {
+            continue;
+        }
         // Hidden and build directories hold no assets
         const std::string name = it->path().filename().string();
         if (it->is_directory(ec) && (name.empty() || name[0] == '.' || name == "build")) {
@@ -2548,7 +2551,7 @@ static bool holdsOnlyAssets(const std::filesystem::path& directory){
     for (auto it = std::filesystem::recursive_directory_iterator(directory, std::filesystem::directory_options::skip_permission_denied, ec);
          it != std::filesystem::recursive_directory_iterator(); ++it){
         const auto& entry = *it;
-        if (!entry.is_regular_file()){
+        if (!entry.is_regular_file() || !editor::FileUtils::isNarrowPath(entry.path())){
             continue;
         }
 
@@ -2573,6 +2576,9 @@ bool editor::Project::visitAssetPathsInMaterialFiles(const std::function<bool(st
     for (auto it = fs::recursive_directory_iterator(projectPath, fs::directory_options::skip_permission_denied, ec);
          it != fs::recursive_directory_iterator(); ++it){
         const auto& entry = *it;
+        if (!FileUtils::isNarrowPath(entry.path())){
+            continue;
+        }
 
         const std::string name = entry.path().filename().string();
         if (entry.is_directory() && !name.empty() && (name[0] == '.' || name == "build")){
@@ -7376,6 +7382,9 @@ std::vector<std::filesystem::path> editor::Project::findProjectFiles(const std::
     for (fs::recursive_directory_iterator it(projectPath, fs::directory_options::skip_permission_denied, ec), end;
          it != end && !ec; it.increment(ec)) {
         const fs::directory_entry& entry = *it;
+        if (!FileUtils::isNarrowPath(entry.path())) {
+            continue;
+        }
 
         // '.doriax' holds the engine copy and the generated resources, 'build' the artifacts
         const std::string filename = entry.path().filename().string();

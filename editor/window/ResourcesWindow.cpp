@@ -1486,8 +1486,8 @@ const std::vector<fs::path>& editor::ResourcesWindow::treeSubdirectories(const f
         const auto entry = *it;
         it.increment(ec);
 
-        // Skip hidden directories (starting with '.')
-        if (entry.path().filename().string()[0] == '.') {
+        // Skip hidden directories (starting with '.') and names narrow paths cannot hold
+        if (!FileUtils::isNarrowPath(entry.path()) || entry.path().filename().string()[0] == '.') {
             continue;
         }
 
@@ -1630,8 +1630,8 @@ void editor::ResourcesWindow::scanDirectory(const fs::path& path) {
         const auto entry = *it;
         it.increment(ec);
 
-        // Skip hidden files and directories (starting with '.')
-        if (entry.path().filename().string()[0] == '.') {
+        // Skip hidden files and directories (starting with '.') and names narrow paths cannot hold
+        if (!FileUtils::isNarrowPath(entry.path()) || entry.path().filename().string()[0] == '.') {
             continue;
         }
 
@@ -2512,7 +2512,7 @@ void editor::ResourcesWindow::cleanupThumbnails() {
 
     // Recursively scan project directory for files that have thumbnails
     for (auto& p : fs::recursive_directory_iterator(project->getProjectPath())) {
-        if (!fs::is_regular_file(p.status()))
+        if (!fs::is_regular_file(p.status()) || !FileUtils::isNarrowPath(p.path()))
             continue;
 
         std::string ext = p.path().extension().string();

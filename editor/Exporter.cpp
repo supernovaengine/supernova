@@ -1344,7 +1344,7 @@ bool editor::Exporter::writeNativeResourcePack(const fs::path& outputPath, bool&
                 setError("Failed to read resource for pack: " + filePath.string() + ": " + ec.message());
                 return false;
             }
-            if (!regular) continue;
+            if (!regular || !FileUtils::isNarrowPath(filePath)) continue;
             // A pack left by an earlier export into the same directory is replaced, not packed
             if (filePath == outputPath || filePath == tempPath) continue;
 
@@ -1870,7 +1870,7 @@ bool editor::Exporter::copyAssets() try {
          it != fs::recursive_directory_iterator(); ++it) {
         const auto& entry = *it;
         fs::path relPath = fs::relative(entry.path(), assetsSrc);
-        if (relPath.empty()) continue;
+        if (relPath.empty() || !FileUtils::isNarrowPath(relPath)) continue;
         if (isExportDir(entry)) { it.disable_recursion_pending(); continue; }
 
         // Skip hidden directories (starting with '.') and build directories
@@ -1974,7 +1974,7 @@ bool editor::Exporter::copyLua() try {
          it != fs::recursive_directory_iterator(); ++it) {
         auto& entry = *it;
         fs::path relPath = fs::relative(entry.path(), luaSrc);
-        if (relPath.empty()) continue;
+        if (relPath.empty() || !FileUtils::isNarrowPath(relPath)) continue;
         if (isExportDir(entry)) { it.disable_recursion_pending(); continue; }
 
         // Skip hidden directories (starting with '.') and build directories
@@ -2071,7 +2071,7 @@ bool editor::Exporter::copyCppScripts() try {
              it != fs::recursive_directory_iterator(); ++it) {
             const auto& entry = *it;
             const fs::path relPath = projectRelativePath(entry.path());
-            if (relPath.empty() || isExportDir(entry)) {
+            if (relPath.empty() || isExportDir(entry) || !FileUtils::isNarrowPath(relPath)) {
                 if (entry.is_directory()) it.disable_recursion_pending();
                 continue;
             }
@@ -2111,6 +2111,7 @@ bool editor::Exporter::copyCppScripts() try {
         try {
             for (auto it = fs::recursive_directory_iterator(rootPath, fs::directory_options::skip_permission_denied);
                  it != fs::recursive_directory_iterator(); ++it) {
+                if (!FileUtils::isNarrowPath(it->path())) continue;
                 const std::string name = it->path().filename().string();
                 const fs::path relPath = projectRelativePath(it->path());
                 if ((it->is_directory() && (name.empty() || name[0] == '.' || name == "build"))

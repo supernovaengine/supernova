@@ -20,6 +20,7 @@
 #include "util/Angle.h"
 #include "util/Color.h"
 #include "util/FileDialogs.h"
+#include "util/FileUtils.h"
 #include "util/TerrainMapFileWriter.h"
 #include "util/TerrainMapUtils.h"
 #include "util/TerrainErosion.h"
@@ -481,11 +482,11 @@ static bool collectTerrainMapDiskReferences(const fs::path& projectPath, std::un
 
         if (entry.is_directory(ec)){
             // Dot-directories hold caches and VCS data (.doriax export copies, .git);
-            // nothing in them defines a live reference.
-            if (entry.path().filename().string().rfind(".", 0) == 0){
+            // nothing in them, or in a folder the editor cannot name, defines a live reference.
+            if (!FileUtils::isNarrowPath(entry.path()) || entry.path().filename().string().rfind(".", 0) == 0){
                 it.disable_recursion_pending();
             }
-        }else if (entry.is_regular_file(ec)){
+        }else if (entry.is_regular_file(ec) && FileUtils::isNarrowPath(entry.path())){
             const std::string entryPath = entry.path().string();
             if (Util::isSceneFile(entryPath) || Util::isMaterialFile(entryPath) || Util::isBundleFile(entryPath)){
                 std::ifstream file(entry.path(), std::ios::binary);
@@ -564,7 +565,7 @@ bool editor::TerrainEditWindow::cleanUnusedTerrainMaps(Project* project){
     // Candidate orphans: editable maps on disk that no loaded scene references.
     std::vector<fs::path> candidates;
     for (const auto& entry : fs::directory_iterator(absoluteBaseDir, ec)){
-        if (entry.is_regular_file(ec)){
+        if (entry.is_regular_file(ec) && FileUtils::isNarrowPath(entry.path())){
             const std::string filename = entry.path().filename().string();
             if (filename.rfind("terrain_edit_", 0) == 0 && activeFiles.find(filename) == activeFiles.end()){
                 candidates.push_back(entry.path());

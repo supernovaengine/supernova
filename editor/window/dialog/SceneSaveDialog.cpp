@@ -134,12 +134,15 @@ void SceneSaveDialog::show() {
         fs::path fullPath = m_selectedPath / FileUtils::pathFromUtf8(fileName);
         // ".." or an absolute path in the name would leave the folders listed above
         bool insideProject = Util::isInsidePath(fullPath, m_projectPath);
-        bool canSave = !fileName.empty() && insideProject;
+        bool validName = FileUtils::isNarrowPath(fullPath);
+        bool canSave = !fileName.empty() && insideProject && validName;
         std::error_code ec;
         bool fileExists = insideProject && fs::exists(fullPath, ec);
 
         if (!fileName.empty() && !insideProject) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Scene files must be inside the project folder.");
+        } else if (!validName) {
+            ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "The name has characters the editor cannot save on this system.");
         } else if (fileExists) {
             ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.0f, 1.0f), "Warning: File already exists and will be overwritten!");
         }
@@ -207,7 +210,7 @@ void SceneSaveDialog::displayDirectoryTree(const fs::path& rootPath, const fs::p
 
         // Collect directories first to sort them
         for (const auto& entry : fs::directory_iterator(currentPath)) {
-            if (entry.is_directory()) {
+            if (entry.is_directory() && FileUtils::isNarrowPath(entry.path())) {
                 subDirs.push_back(entry.path());
             }
         }

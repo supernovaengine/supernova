@@ -1792,6 +1792,9 @@ void AiChatWindow::collectMentionCandidates(std::vector<MentionItem>& out) const
              it != end && !ec; it.increment(ec)) {
             if (ec) break;
             const fs::path& path = it->path();
+            if (!FileUtils::isNarrowPath(path)) {
+                continue;
+            }
             if (path.filename().string().rfind('.', 0) == 0) {
                 if (it->is_directory(ec)) {
                     it.disable_recursion_pending();
