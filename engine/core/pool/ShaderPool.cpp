@@ -762,6 +762,10 @@ ShaderKey ShaderPool::normalizeKey(ShaderKey key) {
     ShaderType type = getShaderTypeFromKey(key);
     uint16_t customId = getCustomIdFromKey(key);
     uint32_t properties = getPropertiesFromKey(key) & getValidPropertyMask(type);
+    // Ult with L2d used to take Tan without Nmp
+    if (type == ShaderType::MESH && (properties & 1u) && (properties & (1u << 22)) && !(properties & (1u << 7))){
+        properties &= ~(1u << 8);
+    }
     return getShaderKey(type, properties, customId);
 }
 

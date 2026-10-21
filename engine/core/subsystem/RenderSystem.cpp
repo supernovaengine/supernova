@@ -3094,7 +3094,8 @@ bool RenderSystem::loadMesh(Entity entity, MeshComponent& mesh, uint16_t pipelin
         bool p_shadows2d = useLight2D && hasShadows2D && mesh.receiveShadows;
         if (useLight2D){
             p_hasNormal = mesh.submeshes[i].hasNormal;
-            if (p_hasNormal && mesh.submeshes[i].hasTangent){
+            // the 2D lighting reads tangents only for a normal map
+            if (p_hasNormal && mesh.submeshes[i].hasTangent && mesh.submeshes[i].hasNormalMap){
                 p_hasTangent = true;
             }
             if (mesh.submeshes[i].hasNormalMap){
