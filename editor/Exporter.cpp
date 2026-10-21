@@ -1002,6 +1002,7 @@ bool editor::Exporter::configureBuild() {
     const std::string platform = config.mode == ExportMode::Desktop
         ? Generator::getGeneratorPlatform(config.cmakeGenerator) : "";
     std::string emcmake;
+    std::string webNinja;
     std::string kitId;
     if (config.mode == ExportMode::Web) {
         EmsdkInfo emsdk = detectEmsdk(config.emsdkPath);
@@ -1012,6 +1013,11 @@ bool editor::Exporter::configureBuild() {
         emcmake = emsdk.emcmake;
         Out::info("Using Emscripten %s", emsdk.description.c_str());
         kitId = "web\n" + emcmake + "\n" + config.buildType + "\n" + config.graphicBackend;
+#ifdef _WIN32
+        // emcmake looks for Ninja only on PATH, where Visual Studio does not put its own
+        webNinja = CommandRunner::findNinja();
+        if (!webNinja.empty()) kitId += "\n" + webNinja;
+#endif
     } else {
         std::string effectiveGenerator = getEffectiveGenerator();
         // The Xcode generator builds a macOS .app bundle (MACOSX_BUNDLE in the
@@ -1071,6 +1077,9 @@ bool editor::Exporter::configureBuild() {
         // Calling emcmake.py with an arbitrary system python3 can break a
         // correctly configured SDK and does not fix an outdated interpreter.
         cmd = "\"" + toCMakePath(emcmake) + "\" cmake ";
+        if (!webNinja.empty()) {
+            cmd += "-G Ninja -DCMAKE_MAKE_PROGRAM=\"" + toCMakePath(webNinja) + "\" ";
+        }
     } else {
         cmd = Generator::cmakeExecutable() + " ";
         if (!config.cmakeGenerator.empty()) {
@@ -3903,25 +3912,28 @@ editor::EmsdkInfo editor::Exporter::detectEmsdk(const std::string& overridePath)
     EmsdkInfo info;
 
 #ifdef _WIN32
-    const char* emcmakeName = "emcmake.bat";
+    // emcmake.bat before Emscripten 6.0
+    const char* emcmakeNames[] = {"emcmake.exe", "emcmake.bat"};
 #else
-    const char* emcmakeName = "emcmake";
+    const char* emcmakeNames[] = {"emcmake"};
 #endif
 
     auto tryRoot = [&](const fs::path& root, const std::string& source) -> bool {
         if (root.empty()) return false;
         std::error_code ec;
-        // Accept both the emsdk root and the emscripten dir pointed at directly.
-        const fs::path candidates[] = {
-            root / "upstream" / "emscripten" / emcmakeName,
-            root / emcmakeName
-        };
-        for (const fs::path& candidate : candidates) {
-            if (fs::exists(candidate, ec)) {
-                info.found = true;
-                info.emcmake = candidate.string();
-                info.description = "from " + source;
-                return true;
+        for (const char* emcmakeName : emcmakeNames) {
+            // Accept both the emsdk root and the emscripten dir pointed at directly.
+            const fs::path candidates[] = {
+                root / "upstream" / "emscripten" / emcmakeName,
+                root / emcmakeName
+            };
+            for (const fs::path& candidate : candidates) {
+                if (fs::exists(candidate, ec)) {
+                    info.found = true;
+                    info.emcmake = candidate.string();
+                    info.description = "from " + source;
+                    return true;
+                }
             }
         }
         return false;
@@ -3939,7 +3951,7 @@ editor::EmsdkInfo editor::Exporter::detectEmsdk(const std::string& overridePath)
     }
 
 #ifdef _WIN32
-    if (!CommandRunner::runCaptureNoWindow("where emcmake.bat 2>nul").empty()) {
+    if (!CommandRunner::runCaptureNoWindow("where emcmake.exe emcmake.bat 2>nul").empty()) {
         info.found = true;
         info.emcmake = "emcmake";
         info.description = "on PATH";

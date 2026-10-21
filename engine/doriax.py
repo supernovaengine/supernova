@@ -33,15 +33,31 @@ def host_platform():
 
 def find_emcmake():
     # Mirrors Exporter::detectEmsdk, plus the older EMSCRIPTEN_ROOT and EMSCRIPTEN variables
-    name ="emcmake.bat" if os.name == "nt" else "emcmake"
+    names = ("emcmake.exe", "emcmake.bat") if os.name == "nt" else ("emcmake",)
     for var in ("EMSDK", "EMSCRIPTEN_ROOT", "EMSCRIPTEN"):
         root = os.environ.get(var)
         if not root:
             continue
-        for path in (os.path.join(root, "upstream", "emscripten", name), os.path.join(root, name)):
-            if os.path.isfile(path):
-                return path
+        for name in names:
+            for path in (os.path.join(root, "upstream", "emscripten", name), os.path.join(root, name)):
+                if os.path.isfile(path):
+                    return path
     return shutil.which("emcmake")
+
+def find_ninja():
+    # On PATH, else the one of the Visual Studio C++ CMake tools
+    ninja = shutil.which("ninja")
+    if ninja:
+        return ninja
+    vswhere = os.path.join(os.environ.get("ProgramFiles(x86)", ""), "Microsoft Visual Studio", "Installer", "vswhere.exe")
+    if not os.path.isfile(vswhere):
+        return None
+    installs = subprocess.run([vswhere, "-products", "*", "-property", "installationPath"], capture_output=True, text=True).stdout
+    for install in installs.splitlines():
+        ninja = os.path.join(install, "Common7", "IDE", "CommonExtensions", "Microsoft", "CMake", "Ninja", "ninja.exe")
+        if os.path.isfile(ninja):
+            return ninja
+    return None
 
 def pbx_string(value):
     return '"' + value.replace("\\", "\\\\").replace('"', '\\"') + '"'
@@ -150,6 +166,12 @@ def build():
     generator = args.generator
     if platform in XCODE_PLATFORMS:
         generator = "Xcode"
+    elif generator is None and platform == "web" and host_platform() == "windows":
+        # emcmake looks for Ninja only on PATH, where Visual Studio does not put its own
+        ninja = find_ninja()
+        if ninja:
+            generator = "Ninja"
+            cmake_command.append("-DCMAKE_MAKE_PROGRAM=" + ninja)
     elif generator is None and platform != "windows" and shutil.which("ninja"):
         # A configured build directory can't change generator
         if not os.path.isfile(os.path.join(build_dir, "CMakeCache.txt")):

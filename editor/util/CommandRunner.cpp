@@ -120,6 +120,20 @@ std::string editor::CommandRunner::findVcvarsall() {
     if (fs::exists(vcvars, ec)) return vcvars.string();
     return "";
 }
+
+// Path to ninja.exe on PATH, else to the one of the Visual Studio C++ CMake tools, or "".
+std::string editor::CommandRunner::findNinja() {
+    std::string onPath = runCaptureNoWindow("where ninja.exe 2>nul");
+    onPath = onPath.substr(0, onPath.find_first_of("\r\n"));
+    if (!onPath.empty()) return onPath;
+
+    std::string installPath = vsInstallationPath();
+    if (installPath.empty()) return "";
+    fs::path ninja = fs::path(installPath) / "Common7" / "IDE" / "CommonExtensions" / "Microsoft" / "CMake" / "Ninja" / "ninja.exe";
+    std::error_code ec;
+    if (fs::exists(ninja, ec)) return ninja.string();
+    return "";
+}
 #endif
 
 void editor::CommandRunner::collectBuildError(const std::string& line, std::vector<std::string>& errors) {
