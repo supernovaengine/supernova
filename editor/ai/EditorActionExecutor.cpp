@@ -1248,7 +1248,7 @@ ActionResult warningResult(const std::string& message) {
 }
 
 std::string fileTypeFromPath(const fs::path& path) {
-    const std::string value = path.string();
+    const std::string value = FileUtils::pathToUtf8(path);
     if (Util::isModelFile(value)) return "model";
     if (Util::isImageFile(value)) return "image";
     if (Util::isMaterialFile(value)) return "material";
@@ -2503,7 +2503,7 @@ ActionResult EditorActionExecutor::searchResources(const Json& arguments) {
 
         fs::path rel = fs::relative(path, projectPath, ec);
         if (ec) continue;
-        const std::string relText = rel.generic_string();
+        const std::string relText = FileUtils::pathToGenericUtf8(rel);
         if (lower(relText).find(query) == std::string::npos) continue;
         const std::string type = fileTypeFromPath(rel);
         if (wantedType != "any" && !wantedType.empty() && type != wantedType) continue;
@@ -3294,12 +3294,12 @@ ActionResult EditorActionExecutor::saveScene(const Json& arguments) {
         if (!safeRelativePath(project, arguments, "path", rel, error)) return failResult(error);
         if (rel.extension() != ".scene") return failResult("path must be a .scene file.");
         if (!sceneProject->filepath.empty() && sceneProject->filepath.lexically_normal() != rel) {
-            return failResult("The scene is already saved as " + sceneProject->filepath.generic_string() + "; save it without path.");
+            return failResult("The scene is already saved as " + FileUtils::pathToGenericUtf8(sceneProject->filepath) + "; save it without path.");
         }
         if (sceneProject->filepath.empty()) {
             const fs::path fullPath = project->getProjectPath() / rel;
             if (fs::exists(fullPath)) {
-                return failResult("A file already exists at " + rel.generic_string() + ".");
+                return failResult("A file already exists at " + FileUtils::pathToGenericUtf8(rel) + ".");
             }
             std::error_code ec;
             fs::create_directories(fullPath.parent_path(), ec);
@@ -4119,10 +4119,10 @@ ActionResult EditorActionExecutor::createScript(const Json& arguments) {
     }
 
     Json attachArgs = arguments;
-    attachArgs["path"] = fs::relative(sourceFull, project->getProjectPath(), ec).generic_string();
+    attachArgs["path"] = FileUtils::pathToGenericUtf8(fs::relative(sourceFull, project->getProjectPath(), ec));
     attachArgs["class_name"] = className;
     if (!headerFull.empty()) {
-        attachArgs["header_path"] = fs::relative(headerFull, project->getProjectPath(), ec).generic_string();
+        attachArgs["header_path"] = FileUtils::pathToGenericUtf8(fs::relative(headerFull, project->getProjectPath(), ec));
     }
     ActionResult attached = attachScript(attachArgs);
     if (!attached.success) return attached;
@@ -4507,7 +4507,7 @@ ActionResult EditorActionExecutor::setProjectScriptDirs(const Json& arguments) {
 
         std::error_code ec;
         if (!fs::is_directory(directory.is_absolute() ? directory : project->getProjectPath() / directory, ec)) {
-            return failResult("Script directory does not exist: " + directory.generic_string() +
+            return failResult("Script directory does not exist: " + FileUtils::pathToGenericUtf8(directory) +
                               ". Create it with create_folder first.");
         }
         if (std::find(directories.begin(), directories.end(), directory) == directories.end()) {
@@ -4642,7 +4642,7 @@ ActionResult EditorActionExecutor::importBundleInstance(const Json& arguments) {
 
     auto* cmd = new ImportEntityBundleCmd(project, sceneId, bundleRel, parent, true);
     if (!CommandHandle::get(sceneId)->addCommandNoMerge(cmd)) {
-        return failResult("Failed to import " + bundleRel.string() + ".");
+        return failResult("Failed to import " + FileUtils::pathToGenericUtf8(bundleRel) + ".");
     }
 
     Entity root = cmd->getRootEntity();
@@ -5673,8 +5673,8 @@ ActionResult EditorActionExecutor::downloadCuratedAsset(const Json& arguments, c
     }
 
     Json data = {
-        {"imported_path", fs::relative(importedFile, project->getProjectPath()).generic_string()},
-        {"attribution_path", fs::relative(attributionPath, project->getProjectPath()).generic_string()}
+        {"imported_path", FileUtils::pathToGenericUtf8(fs::relative(importedFile, project->getProjectPath()))},
+        {"attribution_path", FileUtils::pathToGenericUtf8(fs::relative(attributionPath, project->getProjectPath()))}
     };
 
     if (arguments.contains("scene_id") || arguments.contains("entity_name") || arguments.contains("position")) {
@@ -5717,12 +5717,12 @@ ActionResult EditorActionExecutor::readResourceFile(const Json& arguments) {
     const fs::path fullPath = projectRoot / rel;
     if (!fs::exists(fullPath)) {
         return expectedMissResult(
-            "Resource file not found: " + rel.generic_string());
+            "Resource file not found: " + FileUtils::pathToGenericUtf8(rel));
     }
     std::ifstream in(fullPath, std::ios::binary);
     if (!in) {
         return failResult(
-            "Failed to open resource file: " + rel.generic_string());
+            "Failed to open resource file: " + FileUtils::pathToGenericUtf8(rel));
     }
 
     constexpr size_t kMaxBytes = 512 * 1024;
