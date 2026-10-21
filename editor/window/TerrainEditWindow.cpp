@@ -480,15 +480,16 @@ static bool collectTerrainMapDiskReferences(const fs::path& projectPath, std::un
     while (it != endIt){
         const fs::directory_entry& entry = *it;
 
+        // Names as UTF-8, which never fails: a file left out could lose a map it uses
         if (entry.is_directory(ec)){
             // Dot-directories hold caches and VCS data (.doriax export copies, .git);
-            // nothing in them, or in a folder the editor cannot name, defines a live reference.
-            if (!FileUtils::isNarrowPath(entry.path()) || entry.path().filename().string().rfind(".", 0) == 0){
+            // nothing in them defines a live reference.
+            if (FileUtils::pathToUtf8(entry.path().filename()).rfind(".", 0) == 0){
                 it.disable_recursion_pending();
             }
-        }else if (entry.is_regular_file(ec) && FileUtils::isNarrowPath(entry.path())){
-            const std::string entryPath = entry.path().string();
-            if (Util::isSceneFile(entryPath) || Util::isMaterialFile(entryPath) || Util::isBundleFile(entryPath)){
+        }else if (entry.is_regular_file(ec)){
+            const std::string extension = FileUtils::pathToUtf8(entry.path().extension());
+            if (Util::isSceneFile(extension) || Util::isMaterialFile(extension) || Util::isBundleFile(extension)){
                 std::ifstream file(entry.path(), std::ios::binary);
                 if (!file){
                     return false;
