@@ -3216,7 +3216,7 @@ ActionResult EditorActionExecutor::addProjectScene(const Json& arguments) {
     if (!safeRelativePath(project, arguments, "scene_path", sceneRel, error, true)) return failResult(error);
     if (!Util::isSceneFile(sceneRel.string())) return failResult("scene_path must point to a .scene file.");
     if (project->isAnyScenePlaying()) {
-        return failResult("Cannot change the project scenes while play mode is active.");
+        return failResult(busyError(project, "changing the project scenes"));
     }
 
     const uint32_t existingSceneId = project->findSceneByPath(sceneRel);
@@ -5901,7 +5901,7 @@ ActionResult EditorActionExecutor::openScene(const Json& arguments) {
         return failResult("scene_path must point to a .scene file.");
     }
     if (project->isAnyScenePlaying()) {
-        return failResult("Cannot open a scene while play mode is active.");
+        return failResult(busyError(project, "opening a scene"));
     }
 
     const bool closePrevious = arguments.value("close_previous", false);
@@ -5977,7 +5977,7 @@ ActionResult EditorActionExecutor::deleteScene(const Json& arguments) {
         return failResult("Cannot delete the last scene in the project.");
     }
     if (project->isAnyScenePlaying()) {
-        return failResult("Cannot delete a scene while play mode is active.");
+        return failResult(busyError(project, "deleting a scene"));
     }
     if (sceneProject->filepath.empty()) {
         return failResult("Cannot delete an unsaved scene through AI because it cannot be restored on undo.");
