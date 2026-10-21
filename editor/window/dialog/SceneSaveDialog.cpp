@@ -5,6 +5,7 @@
 #include "SceneSaveDialog.h"
 #include "external/IconsFontAwesome6.h"
 #include "Backend.h"
+#include "util/FileUtils.h"
 #include "util/Util.h"
 #include <algorithm>
 #include <utility>
@@ -116,7 +117,7 @@ void SceneSaveDialog::show() {
         ImGui::InputText("##fileName", m_fileNameBuffer, sizeof(m_fileNameBuffer));
 
         // Show current selected directory path
-        ImGui::TextWrapped("Save to: %s", fs::relative(m_selectedPath, m_projectPath).string().c_str());
+        ImGui::TextWrapped("Save to: %s", FileUtils::pathToUtf8(fs::relative(m_selectedPath, m_projectPath)).c_str());
 
         // Get filename as string for validation and processing
         std::string fileName = m_fileNameBuffer;
@@ -130,7 +131,7 @@ void SceneSaveDialog::show() {
         }
 
         // Validation
-        fs::path fullPath = m_selectedPath / fileName;
+        fs::path fullPath = m_selectedPath / FileUtils::pathFromUtf8(fileName);
         // ".." or an absolute path in the name would leave the folders listed above
         bool insideProject = Util::isInsidePath(fullPath, m_projectPath);
         bool canSave = !fileName.empty() && insideProject;
@@ -252,7 +253,7 @@ void SceneSaveDialog::displayDirectoryTree(const fs::path& rootPath, const fs::p
             }
 
             // Get directory name relative to project path for display
-            std::string displayName = dirPath.filename().string();
+            std::string displayName = FileUtils::pathToUtf8(dirPath.filename());
 
             // Create node label with empty name - we'll draw icon and text separately
             bool nodeOpen = ImGui::TreeNodeEx("##dir", nodeFlags);
