@@ -530,6 +530,7 @@ namespace doriax::editor{
         bool saveSceneFile(SceneProject* sceneProject, const std::filesystem::path& path, bool stopTransientPreviews = true);
         bool saveSceneForPlayStartup(SceneProject* sceneProject);
         bool saveLoadedSceneOnStop(SceneProject* loadedSceneProject, SceneProject* editorScene, bool keepModified);
+        bool saveSceneShaderKeys(const SceneProject* sceneProject);
         bool writeSceneToPath(uint32_t sceneId, const std::filesystem::path& path, bool stopTransientPreviews = true);
         void writeSceneSource(const SceneProject* sceneProject);
         bool hasMissingSceneSources() const;

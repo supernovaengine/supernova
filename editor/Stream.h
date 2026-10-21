@@ -235,6 +235,7 @@ namespace doriax::editor {
         // separates a pre-split file from one that only lists the scene.
         static bool hasSceneDisplaySettings(const YAML::Node& node);
 
+        static YAML::Node encodeShaderKeys(const std::set<ShaderKey>& shaderKeys);
         static YAML::Node encodeSceneProject(const Project* project, const SceneProject* sceneProject);
         static void decodeSceneProject(SceneProject* sceneProject, const YAML::Node& node, bool loadScene);
         static void decodeSceneProjectEntities(Project* project, SceneProject* sceneProject, const YAML::Node& node);

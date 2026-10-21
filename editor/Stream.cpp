@@ -30,33 +30,33 @@
 
 using namespace doriax;
 
-namespace {
-    // The customShaderId in a key is a session-local registry index, so a fork is
-    // named by its project-relative path instead, the way scenes name theirs.
-    // Both directions normalize, keeping a since-retired property bit out of the file.
-    YAML::Node encodeShaderKeys(const std::set<ShaderKey>& shaderKeys) {
-        YAML::Node node(YAML::NodeType::Sequence);
-        for (ShaderKey rawKey : shaderKeys) {
-            const ShaderKey key = ShaderPool::normalizeKey(rawKey);
-            const uint16_t customId = ShaderPool::getCustomIdFromKey(key);
-            std::string customShader;
-            if (customId != 0) {
-                // Without a name there is nothing stable to write, and dropping only
-                // the id would turn the override into one for the built-in shader
-                customShader = ShaderPool::getCustomShaderName(customId);
-                if (customShader.empty()) continue;
-            }
-
-            const uint32_t properties = ShaderPool::getPropertiesFromKey(key);
-            YAML::Node entry(YAML::NodeType::Map);
-            entry["type"] = ShaderPool::getShaderTypeName(ShaderPool::getShaderTypeFromKey(key), true);
-            if (properties) entry["properties"] = properties;
-            if (!customShader.empty()) entry["customShader"] = customShader;
-            node.push_back(entry);
+// The customShaderId in a key is a session-local registry index, so a fork is
+// named by its project-relative path instead, the way scenes name theirs.
+// Both directions normalize, keeping a since-retired property bit out of the file.
+YAML::Node editor::Stream::encodeShaderKeys(const std::set<ShaderKey>& shaderKeys) {
+    YAML::Node node(YAML::NodeType::Sequence);
+    for (ShaderKey rawKey : shaderKeys) {
+        const ShaderKey key = ShaderPool::normalizeKey(rawKey);
+        const uint16_t customId = ShaderPool::getCustomIdFromKey(key);
+        std::string customShader;
+        if (customId != 0) {
+            // Without a name there is nothing stable to write, and dropping only
+            // the id would turn the override into one for the built-in shader
+            customShader = ShaderPool::getCustomShaderName(customId);
+            if (customShader.empty()) continue;
         }
-        return node;
-    }
 
+        const uint32_t properties = ShaderPool::getPropertiesFromKey(key);
+        YAML::Node entry(YAML::NodeType::Map);
+        entry["type"] = ShaderPool::getShaderTypeName(ShaderPool::getShaderTypeFromKey(key), true);
+        if (properties) entry["properties"] = properties;
+        if (!customShader.empty()) entry["customShader"] = customShader;
+        node.push_back(entry);
+    }
+    return node;
+}
+
+namespace {
     std::vector<ShaderKey> decodeShaderKeys(const YAML::Node& node) {
         std::vector<ShaderKey> shaderKeys;
         if (!node || !node.IsSequence()) {

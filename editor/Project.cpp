@@ -5566,24 +5566,38 @@ bool editor::Project::saveLoadedSceneOnStop(SceneProject* loadedSceneProject, Sc
     bool success = false;
     if (loadedSceneProject == editorScene) {
         success = saveSceneFile(editorScene, editorScene->filepath, false);
-        if (success) {
-            editorScene->isModified = keepModified;
-        }
     } else {
-        loadedSceneProject->shaderKeys = editorScene->shaderKeys;
-        success = saveSceneFile(loadedSceneProject, editorScene->filepath, false);
-        if (success) {
-            editorScene->filepath = loadedSceneProject->filepath;
-            editorScene->shaderKeys = loadedSceneProject->shaderKeys;
-            editorScene->isModified = keepModified;
-        }
+        // the runtime clone holds the played state, so only the shader keys are written
+        success = saveSceneShaderKeys(editorScene);
     }
 
     if (success) {
+        editorScene->isModified = keepModified;
         Out::info("Auto-saved scene '%s' on stop", editorScene->name.c_str());
     }
 
     return success;
+}
+
+bool editor::Project::saveSceneShaderKeys(const SceneProject* sceneProject) {
+    fs::path fullPath = sceneProject->filepath;
+    if (fullPath.is_relative()) {
+        fullPath = getProjectPath() / fullPath;
+    }
+
+    try {
+        YAML::Node root = YAML::LoadFile(fullPath.string());
+        root["shaderKeys"] = Stream::encodeShaderKeys(sceneProject->shaderKeys);
+        if (!FileUtils::writeFileReplacing(fullPath, YAML::Dump(root) + "\n")) {
+            Out::error("Failed to write scene file: %s", fullPath.string().c_str());
+            return false;
+        }
+    } catch (const std::exception& e) {
+        Out::error("Failed to save shader keys of scene '%s': %s", sceneProject->name.c_str(), e.what());
+        return false;
+    }
+
+    return true;
 }
 
 void editor::Project::saveScene(uint32_t sceneId, std::function<void(bool)> callback) {
