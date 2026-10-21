@@ -1659,6 +1659,11 @@ bool editor::Exporter::loadAndSaveAllScenes() {
                 }
             }
 
+            // main.cpp also lists scenes never saved, whose sources come a frame later
+            if (ok) {
+                project->updateGeneratedSources();
+            }
+
             // A disabled backend silently drops its components from the generated sources
             auto warnDroppedPhysics = [&](const char* backend, auto usesBackend) {
                 std::string names;
