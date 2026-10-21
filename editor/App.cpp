@@ -2640,6 +2640,11 @@ void editor::App::clearSceneWindowState(uint32_t sceneId) {
 }
 
 void editor::App::prepareForProjectSwitch() {
+    // Queued saves are for the old project; each cancel opens the next dialog
+    while (sceneSaveDialog.isOpen() || projectSaveDialog.isOpen()) {
+        sceneSaveDialog.close();
+        projectSaveDialog.close();
+    }
     imageViewerWindow->closeAll();
     resourcesWindow->cancelThumbnailWork();
     // Thumbnail cancellation prevents new preview loads from being queued;
