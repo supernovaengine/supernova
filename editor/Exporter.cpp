@@ -1587,11 +1587,10 @@ bool editor::Exporter::collectWebArtifacts() {
     fs::path dataSrc = buildDir / (appName + ".data");
     if (fs::exists(dataSrc, ec)) {
         fs::copy_file(dataSrc, config.destinationDir / (appName + ".data"), fs::copy_options::overwrite_existing, ec);
-        if (ec) {
-            setError("Failed to copy " + dataSrc.filename().string() + ": " + ec.message());
-            return false;
-        }
+    } else {
+        fs::remove(config.destinationDir / (appName + ".data"), ec);
     }
+    if (ec) { setError("Failed to update " + appName + ".data: " + ec.message()); return false; }
 
     return true;
 }
