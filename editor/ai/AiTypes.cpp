@@ -42,7 +42,7 @@ std::string defaultModelForProvider(ProviderId provider) {
         case ProviderId::OpenAI: return "gpt-4.1";
         case ProviderId::Anthropic: return "claude-sonnet-4-20250514";
         case ProviderId::Gemini: return "gemini-2.5-flash"; // Flash has a free tier; Pro does not
-        case ProviderId::DeepSeek: return "deepseek-chat";
+        case ProviderId::DeepSeek: return "deepseek-flash";
         case ProviderId::OpenAICompatible: return ""; // whatever the endpoint serves
     }
     return "gpt-4.1";
