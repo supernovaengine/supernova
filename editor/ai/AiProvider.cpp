@@ -6,6 +6,7 @@
 #include "HttpClient.h"
 
 #include <algorithm>
+#include <cctype>
 #include <charconv>
 #include <cstdint>
 #include <limits>
@@ -85,6 +86,15 @@ bool needsChatCompletionsToolReasoningWorkaround(const ProviderRequest& request)
     }
 
     return major > 5 || (major == 5 && minor >= 6);
+}
+
+// Also matches gateway ids such as "deepseek/deepseek-v4-pro".
+bool modelContains(const ProviderRequest& request, const char* name) {
+    std::string model = request.settings.model;
+    std::transform(model.begin(), model.end(), model.begin(), [](unsigned char c) {
+        return static_cast<char>(std::tolower(c));
+    });
+    return model.find(name) != std::string::npos;
 }
 
 std::string attachmentText(const ChatAttachment& attachment) {
@@ -416,6 +426,11 @@ Json buildChatCompletionsPayload(const ProviderRequest& request) {
         root["max_tokens"] = request.settings.maxOutputTokens;
     }
 
+    // DeepSeek rejects an assistant turn without reasoning_content once tools are
+    // sent, also when reached through OpenRouter or another compatible endpoint
+    const bool needsReasoning = request.settings.provider == ProviderId::DeepSeek ||
+                                modelContains(request, "deepseek");
+
     Json messages = Json::array();
     messages.push_back({{"role", "system"}, {"content", request.systemPrompt}});
 
@@ -431,6 +446,9 @@ Json buildChatCompletionsPayload(const ProviderRequest& request) {
                 });
                 break;
             case ChatRole::Assistant: {
+                // Reasoning only goes back to the model that wrote it; other
+                // endpoints may reject the unknown fields
+                const bool ownReasoning = message.model == request.settings.model;
                 Json item;
                 item["role"] = "assistant";
                 if (message.toolCalls.empty()) {
@@ -450,6 +468,12 @@ Json buildChatCompletionsPayload(const ProviderRequest& request) {
                         });
                     }
                     item["tool_calls"] = toolCalls;
+                }
+                if (ownReasoning) item.update(message.reasoningFields);
+                // Stands in for turns without reasoning, like editor notes
+                if (needsReasoning && !item.contains("reasoning_content") &&
+                    !item.contains("reasoning_details")) {
+                    item["reasoning_content"] = ".";
                 }
                 messages.push_back(item);
                 break;
@@ -499,6 +523,11 @@ ProviderResponse parseChatCompletionsBody(const std::string& body) {
     const Json& message = root["choices"][0].value("message", Json::object());
     if (message.contains("content") && message["content"].is_string()) {
         result.text = message["content"].get<std::string>();
+    }
+    // DeepSeek and OpenRouter reasoning models want these back on later requests
+    for (const char* key : {"reasoning_content", "reasoning_details"}) {
+        const auto it = message.find(key);
+        if (it != message.end() && !it->empty() && *it != "") result.reasoningFields[key] = *it;
     }
 
     if (message.contains("tool_calls") && message["tool_calls"].is_array()) {

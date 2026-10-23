@@ -54,6 +54,9 @@ Json messageToJson(const ChatMessage& message) {
     if (!message.anthropicContent.empty()) {
         out["anthropic_content"] = message.anthropicContent;
     }
+    if (!message.reasoningFields.empty()) {
+        out["reasoning_fields"] = message.reasoningFields;
+    }
     return out;
 }
 
@@ -106,6 +109,9 @@ ChatMessage messageFromJson(const Json& node) {
                 message.anthropicContent.push_back(block);
             }
         }
+    }
+    if (node.contains("reasoning_fields") && node["reasoning_fields"].is_object()) {
+        message.reasoningFields = node["reasoning_fields"];
     }
     return message;
 }

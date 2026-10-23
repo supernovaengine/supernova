@@ -124,8 +124,8 @@ struct ChatMessage {
     ChatRole role = ChatRole::User;
     std::string content;
 
-    // Model id active when a user message was sent; the transcript uses it to
-    // show a divider when the model changes mid-conversation.
+    // Model id active when a user message was sent, or that wrote an assistant
+    // message. The transcript shows a divider when it changes between user messages.
     std::string model;
 
     // Inline user-provided files. Kept in history so multimodal context remains
@@ -138,6 +138,10 @@ struct ChatMessage {
 
     // Anthropic content blocks as returned, sent back unchanged.
     std::vector<Json> anthropicContent;
+
+    // Chat Completions reasoning_content / reasoning_details, sent back to the
+    // model that wrote them.
+    Json reasoningFields = Json::object();
 
     // Set on tool-result messages (role == Tool).
     std::string toolCallId;
@@ -169,6 +173,8 @@ struct ProviderResponse {
     std::vector<ToolCall> toolCalls;
     // Anthropic content blocks from the model turn.
     std::vector<Json> anthropicContent;
+    // Chat Completions reasoning fields from the model turn.
+    Json reasoningFields = Json::object();
     std::string error;
     // Provider error metadata (for example OpenAI's "insufficient_quota" or
     // Gemini's numeric code plus "RESOURCE_EXHAUSTED" status). Keeping these
