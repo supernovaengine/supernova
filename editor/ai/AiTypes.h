@@ -136,10 +136,8 @@ struct ChatMessage {
     // history so follow-up requests can present a well-formed tool round-trip.
     std::vector<ToolCall> toolCalls;
 
-    // Anthropic thinking / redacted_thinking content blocks (with signature).
-    // Claude Sonnet 5+ enables adaptive thinking by default; these must be echoed
-    // verbatim ahead of tool_use when continuing a tool-use turn.
-    std::vector<Json> thinkingBlocks;
+    // Anthropic content blocks as returned, sent back unchanged.
+    std::vector<Json> anthropicContent;
 
     // Set on tool-result messages (role == Tool).
     std::string toolCallId;
@@ -169,8 +167,8 @@ struct ProviderRequest {
 struct ProviderResponse {
     std::string text;
     std::vector<ToolCall> toolCalls;
-    // Anthropic thinking / redacted_thinking blocks from the model turn.
-    std::vector<Json> thinkingBlocks;
+    // Anthropic content blocks from the model turn.
+    std::vector<Json> anthropicContent;
     std::string error;
     // Provider error metadata (for example OpenAI's "insufficient_quota" or
     // Gemini's numeric code plus "RESOURCE_EXHAUSTED" status). Keeping these

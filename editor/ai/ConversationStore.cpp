@@ -51,8 +51,8 @@ Json messageToJson(const ChatMessage& message) {
         }
         out["tool_calls"] = calls;
     }
-    if (!message.thinkingBlocks.empty()) {
-        out["thinking_blocks"] = message.thinkingBlocks;
+    if (!message.anthropicContent.empty()) {
+        out["anthropic_content"] = message.anthropicContent;
     }
     return out;
 }
@@ -100,10 +100,10 @@ ChatMessage messageFromJson(const Json& node) {
             message.toolCalls.push_back(call);
         }
     }
-    if (node.contains("thinking_blocks") && node["thinking_blocks"].is_array()) {
-        for (const Json& block : node["thinking_blocks"]) {
+    if (node.contains("anthropic_content") && node["anthropic_content"].is_array()) {
+        for (const Json& block : node["anthropic_content"]) {
             if (block.is_object()) {
-                message.thinkingBlocks.push_back(block);
+                message.anthropicContent.push_back(block);
             }
         }
     }

@@ -571,15 +571,11 @@ Json buildAnthropicPayload(const ProviderRequest& request) {
                 content.push_back({{"type", "text"}, {"text", "(empty message)"}});
             }
             messages.push_back({{"role", "user"}, {"content", content}});
+        } else if (message.role == ChatRole::Assistant && !message.anthropicContent.empty()) {
+            // Rebuilding the turn would break its thinking signatures
+            messages.push_back({{"role", "assistant"}, {"content", message.anthropicContent}});
         } else if (message.role == ChatRole::Assistant) {
             Json content = Json::array();
-            // Thinking blocks must precede text/tool_use and be echoed verbatim
-            // (including signature) when adaptive/extended thinking is active.
-            for (const auto& block : message.thinkingBlocks) {
-                if (block.is_object()) {
-                    content.push_back(block);
-                }
-            }
             if (!message.content.empty()) {
                 content.push_back({{"type", "text"}, {"text", message.content}});
             }
@@ -627,12 +623,12 @@ ProviderResponse parseAnthropicBody(const std::string& body) {
     }
     for (const auto& part : root["content"]) {
         const std::string type = part.value("type", "");
-        if (type == "thinking" || type == "redacted_thinking") {
-            // Keep the full block (signature included) for tool-use round-trips.
-            result.thinkingBlocks.push_back(part);
-        } else if (type == "text" && part.contains("text") && part["text"].is_string()) {
+        if (type == "text" && part.contains("text") && part["text"].is_string()) {
+            const std::string text = part["text"].get<std::string>();
+            // Blank text blocks are rejected when sent back
+            if (text.find_first_not_of(" \t\r\n") == std::string::npos) continue;
             if (!result.text.empty()) result.text += "\n";
-            result.text += part["text"].get<std::string>();
+            result.text += text;
         } else if (type == "tool_use") {
             ToolCall call;
             call.id = part.value("id", "");
@@ -640,6 +636,7 @@ ProviderResponse parseAnthropicBody(const std::string& body) {
             call.arguments = parseArgumentObject(part.value("input", Json::object()));
             if (!call.name.empty()) result.toolCalls.push_back(call);
         }
+        result.anthropicContent.push_back(part);
     }
     return result;
 }

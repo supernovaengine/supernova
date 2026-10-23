@@ -125,13 +125,11 @@ void compactCompletedToolHistory(std::vector<ChatMessage>& messages) {
     for (size_t roundIndex = 0; roundIndex < compactCount; ++roundIndex) {
         const ToolRoundRange& round = completedRounds[roundIndex];
         ChatMessage& assistant = messages[round.assistant];
-        const bool hasSignedReasoning =
-            !assistant.thinkingBlocks.empty() ||
-            std::any_of(
-                assistant.toolCalls.begin(), assistant.toolCalls.end(),
-                [](const ToolCall& call) {
-                    return !call.thoughtSignature.empty();
-                });
+        const bool hasSignedReasoning = std::any_of(
+            assistant.toolCalls.begin(), assistant.toolCalls.end(),
+            [](const ToolCall& call) {
+                return !call.thoughtSignature.empty();
+            });
         if (!hasSignedReasoning) {
             for (ToolCall& call : assistant.toolCalls) {
                 compactHistoricalArgument(call.arguments);
@@ -750,7 +748,10 @@ ProviderRequest AiService::buildRequestSnapshotLocked() const {
     request.settings = settings;
     request.apiKey = SecretStore::getApiKey(accountKey(settings));
     request.messages = messages;
-    compactCompletedToolHistory(request.messages);
+    // Claude rejects its thinking blocks once an earlier message changes
+    if (settings.provider != ProviderId::Anthropic) {
+        compactCompletedToolHistory(request.messages);
+    }
     for (const ToolDefinition& tool : EditorActionRegistry::tools()) {
         if (!tool.mcpOnly) request.tools.push_back(tool);
     }
@@ -925,7 +926,7 @@ void AiService::runProviderRequest(ProviderRequest request, int retryAttempt) {
             assistant.role = ChatRole::Assistant;
             assistant.content = parsed.text;
             assistant.toolCalls = parsed.toolCalls;
-            assistant.thinkingBlocks = parsed.thinkingBlocks;
+            assistant.anthropicContent = parsed.anthropicContent;
             messages.push_back(assistant);
             ++revision;
             for (const ToolCall& call : parsed.toolCalls) {
