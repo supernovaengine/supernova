@@ -430,6 +430,7 @@ Json buildChatCompletionsPayload(const ProviderRequest& request) {
     // sent, also when reached through OpenRouter or another compatible endpoint
     const bool needsReasoning = request.settings.provider == ProviderId::DeepSeek ||
                                 modelContains(request, "deepseek");
+    const bool gemini = modelContains(request, "gemini");
 
     Json messages = Json::array();
     messages.push_back({{"role", "system"}, {"content", request.systemPrompt}});
@@ -457,15 +458,29 @@ Json buildChatCompletionsPayload(const ProviderRequest& request) {
                     // content may be empty when the turn is purely tool calls.
                     item["content"] = message.content.empty() ? Json(nullptr) : Json(message.content);
                     Json toolCalls = Json::array();
+                    bool firstCall = true;
                     for (const auto& call : message.toolCalls) {
-                        toolCalls.push_back({
+                        Json toolCall = {
                             {"id", call.id},
                             {"type", "function"},
                             {"function", {
                                 {"name", call.name},
                                 {"arguments", argumentsToString(call.arguments)}
                             }}
-                        });
+                        };
+                        std::string signature = ownReasoning ? call.thoughtSignature : "";
+                        // Gemini 3 wants a signature on each step's first call; Google
+                        // documents this bypass for steps another model made
+                        if (!ownReasoning && gemini && firstCall) {
+                            signature = "skip_thought_signature_validator";
+                        }
+                        if (!signature.empty()) {
+                            toolCall["extra_content"] = {
+                                {"google", {{"thought_signature", signature}}}
+                            };
+                        }
+                        toolCalls.push_back(toolCall);
+                        firstCall = false;
                     }
                     item["tool_calls"] = toolCalls;
                 }
@@ -537,6 +552,7 @@ ProviderResponse parseChatCompletionsBody(const std::string& body) {
             call.id = item.value("id", "");
             call.name = fn.value("name", "");
             call.arguments = parseArgumentObject(fn.value("arguments", Json::object()));
+            call.thoughtSignature = item.value("/extra_content/google/thought_signature"_json_pointer, "");
             if (!call.name.empty()) result.toolCalls.push_back(call);
         }
     }

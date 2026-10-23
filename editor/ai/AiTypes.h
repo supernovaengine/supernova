@@ -88,9 +88,10 @@ struct ToolCall {
     std::string id;
     std::string name;
     Json arguments = Json::object();
-    // Opaque Gemini thought signature (REST: thoughtSignature). Required on the
-    // first functionCall part of each model step for Gemini 3 / thinking models;
-    // must be echoed verbatim on the next request.
+    // Opaque Gemini thought signature (REST: thoughtSignature, OpenAI-compatible:
+    // extra_content.google.thought_signature). Required on the first functionCall
+    // part of each model step for Gemini 3 / thinking models; must be echoed
+    // verbatim on the next request.
     std::string thoughtSignature;
 };
 
